@@ -1,4 +1,4 @@
-const script = require("../../libs/contracts/deploy/ipor_token/dai/0001_initial_deploy.js");
+const script = require("../../libs/contracts/deploy/ipor_token/0001_initial_deploy.js");
 const func = require("../../libs/json_func.js");
 const IporToken = artifacts.require("IporToken");
 
