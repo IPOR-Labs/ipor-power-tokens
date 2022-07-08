@@ -5,6 +5,7 @@ import { IpToken, IporToken } from "../../../types";
 
 import { assertError } from "../../utils/AssertUtils";
 import { prepareTestDataForMining } from "../../utils/DataUtils";
+import { N1__0_18DEC } from "../../utils/Constants";
 
 const { expect } = chai;
 
@@ -157,5 +158,41 @@ describe("IporToken", () => {
             //then
             "Transaction reverted: function selector was not recognized and there's no fallback nor receive function"
         );
+    });
+
+    it("should contain initially 1 000 000 tokens in 18 decimals", async () => {
+        //given
+        const { iporToken } = await preperateTestDataCase01();
+        const expectedTotalSupply = BigNumber.from("100000000").mul(N1__0_18DEC);
+
+        //when
+        const actualTotalSupply = await iporToken.totalSupply();
+
+        //then
+        expect(
+            expectedTotalSupply,
+            `Incorrect total supply actual: ${actualTotalSupply}, expected: ${expectedTotalSupply}`
+        ).to.be.equal(actualTotalSupply);
+    });
+
+    it("should deployer contain initially 1 000 000 tokens in 18 decimals which is equal total supply", async () => {
+        //given
+        const { iporToken } = await preperateTestDataCase01();
+        const expectedDeployerBalance = BigNumber.from("100000000").mul(N1__0_18DEC);
+
+        //when
+        const actualDeployerBalance = await iporToken.balanceOf(await admin.getAddress());
+        const actualTotalSupply = await iporToken.totalSupply();
+
+        //then
+        expect(
+            expectedDeployerBalance,
+            `Incorrect deployer balance actual: ${actualDeployerBalance}, expected: ${expectedDeployerBalance}`
+        ).to.be.equal(actualDeployerBalance);
+
+        expect(
+            expectedDeployerBalance,
+            `Deployer balance is different than total supply, but should be the same.`
+        ).to.be.equal(actualTotalSupply);
     });
 });
