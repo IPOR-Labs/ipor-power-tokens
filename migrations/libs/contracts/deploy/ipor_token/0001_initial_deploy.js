@@ -3,7 +3,6 @@ const keys = require("../../../json_keys.js");
 const func = require("../../../json_func.js");
 
 module.exports = async function (deployer, _network, addresses, IporToken) {
-	
     if (!process.env.SC_MIGRATION_INITIAL_IPOR_TOKEN_OWNER) {
         throw new Error(
             "Migration stopped! Environment parameter SC_MIGRATION_INITIAL_IPOR_TOKEN_OWNER is not set!"
