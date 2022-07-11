@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.15;
+pragma solidity 0.8.14;
 
 import "./types/IporTypes.sol";
 import "./types/AmmTypes.sol";
@@ -149,16 +149,8 @@ interface IMiltonStorage {
         returns (int256 soapReceiveFixed);
 
     /// @notice add liquidity to the Liquidity Pool. Function available only to Joseph.
-    /// @param account account address who execute request for redeem asset amount
     /// @param assetAmount amount of asset added to balance of Liquidity Pool, represented in 18 decimals
-    /// @param cfgMaxLiquidityPoolBalance max liquidity pool balance taken from Joseph configuration, represented in 18 decimals.
-    /// @param cfgMaxLpAccountContribution max liquidity pool account contribution taken from Joseph configuration, represented in 18 decimals.
-    function addLiquidity(
-        address account,
-        uint256 assetAmount,
-        uint256 cfgMaxLiquidityPoolBalance,
-        uint256 cfgMaxLpAccountContribution
-    ) external;
+    function addLiquidity(uint256 assetAmount) external;
 
     /// @notice subtract liquidity from the Liquidity Pool. Function available only to Joseph.
     /// @param assetAmount amount of asset subtracted from Liquidity Pool, represented in 18 decimals
@@ -207,8 +199,8 @@ interface IMiltonStorage {
     /// @param liquidator address of account closing the swap
     /// @param iporSwap swap structure {IporTypes.IporSwapMemory}
     /// @param payoff amount that trader has earned or lost, represented in 18 decimals, can be negative.
-    /// @param incomeFeeValue amount of fee calculated based on payoff.
     /// @param closingTimestamp moment when swap was closed
+    /// @param cfgIncomeFeeRate income fee rate used to calculate the income fee deducted from trader profit payoff, configuration param represented in 18 decimals
     /// @param cfgMinLiquidationThresholdToCloseBeforeMaturity configuration param for closing swap validation, describes minimal change in
     /// position value required to close swap before maturity. Value represented in 18 decimals.
     /// @param cfgSecondsToMaturityWhenPositionCanBeClosed configuration param for closing swap validation, describes number of seconds before swap
@@ -217,8 +209,8 @@ interface IMiltonStorage {
         address liquidator,
         IporTypes.IporSwapMemory memory iporSwap,
         int256 payoff,
-        uint256 incomeFeeValue,
         uint256 closingTimestamp,
+        uint256 cfgIncomeFeeRate,
         uint256 cfgMinLiquidationThresholdToCloseBeforeMaturity,
         uint256 cfgSecondsToMaturityWhenPositionCanBeClosed
     ) external;

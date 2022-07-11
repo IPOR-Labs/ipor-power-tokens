@@ -19,21 +19,21 @@ export default ({ drizzle, drizzleState }) => (
                 <th scope="col">
                     USDT
                     <br />
-                    {drizzle.contracts.DrizzleUsdt.address}
+                    {drizzle.contracts.MockTestnetTokenUsdt.address}
                     <br />
                     <br />
                 </th>
                 <th scope="col">
                     USDC
                     <br />
-                    {drizzle.contracts.DrizzleUsdc.address}
+                    {drizzle.contracts.MockTestnetTokenUsdc.address}
                     <br />
                     <br />
                 </th>
                 <th scope="col">
                     DAI
                     <br />
-                    {drizzle.contracts.DrizzleDai.address}
+                    {drizzle.contracts.MockTestnetTokenDai.address}
                     <br />
                     <br />
                 </th>
@@ -41,97 +41,193 @@ export default ({ drizzle, drizzleState }) => (
             <tr>
                 <td>Open Pay Fixed Swap</td>
                 <td>
-                    <ContractForm
-                        drizzle={drizzle}
-                        contract="DrizzleMiltonUsdt"
-                        method="openSwapPayFixed"
-                    />
+                    {process.env.REACT_APP_ITF_ENABLED === "true" ? (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="ItfMiltonUsdt"
+                            method="openSwapPayFixed"
+                        />
+                    ) : (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="MiltonUsdt"
+                            method="openSwapPayFixed"
+                        />
+                    )}
                 </td>
                 <td>
-                    <ContractForm
-                        drizzle={drizzle}
-                        contract="DrizzleMiltonUsdc"
-                        method="openSwapPayFixed"
-                    />
+                    {process.env.REACT_APP_ITF_ENABLED === "true" ? (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="ItfMiltonUsdc"
+                            method="openSwapPayFixed"
+                        />
+                    ) : (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="MiltonUsdc"
+                            method="openSwapPayFixed"
+                        />
+                    )}
                 </td>
                 <td>
-                    <ContractForm
-                        drizzle={drizzle}
-                        contract="DrizzleMiltonDai"
-                        method="openSwapPayFixed"
-                    />
+                    {process.env.REACT_APP_ITF_ENABLED === "true" ? (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="ItfMiltonDai"
+                            method="openSwapPayFixed"
+                        />
+                    ) : (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="MiltonDai"
+                            method="openSwapPayFixed"
+                        />
+                    )}
                 </td>
             </tr>
             <tr>
                 <td>Open Receive Fixed Swap</td>
                 <td>
-                    <ContractForm
-                        drizzle={drizzle}
-                        contract="DrizzleMiltonUsdt"
-                        method="openSwapReceiveFixed"
-                    />
+                    {process.env.REACT_APP_ITF_ENABLED === "true" ? (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="ItfMiltonUsdt"
+                            method="openSwapReceiveFixed"
+                        />
+                    ) : (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="MiltonUsdt"
+                            method="openSwapReceiveFixed"
+                        />
+                    )}
                 </td>
                 <td>
-                    <ContractForm
-                        drizzle={drizzle}
-                        contract="DrizzleMiltonUsdc"
-                        method="openSwapReceiveFixed"
-                    />
+                    {process.env.REACT_APP_ITF_ENABLED === "true" ? (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="ItfMiltonUsdc"
+                            method="openSwapReceiveFixed"
+                        />
+                    ) : (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="MiltonUsdc"
+                            method="openSwapReceiveFixed"
+                        />
+                    )}
                 </td>
                 <td>
-                    <ContractForm
-                        drizzle={drizzle}
-                        contract="DrizzleMiltonDai"
-                        method="openSwapReceiveFixed"
-                    />
+                    {process.env.REACT_APP_ITF_ENABLED === "true" ? (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="ItfMiltonDai"
+                            method="openSwapReceiveFixed"
+                        />
+                    ) : (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="MiltonDai"
+                            method="openSwapReceiveFixed"
+                        />
+                    )}
                 </td>
             </tr>
             <tr>
                 <td>Close Pay Fixed Swap</td>
                 <td>
-                    <ContractForm
-                        drizzle={drizzle}
-                        contract="DrizzleMiltonUsdt"
-                        method="closeSwapPayFixed"
-                    />
+                    {process.env.REACT_APP_ITF_ENABLED === "true" ? (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="ItfMiltonUsdt"
+                            method="closeSwapPayFixed"
+                        />
+                    ) : (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="MiltonUsdt"
+                            method="closeSwapPayFixed"
+                        />
+                    )}
                 </td>
                 <td>
-                    <ContractForm
-                        drizzle={drizzle}
-                        contract="DrizzleMiltonUsdc"
-                        method="closeSwapPayFixed"
-                    />
+                    {process.env.REACT_APP_ITF_ENABLED === "true" ? (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="ItfMiltonUsdc"
+                            method="closeSwapPayFixed"
+                        />
+                    ) : (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="MiltonUsdc"
+                            method="closeSwapPayFixed"
+                        />
+                    )}
                 </td>
                 <td>
-                    <ContractForm
-                        drizzle={drizzle}
-                        contract="DrizzleMiltonDai"
-                        method="closeSwapPayFixed"
-                    />
+                    {process.env.REACT_APP_ITF_ENABLED === "true" ? (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="ItfMiltonDai"
+                            method="closeSwapPayFixed"
+                        />
+                    ) : (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="MiltonDai"
+                            method="closeSwapPayFixed"
+                        />
+                    )}
                 </td>
             </tr>
             <tr>
                 <td>Close Receive Fixed Swap</td>
                 <td>
-                    <ContractForm
-                        drizzle={drizzle}
-                        contract="DrizzleMiltonUsdt"
-                        method="closeSwapReceiveFixed"
-                    />
+                    {process.env.REACT_APP_ITF_ENABLED === "true" ? (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="ItfMiltonUsdt"
+                            method="closeSwapReceiveFixed"
+                        />
+                    ) : (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="MiltonUsdt"
+                            method="closeSwapReceiveFixed"
+                        />
+                    )}
                 </td>
                 <td>
-                    <ContractForm
-                        drizzle={drizzle}
-                        contract="DrizzleMiltonUsdc"
-                        method="closeSwapReceiveFixed"
-                    />
+                    {process.env.REACT_APP_ITF_ENABLED === "true" ? (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="ItfMiltonUsdc"
+                            method="closeSwapReceiveFixed"
+                        />
+                    ) : (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="MiltonUsdc"
+                            method="closeSwapReceiveFixed"
+                        />
+                    )}
                 </td>
                 <td>
-                    <ContractForm
-                        drizzle={drizzle}
-                        contract="DrizzleMiltonDai"
-                        method="closeSwapReceiveFixed"
-                    />
+                    {process.env.REACT_APP_ITF_ENABLED === "true" ? (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="ItfMiltonDai"
+                            method="closeSwapReceiveFixed"
+                        />
+                    ) : (
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="MiltonDai"
+                            method="closeSwapReceiveFixed"
+                        />
+                    )}
                 </td>
             </tr>
         </table>

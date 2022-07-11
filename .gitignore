@@ -1,6 +1,6 @@
 ### Environment ###
 /.env
-/containers/cockpit/.env
+/containers/dev-tool/.env
 
 ### Java build artifacts ###
 /src/generated/
@@ -62,7 +62,3 @@ app/.env
 
 ### Utiles results ###
 iporErrorList.json
-
-### ETH dumps ###
-/containers/eth-bc/eth-bc-dump
-

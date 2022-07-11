@@ -334,8 +334,7 @@ describe("Milton Events", () => {
                 params.openTimestamp.add(PERIOD_28_DAYS_IN_SECONDS),
                 await userTwo.getAddress(),
                 BigNumber.from("18957318804358692392282"),
-                ZERO,
-                BigNumber.from("996700989703089073278")
+                ZERO
             );
     });
 
@@ -390,8 +389,7 @@ describe("Milton Events", () => {
                 params.openTimestamp.add(PERIOD_28_DAYS_IN_SECONDS),
                 await userTwo.getAddress(),
                 BigNumber.from("18957318804000000000000"),
-                ZERO,
-                BigNumber.from("996700989703089073278")
+                ZERO
             );
     });
 
@@ -446,8 +444,7 @@ describe("Milton Events", () => {
                 params.openTimestamp.add(PERIOD_28_DAYS_IN_SECONDS),
                 await userThree.getAddress(),
                 BigNumber.from("18937318804000000000000"),
-                BigNumber.from("20").mul(N1__0_18DEC),
-                BigNumber.from("996700989703089073278")
+                BigNumber.from("20").mul(N1__0_18DEC)
             );
     });
 });

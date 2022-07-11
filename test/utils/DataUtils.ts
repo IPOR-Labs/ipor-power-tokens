@@ -41,8 +41,6 @@ import {
 } from "../../types";
 
 import {
-    USD_10_000_000,
-    USD_1_000_000,
     TC_DEFAULT_EMA_18DEC,
     USD_10_000_6DEC,
     TOTAL_SUPPLY_6_DECIMALS,
@@ -220,9 +218,6 @@ export const prepareTestData = async (
             miltonStorageUsdt.address,
             stanleyUsdt.address
         );
-        await josephUsdt.setMaxLiquidityPoolBalance(USD_10_000_000);
-        await josephUsdt.setMaxLpAccountContribution(USD_1_000_000);
-
         await miltonStorageUsdt.setJoseph(josephUsdt.address);
         await miltonStorageUsdt.setMilton(miltonUsdt.address);
 
@@ -260,9 +255,6 @@ export const prepareTestData = async (
             stanleyUsdc.address
         );
 
-        await josephUsdc.setMaxLiquidityPoolBalance(USD_10_000_000);
-        await josephUsdc.setMaxLpAccountContribution(USD_1_000_000);
-
         await miltonStorageUsdc.setJoseph(josephUsdc.address);
         await miltonStorageUsdc.setMilton(miltonUsdc.address);
 
@@ -298,9 +290,6 @@ export const prepareTestData = async (
             miltonStorageDai.address,
             stanleyDai.address
         );
-
-        await josephDai.setMaxLiquidityPoolBalance(USD_10_000_000);
-        await josephDai.setMaxLpAccountContribution(USD_1_000_000);
 
         await miltonStorageDai.setJoseph(josephDai.address);
         await miltonStorageDai.setMilton(miltonDai.address);

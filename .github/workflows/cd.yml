@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - develop
 
 jobs:
 
@@ -13,11 +12,11 @@ jobs:
     secrets:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
-  build-sc:
+  build-1:
     needs: notify
     uses: ./.github/workflows/build-smart-contracts.yml
 
-  build-java:
+  build-2:
     needs: notify
     uses: ./.github/workflows/build-java.yml
     with:
@@ -27,38 +26,11 @@ jobs:
       publish-jar-enabled: false
       push-docker-enabled: false
 
-  build-geth-itf:
-    needs: notify
-    uses: ./.github/workflows/build-geth-image.yml
-    secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    with:
-      image-type: itf
-      build-enabled: true
-      push-docker-enabled: true
-      retag-docker-enabled: false
-
-  build-geth-s0-s12:
-    needs: notify
-    uses: ./.github/workflows/build-geth-image.yml
-    secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    with:
-      image-type: s0/s12
-      build-enabled: true
-      push-docker-enabled: true
-      retag-docker-enabled: false
-
-  publish-jar:
-    if: ${{ needs.notify.outputs.branch-name == 'main' }}
+  publish:
     needs:
       - notify
-      - build-sc
-      - build-java
-      - build-geth-itf
-      - build-geth-s0-s12
+      - build-1
+      - build-2
     uses: ./.github/workflows/build-java.yml
     with:
       smart-contracts-compile-enabled: true
@@ -67,36 +39,16 @@ jobs:
       publish-jar-enabled: true
       push-docker-enabled: false
 
-  publish-docker:
-    needs:
-      - notify
-      - build-sc
-      - build-java
-      - build-geth-itf
-      - build-geth-s0-s12
-    uses: ./.github/workflows/build-geth-image.yml
-    secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    with:
-      image-type: itf/s0/s12
-      build-enabled: false
-      push-docker-enabled: false
-      retag-docker-enabled: true
-
   report:
     if: ${{ always() }}
     needs:
       - notify
-      - build-sc
-      - build-java
-      - build-geth-itf
-      - build-geth-s0-s12
-      - publish-jar
-      - publish-docker
+      - build-1
+      - build-2
+      - publish
     uses: ./.github/workflows/report-slack.yml
     secrets:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
     with:
-      success: ${{ (needs.publish-jar.result == 'success' || needs.publish-jar.result == 'skipped') && needs.publish-docker.result == 'success' }}
+      success: ${{ needs.publish.result == 'success' }}
       slack-status-msg-id: ${{ needs.notify.outputs.slack-status-msg-id }}

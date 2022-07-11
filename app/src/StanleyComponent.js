@@ -30,49 +30,97 @@ export default ({ drizzle, drizzleState }) => (
                         <strong>Exchange Rate</strong>
                     </td>
                     <td>
-                        <ContractData
-                            drizzle={drizzle}
-                            drizzleState={drizzleState}
-                            contract="DrizzleStanleyUsdt"
-                            method="calculateExchangeRate"
-                            render={(value) => (
-                                <div>
-                                    {value / 1000000000000000000}
-                                    <br />
-                                    <small>{value}</small>
-                                </div>
-                            )}
-                        />
+                        {process.env.REACT_APP_ITF_ENABLED === "true" ? (
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="ItfStanleyUsdt"
+                                method="calculateExchangeRate"
+                                render={(value) => (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                )}
+                            />
+                        ) : (
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="StanleyUsdt"
+                                method="calculateExchangeRate"
+                                render={(value) => (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                )}
+                            />
+                        )}
                     </td>
                     <td>
-                        <ContractData
-                            drizzle={drizzle}
-                            drizzleState={drizzleState}
-                            contract="DrizzleStanleyUsdc"
-                            method="calculateExchangeRate"
-                            render={(value) => (
-                                <div>
-                                    {value / 1000000000000000000}
-                                    <br />
-                                    <small>{value}</small>
-                                </div>
-                            )}
-                        />
+                        {process.env.REACT_APP_ITF_ENABLED === "true" ? (
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="ItfStanleyUsdc"
+                                method="calculateExchangeRate"
+                                render={(value) => (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                )}
+                            />
+                        ) : (
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="StanleyUsdc"
+                                method="calculateExchangeRate"
+                                render={(value) => (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                )}
+                            />
+                        )}
                     </td>
                     <td>
-                        <ContractData
-                            drizzle={drizzle}
-                            drizzleState={drizzleState}
-                            contract="DrizzleStanleyDai"
-                            method="calculateExchangeRate"
-                            render={(value) => (
-                                <div>
-                                    {value / 1000000000000000000}
-                                    <br />
-                                    <small>{value}</small>
-                                </div>
-                            )}
-                        />
+                        {process.env.REACT_APP_ITF_ENABLED === "true" ? (
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="ItfStanleyDai"
+                                method="calculateExchangeRate"
+                                render={(value) => (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                )}
+                            />
+                        ) : (
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="StanleyDai"
+                                method="calculateExchangeRate"
+                                render={(value) => (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                )}
+                            />
+                        )}
                     </td>
                 </tr>
                 <tr>
@@ -85,7 +133,7 @@ export default ({ drizzle, drizzleState }) => (
                             drizzleState={drizzleState}
                             contract="CockpitDataProvider"
                             method="getMyIvTokenBalance"
-                            methodArgs={[drizzle.contracts.DrizzleUsdt.address]}
+                            methodArgs={[drizzle.contracts.MockTestnetTokenUsdt.address]}
                             render={(value) => (
                                 <div>
                                     {value / 1000000000000000000}
@@ -101,7 +149,7 @@ export default ({ drizzle, drizzleState }) => (
                             drizzleState={drizzleState}
                             contract="CockpitDataProvider"
                             method="getMyIvTokenBalance"
-                            methodArgs={[drizzle.contracts.DrizzleUsdc.address]}
+                            methodArgs={[drizzle.contracts.MockTestnetTokenUsdc.address]}
                             render={(value) => (
                                 <div>
                                     {value / 1000000000000000000}
@@ -117,7 +165,7 @@ export default ({ drizzle, drizzleState }) => (
                             drizzleState={drizzleState}
                             contract="CockpitDataProvider"
                             method="getMyIvTokenBalance"
-                            methodArgs={[drizzle.contracts.DrizzleDai.address]}
+                            methodArgs={[drizzle.contracts.MockTestnetTokenDai.address]}
                             render={(value) => (
                                 <div>
                                     {value / 1000000000000000000}
@@ -133,52 +181,103 @@ export default ({ drizzle, drizzleState }) => (
                         <strong>Milton IvToken Balance</strong>
                     </td>
                     <td>
-                        <ContractData
-                            drizzle={drizzle}
-                            drizzleState={drizzleState}
-                            contract="IvTokenUsdt"
-                            method="balanceOf"
-                            methodArgs={[drizzle.contracts.DrizzleMiltonUsdt.address]}
-                            render={(value) => (
-                                <div>
-                                    {value / 1000000000000000000}
-                                    <br />
-                                    <small>{value}</small>
-                                </div>
-                            )}
-                        />
+                        {process.env.REACT_APP_ITF_ENABLED === "true" ? (
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="IvTokenUsdt"
+                                method="balanceOf"
+                                methodArgs={[drizzle.contracts.ItfMiltonUsdt.address]}
+                                render={(value) => (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                )}
+                            />
+                        ) : (
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="IvTokenUsdt"
+                                method="balanceOf"
+                                methodArgs={[drizzle.contracts.MiltonUsdt.address]}
+                                render={(value) => (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                )}
+                            />
+                        )}
                     </td>
                     <td>
-                        <ContractData
-                            drizzle={drizzle}
-                            drizzleState={drizzleState}
-                            contract="IvTokenUsdc"
-                            method="balanceOf"
-                            methodArgs={[drizzle.contracts.DrizzleMiltonUsdc.address]}
-                            render={(value) => (
-                                <div>
-                                    {value / 1000000000000000000}
-                                    <br />
-                                    <small>{value}</small>
-                                </div>
-                            )}
-                        />
+                        {process.env.REACT_APP_ITF_ENABLED === "true" ? (
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="IvTokenUsdc"
+                                method="balanceOf"
+                                methodArgs={[drizzle.contracts.ItfMiltonUsdc.address]}
+                                render={(value) => (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                )}
+                            />
+                        ) : (
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="IvTokenUsdc"
+                                method="balanceOf"
+                                methodArgs={[drizzle.contracts.MiltonUsdc.address]}
+                                render={(value) => (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                )}
+                            />
+                        )}
                     </td>
                     <td>
-                        <ContractData
-                            drizzle={drizzle}
-                            drizzleState={drizzleState}
-                            contract="IvTokenDai"
-                            method="balanceOf"
-                            methodArgs={[drizzle.contracts.DrizzleMiltonDai.address]}
-                            render={(value) => (
-                                <div>
-                                    {value / 1000000000000000000}
-                                    <br />
-                                    <small>{value}</small>
-                                </div>
-                            )}
-                        />
+                        {process.env.REACT_APP_ITF_ENABLED === "true" ? (
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="IvTokenDai"
+                                method="balanceOf"
+                                methodArgs={[drizzle.contracts.ItfMiltonDai.address]}
+                                render={(value) => (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                )}
+                            />
+                        ) : (
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="IvTokenDai"
+                                method="balanceOf"
+                                methodArgs={[drizzle.contracts.MiltonDai.address]}
+                                render={(value) => (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                )}
+                            />
+                        )}
                     </td>
                 </tr>
             </table>
@@ -189,17 +288,17 @@ export default ({ drizzle, drizzleState }) => (
                     <th scope="col">
                         aUSDT
                         <br />
-                        {drizzle.contracts.DrizzleShareTokenAaveUsdt.address}
+                        {drizzle.contracts.MockTestnetShareTokenAaveUsdt.address}
                     </th>
                     <th scope="col">
                         aUSDC
                         <br />
-                        {drizzle.contracts.DrizzleShareTokenAaveUsdc.address}
+                        {drizzle.contracts.MockTestnetShareTokenAaveUsdc.address}
                     </th>
                     <th scope="col">
                         aDAI
                         <br />
-                        {drizzle.contracts.DrizzleShareTokenAaveDai.address}
+                        {drizzle.contracts.MockTestnetShareTokenAaveDai.address}
                     </th>
                 </tr>
                 <tr>
@@ -210,7 +309,7 @@ export default ({ drizzle, drizzleState }) => (
                         <ContractData
                             drizzle={drizzle}
                             drizzleState={drizzleState}
-                            contract="DrizzleShareTokenAaveUsdt"
+                            contract="MockTestnetShareTokenAaveUsdt"
                             method="totalSupply"
                             render={(value) => (
                                 <div>
@@ -225,7 +324,7 @@ export default ({ drizzle, drizzleState }) => (
                         <ContractData
                             drizzle={drizzle}
                             drizzleState={drizzleState}
-                            contract="DrizzleShareTokenAaveUsdc"
+                            contract="MockTestnetShareTokenAaveUsdc"
                             method="totalSupply"
                             render={(value) => (
                                 <div>
@@ -240,7 +339,7 @@ export default ({ drizzle, drizzleState }) => (
                         <ContractData
                             drizzle={drizzle}
                             drizzleState={drizzleState}
-                            contract="DrizzleShareTokenAaveDai"
+                            contract="MockTestnetShareTokenAaveDai"
                             method="totalSupply"
                             render={(value) => (
                                 <div>
@@ -260,7 +359,7 @@ export default ({ drizzle, drizzleState }) => (
                         <ContractData
                             drizzle={drizzle}
                             drizzleState={drizzleState}
-                            contract="DrizzleShareTokenAaveUsdt"
+                            contract="MockTestnetShareTokenAaveUsdt"
                             method="balanceOf"
                             methodArgs={[drizzle.contracts.DrizzleStrategyAaveUsdt.address]}
                             render={(value) => (
@@ -276,7 +375,7 @@ export default ({ drizzle, drizzleState }) => (
                         <ContractData
                             drizzle={drizzle}
                             drizzleState={drizzleState}
-                            contract="DrizzleShareTokenAaveUsdc"
+                            contract="MockTestnetShareTokenAaveUsdc"
                             method="balanceOf"
                             methodArgs={[drizzle.contracts.DrizzleStrategyAaveUsdc.address]}
                             render={(value) => (
@@ -292,7 +391,7 @@ export default ({ drizzle, drizzleState }) => (
                         <ContractData
                             drizzle={drizzle}
                             drizzleState={drizzleState}
-                            contract="DrizzleShareTokenAaveDai"
+                            contract="MockTestnetShareTokenAaveDai"
                             method="balanceOf"
                             methodArgs={[drizzle.contracts.DrizzleStrategyAaveDai.address]}
                             render={(value) => (
@@ -313,17 +412,17 @@ export default ({ drizzle, drizzleState }) => (
                     <th scope="col">
                         cUSDT
                         <br />
-                        {drizzle.contracts.DrizzleShareTokenCompoundUsdt.address}
+                        {drizzle.contracts.MockTestnetShareTokenCompoundUsdt.address}
                     </th>
                     <th scope="col">
                         cUSDC
                         <br />
-                        {drizzle.contracts.DrizzleShareTokenCompoundUsdc.address}
+                        {drizzle.contracts.MockTestnetShareTokenCompoundUsdc.address}
                     </th>
                     <th scope="col">
                         cDAI
                         <br />
-                        {drizzle.contracts.DrizzleShareTokenCompoundDai.address}
+                        {drizzle.contracts.MockTestnetShareTokenCompoundDai.address}
                     </th>
                 </tr>
                 <tr>
@@ -334,7 +433,7 @@ export default ({ drizzle, drizzleState }) => (
                         <ContractData
                             drizzle={drizzle}
                             drizzleState={drizzleState}
-                            contract="DrizzleShareTokenCompoundUsdt"
+                            contract="MockTestnetShareTokenCompoundUsdt"
                             method="totalSupply"
                             render={(value) => (
                                 <div>
@@ -349,7 +448,7 @@ export default ({ drizzle, drizzleState }) => (
                         <ContractData
                             drizzle={drizzle}
                             drizzleState={drizzleState}
-                            contract="DrizzleShareTokenCompoundUsdc"
+                            contract="MockTestnetShareTokenCompoundUsdc"
                             method="totalSupply"
                             render={(value) => (
                                 <div>
@@ -364,7 +463,7 @@ export default ({ drizzle, drizzleState }) => (
                         <ContractData
                             drizzle={drizzle}
                             drizzleState={drizzleState}
-                            contract="DrizzleShareTokenCompoundDai"
+                            contract="MockTestnetShareTokenCompoundDai"
                             method="totalSupply"
                             render={(value) => (
                                 <div>
@@ -384,7 +483,7 @@ export default ({ drizzle, drizzleState }) => (
                         <ContractData
                             drizzle={drizzle}
                             drizzleState={drizzleState}
-                            contract="DrizzleShareTokenCompoundUsdt"
+                            contract="MockTestnetShareTokenCompoundUsdt"
                             method="balanceOf"
                             methodArgs={[drizzle.contracts.DrizzleStrategyCompoundUsdt.address]}
                             render={(value) => (
@@ -400,7 +499,7 @@ export default ({ drizzle, drizzleState }) => (
                         <ContractData
                             drizzle={drizzle}
                             drizzleState={drizzleState}
-                            contract="DrizzleShareTokenCompoundUsdc"
+                            contract="MockTestnetShareTokenCompoundUsdc"
                             method="balanceOf"
                             methodArgs={[drizzle.contracts.DrizzleStrategyCompoundUsdc.address]}
                             render={(value) => (
@@ -416,7 +515,7 @@ export default ({ drizzle, drizzleState }) => (
                         <ContractData
                             drizzle={drizzle}
                             drizzleState={drizzleState}
-                            contract="DrizzleShareTokenCompoundDai"
+                            contract="MockTestnetShareTokenCompoundDai"
                             method="balanceOf"
                             methodArgs={[drizzle.contracts.DrizzleStrategyCompoundDai.address]}
                             render={(value) => (
@@ -444,52 +543,103 @@ export default ({ drizzle, drizzleState }) => (
                         <strong>Stanley Asset Balance</strong>
                     </td>
                     <td>
-                        <ContractData
-                            drizzle={drizzle}
-                            drizzleState={drizzleState}
-                            contract="DrizzleStanleyUsdt"
-                            method="totalBalance"
-                            methodArgs={[drizzle.contracts.DrizzleStanleyUsdt.address]}
-                            render={(value) => (
-                                <div>
-                                    {value / 1000000000000000000}
-                                    <br />
-                                    <small>{value}</small>
-                                </div>
-                            )}
-                        />
+                        {process.env.REACT_APP_ITF_ENABLED === "true" ? (
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="ItfStanleyUsdt"
+                                method="totalBalance"
+                                methodArgs={[drizzle.contracts.ItfStanleyUsdt.address]}
+                                render={(value) => (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                )}
+                            />
+                        ) : (
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="StanleyUsdt"
+                                method="totalBalance"
+                                methodArgs={[drizzle.contracts.StanleyUsdt.address]}
+                                render={(value) => (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                )}
+                            />
+                        )}
                     </td>
                     <td>
-                        <ContractData
-                            drizzle={drizzle}
-                            drizzleState={drizzleState}
-                            contract="DrizzleStanleyUsdc"
-                            method="totalBalance"
-                            methodArgs={[drizzle.contracts.DrizzleStanleyUsdc.address]}
-                            render={(value) => (
-                                <div>
-                                    {value / 1000000000000000000}
-                                    <br />
-                                    <small>{value}</small>
-                                </div>
-                            )}
-                        />
+                        {process.env.REACT_APP_ITF_ENABLED === "true" ? (
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="ItfStanleyUsdc"
+                                method="totalBalance"
+                                methodArgs={[drizzle.contracts.ItfStanleyUsdc.address]}
+                                render={(value) => (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                )}
+                            />
+                        ) : (
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="StanleyUsdc"
+                                method="totalBalance"
+                                methodArgs={[drizzle.contracts.StanleyUsdc.address]}
+                                render={(value) => (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                )}
+                            />
+                        )}
                     </td>
                     <td>
-                        <ContractData
-                            drizzle={drizzle}
-                            drizzleState={drizzleState}
-                            contract="DrizzleStanleyDai"
-                            method="totalBalance"
-                            methodArgs={[drizzle.contracts.DrizzleStanleyDai.address]}
-                            render={(value) => (
-                                <div>
-                                    {value / 1000000000000000000}
-                                    <br />
-                                    <small>{value}</small>
-                                </div>
-                            )}
-                        />
+                        {process.env.REACT_APP_ITF_ENABLED === "true" ? (
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="ItfStanleyDai"
+                                method="totalBalance"
+                                methodArgs={[drizzle.contracts.ItfStanleyDai.address]}
+                                render={(value) => (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                )}
+                            />
+                        ) : (
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="StanleyDai"
+                                method="totalBalance"
+                                methodArgs={[drizzle.contracts.StanleyDai.address]}
+                                render={(value) => (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                )}
+                            />
+                        )}
                     </td>
                 </tr>
 
@@ -602,7 +752,7 @@ export default ({ drizzle, drizzleState }) => (
                         <ContractData
                             drizzle={drizzle}
                             drizzleState={drizzleState}
-                            contract="DrizzleUsdt"
+                            contract="MockTestnetTokenUsdt"
                             method="balanceOf"
                             methodArgs={[drizzle.contracts.DrizzleStrategyAaveUsdt.address]}
                             render={(value) => (
@@ -618,7 +768,7 @@ export default ({ drizzle, drizzleState }) => (
                         <ContractData
                             drizzle={drizzle}
                             drizzleState={drizzleState}
-                            contract="DrizzleUsdc"
+                            contract="MockTestnetTokenUsdc"
                             method="balanceOf"
                             methodArgs={[drizzle.contracts.DrizzleStrategyAaveUsdc.address]}
                             render={(value) => (
@@ -634,7 +784,7 @@ export default ({ drizzle, drizzleState }) => (
                         <ContractData
                             drizzle={drizzle}
                             drizzleState={drizzleState}
-                            contract="DrizzleDai"
+                            contract="MockTestnetTokenDai"
                             method="balanceOf"
                             methodArgs={[drizzle.contracts.DrizzleStrategyAaveDai.address]}
                             render={(value) => (
@@ -655,7 +805,7 @@ export default ({ drizzle, drizzleState }) => (
                         <ContractData
                             drizzle={drizzle}
                             drizzleState={drizzleState}
-                            contract="DrizzleUsdt"
+                            contract="MockTestnetTokenUsdt"
                             method="balanceOf"
                             methodArgs={[drizzle.contracts.DrizzleStrategyCompoundUsdt.address]}
                             render={(value) => (
@@ -671,7 +821,7 @@ export default ({ drizzle, drizzleState }) => (
                         <ContractData
                             drizzle={drizzle}
                             drizzleState={drizzleState}
-                            contract="DrizzleUsdc"
+                            contract="MockTestnetTokenUsdc"
                             method="balanceOf"
                             methodArgs={[drizzle.contracts.DrizzleStrategyCompoundUsdc.address]}
                             render={(value) => (
@@ -687,7 +837,7 @@ export default ({ drizzle, drizzleState }) => (
                         <ContractData
                             drizzle={drizzle}
                             drizzleState={drizzleState}
-                            contract="DrizzleDai"
+                            contract="MockTestnetTokenDai"
                             method="balanceOf"
                             methodArgs={[drizzle.contracts.DrizzleStrategyCompoundDai.address]}
                             render={(value) => (
@@ -812,7 +962,7 @@ export default ({ drizzle, drizzleState }) => (
                 </tr>
             </table>
 
-            {/* <table className="table" align="center">
+            <table className="table" align="center">
                 <tr>
                     <th scope="col">Stanley Allowances</th>
                     <th scope="col">USDT</th>
@@ -826,14 +976,14 @@ export default ({ drizzle, drizzleState }) => (
                         For deposit and withdraw to Strategy
                     </td>
                     <td>
-                    
+                        {process.env.REACT_APP_ITF_ENABLED === "true" ? (
                             <ContractData
                                 drizzle={drizzle}
                                 drizzleState={drizzleState}
-                                contract="DrizzleUsdt"
+                                contract="MockTestnetTokenUsdt"
                                 method="allowance"
                                 methodArgs={[
-                                    drizzle.contracts.DrizzleStanleyUsdt.address,
+                                    drizzle.contracts.ItfStanleyUsdt.address,
                                     drizzle.contracts.DrizzleStrategyAaveUsdt.address,
                                 ]}
                                 render={(value) => (
@@ -844,17 +994,35 @@ export default ({ drizzle, drizzleState }) => (
                                     </div>
                                 )}
                             />
-                       
-                    </td>
-                    <td>
-                  
+                        ) : (
                             <ContractData
                                 drizzle={drizzle}
                                 drizzleState={drizzleState}
-                                contract="DrizzleUsdc"
+                                contract="MockTestnetTokenUsdt"
                                 method="allowance"
                                 methodArgs={[
-                                    drizzle.contracts.DrizzleStanleyUsdc.address,
+                                    drizzle.contracts.StanleyUsdt.address,
+                                    drizzle.contracts.DrizzleStrategyAaveUsdt.address,
+                                ]}
+                                render={(value) => (
+                                    <div>
+                                        {value / 1000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                )}
+                            />
+                        )}
+                    </td>
+                    <td>
+                        {process.env.REACT_APP_ITF_ENABLED === "true" ? (
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="MockTestnetTokenUsdc"
+                                method="allowance"
+                                methodArgs={[
+                                    drizzle.contracts.ItfStanleyUsdc.address,
                                     drizzle.contracts.DrizzleStrategyAaveUsdc.address,
                                 ]}
                                 render={(value) => (
@@ -865,17 +1033,35 @@ export default ({ drizzle, drizzleState }) => (
                                     </div>
                                 )}
                             />
-                       
-                    </td>
-                    <td>
-                         
+                        ) : (
                             <ContractData
                                 drizzle={drizzle}
                                 drizzleState={drizzleState}
-                                contract="DrizzleDai"
+                                contract="MockTestnetTokenUsdc"
                                 method="allowance"
                                 methodArgs={[
-                                    drizzle.contracts.DrizzleStanleyDai.address,
+                                    drizzle.contracts.StanleyUsdc.address,
+                                    drizzle.contracts.DrizzleStrategyAaveUsdc.address,
+                                ]}
+                                render={(value) => (
+                                    <div>
+                                        {value / 1000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                )}
+                            />
+                        )}
+                    </td>
+                    <td>
+                        {process.env.REACT_APP_ITF_ENABLED === "true" ? (
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="MockTestnetTokenDai"
+                                method="allowance"
+                                methodArgs={[
+                                    drizzle.contracts.ItfStanleyDai.address,
                                     drizzle.contracts.DrizzleStrategyAaveDai.address,
                                 ]}
                                 render={(value) => (
@@ -886,10 +1072,28 @@ export default ({ drizzle, drizzleState }) => (
                                     </div>
                                 )}
                             />
-                         
+                        ) : (
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="MockTestnetTokenDai"
+                                method="allowance"
+                                methodArgs={[
+                                    drizzle.contracts.StanleyDai.address,
+                                    drizzle.contracts.DrizzleStrategyAaveDai.address,
+                                ]}
+                                render={(value) => (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                )}
+                            />
+                        )}
                     </td>
                 </tr>
-            </table> */}
+            </table>
 
             <h4>Strategies claim</h4>
             <table className="table" align="center">
