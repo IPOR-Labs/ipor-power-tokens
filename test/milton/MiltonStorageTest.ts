@@ -373,9 +373,14 @@ describe("MiltonStorage", () => {
         await miltonStorageDai.setJoseph(await admin.getAddress());
         await assertError(
             //when
-            miltonStorageDai.addLiquidity(ZERO),
+            miltonStorageDai.addLiquidity(
+                await liquidityProvider.getAddress(),
+                ZERO,
+                BigNumber.from("10000000").mul(N1__0_18DEC),
+                BigNumber.from("1000000").mul(N1__0_18DEC)
+            ),
             //then
-            "IPOR_326"
+            "IPOR_328"
         );
     });
 
@@ -404,7 +409,7 @@ describe("MiltonStorage", () => {
             //when
             miltonStorageDai.updateStorageWhenTransferToTreasury(N1__0_18DEC.mul(N1__0_18DEC)),
             //then
-            "IPOR_328"
+            "IPOR_330"
         );
     });
 
@@ -433,11 +438,11 @@ describe("MiltonStorage", () => {
             //when
             miltonStorageDai.updateStorageWhenDepositToStanley(N1__0_18DEC, ZERO),
             //then
-            "IPOR_327"
+            "IPOR_329"
         );
     });
 
-    it("should NOT update Storage When transferredAmount > balanc", async () => {
+    it("should NOT update Storage When transferredAmount > balance", async () => {
         //given
         const { miltonStorageDai, miltonDai } = await prepareTestData(
             BigNumber.from(Math.floor(Date.now() / 1000)),
@@ -464,7 +469,7 @@ describe("MiltonStorage", () => {
                 N1__0_18DEC.mul(N1__0_18DEC)
             ),
             //then
-            "IPOR_324"
+            "IPOR_326"
         );
     });
 
@@ -573,8 +578,8 @@ describe("MiltonStorage", () => {
                 await userTwo.getAddress(),
                 derivativeItem,
                 BigNumber.from("10").mul(N1__0_18DEC),
+                BigNumber.from("1").mul(N1__0_18DEC),
                 closeSwapTimestamp,
-                await miltonDai.getIncomeFeeRate(),
                 PERCENTAGE_95_18DEC,
                 PERIOD_6_HOURS_IN_SECONDS
             );
@@ -659,8 +664,8 @@ describe("MiltonStorage", () => {
                 await userTwo.getAddress(),
                 derivativeItem,
                 BigNumber.from("10").mul(N1__0_6DEC),
+                BigNumber.from("1").mul(N1__0_6DEC),
                 closeSwapTimestamp,
-                await miltonUsdt.getIncomeFeeRate(),
                 PERCENTAGE_95_18DEC,
                 PERIOD_6_HOURS_IN_SECONDS
             );
@@ -739,8 +744,8 @@ describe("MiltonStorage", () => {
                     await userTwo.getAddress(),
                     derivativeItem,
                     BigNumber.from("10").mul(N1__0_18DEC),
+                    BigNumber.from("1").mul(N1__0_18DEC),
                     closeSwapTimestamp,
-                    await miltonDai.getIncomeFeeRate(),
                     PERCENTAGE_95_18DEC,
                     PERIOD_6_HOURS_IN_SECONDS
                 ),

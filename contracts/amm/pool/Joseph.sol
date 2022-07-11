@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.14;
+pragma solidity 0.8.15;
 
 import "../../libraries/errors/IporErrors.sol";
 import "../../libraries/errors/MiltonErrors.sol";
@@ -33,27 +33,27 @@ abstract contract Joseph is JosephInternal, IJoseph {
             IporErrors.WRONG_DECIMALS
         );
 
-        IIpToken iipToken = IIpToken(ipToken);
-        require(initAsset == iipToken.getAsset(), IporErrors.ADDRESSES_MISMATCH);
+        IIpToken iIpToken = IIpToken(ipToken);
+        require(initAsset == iIpToken.getAsset(), IporErrors.ADDRESSES_MISMATCH);
 
         _asset = initAsset;
-        _ipToken = iipToken;
+        _ipToken = iIpToken;
         _milton = IMiltonInternal(milton);
         _miltonStorage = IMiltonStorage(miltonStorage);
         _stanley = IStanley(stanley);
         _miltonStanleyBalanceRatio = 85e16;
+        _maxLiquidityPoolBalance = 2_000_000;
+        _maxLpAccountContribution = 50_000;
     }
 
     function calculateExchangeRate() external view override returns (uint256) {
         return _calculateExchangeRate(block.timestamp);
     }
 
-    //@param assetAmount underlying token amount represented in decimals specific for underlying asset
     function provideLiquidity(uint256 assetAmount) external override whenNotPaused {
         _provideLiquidity(assetAmount, _getDecimals(), block.timestamp);
     }
 
-    //@param ipTokenAmount IpToken amount represented in 18 decimals
     function redeem(uint256 ipTokenAmount) external override whenNotPaused {
         _redeem(ipTokenAmount, block.timestamp);
     }
@@ -86,12 +86,12 @@ abstract contract Joseph is JosephInternal, IJoseph {
         return IporMath.division(wadMiltonAssetBalance * Constants.D18, totalBalance);
     }
 
-    //@param assetAmount in decimals like asset
     function _provideLiquidity(
         uint256 assetAmount,
         uint256 assetDecimals,
         uint256 timestamp
     ) internal nonReentrant {
+        address msgSender = _msgSender();
         IMiltonInternal milton = _getMilton();
 
         uint256 exchangeRate = _calculateExchangeRate(timestamp);
@@ -100,17 +100,22 @@ abstract contract Joseph is JosephInternal, IJoseph {
 
         uint256 wadAssetAmount = IporMath.convertToWad(assetAmount, assetDecimals);
 
-        _getMiltonStorage().addLiquidity(wadAssetAmount);
+        _getMiltonStorage().addLiquidity(
+            msgSender,
+            wadAssetAmount,
+            _maxLiquidityPoolBalance * Constants.D18,
+            _maxLpAccountContribution * Constants.D18
+        );
 
-        IERC20Upgradeable(_asset).safeTransferFrom(_msgSender(), address(milton), assetAmount);
+        IERC20Upgradeable(_asset).safeTransferFrom(msgSender, address(milton), assetAmount);
 
         uint256 ipTokenAmount = IporMath.division(wadAssetAmount * Constants.D18, exchangeRate);
 
-        _getIpToken().mint(_msgSender(), ipTokenAmount);
+        _getIpToken().mint(msgSender, ipTokenAmount);
 
         emit ProvideLiquidity(
             timestamp,
-            _msgSender(),
+            msgSender,
             address(milton),
             exchangeRate,
             wadAssetAmount,
