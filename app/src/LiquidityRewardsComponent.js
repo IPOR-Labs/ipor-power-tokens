@@ -5,7 +5,7 @@ const { ContractData, ContractForm } = newContextComponents;
 
 export default ({ drizzle, drizzleState }) => (
     <div>
-        <strong>Liqudity Rewards</strong> {drizzle.contracts.LiquidityRewards.address}
+        <strong>Liquidity Rewards</strong> {drizzle.contracts.LiquidityRewards.address}
         <div className="row">
             <table className="table" align="center">
                 <tr>

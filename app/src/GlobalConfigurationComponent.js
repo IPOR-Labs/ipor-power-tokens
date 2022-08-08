@@ -1146,7 +1146,7 @@ export default ({ drizzle, drizzleState }) => (
                 </td>
             </tr>
             <tr>
-                <td>Liqudity Rewards</td>
+                <td>Liquidity Rewards</td>
                 <td>{drizzle.contracts.LiquidityRewards.address}</td>
                 <td>
                     <ContractData
@@ -1590,7 +1590,7 @@ export default ({ drizzle, drizzleState }) => (
                 </td>
             </tr>
             <tr>
-                <td>Liqudity Rewards</td>
+                <td>Liquidity Rewards</td>
                 <td>{drizzle.contracts.LiquidityRewards.address}</td>
                 <td>
                     <ContractData
