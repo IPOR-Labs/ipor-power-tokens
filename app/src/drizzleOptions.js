@@ -72,6 +72,8 @@ import MockTestnetStrategyCompoundUsdt from "./contracts/MockTestnetStrategyComp
 import MockTestnetStrategyCompoundUsdc from "./contracts/MockTestnetStrategyCompoundUsdc.json";
 import MockTestnetStrategyCompoundDai from "./contracts/MockTestnetStrategyCompoundDai.json";
 
+import LiquidityRewards from "./contracts/LiquidityRewards.json";
+
 require("dotenv").config({ path: "../../.env" });
 
 const Web3 = require("web3");
@@ -320,6 +322,8 @@ let options = {
         CockpitDataProvider,
         MiltonFacadeDataProvider,
         IporOracleFacadeDataProvider,
+
+        LiquidityRewards,
     ],
 };
 
