@@ -15,6 +15,7 @@ import GlobalConfigurationComponent from "./GlobalConfigurationComponent";
 import FaucetComponent from "./FaucetComponent";
 import FrontendComponent from "./FrontendComponent";
 import LiquidityRewardsComponent from "./LiquidityRewardsComponent";
+import PwIporTokenComponent from "./PwIporTokenComponent";
 
 require("dotenv").config({ path: "../../.env" });
 const { AccountData, ContractData, ContractForm } = newContextComponents;
@@ -114,6 +115,10 @@ export default ({ drizzle, drizzleState }) => {
 
                 <Tab eventKey="LiquidityRewards" title="Liquidity Rewards">
                     <LiquidityRewardsComponent drizzle={drizzle} drizzleState={drizzleState} />
+                </Tab>
+
+                <Tab eventKey="PwIporToken" title="PwIporToken">
+                    <PwIporTokenComponent drizzle={drizzle} drizzleState={drizzleState} />
                 </Tab>
             </Tabs>
         </div>

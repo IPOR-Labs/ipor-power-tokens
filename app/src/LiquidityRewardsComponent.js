@@ -92,7 +92,7 @@ export default ({ drizzle, drizzleState }) => (
                             methodArgs={[drizzle.contracts.IpTokenUsdt.address]}
                             render={(value) => (
                                 <div>
-                                    {value / 1000000}
+                                    {value / 1000000000000000000}
                                     <br />
                                     <small>{value}</small>
                                 </div>
@@ -108,7 +108,7 @@ export default ({ drizzle, drizzleState }) => (
                             methodArgs={[drizzle.contracts.IpTokenUsdc.address]}
                             render={(value) => (
                                 <div>
-                                    {value / 1000000}
+                                    {value / 1000000000000000000}
                                     <br />
                                     <small>{value}</small>
                                 </div>

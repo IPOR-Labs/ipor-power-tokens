@@ -73,6 +73,8 @@ import MockTestnetStrategyCompoundUsdc from "./contracts/MockTestnetStrategyComp
 import MockTestnetStrategyCompoundDai from "./contracts/MockTestnetStrategyCompoundDai.json";
 
 import LiquidityRewards from "./contracts/LiquidityRewards.json";
+import IporToken from "./contracts/IporToken.json";
+import PwIporToken from "./contracts/PwIporToken.json";
 
 require("dotenv").config({ path: "../../.env" });
 
@@ -324,6 +326,8 @@ let options = {
         IporOracleFacadeDataProvider,
 
         LiquidityRewards,
+        IporToken,
+        PwIporToken
     ],
 };
 
