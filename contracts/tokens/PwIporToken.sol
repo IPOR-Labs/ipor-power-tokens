@@ -5,12 +5,13 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "../interfaces/IPwIporToken.sol";
 import "../security/IporOwnableUpgradeable.sol";
 import "../libraries/errors/IporErrors.sol";
 import "../libraries/Constants.sol";
 import "../libraries/math/IporMath.sol";
 
-contract PwIporToken is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgradeable {
+contract PwIporToken is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgradeable, IPwIporToken {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     address private _iporToken;
@@ -22,15 +23,15 @@ contract PwIporToken is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgrade
         _iporToken = iporToken;
     }
 
-    function name() public pure returns (string memory) {
+    function name() external pure returns (string memory) {
         return "Power IPOR";
     }
 
-    function symbol() public pure returns (string memory) {
+    function symbol() external pure returns (string memory) {
         return "PwIPOR";
     }
 
-    function decimals() public pure returns (uint8) {
+    function decimals() external pure returns (uint8) {
         return uint8(18);
     }
 
