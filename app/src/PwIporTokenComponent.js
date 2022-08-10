@@ -6,13 +6,15 @@ const { ContractData, ContractForm } = newContextComponents;
 export default ({ drizzle, drizzleState }) => (
     <div>
         <br />
-        <h3>IporToken <small>{drizzle.contracts.IporToken.address}</small></h3>
+        <h3>
+            IporToken <small>{drizzle.contracts.IporToken.address}</small>
+        </h3>
         <br />
         <div className="row">
             <table className="table" align="center">
                 <tr>
                     <td>
-                        <strong>My IporToken Balance</strong>
+                        <strong>My Balance</strong>
                     </td>
                     <td>
                         <ContractData
@@ -33,10 +35,10 @@ export default ({ drizzle, drizzleState }) => (
                 </tr>
                 <tr>
                     <td>
-                        <strong>My allowances for PwIporToken</strong>
+                        <strong>My allowances</strong>
                     </td>
                     <td>
-                    <ContractData
+                        <ContractData
                             drizzle={drizzle}
                             drizzleState={drizzleState}
                             contract="IporToken"
@@ -56,7 +58,10 @@ export default ({ drizzle, drizzleState }) => (
                     </td>
                 </tr>
                 <tr>
-                <td colspan="2">
+                    <td>
+                        <strong>Set allowances</strong>
+                    </td>
+                    <td>
                         <ContractForm drizzle={drizzle} contract="IporToken" method="approve" />
                     </td>
                 </tr>
@@ -65,22 +70,44 @@ export default ({ drizzle, drizzleState }) => (
                         <strong>Transfer TOKENS to</strong>
                     </td>
                     <td>
-                    <ContractForm drizzle={drizzle} contract="IporToken" method="transfer" />
+                        <ContractForm drizzle={drizzle} contract="IporToken" method="transfer" />
                     </td>
                 </tr>
             </table>
             <br />
-            </div>
-            <br />
+        </div>
         <br />
-        <h3>PwIporToken <small>{drizzle.contracts.PwIporToken.address}</small></h3>
+        <br />
+        <h3>
+            Power Ipor <small>{drizzle.contracts.PwIporToken.address}</small>
+        </h3>
         <br />
         <br />
         <div className="row">
-        <table className="table" align="center">
+            <table className="table" align="center">
                 <tr>
                     <td>
-                        <strong>My PwIporToken Balance</strong>
+                        <strong>Total Supply(Underline Tokens)</strong>
+                    </td>
+                    <td>
+                        <ContractData
+                            drizzle={drizzle}
+                            drizzleState={drizzleState}
+                            contract="PwIporToken"
+                            method="totalSupplyUnderlineTokens"
+                            render={(value) => (
+                                <div>
+                                    {value / 1000000000000000000}
+                                    <br />
+                                    <small>{value}</small>
+                                </div>
+                            )}
+                        />
+                    </td>
+                </tr>{" "}
+                <tr>
+                    <td>
+                        <strong>My Balance</strong>
                     </td>
                     <td>
                         <ContractData
@@ -126,11 +153,7 @@ export default ({ drizzle, drizzleState }) => (
                         <small>Stake iporToken into PwIporToken contract</small>
                     </td>
                     <td>
-                        <ContractForm
-                            drizzle={drizzle}
-                            contract="PwIporToken"
-                            method="stake"
-                        />
+                        <ContractForm drizzle={drizzle} contract="PwIporToken" method="stake" />
                     </td>
                 </tr>
             </table>

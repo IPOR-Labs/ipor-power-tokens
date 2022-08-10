@@ -117,7 +117,7 @@ export default ({ drizzle, drizzleState }) => {
                     <LiquidityRewardsComponent drizzle={drizzle} drizzleState={drizzleState} />
                 </Tab>
 
-                <Tab eventKey="PwIporToken" title="PwIporToken">
+                <Tab eventKey="PwIporToken" title="Power Ipor">
                     <PwIporTokenComponent drizzle={drizzle} drizzleState={drizzleState} />
                 </Tab>
             </Tabs>
