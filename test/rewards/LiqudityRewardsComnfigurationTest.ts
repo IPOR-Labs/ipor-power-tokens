@@ -40,9 +40,9 @@ describe("LiquidityRewards comnfiguration, deploy tests", () => {
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
         ])) as LiquidityRewards;
         // then
-        const isDaiActive = await liquidityRewards.isAssetActive(tokens.ipTokenDai.address);
-        const isUsdcActive = await liquidityRewards.isAssetActive(tokens.ipTokenUsdc.address);
-        const isUsdtActive = await liquidityRewards.isAssetActive(tokens.ipTokenUsdt.address);
+        const isDaiActive = await liquidityRewards.isAssetSupported(tokens.ipTokenDai.address);
+        const isUsdcActive = await liquidityRewards.isAssetSupported(tokens.ipTokenUsdc.address);
+        const isUsdtActive = await liquidityRewards.isAssetSupported(tokens.ipTokenUsdt.address);
 
         expect(isDaiActive).to.be.true;
         expect(isUsdcActive).to.be.true;
@@ -57,9 +57,9 @@ describe("LiquidityRewards comnfiguration, deploy tests", () => {
             [tokens.ipTokenDai.address],
         ])) as LiquidityRewards;
         // then
-        const isDaiActive = await liquidityRewards.isAssetActive(tokens.ipTokenDai.address);
-        const isUsdcActive = await liquidityRewards.isAssetActive(tokens.ipTokenUsdc.address);
-        const isUsdtActive = await liquidityRewards.isAssetActive(tokens.ipTokenUsdt.address);
+        const isDaiActive = await liquidityRewards.isAssetSupported(tokens.ipTokenDai.address);
+        const isUsdcActive = await liquidityRewards.isAssetSupported(tokens.ipTokenUsdc.address);
+        const isUsdtActive = await liquidityRewards.isAssetSupported(tokens.ipTokenUsdt.address);
 
         expect(isDaiActive).to.be.true;
         expect(isUsdcActive).to.be.false;
@@ -72,16 +72,26 @@ describe("LiquidityRewards comnfiguration, deploy tests", () => {
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [],
         ])) as LiquidityRewards;
-        const isDaiActiveBefore = await liquidityRewards.isAssetActive(tokens.ipTokenDai.address);
-        const isUsdcActiveBefore = await liquidityRewards.isAssetActive(tokens.ipTokenUsdc.address);
-        const isUsdtActiveBefore = await liquidityRewards.isAssetActive(tokens.ipTokenUsdt.address);
+        const isDaiActiveBefore = await liquidityRewards.isAssetSupported(
+            tokens.ipTokenDai.address
+        );
+        const isUsdcActiveBefore = await liquidityRewards.isAssetSupported(
+            tokens.ipTokenUsdc.address
+        );
+        const isUsdtActiveBefore = await liquidityRewards.isAssetSupported(
+            tokens.ipTokenUsdt.address
+        );
         // when
         await liquidityRewards.addAsset(tokens.ipTokenUsdc.address);
         await liquidityRewards.addAsset(tokens.ipTokenUsdt.address);
         // then
-        const isDaiActiveAfter = await liquidityRewards.isAssetActive(tokens.ipTokenDai.address);
-        const isUsdcActiveAfter = await liquidityRewards.isAssetActive(tokens.ipTokenUsdc.address);
-        const isUsdtActiveAfter = await liquidityRewards.isAssetActive(tokens.ipTokenUsdt.address);
+        const isDaiActiveAfter = await liquidityRewards.isAssetSupported(tokens.ipTokenDai.address);
+        const isUsdcActiveAfter = await liquidityRewards.isAssetSupported(
+            tokens.ipTokenUsdc.address
+        );
+        const isUsdtActiveAfter = await liquidityRewards.isAssetSupported(
+            tokens.ipTokenUsdt.address
+        );
 
         expect(isDaiActiveBefore).to.be.false;
         expect(isUsdcActiveBefore).to.be.false;
@@ -98,7 +108,9 @@ describe("LiquidityRewards comnfiguration, deploy tests", () => {
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [],
         ])) as LiquidityRewards;
-        const isUsdcActiveBefore = await liquidityRewards.isAssetActive(tokens.ipTokenUsdc.address);
+        const isUsdcActiveBefore = await liquidityRewards.isAssetSupported(
+            tokens.ipTokenUsdc.address
+        );
         const [admin, userOne] = accounts;
         // when
         await expect(

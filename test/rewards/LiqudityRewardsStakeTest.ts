@@ -127,7 +127,7 @@ describe("LiquidityRewards Stake and balance", () => {
         const balanceBefore = await liquidityRewards
             .connect(userOne)
             .balanceOf(tokens.ipTokenUsdc.address);
-        await liquidityRewards.deactivateAsset(tokens.ipTokenUsdt.address);
+        await liquidityRewards.removeAsset(tokens.ipTokenUsdt.address);
         // when
         await expect(
             liquidityRewards.connect(userOne).stake(tokens.ipTokenUsdt.address, N1__0_6DEC)

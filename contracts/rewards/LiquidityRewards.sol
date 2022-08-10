@@ -40,20 +40,23 @@ contract LiquidityRewards is
         IERC20Upgradeable(asset).safeTransferFrom(_msgSender(), address(this), amount);
         uint256 newBalance = oldUserBalance + amount;
         _balances[_msgSender()][asset] = newBalance;
+        // TODO: ADD event
     }
 
-    function isAssetActive(address asset) external view returns (bool) {
+    function isAssetSupported(address asset) external view returns (bool) {
         return _assets[asset];
     }
 
     function addAsset(address asset) external onlyOwner whenNotPaused {
         require(asset != address(0), IporErrors.WRONG_ADDRESS);
         _assets[asset] = true;
+        // TODO: ADD event
     }
 
-    function deactivateAsset(address asset) external onlyOwner {
+    function removeAsset(address asset) external onlyOwner {
         require(asset != address(0), IporErrors.WRONG_ADDRESS);
         _assets[asset] = false;
+        // TODO: ADD event
     }
 
     function balanceOf(address asset) external view returns (uint256) {

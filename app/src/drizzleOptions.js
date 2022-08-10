@@ -327,7 +327,7 @@ let options = {
 
         LiquidityRewards,
         IporToken,
-        PwIporToken
+        PwIporToken,
     ],
 };
 

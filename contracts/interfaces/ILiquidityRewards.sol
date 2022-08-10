@@ -7,11 +7,11 @@ interface ILiquidityRewards {
 
     function stake(address asset, uint256 amount) external;
 
-    function isAssetActive(address asset) external view returns (bool);
+    function isAssetSupported(address asset) external view returns (bool);
 
     function addAsset(address asset) external;
 
-    function deactivateAsset(address asset) external;
+    function removeAsset(address asset) external;
 
     function balanceOf(address asset) external view returns (uint256);
 
