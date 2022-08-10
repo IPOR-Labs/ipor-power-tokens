@@ -97,4 +97,6 @@ module.exports = {
     ItfCockpitDataProviderImpl: "ItfCockpitDataProviderImpl",
     ItfDataProviderProxy: "ItfDataProviderProxy",
     ItfDataProviderImpl: "ItfDataProviderImpl",
+    LiquidityRewardsProxy: "LiquidityRewardsProxy",
+    LiquidityRewardsImpl: "LiquidityRewardsImpl",
 };

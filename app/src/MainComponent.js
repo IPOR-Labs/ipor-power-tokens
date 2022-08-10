@@ -14,10 +14,10 @@ import MiltonSpreadConfigurationComponent from "./MiltonSpreadConfigurationCompo
 import GlobalConfigurationComponent from "./GlobalConfigurationComponent";
 import FaucetComponent from "./FaucetComponent";
 import FrontendComponent from "./FrontendComponent";
+import LiquidityRewardsComponent from "./LiquidityRewardsComponent";
 
 require("dotenv").config({ path: "../../.env" });
 const { AccountData, ContractData, ContractForm } = newContextComponents;
-
 
 export default ({ drizzle, drizzleState }) => {
     return (
@@ -110,6 +110,10 @@ export default ({ drizzle, drizzleState }) => {
 
                 <Tab eventKey="frontend" title="Frontend Data Provider">
                     <FrontendComponent drizzle={drizzle} drizzleState={drizzleState} />
+                </Tab>
+
+                <Tab eventKey="LiquidityRewards" title="Liquidity Rewards">
+                    <LiquidityRewardsComponent drizzle={drizzle} drizzleState={drizzleState} />
                 </Tab>
             </Tabs>
         </div>
