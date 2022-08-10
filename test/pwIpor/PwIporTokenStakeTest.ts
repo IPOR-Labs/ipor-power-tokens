@@ -165,5 +165,4 @@ describe("PwIporToken configuration, deploy tests", () => {
         expect(userTwoBalanceAfter).to.be.equal(N1__0_18DEC);
         expect(exchangeRateAfter).to.be.equal(N2__0_18DEC);
     });
-    // TODO: more tests will be implement in IL-1064
 });
