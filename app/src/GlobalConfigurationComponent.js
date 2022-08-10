@@ -319,6 +319,18 @@ export default ({ drizzle, drizzleState }) => (
                     />
                 </td>
             </tr>
+            <tr>
+                <td>PwIporToken</td>
+                <td>{drizzle.contracts.PwIporToken.address}</td>
+                <td>
+                    <ContractData
+                        drizzle={drizzle}
+                        drizzleState={drizzleState}
+                        contract="PwIporToken"
+                        method="getVersion"
+                    />
+                </td>
+            </tr>
         </table>
 
         <hr />
@@ -504,6 +516,32 @@ export default ({ drizzle, drizzleState }) => (
                     <ContractForm
                         drizzle={drizzle}
                         contract="IvTokenDai"
+                        method="confirmTransferOwnership"
+                    />
+                </td>
+            </tr>
+            <tr>
+                <td>IporToken</td>
+                <td>{drizzle.contracts.IporToken.address}</td>
+                <td>
+                    <ContractData
+                        drizzle={drizzle}
+                        drizzleState={drizzleState}
+                        contract="IporToken"
+                        method="owner"
+                    />
+                </td>
+                <td>
+                    <ContractForm
+                        drizzle={drizzle}
+                        contract="IporToken"
+                        method="transferOwnership"
+                    />
+                </td>
+                <td>
+                    <ContractForm
+                        drizzle={drizzle}
+                        contract="IporToken"
                         method="confirmTransferOwnership"
                     />
                 </td>
@@ -1171,6 +1209,32 @@ export default ({ drizzle, drizzleState }) => (
                     />
                 </td>
             </tr>
+            <tr>
+                <td>PwIporToken</td>
+                <td>{drizzle.contracts.PwIporToken.address}</td>
+                <td>
+                    <ContractData
+                        drizzle={drizzle}
+                        drizzleState={drizzleState}
+                        contract="PwIporToken"
+                        method="owner"
+                    />
+                </td>
+                <td>
+                    <ContractForm
+                        drizzle={drizzle}
+                        contract="PwIporToken"
+                        method="transferOwnership"
+                    />
+                </td>
+                <td>
+                    <ContractForm
+                        drizzle={drizzle}
+                        contract="PwIporToken"
+                        method="confirmTransferOwnership"
+                    />
+                </td>
+            </tr>
         </table>
 
         <hr />
@@ -1605,6 +1669,24 @@ export default ({ drizzle, drizzleState }) => (
                 </td>
                 <td>
                     <ContractForm drizzle={drizzle} contract="LiquidityRewards" method="unpause" />
+                </td>
+            </tr>
+            <tr>
+                <td>PwIporToken</td>
+                <td>{drizzle.contracts.PwIporToken.address}</td>
+                <td>
+                    <ContractData
+                        drizzle={drizzle}
+                        drizzleState={drizzleState}
+                        contract="PwIporToken"
+                        method="paused"
+                    />
+                </td>
+                <td>
+                    <ContractForm drizzle={drizzle} contract="PwIporToken" method="pause" />
+                </td>
+                <td>
+                    <ContractForm drizzle={drizzle} contract="PwIporToken" method="unpause" />
                 </td>
             </tr>
         </table>

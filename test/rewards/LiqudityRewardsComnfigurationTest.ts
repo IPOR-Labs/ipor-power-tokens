@@ -72,16 +72,26 @@ describe("LiquidityRewards comnfiguration, deploy tests", () => {
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [],
         ])) as LiquidityRewards;
-        const isDaiActiveBefore = await liquidityRewards.isAssetSupported(tokens.ipTokenDai.address);
-        const isUsdcActiveBefore = await liquidityRewards.isAssetSupported(tokens.ipTokenUsdc.address);
-        const isUsdtActiveBefore = await liquidityRewards.isAssetSupported(tokens.ipTokenUsdt.address);
+        const isDaiActiveBefore = await liquidityRewards.isAssetSupported(
+            tokens.ipTokenDai.address
+        );
+        const isUsdcActiveBefore = await liquidityRewards.isAssetSupported(
+            tokens.ipTokenUsdc.address
+        );
+        const isUsdtActiveBefore = await liquidityRewards.isAssetSupported(
+            tokens.ipTokenUsdt.address
+        );
         // when
         await liquidityRewards.addAsset(tokens.ipTokenUsdc.address);
         await liquidityRewards.addAsset(tokens.ipTokenUsdt.address);
         // then
         const isDaiActiveAfter = await liquidityRewards.isAssetSupported(tokens.ipTokenDai.address);
-        const isUsdcActiveAfter = await liquidityRewards.isAssetSupported(tokens.ipTokenUsdc.address);
-        const isUsdtActiveAfter = await liquidityRewards.isAssetSupported(tokens.ipTokenUsdt.address);
+        const isUsdcActiveAfter = await liquidityRewards.isAssetSupported(
+            tokens.ipTokenUsdc.address
+        );
+        const isUsdtActiveAfter = await liquidityRewards.isAssetSupported(
+            tokens.ipTokenUsdt.address
+        );
 
         expect(isDaiActiveBefore).to.be.false;
         expect(isUsdcActiveBefore).to.be.false;
@@ -98,7 +108,9 @@ describe("LiquidityRewards comnfiguration, deploy tests", () => {
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [],
         ])) as LiquidityRewards;
-        const isUsdcActiveBefore = await liquidityRewards.isAssetSupported(tokens.ipTokenUsdc.address);
+        const isUsdcActiveBefore = await liquidityRewards.isAssetSupported(
+            tokens.ipTokenUsdc.address
+        );
         const [admin, userOne] = accounts;
         // when
         await expect(

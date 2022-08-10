@@ -5,7 +5,9 @@ const { ContractData, ContractForm } = newContextComponents;
 
 export default ({ drizzle, drizzleState }) => (
     <div>
-        <strong>Liquidity Rewards</strong> {drizzle.contracts.LiquidityRewards.address}
+        <br />
+        <h3>Liquidity Rewards {drizzle.contracts.LiquidityRewards.address} </h3>
+        <br />
         <div className="row">
             <table className="table" align="center">
                 <tr>
@@ -92,7 +94,7 @@ export default ({ drizzle, drizzleState }) => (
                             methodArgs={[drizzle.contracts.IpTokenUsdt.address]}
                             render={(value) => (
                                 <div>
-                                    {value / 1000000}
+                                    {value / 1000000000000000000}
                                     <br />
                                     <small>{value}</small>
                                 </div>
@@ -108,7 +110,7 @@ export default ({ drizzle, drizzleState }) => (
                             methodArgs={[drizzle.contracts.IpTokenUsdc.address]}
                             render={(value) => (
                                 <div>
-                                    {value / 1000000}
+                                    {value / 1000000000000000000}
                                     <br />
                                     <small>{value}</small>
                                 </div>

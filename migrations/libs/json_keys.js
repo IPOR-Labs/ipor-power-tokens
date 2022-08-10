@@ -99,4 +99,7 @@ module.exports = {
     ItfDataProviderImpl: "ItfDataProviderImpl",
     LiquidityRewardsProxy: "LiquidityRewardsProxy",
     LiquidityRewardsImpl: "LiquidityRewardsImpl",
+    IPOR: "IPOR",
+    PwIporTokenProxy: "PwIporTokenProxy",
+    PwIporTokenImpl: "PwIporTokenImpl",
 };
