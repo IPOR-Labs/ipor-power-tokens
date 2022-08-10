@@ -7,7 +7,7 @@ export default ({ drizzle, drizzleState }) => (
     <div>
         <br />
         <h3>
-            IporToken <small>{drizzle.contracts.IporToken.address}</small>
+            Ipor Token <small>{drizzle.contracts.IporToken.address}</small>
         </h3>
         <br />
         <div className="row">
