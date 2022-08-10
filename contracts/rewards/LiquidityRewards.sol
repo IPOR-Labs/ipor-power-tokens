@@ -43,7 +43,7 @@ contract LiquidityRewards is
         // TODO: ADD event
     }
 
-    function isAssetActive(address asset) external view returns (bool) {
+    function isAssetSupported(address asset) external view returns (bool) {
         return _assets[asset];
     }
 
@@ -53,7 +53,7 @@ contract LiquidityRewards is
         // TODO: ADD event
     }
 
-    function deactivateAsset(address asset) external onlyOwner {
+    function removeAsset(address asset) external onlyOwner {
         require(asset != address(0), IporErrors.WRONG_ADDRESS);
         _assets[asset] = false;
         // TODO: ADD event
