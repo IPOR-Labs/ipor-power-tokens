@@ -4,7 +4,7 @@ const func = require("../../libs/json_func.js");
 const script = require("../../libs/contracts/deploy/pw_ipor_token/0001_initial_deploy.js");
 
 module.exports = async function (deployer, _network, addresses) {
-    const iporToken = await func.getValue(keys.IporToken);
+    const iporToken = await func.getValue(keys.IPOR);
 
     const initialParams = {
         iporToken,

@@ -32,7 +32,7 @@ contract PwIporToken is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgrade
     }
 
     function decimals() external pure returns (uint8) {
-        return uint8(18);
+        return 18;
     }
 
     function getVersion() external pure returns (uint256) {

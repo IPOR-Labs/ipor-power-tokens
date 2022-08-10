@@ -17,5 +17,5 @@ module.exports = async function (deployer, _network, addresses, IporToken) {
 
     const iporToken = await IporToken.deployed();
 
-    await func.update(keys.IporToken, iporToken.address);
+    await func.update(keys.IPOR, iporToken.address);
 };
