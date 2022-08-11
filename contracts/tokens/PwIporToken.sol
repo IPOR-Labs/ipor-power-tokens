@@ -6,6 +6,7 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "../interfaces/IPwIporToken.sol";
+import "../interfaces/ILiquidityRewards.sol";
 import "../security/IporOwnableUpgradeable.sol";
 import "../libraries/errors/IporErrors.sol";
 import "../libraries/errors/MiningErrors.sol";
@@ -16,6 +17,7 @@ contract PwIporToken is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgrade
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     address private _iporToken;
+    address private _liquidityRewards;
     mapping(address => uint256) private _baseBalance;
     //    balance in pwTokens
     mapping(address => uint256) private _delegatedBalance;
@@ -52,6 +54,11 @@ contract PwIporToken is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgrade
         return _baseTotalSupply;
     }
 
+    function setLiquidityRewardsAddress(address liquidityRewards) external onlyOwner whenNotPaused {
+        require(liquidityRewards != address(0), IporErrors.WRONG_ADDRESS);
+        _liquidityRewards = liquidityRewards;
+    }
+
     function stake(uint256 amount) external whenNotPaused {
         require(amount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
         uint256 oldUserBalance = _baseBalance[_msgSender()];
@@ -78,7 +85,8 @@ contract PwIporToken is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgrade
         uint256 newUserDelegatedBalance = pwIporToDelegate + userDelegatedBalance;
         require(userBalance >= newUserDelegatedBalance, MiningErrors.UNSTAKED_BALANCE_TOO_LOW);
         _delegatedBalance[_msgSender()] = newUserDelegatedBalance;
-        //TODO: delegate to reward contract
+        ILiquidityRewards(_liquidityRewards).delegatePwIpor(assets, amounts);
+
         // TODO: ADD Event
     }
 

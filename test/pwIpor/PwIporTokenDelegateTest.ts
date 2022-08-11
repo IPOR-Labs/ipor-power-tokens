@@ -4,7 +4,7 @@ import chai from "chai";
 import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { IporToken, PwIporToken } from "../../types";
+import { IporToken, PwIporToken, LiquidityRewards } from "../../types";
 import { N1__0_18DEC, ZERO, TOTAL_SUPPLY_18_DECIMALS, N0__1_18DEC } from "../utils/Constants";
 import { it } from "mocha";
 import { getDeployedTokens, Tokens } from "../utils/LiquidityRewardsUtils";
@@ -34,6 +34,13 @@ describe("PwIporToken configuration, deploy tests", () => {
         const PwIporToken = await ethers.getContractFactory("PwIporToken");
         pwIporToken = (await upgrades.deployProxy(PwIporToken, [iporToken.address])) as PwIporToken;
         await iporToken.increaseAllowance(pwIporToken.address, TOTAL_SUPPLY_18_DECIMALS);
+        const LiquidityRewards = await hre.ethers.getContractFactory("LiquidityRewards");
+        const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
+            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
+            pwIporToken.address,
+        ])) as LiquidityRewards;
+
+        await pwIporToken.setLiquidityRewardsAddress(liquidityRewards.address);
     });
 
     it("Should revert transaction when mismatch arrays", async () => {
@@ -77,7 +84,7 @@ describe("PwIporToken configuration, deploy tests", () => {
             await admin.getAddress()
         );
         //    when
-        await pwIporToken.delegateToRewards([tokens.tokenDai.address], [N0__1_18DEC]);
+        await pwIporToken.delegateToRewards([tokens.ipTokenDai.address], [N0__1_18DEC]);
         //    then
         const delegatedBalanceAfter = await pwIporToken.delegatedBalanceOf(
             await admin.getAddress()
@@ -96,7 +103,7 @@ describe("PwIporToken configuration, deploy tests", () => {
         );
         //    when
         await pwIporToken.delegateToRewards(
-            [tokens.tokenDai.address, tokens.tokenUsdc.address],
+            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
             [N0__1_18DEC, N0__1_18DEC]
         );
         //    then
