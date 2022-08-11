@@ -15,7 +15,8 @@ contract PwIporToken is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgrade
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     address private _iporToken;
-    mapping(address => uint256) private _pwIporUnderlineBalance;
+    mapping(address => uint256) private _baseBalance;
+    uint256 private _baseTotalSupply;
 
     function initialize(address iporToken) public initializer {
         __Ownable_init();
@@ -39,21 +40,32 @@ contract PwIporToken is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgrade
         return 1;
     }
 
+
+    function totalSupply() external view returns (uint256) {
+        return IporMath.division(_baseTotalSupply * _exchangeRate(), Constants.D18);
+    }
+
+    function totalSupplyBase() external view returns (uint256) {
+        return _baseTotalSupply;
+    }
+
     function stake(uint256 amount) external whenNotPaused {
         require(amount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
-        uint256 oldUserBalance = _pwIporUnderlineBalance[_msgSender()];
+        uint256 oldUserBalance = _baseBalance[_msgSender()];
+        uint256 oldTotalSupply = _baseTotalSupply;
+        uint256 exchangeRate = _exchangeRate();
         IERC20Upgradeable(_iporToken).safeTransferFrom(_msgSender(), address(this), amount);
-        uint256 newBalance = oldUserBalance +
-            IporMath.division(amount * Constants.D18, _exchangeRate());
-        _pwIporUnderlineBalance[_msgSender()] = newBalance;
+        uint256 newBaseTokens = IporMath.division(amount * Constants.D18, exchangeRate);
+        _baseBalance[_msgSender()] = oldUserBalance + newBaseTokens;
+        _baseTotalSupply = oldTotalSupply + newBaseTokens;
         // TODO: ADD Event
     }
 
     function balanceOf(address account) external view returns (uint256) {
-        return IporMath.division(_pwIporUnderlineBalance[account] * Constants.D18, _exchangeRate());
+        return IporMath.division(_baseBalance[account] * _exchangeRate(), Constants.D18);
     }
 
-    function exchangeRate() external pure returns (uint256) {
+    function exchangeRate() external view returns (uint256) {
         return _exchangeRate();
     }
 
@@ -65,9 +77,16 @@ contract PwIporToken is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgrade
         _unpause();
     }
 
-    function _exchangeRate() internal pure returns (uint256) {
-        // TODO: will be implement in IL-1064
-        return Constants.D18;
+    function _exchangeRate() internal view returns (uint256) {
+        uint256 totalSupply = _baseTotalSupply;
+        if(totalSupply == 0) {
+            return Constants.D18;
+        }
+        uint256 balanceOfIporToken = IERC20Upgradeable(_iporToken).balanceOf(address(this));
+        if(balanceOfIporToken == 0 ){
+            return Constants.D18;
+        }
+        return IporMath.division( balanceOfIporToken * Constants.D18, totalSupply);
     }
 
     //solhint-disable no-empty-blocks
