@@ -8,6 +8,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeab
 import "../interfaces/IPwIporToken.sol";
 import "../security/IporOwnableUpgradeable.sol";
 import "../libraries/errors/IporErrors.sol";
+import "../libraries/errors/MiningErrors.sol";
 import "../libraries/Constants.sol";
 import "../libraries/math/IporMath.sol";
 
@@ -16,6 +17,9 @@ contract PwIporToken is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgrade
 
     address private _iporToken;
     mapping(address => uint256) private _baseBalance;
+    //    balance in pwTokens
+    mapping(address => uint256) private _delegatedBalance;
+
     uint256 private _baseTotalSupply;
 
     function initialize(address iporToken) public initializer {
@@ -40,7 +44,6 @@ contract PwIporToken is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgrade
         return 1;
     }
 
-
     function totalSupply() external view returns (uint256) {
         return IporMath.division(_baseTotalSupply * _exchangeRate(), Constants.D18);
     }
@@ -61,8 +64,30 @@ contract PwIporToken is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgrade
         // TODO: ADD Event
     }
 
+    function delegateToRewards(address[] memory assets, uint256[] memory amounts)
+        external
+        whenNotPaused
+    {
+        require(assets.length == amounts.length, IporErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
+        uint256 pwIporToDelegate;
+        for (uint256 i = 0; i != amounts.length; i++) {
+            pwIporToDelegate += amounts[i];
+        }
+        uint256 userBalance = _balanceOf(_msgSender());
+        uint256 userDelegatedBalance = _delegatedBalance[_msgSender()];
+        uint256 newUserDelegatedBalance = pwIporToDelegate + userDelegatedBalance;
+        require(userBalance >= newUserDelegatedBalance, MiningErrors.UNSTAKED_BALANCE_TOO_LOW);
+        _delegatedBalance[_msgSender()] = newUserDelegatedBalance;
+        //TODO: delegate to reward contract
+        // TODO: ADD Event
+    }
+
     function balanceOf(address account) external view returns (uint256) {
-        return IporMath.division(_baseBalance[account] * _exchangeRate(), Constants.D18);
+        return _balanceOf(account);
+    }
+
+    function delegatedBalanceOf(address account) external view returns (uint256) {
+        return _delegatedBalance[account];
     }
 
     function exchangeRate() external view returns (uint256) {
@@ -79,14 +104,18 @@ contract PwIporToken is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgrade
 
     function _exchangeRate() internal view returns (uint256) {
         uint256 totalSupply = _baseTotalSupply;
-        if(totalSupply == 0) {
+        if (totalSupply == 0) {
             return Constants.D18;
         }
         uint256 balanceOfIporToken = IERC20Upgradeable(_iporToken).balanceOf(address(this));
-        if(balanceOfIporToken == 0 ){
+        if (balanceOfIporToken == 0) {
             return Constants.D18;
         }
-        return IporMath.division( balanceOfIporToken * Constants.D18, totalSupply);
+        return IporMath.division(balanceOfIporToken * Constants.D18, totalSupply);
+    }
+
+    function _balanceOf(address account) internal view returns (uint256) {
+        return IporMath.division(_baseBalance[account] * _exchangeRate(), Constants.D18);
     }
 
     //solhint-disable no-empty-blocks
