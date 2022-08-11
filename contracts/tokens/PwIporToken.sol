@@ -16,7 +16,7 @@ contract PwIporToken is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgrade
 
     address private _iporToken;
     mapping(address => uint256) private _baseBalance;
-    uint256 private _totalSupplyBase;
+    uint256 private _baseTotalSupply;
 
     function initialize(address iporToken) public initializer {
         __Ownable_init();
@@ -42,22 +42,22 @@ contract PwIporToken is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgrade
 
 
     function totalSupply() external view returns (uint256) {
-        return IporMath.division(_totalSupplyBase * _exchangeRate(), Constants.D18);
+        return IporMath.division(_baseTotalSupply * _exchangeRate(), Constants.D18);
     }
 
     function totalSupplyBase() external view returns (uint256) {
-        return _totalSupplyBase;
+        return _baseTotalSupply;
     }
 
     function stake(uint256 amount) external whenNotPaused {
         require(amount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
         uint256 oldUserBalance = _baseBalance[_msgSender()];
-        uint256 oldTotalSupply = _totalSupplyBase;
+        uint256 oldTotalSupply = _baseTotalSupply;
         uint256 exchangeRate = _exchangeRate();
         IERC20Upgradeable(_iporToken).safeTransferFrom(_msgSender(), address(this), amount);
         uint256 newBaseTokens = IporMath.division(amount * Constants.D18, exchangeRate);
         _baseBalance[_msgSender()] = oldUserBalance + newBaseTokens;
-        _totalSupplyBase = oldTotalSupply + newBaseTokens;
+        _baseTotalSupply = oldTotalSupply + newBaseTokens;
         // TODO: ADD Event
     }
 
@@ -78,7 +78,7 @@ contract PwIporToken is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgrade
     }
 
     function _exchangeRate() internal view returns (uint256) {
-        uint256 totalSupply = _totalSupplyBase;
+        uint256 totalSupply = _baseTotalSupply;
         if(totalSupply == 0) {
             return Constants.D18;
         }
