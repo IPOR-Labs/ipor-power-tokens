@@ -15,7 +15,7 @@ interface IPwIporToken {
 
     function balanceOf(address account) external view returns (uint256);
 
-    function totalSupplyUnderlineTokens() external view returns (uint256);
+    function totalSupplyBase() external view returns (uint256);
 
     function totalSupply() external view returns (uint256);
 

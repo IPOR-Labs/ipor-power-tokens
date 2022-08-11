@@ -87,14 +87,14 @@ export default ({ drizzle, drizzleState }) => (
             <table className="table" align="center">
                 <tr>
                     <td>
-                        <strong>Total Supply(Underline Tokens)</strong>
+                        <strong>Total Supply(Base Tokens)</strong>
                     </td>
                     <td>
                         <ContractData
                             drizzle={drizzle}
                             drizzleState={drizzleState}
                             contract="PwIporToken"
-                            method="totalSupplyUnderlineTokens"
+                            method="totalSupplyBase"
                             render={(value) => (
                                 <div>
                                     {value / 1000000000000000000}

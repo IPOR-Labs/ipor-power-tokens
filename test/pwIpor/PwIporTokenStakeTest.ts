@@ -36,12 +36,12 @@ describe("PwIporToken configuration, deploy tests", () => {
         // given
         const adminAddress = await accounts[0].getAddress();
         const balanceBefore = await pwIporToken.balanceOf(adminAddress);
-        const totalSupplyBefore = await pwIporToken.totalSupplyUnderlineTokens();
+        const totalSupplyBefore = await pwIporToken.totalSupplyBase();
         // when
         await expect(pwIporToken.stake(ZERO)).to.be.revertedWith("IPOR_004");
         // then
         const balanceAfter = await pwIporToken.balanceOf(adminAddress);
-        const totalSupplyAfter = await pwIporToken.totalSupplyUnderlineTokens();
+        const totalSupplyAfter = await pwIporToken.totalSupplyBase();
         expect(balanceBefore).to.be.equal(ZERO);
         expect(balanceAfter).to.be.equal(ZERO);
         expect(totalSupplyBefore).to.be.equal(ZERO);
