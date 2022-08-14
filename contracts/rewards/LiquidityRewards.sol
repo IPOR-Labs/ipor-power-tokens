@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.15;
 
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
@@ -14,10 +15,10 @@ import "../interfaces/types/LiquidityRewardsTypes.sol";
 import "hardhat/console.sol";
 
 contract LiquidityRewards is
+    Initializable,
+    PausableUpgradeable,
     UUPSUpgradeable,
     IporOwnableUpgradeable,
-    PausableUpgradeable,
-    Initializable,
     ILiquidityRewards
 {
     using SafeERC20Upgradeable for IERC20Upgradeable;
