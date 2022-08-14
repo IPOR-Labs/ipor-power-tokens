@@ -17,6 +17,7 @@ contract LiquidityRewards is
     UUPSUpgradeable,
     IporOwnableUpgradeable,
     PausableUpgradeable,
+    Initializable,
     ILiquidityRewards
 {
     using SafeERC20Upgradeable for IERC20Upgradeable;
@@ -28,8 +29,15 @@ contract LiquidityRewards is
     //    userAddress -> assetAddress -> amount
     mapping(address => mapping(address => uint256)) private _delegatedPowerTokenBalances;
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address[] memory assets, address pwIpor) public initializer {
+        __Pausable_init();
         __Ownable_init();
+        __UUPSUpgradeable_init();
         uint256 assetsLength = assets.length;
         require(pwIpor != address(0), IporErrors.WRONG_ADDRESS);
         _pwIpor = pwIpor;
@@ -63,8 +71,6 @@ contract LiquidityRewards is
         address[] memory assets,
         uint256[] memory amounts
     ) external onlyPwIpor whenNotPaused {
-        console.log("delegatePwIpor -> assets[0]: ", assets[0]);
-        console.log("delegatePwIpor -> amounts[0]: ", amounts[0]);
         for (uint256 i = 0; i != assets.length; i++) {
             require(_assets[assets[i]], MiningErrors.ASSET_NOT_SUPPORTED);
             _addPwIporToBalance(user, assets[i], amounts[i]);
@@ -82,11 +88,6 @@ contract LiquidityRewards is
         for (uint256 i = 0; i != requestAssets.length; i++) {
             address asset = requestAssets[i];
             require(_assets[asset], MiningErrors.ASSET_NOT_SUPPORTED);
-            console.log("balanceOfDelegatedPwIpor -> requestAssets: ", asset);
-            console.log(
-                "balanceOfDelegatedPwIpor -> balanceOfDelegatedPwIpor: ",
-                _delegatedPowerTokenBalances[user][asset]
-            );
             balances[i] = LiquidityRewardsTypes.DelegatedPwIpor(
                 asset,
                 _delegatedPowerTokenBalances[user][asset]
@@ -102,8 +103,6 @@ contract LiquidityRewards is
     ) internal returns (uint256 newBalance) {
         uint256 oldBalance = _delegatedPowerTokenBalances[user][asset];
         newBalance = oldBalance + amount;
-        console.log("_addPwIporToBalance -> newBalance: ", newBalance);
-        console.log("_addPwIporToBalance -> asset: ", asset);
         _delegatedPowerTokenBalances[user][asset] = newBalance;
         // TODO: ADD event
     }
