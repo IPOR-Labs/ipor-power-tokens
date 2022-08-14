@@ -7,7 +7,11 @@ interface ILiquidityRewards {
 
     function stake(address asset, uint256 amount) external;
 
-    function delegatePwIpor(address[] memory assets, uint256[] memory amounts) external;
+    function delegatePwIpor(
+        address user,
+        address[] memory assets,
+        uint256[] memory amounts
+    ) external;
 
     function isAssetSupported(address asset) external view returns (bool);
 

@@ -12,6 +12,9 @@ import "../libraries/errors/IporErrors.sol";
 import "../libraries/errors/MiningErrors.sol";
 import "../libraries/Constants.sol";
 import "../libraries/math/IporMath.sol";
+//TODO: remove at the end
+
+import "hardhat/console.sol";
 
 contract PwIporToken is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgradeable, IPwIporToken {
     using SafeERC20Upgradeable for IERC20Upgradeable;
@@ -85,7 +88,9 @@ contract PwIporToken is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgrade
         uint256 newUserDelegatedBalance = pwIporToDelegate + userDelegatedBalance;
         require(userBalance >= newUserDelegatedBalance, MiningErrors.UNSTAKED_BALANCE_TOO_LOW);
         _delegatedBalance[_msgSender()] = newUserDelegatedBalance;
-        ILiquidityRewards(_liquidityRewards).delegatePwIpor(assets, amounts);
+        //        console.log("delegateToRewards->amounts: ", amounts);
+        //        console.log("delegateToRewards->assets: ", assets);
+        ILiquidityRewards(_liquidityRewards).delegatePwIpor(_msgSender(), assets, amounts);
 
         // TODO: ADD Event
     }
