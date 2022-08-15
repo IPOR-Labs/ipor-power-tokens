@@ -58,7 +58,11 @@ describe("LiquidityRewards Stake and balance", () => {
         await expect(
             liquidityRewards
                 .connect(userOne)
-                .delegatePwIpor([tokens.ipTokenDai.address], [N1__0_18DEC])
+                .delegatePwIpor(
+                    await userOne.getAddress(),
+                    [tokens.ipTokenDai.address],
+                    [N1__0_18DEC]
+                )
         ).to.be.revertedWith("IPOR_701");
         //    then
     });
@@ -67,7 +71,11 @@ describe("LiquidityRewards Stake and balance", () => {
         //    given
         //    when
         await expect(
-            liquidityRewards.delegatePwIpor([tokens.tokenDai.address], [N1__0_18DEC])
+            liquidityRewards.delegatePwIpor(
+                await admin.getAddress(),
+                [tokens.tokenDai.address],
+                [N1__0_18DEC]
+            )
         ).to.be.revertedWith("IPOR_702");
         //    then
     });
@@ -82,6 +90,7 @@ describe("LiquidityRewards Stake and balance", () => {
 
         //    when
         await liquidityRewards.delegatePwIpor(
+            await admin.getAddress(),
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
             amounts
         );
@@ -104,6 +113,7 @@ describe("LiquidityRewards Stake and balance", () => {
         //    when
         await expect(
             liquidityRewards.delegatePwIpor(
+                await admin.getAddress(),
                 [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
                 amounts
             )

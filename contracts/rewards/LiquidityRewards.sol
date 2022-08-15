@@ -30,6 +30,8 @@ contract LiquidityRewards is
     //    userAddress -> assetAddress -> amount
     mapping(address => mapping(address => uint256)) private _delegatedPowerTokenBalances;
 
+    mapping(address => uint32) private _rewardsPerBlock;
+
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
@@ -55,6 +57,16 @@ contract LiquidityRewards is
 
     function getVersion() external pure returns (uint256) {
         return 1;
+    }
+
+    function setRewardsPerBlock(address asset, uint32 amount) external onlyOwner {
+        require(_assets[asset], MiningErrors.ASSET_NOT_SUPPORTED);
+        _rewardsPerBlock[asset] = amount;
+        // TODO: ADD event
+    }
+
+    function getRewardsPerBlock(address asset) external view returns (uint32) {
+        return _rewardsPerBlock[asset];
     }
 
     function stake(address asset, uint256 amount) external whenNotPaused {

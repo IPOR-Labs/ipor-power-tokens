@@ -138,23 +138,25 @@ export default ({ drizzle, drizzleState }) => (
                     <td>
                         <strong>My Delegated power token balance</strong>
                     </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Rewards per block</strong>
+                    </td>
                     <td>
                         <ContractData
                             drizzle={drizzle}
                             drizzleState={drizzleState}
                             contract="LiquidityRewards"
-                            method="balanceOfDelegatedPwIpor"
-                            methodArgs={[
-                                drizzleState.accounts[0],
-                                [drizzle.contracts.IpTokenUsdt.address],
-                            ]}
+                            method="getRewardsPerBlock"
+                            methodArgs={[drizzle.contracts.IpTokenUsdt.address]}
                             render={(value) => {
                                 console.error(value);
                                 return (
                                     <div>
-                                        {value[0][0]["amount"] / 1000000000000000000}
+                                        {value / 100000000}
                                         <br />
-                                        <small>{value[0][0]["amount"]}</small>
+                                        <small>{value}</small>
                                     </div>
                                 );
                             }}
@@ -165,18 +167,15 @@ export default ({ drizzle, drizzleState }) => (
                             drizzle={drizzle}
                             drizzleState={drizzleState}
                             contract="LiquidityRewards"
-                            method="balanceOfDelegatedPwIpor"
-                            methodArgs={[
-                                drizzleState.accounts[0],
-                                [drizzle.contracts.IpTokenUsdc.address],
-                            ]}
+                            method="getRewardsPerBlock"
+                            methodArgs={[drizzle.contracts.IpTokenUsdc.address]}
                             render={(value) => {
                                 console.error(value);
                                 return (
                                     <div>
-                                        {value[0][0]["amount"] / 1000000000000000000}
+                                        {value / 100000000}
                                         <br />
-                                        <small>{value[0][0]["amount"]}</small>
+                                        <small>{value}</small>
                                     </div>
                                 );
                             }}
@@ -187,21 +186,31 @@ export default ({ drizzle, drizzleState }) => (
                             drizzle={drizzle}
                             drizzleState={drizzleState}
                             contract="LiquidityRewards"
-                            method="balanceOfDelegatedPwIpor"
-                            methodArgs={[
-                                drizzleState.accounts[0],
-                                [drizzle.contracts.IpTokenDai.address],
-                            ]}
+                            method="getRewardsPerBlock"
+                            methodArgs={[drizzle.contracts.IpTokenDai.address]}
                             render={(value) => {
                                 console.error(value);
                                 return (
                                     <div>
-                                        {value[0][0]["amount"] / 1000000000000000000}
+                                        {value / 100000000}
                                         <br />
-                                        <small>{value[0][0]["amount"]}</small>
+                                        <small>{value}</small>
                                     </div>
                                 );
                             }}
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Set rewards per block</strong> <br />
+                        <small>1 = 100 000 000</small>
+                    </td>
+                    <td colspan="2">
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="LiquidityRewards"
+                            method="setRewardsPerBlock"
                         />
                     </td>
                 </tr>
