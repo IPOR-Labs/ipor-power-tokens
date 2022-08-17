@@ -245,8 +245,6 @@ export default ({ drizzle, drizzleState }) => {
                                 contract="PwIporToken"
                                 method="delegateToRewards"
                                 render={({ handleSubmit, inputs, state, handleInputChange }) => {
-                                    console.log(inputs);
-                                    console.log(state);
                                     state["assets"] = assets;
                                     state["amounts"] = amounts;
                                     return (

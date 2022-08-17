@@ -63,8 +63,24 @@ contract LiquidityRewards is
         LiquidityRewardsTypes.GlobalRewardsParams memory params = _globalParameters[asset];
         params.blockRewords = amount;
         params.lastRebalancingBlockNumber = uint32(block.number);
-        _globalParameters[asset] = params;
+        _saveGlobalParams(asset, params);
         // TODO: ADD event
+    }
+
+    function getGlobalParams(address asset)
+        external
+        view
+        returns (LiquidityRewardsTypes.GlobalRewardsParams memory)
+    {
+        return _globalParameters[asset];
+    }
+
+    function getMyParams(address asset)
+        external
+        view
+        returns (LiquidityRewardsTypes.UserRewardsParams memory)
+    {
+        return _usersParams[_msgSender()][asset];
     }
 
     function getRewardsPerBlock(address asset) external view returns (uint32) {
@@ -82,7 +98,7 @@ contract LiquidityRewards is
         uint256 oldUserBalance = userParams.ipTokensBalance;
         IERC20Upgradeable(asset).safeTransferFrom(_msgSender(), address(this), amount);
         userParams.ipTokensBalance = oldUserBalance + amount;
-        _usersParams[_msgSender()][asset] = userParams;
+        _saveUserParams(_msgSender(), asset, userParams);
         // TODO: ADD event
     }
 
@@ -125,13 +141,11 @@ contract LiquidityRewards is
         address asset,
         uint256 amount
     ) internal returns (uint256 newBalance) {
-        LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[_msgSender()][
-            asset
-        ];
+        LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[user][asset];
         uint256 oldBalance = userParams.delegatedPowerTokenBalance;
         newBalance = oldBalance + amount;
         userParams.delegatedPowerTokenBalance = newBalance;
-        _usersParams[_msgSender()][asset] = userParams;
+        _saveUserParams(user, asset, userParams);
         // TODO: ADD event
     }
 
@@ -165,6 +179,23 @@ contract LiquidityRewards is
 
     function _getPwIpor() internal view returns (address) {
         return _pwIpor;
+    }
+
+    function _saveUserParams(
+        address user,
+        address asset,
+        LiquidityRewardsTypes.UserRewardsParams memory params
+    ) internal virtual {
+        _usersParams[user][asset] = params;
+        // TODO: ADD event
+    }
+
+    function _saveGlobalParams(
+        address asset,
+        LiquidityRewardsTypes.GlobalRewardsParams memory params
+    ) internal virtual {
+        _globalParameters[asset] = params;
+        // TODO: ADD event
     }
 
     //solhint-disable no-empty-blocks

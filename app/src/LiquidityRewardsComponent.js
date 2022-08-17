@@ -30,6 +30,310 @@ export default ({ drizzle, drizzleState }) => (
                 </tr>
                 <tr>
                     <td>
+                        <strong>Global params</strong>
+                    </td>
+                    <td>
+                        <ContractData
+                            drizzle={drizzle}
+                            drizzleState={drizzleState}
+                            contract="LiquidityRewards"
+                            method="getGlobalParams"
+                            methodArgs={[drizzle.contracts.IpTokenUsdt.address]}
+                            render={(value) => {
+                                return (
+                                    <table>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Aggregate power up</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[0] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[0]}</small>
+                                            </td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Accrued rewards</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[1] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[1]}</small>
+                                            </td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Composite multiplier</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[2] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[2]}</small>
+                                            </td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Last rebalancing block number</td>
+                                            <td style={{ "padding-left": "1rem" }}>{value[3]}</td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Block rewords</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[4] / 100000000}
+                                                <br />
+                                                <small>{value[4]}</small>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                );
+                            }}
+                        />
+                    </td>
+                    <td>
+                        <ContractData
+                            drizzle={drizzle}
+                            drizzleState={drizzleState}
+                            contract="LiquidityRewards"
+                            method="getGlobalParams"
+                            methodArgs={[drizzle.contracts.IpTokenUsdc.address]}
+                            render={(value) => {
+                                return (
+                                    <table>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Aggregate power up</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[0] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[0]}</small>
+                                            </td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Accrued rewards</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[1] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[1]}</small>
+                                            </td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Composite multiplier</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[2] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[2]}</small>
+                                            </td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Last rebalancing block number</td>
+                                            <td style={{ "padding-left": "1rem" }}>{value[3]}</td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Block rewords</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[4] / 100000000}
+                                                <br />
+                                                <small>{value[4]}</small>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                );
+                            }}
+                        />
+                    </td>
+                    <td>
+                        <ContractData
+                            drizzle={drizzle}
+                            drizzleState={drizzleState}
+                            contract="LiquidityRewards"
+                            method="getGlobalParams"
+                            methodArgs={[drizzle.contracts.IpTokenDai.address]}
+                            render={(value) => {
+                                return (
+                                    <table>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Aggregate power up</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[0] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[0]}</small>
+                                            </td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Accrued rewards</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[1] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[1]}</small>
+                                            </td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Composite multiplier</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[2] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[2]}</small>
+                                            </td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Last rebalancing block number</td>
+                                            <td style={{ "padding-left": "1rem" }}>{value[3]}</td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Block rewords</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[4] / 100000000}
+                                                <br />
+                                                <small>{value[4]}</small>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                );
+                            }}
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>My params</strong>
+                    </td>
+                    <td>
+                        <ContractData
+                            drizzle={drizzle}
+                            drizzleState={drizzleState}
+                            contract="LiquidityRewards"
+                            method="getMyParams"
+                            methodArgs={[drizzle.contracts.IpTokenUsdt.address]}
+                            render={(value) => {
+                                return (
+                                    <table>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Power up</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[0] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[0]}</small>
+                                            </td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Composite multiplier</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[1] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[1]}</small>
+                                            </td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Staked ipTokens</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[2] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[2]}</small>
+                                            </td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Delegated powerToken</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[3] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[3]}</small>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                );
+                            }}
+                        />
+                    </td>
+                    <td>
+                        <ContractData
+                            drizzle={drizzle}
+                            drizzleState={drizzleState}
+                            contract="LiquidityRewards"
+                            method="getMyParams"
+                            methodArgs={[drizzle.contracts.IpTokenUsdc.address]}
+                            render={(value) => {
+                                return (
+                                    <table>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Power up</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[0] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[0]}</small>
+                                            </td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Composite multiplier</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[1] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[1]}</small>
+                                            </td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Staked ipTokens</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[2] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[2]}</small>
+                                            </td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Delegated powerToken</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[3] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[3]}</small>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                );
+                            }}
+                        />
+                    </td>
+                    <td>
+                        <ContractData
+                            drizzle={drizzle}
+                            drizzleState={drizzleState}
+                            contract="LiquidityRewards"
+                            method="getMyParams"
+                            methodArgs={[drizzle.contracts.IpTokenDai.address]}
+                            render={(value) => {
+                                return (
+                                    <table>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Power up</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[0] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[0]}</small>
+                                            </td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Composite multiplier</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[1] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[1]}</small>
+                                            </td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Staked ipTokens</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[2] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[2]}</small>
+                                            </td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Delegated powerToken</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[3] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[3]}</small>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                );
+                            }}
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
                         <strong>My IpToken Balance</strong>
                     </td>
                     <td>

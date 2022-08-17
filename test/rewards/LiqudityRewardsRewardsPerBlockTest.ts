@@ -47,7 +47,7 @@ describe("LiquidityRewards Stake and balance", () => {
         expect(rewardsAfter).to.be.equal(N2_0_8D);
     });
 
-    it("Should setap 3 asset", async () => {
+    it("Should setup 3 asset", async () => {
         //    given
         const rewardsDaiBefore = await liquidityRewards.getRewardsPerBlock(
             tokens.ipTokenDai.address
