@@ -23,14 +23,12 @@ contract LiquidityRewards is
 {
     using SafeERC20Upgradeable for IERC20Upgradeable;
     address private _pwIpor;
-
     mapping(address => bool) private _assets;
-    //    userAddress -> assetAddress -> amount
-    mapping(address => mapping(address => uint256)) private _balances;
-    //    userAddress -> assetAddress -> amount
-    mapping(address => mapping(address => uint256)) private _delegatedPowerTokenBalances;
 
-    mapping(address => uint32) private _rewardsPerBlock;
+    //  asset address -> global parameters for asset
+    mapping(address => LiquidityRewardsTypes.GlobalRewardsParams) private _globalParameters;
+    //    user address => asset address => users params
+    mapping(address => mapping(address => LiquidityRewardsTypes.UserRewardsParams)) _usersParams;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -59,26 +57,36 @@ contract LiquidityRewards is
         return 1;
     }
 
+    //    global per asset
     function setRewardsPerBlock(address asset, uint32 amount) external onlyOwner {
         require(_assets[asset], MiningErrors.ASSET_NOT_SUPPORTED);
-        _rewardsPerBlock[asset] = amount;
+        LiquidityRewardsTypes.GlobalRewardsParams memory params = _globalParameters[asset];
+        params.blockRewords = amount;
+        params.lastRebalancingBlockNumber = uint32(block.number);
+        _globalParameters[asset] = params;
         // TODO: ADD event
     }
 
     function getRewardsPerBlock(address asset) external view returns (uint32) {
-        return _rewardsPerBlock[asset];
+        LiquidityRewardsTypes.GlobalRewardsParams memory params = _globalParameters[asset];
+        return params.blockRewords;
     }
 
+    //    all per asset
     function stake(address asset, uint256 amount) external whenNotPaused {
         require(amount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
         require(_assets[asset], MiningErrors.ASSET_NOT_SUPPORTED);
-        uint256 oldUserBalance = _balances[_msgSender()][asset];
+        LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[_msgSender()][
+            asset
+        ];
+        uint256 oldUserBalance = userParams.ipTokensBalance;
         IERC20Upgradeable(asset).safeTransferFrom(_msgSender(), address(this), amount);
-        uint256 newBalance = oldUserBalance + amount;
-        _balances[_msgSender()][asset] = newBalance;
+        userParams.ipTokensBalance = oldUserBalance + amount;
+        _usersParams[_msgSender()][asset] = userParams;
         // TODO: ADD event
     }
 
+    //all per asset
     function delegatePwIpor(
         address user,
         address[] memory assets,
@@ -101,9 +109,12 @@ contract LiquidityRewards is
         for (uint256 i = 0; i != requestAssets.length; i++) {
             address asset = requestAssets[i];
             require(_assets[asset], MiningErrors.ASSET_NOT_SUPPORTED);
+            LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[_msgSender()][
+                asset
+            ];
             balances[i] = LiquidityRewardsTypes.DelegatedPwIpor(
                 asset,
-                _delegatedPowerTokenBalances[user][asset]
+                userParams.delegatedPowerTokenBalance
             );
         }
         return LiquidityRewardsTypes.BalanceOfDelegatedPwIpor(balances);
@@ -114,9 +125,13 @@ contract LiquidityRewards is
         address asset,
         uint256 amount
     ) internal returns (uint256 newBalance) {
-        uint256 oldBalance = _delegatedPowerTokenBalances[user][asset];
+        LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[_msgSender()][
+            asset
+        ];
+        uint256 oldBalance = userParams.delegatedPowerTokenBalance;
         newBalance = oldBalance + amount;
-        _delegatedPowerTokenBalances[user][asset] = newBalance;
+        userParams.delegatedPowerTokenBalance = newBalance;
+        _usersParams[_msgSender()][asset] = userParams;
         // TODO: ADD event
     }
 
@@ -137,7 +152,7 @@ contract LiquidityRewards is
     }
 
     function balanceOf(address asset) external view returns (uint256) {
-        return _balances[_msgSender()][asset];
+        return _usersParams[_msgSender()][asset].ipTokensBalance;
     }
 
     function pause() external onlyOwner {

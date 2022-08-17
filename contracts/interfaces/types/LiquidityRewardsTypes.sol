@@ -7,7 +7,23 @@ library LiquidityRewardsTypes {
         address asset;
         uint256 amount;
     }
+
     struct BalanceOfDelegatedPwIpor {
         DelegatedPwIpor[] balances;
+    }
+
+    struct GlobalRewardsParams {
+        uint256 aggregatePowerUp;
+        uint256 accruedRewards;
+        uint256 compositeMultiplier;
+        uint32 lastRebalancingBlockNumber;
+        uint32 blockRewords;
+    }
+
+    struct UserRewardsParams {
+        uint256 powerUp;
+        uint256 compositeMultiplier;
+        uint256 ipTokensBalance;
+        uint256 delegatedPowerTokenBalance;
     }
 }

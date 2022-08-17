@@ -88,7 +88,7 @@ library MiningCalculation {
     ) internal view returns (uint256) {
         require(
             compositeMultiplier >= userCompositeMultiplier,
-            COMPOSITE_MULTIPLIER_GREATER_OR_EQUAL_THEN_USER_COMPOSITE_MULTIPLIER
+            MiningErrors.COMPOSITE_MULTIPLIER_GREATER_OR_EQUAL_THEN_USER_COMPOSITE_MULTIPLIER
         );
         uint256 userRewards = userIpTokens *
             userPowerUp *
