@@ -2,12 +2,17 @@
 pragma solidity 0.8.15;
 
 import "abdk-libraries-solidity/ABDKMathQuad.sol";
+import "@openzeppelin/contracts/utils/math/SafeCast.sol";
+
 import "../errors/MiningErrors.sol";
 import "../Constants.sol";
 import "./IporMath.sol";
 import "hardhat/console.sol";
 
 library MiningCalculation {
+    using SafeCast for uint256;
+    using SafeCast for int256;
+
     function calculateUserPowerUp(
         uint256 pwToken,
         uint256 ipToken,
@@ -39,6 +44,7 @@ library MiningCalculation {
         uint256 previousUserIpToken,
         uint256 previousAggregatePowerUp
     ) internal view returns (uint256) {
+        //        todo fix to int
         uint256 apu = userPowerUp * userIpToken - previousUserPowerUp * previousUserIpToken;
         return previousAggregatePowerUp + IporMath.division(apu, Constants.D18);
     }
@@ -53,8 +59,11 @@ library MiningCalculation {
             blocNumber >= lastRebalancingBlockNumber,
             MiningErrors.BLOCK_NUMBER_GREATER_OR_EQUAL_THEN_PREVIOUS_BLOCK_NUMBER
         );
-        uint256 newRewords = (blocNumber - lastRebalancingBlockNumber) * blockRewords;
-        return previousAccruedRewards + IporMath.division(newRewords, Constants.D18);
+        //        TODO fix uint to int
+        uint256 newRewords = (blocNumber - lastRebalancingBlockNumber) *
+            blockRewords *
+            Constants.D10;
+        return previousAccruedRewards + newRewords;
     }
 
     //    TODO: what if in one block we change  blockRewards and calculate calculateUserCompositeMultiplier ??
@@ -64,20 +73,30 @@ library MiningCalculation {
         uint256 aggregatePowerUp
     ) internal view returns (uint256) {
         uint256 rewards = blockRewards * aggregatePowerUp;
-        return compositeMultiplier - IporMath.division(rewards, Constants.D18);
+        console.log("blockRewards: ", blockRewards);
+        console.log("aggregatePowerUp: ", aggregatePowerUp);
+        console.log("rewards: ", rewards);
+        console.log("compositeMultiplier: ", compositeMultiplier);
+        int256 result = compositeMultiplier.toInt256() -
+            IporMath.division(rewards, Constants.D8).toInt256();
+        if (result < 0) {
+            console.logInt(result);
+            return 0;
+        }
+        return result.toUint256();
     }
 
     function calculateCompositeMultiplier(
         uint256 previousCompositeMultiplier,
-        uint256 aggregateRewards,
+        uint256 accruedRewards,
         uint256 aggregatePowerUp
     ) internal view returns (uint256) {
         if (aggregatePowerUp == 0) {
-            return previousCompositeMultiplier;
+            return accruedRewards; // todo ask łukasz accruedRewards ? aggregatePowerUp
         }
         return
             previousCompositeMultiplier +
-            IporMath.division(aggregateRewards * Constants.D18, aggregatePowerUp);
+            IporMath.division(accruedRewards * Constants.D18, aggregatePowerUp);
     }
 
     function calculateUserRewards(
