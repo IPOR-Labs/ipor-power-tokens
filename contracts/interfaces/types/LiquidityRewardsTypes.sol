@@ -15,14 +15,15 @@ library LiquidityRewardsTypes {
     struct GlobalRewardsParams {
         uint256 aggregatePowerUp;
         uint256 accruedRewards;
-        uint256 compositeMultiplier;
-        uint32 lastRebalancingBlockNumber;
+        uint256 compositeMultiplierInTheBlock;
+        uint256 compositeMultiplierCumulativeBeforeBlock;
+        uint32 blockNumber;
         uint32 blockRewords;
     }
 
     struct UserRewardsParams {
         uint256 powerUp;
-        uint256 compositeMultiplier;
+        uint256 compositeMultiplierCumulative;
         uint256 ipTokensBalance;
         uint256 delegatedPowerTokenBalance;
     }

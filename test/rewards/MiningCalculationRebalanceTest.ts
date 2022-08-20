@@ -363,8 +363,6 @@ describe("LiquidityRewards Stake and balance", () => {
             user2compositeMultiplierCumulativeBefore
         );
 
-        console.log(rewardsInBlock5UserTwo.toString());
-
         expect(rewardsInBlock5UserTwo, "Rewords userOne in block 4").to.be.equal(
             BigNumber.from("3800745456218982320")
         );

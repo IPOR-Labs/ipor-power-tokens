@@ -41,7 +41,7 @@ contract MockMiningCalculation {
         uint256 lastRebalancingBlockNumber,
         uint256 blockRewords,
         uint256 previousAccruedRewards
-    ) internal view returns (uint256) {
+    ) public view returns (uint256) {
         return
             MiningCalculation.calculateAccruedRewards(
                 blocNumber,
@@ -51,29 +51,28 @@ contract MockMiningCalculation {
             );
     }
 
-    function calculateUserCompositeMultiplier(
-        uint256 compositeMultiplier,
-        uint256 blockRewards,
-        uint256 aggregatePowerUp
-    ) public view returns (uint256) {
-        return
-            MiningCalculation.calculateUserCompositeMultiplier(
-                compositeMultiplier,
-                blockRewards,
-                aggregatePowerUp
-            );
+    function compositeMultiplier(uint256 blockRewards, uint256 aggregatePowerUp)
+        public
+        view
+        returns (uint256)
+    {
+        return MiningCalculation.compositeMultiplier(blockRewards, aggregatePowerUp);
     }
 
-    function calculateCompositeMultiplier(
+    function compositeMultiplierCumulative(
+        uint256 lastRebalanseBlockNumber,
+        uint256 blockNumber,
+        uint256 previousCompositeMultiplierCumulative,
         uint256 previousCompositeMultiplier,
-        uint256 aggregateRewards,
-        uint256 aggregatePowerUp
+        uint256 compositeMultiplier
     ) public view returns (uint256) {
         return
-            MiningCalculation.calculateCompositeMultiplier(
+            MiningCalculation.compositeMultiplierCumulative(
+                lastRebalanseBlockNumber,
+                blockNumber,
+                previousCompositeMultiplierCumulative,
                 previousCompositeMultiplier,
-                aggregateRewards,
-                aggregatePowerUp
+                compositeMultiplier
             );
     }
 
@@ -82,7 +81,7 @@ contract MockMiningCalculation {
         uint256 userPowerUp,
         uint256 compositeMultiplier,
         uint256 userCompositeMultiplier
-    ) internal view returns (uint256) {
+    ) public view returns (uint256) {
         return
             MiningCalculation.calculateUserRewards(
                 userIpTokens,

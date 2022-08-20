@@ -50,13 +50,7 @@ contract LiquidityRewards is
             _assets[assets[i]] = true;
             _saveGlobalParams(
                 assets[i],
-                LiquidityRewardsTypes.GlobalRewardsParams(
-                    0,
-                    0,
-                    0,
-                    uint32(block.number),
-                    uint32(Constants.D8)
-                )
+                LiquidityRewardsTypes.GlobalRewardsParams(0, 0, 0, 0, 0, uint32(Constants.D8))
             );
         }
     }
@@ -70,34 +64,64 @@ contract LiquidityRewards is
         return 1;
     }
 
+    function calculateUserRewards(address asset) external view returns (uint256) {
+        LiquidityRewardsTypes.GlobalRewardsParams memory globalParamsOld = _globalParameters[asset];
+        LiquidityRewardsTypes.UserRewardsParams memory userParamsOld = _usersParams[_msgSender()][
+            asset
+        ];
+
+        console.log(
+            "LiquidityRewards->calculateUserRewards->globalParamsOld.compositeMultiplierInTheBlock: ",
+            globalParamsOld.compositeMultiplierInTheBlock
+        );
+
+        console.log("LiquidityRewards->calculateUserRewards->block.number: ", block.number);
+
+        uint256 compositeMultiplierCumulativeBeforeBlock = globalParamsOld
+            .compositeMultiplierCumulativeBeforeBlock +
+            (block.number - globalParamsOld.blockNumber) *
+            globalParamsOld.compositeMultiplierInTheBlock;
+
+        console.log(
+            "LiquidityRewards->calculateUserRewards->compositeMultiplierCumulative: ",
+            compositeMultiplierCumulativeBeforeBlock + globalParamsOld.compositeMultiplierInTheBlock
+        );
+
+        uint256 accruedRewards = MiningCalculation.calculateAccruedRewards(
+            block.number,
+            globalParamsOld.blockNumber,
+            globalParamsOld.blockRewords,
+            globalParamsOld.accruedRewards
+        );
+
+        console.log("LiquidityRewards->calculateUserRewards->accruedRewards: ", accruedRewards);
+
+        return
+            MiningCalculation.calculateUserRewards(
+                userParamsOld.ipTokensBalance,
+                userParamsOld.powerUp,
+                compositeMultiplierCumulativeBeforeBlock,
+                userParamsOld.compositeMultiplierCumulative
+            );
+    }
+
     //    global per asset
-    function setRewardsPerBlock(address asset, uint32 amount) external onlyOwner {
+    function setRewardsPerBlock(address asset, uint32 rewardsValue) external onlyOwner {
         require(_assets[asset], MiningErrors.ASSET_NOT_SUPPORTED);
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParamsOld = _globalParameters[asset];
 
         //       ReBalance GlobalParams
-
-        uint256 accruedRewards = MiningCalculation.calculateAccruedRewards(
-            block.number,
-            globalParamsOld.lastRebalancingBlockNumber,
-            amount,
-            globalParamsOld.accruedRewards
-        );
-
-        uint256 compositeMultiplier = MiningCalculation.calculateCompositeMultiplier(
-            globalParamsOld.compositeMultiplier,
-            accruedRewards,
-            globalParamsOld.aggregatePowerUp
-        );
+        //        TODO add rebalansing
 
         _saveGlobalParams(
             asset,
             LiquidityRewardsTypes.GlobalRewardsParams(
-                globalParamsOld.aggregatePowerUp,
-                accruedRewards,
-                compositeMultiplier,
+                0,
+                0,
+                0,
+                0,
                 uint32(block.number),
-                amount
+                rewardsValue
             )
         );
         // TODO: ADD event
@@ -125,67 +149,81 @@ contract LiquidityRewards is
     }
 
     //    all per asset
-    function stake(address asset, uint256 amount) external whenNotPaused {
-        require(amount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+    function stake(address asset, uint256 stakedIpTokens) external whenNotPaused {
+        require(stakedIpTokens != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
         require(_assets[asset], MiningErrors.ASSET_NOT_SUPPORTED);
-
+        IERC20Upgradeable(asset).safeTransferFrom(_msgSender(), address(this), stakedIpTokens);
         LiquidityRewardsTypes.UserRewardsParams memory userParamsOld = _usersParams[_msgSender()][
             asset
         ];
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParamsOld = _globalParameters[asset];
+        console.log(
+            "LiquidityRewards->stake->globalParamsOld.blockNumber: ",
+            globalParamsOld.blockNumber
+        );
+        if (globalParamsOld.blockNumber == 0) {
+            globalParamsOld.blockNumber = uint32(block.number);
+        }
 
-        IERC20Upgradeable(asset).safeTransferFrom(_msgSender(), address(this), amount);
-        uint256 newUserBalance = userParamsOld.ipTokensBalance + amount;
-        //        TODO: claim rewards in IL-685
-        //        ReBalance userParams
+        uint256 ipTokensBalance = userParamsOld.ipTokensBalance + stakedIpTokens;
+
         uint256 userPowerUp = MiningCalculation.calculateUserPowerUp(
             userParamsOld.delegatedPowerTokenBalance,
-            newUserBalance,
+            userParamsOld.ipTokensBalance + stakedIpTokens,
             _verticalShift,
             _horizontalShift
         );
+        console.log("LiquidityRewards->stake->userPowerUp: ", userPowerUp);
 
-        console.log("userPowerUp: ", userPowerUp);
+        uint256 compositeMultiplierCumulativeBeforeBlock = globalParamsOld
+            .compositeMultiplierCumulativeBeforeBlock +
+            (block.number - globalParamsOld.blockNumber) *
+            globalParamsOld.compositeMultiplierInTheBlock;
 
-        uint256 userCompositeMultiplier = MiningCalculation.calculateUserCompositeMultiplier(
-            globalParamsOld.compositeMultiplier,
-            globalParamsOld.blockRewords,
-            globalParamsOld.aggregatePowerUp
+        console.log(
+            "LiquidityRewards->stake->compositeMultiplierCumulativeBeforeBlock: ",
+            compositeMultiplierCumulativeBeforeBlock
         );
+
+        //        TODO add rebalansing
 
         _saveUserParams(
             _msgSender(),
             asset,
             LiquidityRewardsTypes.UserRewardsParams(
                 userPowerUp,
-                userCompositeMultiplier,
-                newUserBalance,
+                compositeMultiplierCumulativeBeforeBlock,
+                ipTokensBalance,
                 userParamsOld.delegatedPowerTokenBalance
             )
         );
 
-        //       ReBalance GlobalParams
-
         uint256 aggregatePowerUp = MiningCalculation.calculateAggregatePowerUp(
             userPowerUp,
-            newUserBalance,
-            userParamsOld.powerUp,
+            ipTokensBalance,
+            userParamsOld.delegatedPowerTokenBalance,
             userParamsOld.ipTokensBalance,
             globalParamsOld.aggregatePowerUp
         );
+        console.log("LiquidityRewards->stake->aggregatePowerUp: ", aggregatePowerUp);
 
         uint256 accruedRewards = MiningCalculation.calculateAccruedRewards(
             block.number,
-            globalParamsOld.lastRebalancingBlockNumber,
+            globalParamsOld.blockNumber,
             globalParamsOld.blockRewords,
             globalParamsOld.accruedRewards
         );
 
-        uint256 compositeMultiplier = MiningCalculation.calculateCompositeMultiplier(
-            globalParamsOld.compositeMultiplier,
-            accruedRewards,
+        console.log("LiquidityRewards->stake->accruedRewards: ", accruedRewards);
+
+        uint256 compositeMultiplier = MiningCalculation.compositeMultiplier(
+            globalParamsOld.blockRewords,
             aggregatePowerUp
         );
+
+        console.log("LiquidityRewards->stake->compositeMultiplier: ", compositeMultiplier);
+
+        //       ReBalance GlobalParams
 
         _saveGlobalParams(
             asset,
@@ -193,6 +231,7 @@ contract LiquidityRewards is
                 aggregatePowerUp,
                 accruedRewards,
                 compositeMultiplier,
+                compositeMultiplierCumulativeBeforeBlock,
                 uint32(block.number),
                 globalParamsOld.blockRewords
             )
@@ -242,68 +281,18 @@ contract LiquidityRewards is
         LiquidityRewardsTypes.UserRewardsParams memory userParamsOld = _usersParams[user][asset];
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParamsOld = _globalParameters[asset];
         //        TODO: claim rewards in IL-685
-        //        uint256 oldBalance = userParams.delegatedPowerTokenBalance;
         newBalance = userParamsOld.delegatedPowerTokenBalance + amount;
-        //        userParams.delegatedPowerTokenBalance = newBalance;
-        //        _saveUserParams(user, asset, userParams);
-        //        ReBalance userParams
-        uint256 userPowerUp = MiningCalculation.calculateUserPowerUp(
-            newBalance,
-            userParamsOld.ipTokensBalance,
-            _verticalShift,
-            _horizontalShift
-        );
-
-        uint256 userCompositeMultiplier = MiningCalculation.calculateUserCompositeMultiplier(
-            globalParamsOld.compositeMultiplier,
-            globalParamsOld.blockRewords,
-            globalParamsOld.aggregatePowerUp
-        );
-
         _saveUserParams(
             user,
             asset,
             LiquidityRewardsTypes.UserRewardsParams(
-                userPowerUp,
-                userCompositeMultiplier,
+                0,
+                0, //userCompositeMultiplier,
                 userParamsOld.ipTokensBalance,
                 newBalance
             )
         );
 
-        //       ReBalance GlobalParams
-
-        uint256 aggregatePowerUp = MiningCalculation.calculateAggregatePowerUp(
-            newBalance,
-            userParamsOld.ipTokensBalance,
-            userParamsOld.powerUp,
-            userParamsOld.ipTokensBalance,
-            globalParamsOld.aggregatePowerUp
-        );
-
-        uint256 accruedRewards = MiningCalculation.calculateAccruedRewards(
-            block.number,
-            globalParamsOld.lastRebalancingBlockNumber,
-            globalParamsOld.blockRewords,
-            globalParamsOld.accruedRewards
-        );
-
-        uint256 compositeMultiplier = MiningCalculation.calculateCompositeMultiplier(
-            globalParamsOld.compositeMultiplier,
-            accruedRewards,
-            aggregatePowerUp
-        );
-
-        _saveGlobalParams(
-            asset,
-            LiquidityRewardsTypes.GlobalRewardsParams(
-                aggregatePowerUp,
-                accruedRewards,
-                compositeMultiplier,
-                uint32(block.number),
-                globalParamsOld.blockRewords
-            )
-        );
         // TODO: ADD event
     }
 
@@ -317,6 +306,7 @@ contract LiquidityRewards is
         _saveGlobalParams(
             asset,
             LiquidityRewardsTypes.GlobalRewardsParams(
+                0,
                 0,
                 0,
                 0,

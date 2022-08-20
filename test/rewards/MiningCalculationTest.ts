@@ -74,7 +74,7 @@ describe("LiquidityRewards Stake and balance", () => {
             horizontalShift
         );
         //    then
-        expect(result).to.be.equal(BigNumber.from("399999999999999999"));
+        expect(result).to.be.equal(BigNumber.from("400000000000000000"));
     });
 
     it("Should calculate simple case 1 ", async () => {

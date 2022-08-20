@@ -6,7 +6,6 @@ import { BigNumber, Signer } from "ethers";
 import { solidity } from "ethereum-waffle";
 import { LiquidityRewards } from "../../types";
 import { Tokens, getDeployedTokens } from "../utils/LiquidityRewardsUtils";
-import { ZERO } from "../utils/Constants";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -43,7 +42,7 @@ describe("LiquidityRewards Stake and balance", () => {
         //    then
         const rewardsAfter = await liquidityRewards.getRewardsPerBlock(tokens.ipTokenUsdc.address);
 
-        expect(rewardsBefore).to.be.equal(ZERO);
+        expect(rewardsBefore).to.be.equal(N1_0_8D);
         expect(rewardsAfter).to.be.equal(N2_0_8D);
     });
 
@@ -75,9 +74,9 @@ describe("LiquidityRewards Stake and balance", () => {
             tokens.ipTokenUsdt.address
         );
 
-        expect(rewardsDaiBefore).to.be.equal(ZERO);
-        expect(rewardsUsdcBefore).to.be.equal(ZERO);
-        expect(rewardsUsdtBefore).to.be.equal(ZERO);
+        expect(rewardsDaiBefore).to.be.equal(N1_0_8D);
+        expect(rewardsUsdcBefore).to.be.equal(N1_0_8D);
+        expect(rewardsUsdtBefore).to.be.equal(N1_0_8D);
 
         expect(rewardsDaiAfter).to.be.equal(N1_0_8D);
         expect(rewardsUsdcAfter).to.be.equal(N2_0_8D);
@@ -92,7 +91,7 @@ describe("LiquidityRewards Stake and balance", () => {
 
         //    when
         await expect(
-            liquidityRewards.connect(userOne).setRewardsPerBlock(tokens.ipTokenDai.address, N1_0_8D)
+            liquidityRewards.connect(userOne).setRewardsPerBlock(tokens.ipTokenDai.address, N2_0_8D)
         ).to.be.revertedWith("Ownable: caller is not the owner");
 
         //    then
@@ -100,7 +99,7 @@ describe("LiquidityRewards Stake and balance", () => {
             tokens.ipTokenDai.address
         );
 
-        expect(rewardsDaiBefore).to.be.equal(ZERO);
-        expect(rewardsDaiAfter).to.be.equal(ZERO);
+        expect(rewardsDaiBefore).to.be.equal(N1_0_8D);
+        expect(rewardsDaiAfter).to.be.equal(N1_0_8D);
     });
 });

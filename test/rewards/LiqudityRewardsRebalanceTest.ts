@@ -23,6 +23,56 @@ describe("LiquidityRewards Stake and balance", () => {
     let tokens: Tokens;
     let liquidityRewards: LiquidityRewards;
     let admin: Signer, userOne: Signer, userTwo: Signer, userThree: Signer;
+    const D18 = BigNumber.from("1000000000000000000");
+
+    const extractMyParam = (value: any) => {
+        const powerUp = value[0];
+        const userCompositeMltiplier = value[1];
+        const stakedIpTokens = value[2];
+        const delegatedPowerToken = value[3];
+
+        console.log("#######################################################");
+        console.log("My Params");
+        console.log("##### powerUp:", powerUp.toString());
+        if (userCompositeMltiplier.toString() == "0") {
+            console.error(
+                "##### Error: userCompositeMltiplier:",
+                userCompositeMltiplier.toString()
+            );
+        } else {
+            console.log("##### userCompositeMltiplier:", userCompositeMltiplier.toString());
+        }
+
+        console.log("##### stakedIpTokens:", stakedIpTokens.toString());
+        console.log("##### delegatedPowerToken:", delegatedPowerToken.toString());
+        console.log("#######################################################");
+    };
+
+    const extractGlobalParam = (value: any) => {
+        const aggregatePowerUp = value[0];
+        const accruedRewards = value[1];
+        const compositeMultiplier = value[2];
+        const lastRebalancingBlockNumber = value[3];
+        const blockRewords = value[4];
+
+        console.log("#######################################################");
+        console.log("Global Params");
+        console.log("##### aggregatePowerUp:", aggregatePowerUp.toString());
+        console.log("##### accruedRewards:", accruedRewards.toString());
+        console.log("##### compositeMultiplier:", compositeMultiplier.toString());
+        console.log("##### lastRebalancingBlockNumber:", lastRebalancingBlockNumber.toString());
+        console.log("##### blockRewords:", blockRewords.toString());
+        console.log("#######################################################");
+    };
+
+    const printParams = async () => {
+        const r1 = await liquidityRewards.connect(userOne).getMyParams(tokens.ipTokenDai.address);
+        extractMyParam(r1);
+        const rg1 = await liquidityRewards
+            .connect(userOne)
+            .getGlobalParams(tokens.ipTokenDai.address);
+        extractGlobalParam(rg1);
+    };
 
     before(async () => {
         [admin, userOne, userTwo, userThree] = await hre.ethers.getSigners();
@@ -61,178 +111,43 @@ describe("LiquidityRewards Stake and balance", () => {
             .approve(liquidityRewards.address, TOTAL_SUPPLY_6_DECIMALS);
     });
 
-    it("Should not be able to stake when insufficient allowance on ipToken(Dai) ", async () => {
-        // given
-        const balanceBefore = await liquidityRewards.balanceOf(tokens.ipTokenDai.address);
-        // when
-        await expect(
-            liquidityRewards.connect(userThree).stake(tokens.ipTokenDai.address, N1__0_18DEC)
-        ).to.be.revertedWith("ERC20: insufficient allowance");
-        // then
-        const balanceAfter = await liquidityRewards.balanceOf(tokens.ipTokenDai.address);
-
-        expect(balanceBefore).to.be.equal(ZERO);
-        expect(balanceAfter).to.be.equal(ZERO);
-    });
-
-    it("Should be able to stake ipToken(Dai)", async () => {
-        // given
-        const balanceBefore = await liquidityRewards
-            .connect(userOne)
-            .balanceOf(tokens.ipTokenDai.address);
-        // when
-        await liquidityRewards.connect(userOne).stake(tokens.ipTokenDai.address, N1__0_18DEC);
-        // then
-        const balanceAfter = await liquidityRewards
-            .connect(userOne)
-            .balanceOf(tokens.ipTokenDai.address);
-
-        expect(balanceBefore).to.be.equal(ZERO);
-        expect(balanceAfter).to.be.equal(N1__0_18DEC);
-    });
-
-    it.only("Should be able to stake twice ipToken(Dai)", async () => {
+    it("Should be able to stake twice ipToken(Dai)", async () => {
         // given
 
-        const balanceBefore = await liquidityRewards
-            .connect(userOne)
-            .balanceOf(tokens.ipTokenDai.address);
-
-        await liquidityRewards.setRewardsPerBlock(
-            tokens.ipTokenDai.address,
-            BigNumber.from("100000000")
-        );
-        const r1 = await liquidityRewards.connect(userOne).getMyParams(tokens.ipTokenDai.address);
-        console.table(r1);
-        const rg1 = await liquidityRewards
-            .connect(userOne)
-            .getGlobalParams(tokens.ipTokenDai.address);
-        console.table(rg1);
-
+        console.log("############## Init State ##################");
+        await printParams();
+        const delegatePowerToken = N1__0_18DEC.mul(BigNumber.from("100"));
         await liquidityRewards.delegatePwIpor(
             await userOne.getAddress(),
             [tokens.ipTokenDai.address],
-            [N1__0_18DEC.mul(BigNumber.from("100"))]
+            [delegatePowerToken]
         );
 
-        const p1 = await liquidityRewards.connect(userOne).getMyParams(tokens.ipTokenDai.address);
-        console.table(p1);
-
-        const pg1 = await liquidityRewards
-            .connect(userOne)
-            .getGlobalParams(tokens.ipTokenDai.address);
-        console.table(pg1);
+        console.log("############## after delegate 1 ##################");
+        await printParams();
 
         // when
         await liquidityRewards
             .connect(userOne)
-            .stake(tokens.ipTokenDai.address, N1__0_18DEC.mul(BigNumber.from("1")));
-        const u1 = await liquidityRewards.connect(userOne).getMyParams(tokens.ipTokenDai.address);
-        console.table(u1);
+            .stake(tokens.ipTokenDai.address, N1__0_18DEC.mul(BigNumber.from("100")));
 
-        const g1 = await liquidityRewards
-            .connect(userOne)
-            .getGlobalParams(tokens.ipTokenDai.address);
-        console.table(g1);
-        await liquidityRewards
-            .connect(userOne)
-            .stake(tokens.ipTokenDai.address, N1__0_18DEC.mul(BigNumber.from("1")));
-        const u2 = await liquidityRewards.connect(userOne).getMyParams(tokens.ipTokenDai.address);
-        console.table(u2);
-        const g2 = await liquidityRewards
-            .connect(userOne)
-            .getGlobalParams(tokens.ipTokenDai.address);
-        console.table(g2);
-        await liquidityRewards
-            .connect(userOne)
-            .stake(tokens.ipTokenDai.address, N1__0_18DEC.mul(BigNumber.from("1")));
-        // then;
+        console.log("############## after stake ipToken 1 ##################");
+        await printParams();
 
-        const u3 = await liquidityRewards.connect(userOne).getMyParams(tokens.ipTokenDai.address);
-        console.table(u3);
-        const g3 = await liquidityRewards
+        const r = await liquidityRewards
             .connect(userOne)
-            .getGlobalParams(tokens.ipTokenDai.address);
-        console.table(g3);
+            .calculateUserRewards(tokens.ipTokenDai.address);
 
-        const balanceAfter = await liquidityRewards
-            .connect(userOne)
-            .balanceOf(tokens.ipTokenDai.address);
-
-        expect(balanceBefore).to.be.equal(ZERO);
-        expect(balanceAfter).to.be.equal(N1__0_18DEC.mul(BigNumber.from("3")));
-    });
-
-    it("Should be able to stake twice ipToken(usdc)", async () => {
-        // given
-        const balanceBefore = await liquidityRewards
-            .connect(userOne)
-            .balanceOf(tokens.ipTokenUsdc.address);
-        // when
-        await liquidityRewards.connect(userOne).stake(tokens.ipTokenUsdc.address, N1__0_6DEC);
-        await liquidityRewards.connect(userOne).stake(tokens.ipTokenUsdc.address, N1__0_6DEC);
-        // then
-        const balanceAfter = await liquidityRewards
-            .connect(userOne)
-            .balanceOf(tokens.ipTokenUsdc.address);
-
-        expect(balanceBefore).to.be.equal(ZERO);
-        expect(balanceAfter).to.be.equal(N1__0_6DEC.mul(BigNumber.from("2")));
-    });
-
-    it("Should not be able to stake when IpToken(usdt) is deactivated", async () => {
-        // given
-        const balanceBefore = await liquidityRewards
-            .connect(userOne)
-            .balanceOf(tokens.ipTokenUsdc.address);
-        await liquidityRewards.removeAsset(tokens.ipTokenUsdt.address);
-        // when
-        await expect(
-            liquidityRewards.connect(userOne).stake(tokens.ipTokenUsdt.address, N1__0_6DEC)
-        ).to.be.revertedWith("IPOR_702");
-        // then
-        const balanceAfter = await liquidityRewards
-            .connect(userOne)
-            .balanceOf(tokens.ipTokenUsdc.address);
-
-        expect(balanceBefore).to.be.equal(ZERO);
-        expect(balanceAfter).to.be.equal(ZERO);
-    });
-
-    it("Should not be able to stake when contract is pause", async () => {
-        // given
-        const balanceBefore = await liquidityRewards
-            .connect(userOne)
-            .balanceOf(tokens.ipTokenUsdc.address);
-        await liquidityRewards.pause();
-        // when
-        await expect(
-            liquidityRewards.connect(userOne).stake(tokens.ipTokenUsdt.address, N1__0_6DEC)
-        ).to.be.revertedWith("Pausable: paused");
-        // then
-        const balanceAfter = await liquidityRewards
-            .connect(userOne)
-            .balanceOf(tokens.ipTokenUsdc.address);
-
-        expect(balanceBefore).to.be.equal(ZERO);
-        expect(balanceAfter).to.be.equal(ZERO);
-    });
-
-    it("Should not be able to stake when amount is zero", async () => {
-        // given
-        const balanceBefore = await liquidityRewards
-            .connect(userOne)
-            .balanceOf(tokens.ipTokenUsdc.address);
-        // when
-        await expect(
-            liquidityRewards.connect(userOne).stake(tokens.ipTokenUsdt.address, ZERO)
-        ).to.be.revertedWith("IPOR_004");
-        // then
-        const balanceAfter = await liquidityRewards
-            .connect(userOne)
-            .balanceOf(tokens.ipTokenUsdc.address);
-
-        expect(balanceBefore).to.be.equal(ZERO);
-        expect(balanceAfter).to.be.equal(ZERO);
+        // await liquidityRewards
+        //     .connect(userOne)
+        //     .stake(tokens.ipTokenDai.address, N1__0_18DEC.mul(BigNumber.from("100")));
+        // console.log("############## after stake ipToken 2 ##################");
+        // await printParams();
+        //
+        // await liquidityRewards
+        //     .connect(userOne)
+        //     .stake(tokens.ipTokenDai.address, N1__0_18DEC.mul(BigNumber.from("100")));
+        // console.log("############## after stake ipToken 3 ##################");
+        // await printParams();
     });
 });

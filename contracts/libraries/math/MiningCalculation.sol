@@ -19,6 +19,10 @@ library MiningCalculation {
         uint256 verticalShift,
         uint256 horizontalShift
     ) internal view returns (uint256) {
+        console.log("MiningCalculation->calculateUserPowerUp->pwToken: ", pwToken);
+        console.log("MiningCalculation->calculateUserPowerUp->ipToken: ", ipToken);
+        console.log("MiningCalculation->calculateUserPowerUp->verticalShift: ", verticalShift);
+        console.log("MiningCalculation->calculateUserPowerUp->horizontalShift: ", horizontalShift);
         if (ipToken == 0) {
             return 0;
         }
@@ -45,8 +49,34 @@ library MiningCalculation {
         uint256 previousAggregatePowerUp
     ) internal view returns (uint256) {
         //        todo fix to int
-        uint256 apu = userPowerUp * userIpToken - previousUserPowerUp * previousUserIpToken;
-        return previousAggregatePowerUp + IporMath.division(apu, Constants.D18);
+        console.log("MiningCalculation->calculateAggregatePowerUp->userPowerUp: -", userPowerUp);
+        console.log("MiningCalculation->calculateAggregatePowerUp->userIpToken: -", userIpToken);
+        console.log(
+            "MiningCalculation->calculateAggregatePowerUp->previousUserPowerUp: -",
+            previousUserPowerUp
+        );
+        console.log(
+            "MiningCalculation->calculateAggregatePowerUp->previousUserIpToken: -",
+            previousUserIpToken
+        );
+        console.log(
+            "MiningCalculation->calculateAggregatePowerUp->previousAggregatePowerUp: -",
+            previousAggregatePowerUp
+        );
+
+        int256 apu = userPowerUp.toInt256() *
+            userIpToken.toInt256() -
+            previousUserPowerUp.toInt256() *
+            previousUserIpToken.toInt256();
+
+        if (apu < 0) {
+            console.log("MiningCalculation->calculateAggregatePowerUp->apu: -", (-apu).toUint256());
+
+            return previousAggregatePowerUp - IporMath.division((-apu).toUint256(), Constants.D18);
+        }
+        console.log("MiningCalculation->calculateAggregatePowerUp->apu: ", (apu).toUint256());
+
+        return previousAggregatePowerUp + IporMath.division(apu.toUint256(), Constants.D18);
     }
 
     function calculateAccruedRewards(
@@ -59,44 +89,44 @@ library MiningCalculation {
             blocNumber >= lastRebalancingBlockNumber,
             MiningErrors.BLOCK_NUMBER_GREATER_OR_EQUAL_THEN_PREVIOUS_BLOCK_NUMBER
         );
-        //        TODO fix uint to int
         uint256 newRewords = (blocNumber - lastRebalancingBlockNumber) *
             blockRewords *
             Constants.D10;
         return previousAccruedRewards + newRewords;
     }
 
-    //    TODO: what if in one block we change  blockRewards and calculate calculateUserCompositeMultiplier ??
-    function calculateUserCompositeMultiplier(
-        uint256 compositeMultiplier,
-        uint256 blockRewards,
-        uint256 aggregatePowerUp
-    ) internal view returns (uint256) {
-        uint256 rewards = blockRewards * aggregatePowerUp;
-        console.log("blockRewards: ", blockRewards);
-        console.log("aggregatePowerUp: ", aggregatePowerUp);
-        console.log("rewards: ", rewards);
-        console.log("compositeMultiplier: ", compositeMultiplier);
-        int256 result = compositeMultiplier.toInt256() -
-            IporMath.division(rewards, Constants.D8).toInt256();
-        if (result < 0) {
-            console.logInt(result);
-            return 0;
-        }
-        return result.toUint256();
-    }
-
-    function calculateCompositeMultiplier(
+    function compositeMultiplierCumulative(
+        uint256 lastRebalanseBlockNumber,
+        uint256 blockNumber,
+        uint256 previousCompositeMultiplierCumulative,
         uint256 previousCompositeMultiplier,
-        uint256 accruedRewards,
-        uint256 aggregatePowerUp
+        uint256 compositeMultiplier
     ) internal view returns (uint256) {
-        if (aggregatePowerUp == 0) {
-            return accruedRewards; // todo ask łukasz accruedRewards ? aggregatePowerUp
+        if (blockNumber == lastRebalanseBlockNumber) {
+            return previousCompositeMultiplierCumulative;
         }
         return
+            (blockNumber - lastRebalanseBlockNumber - 1) *
             previousCompositeMultiplier +
-            IporMath.division(accruedRewards * Constants.D18, aggregatePowerUp);
+            previousCompositeMultiplierCumulative +
+            compositeMultiplier;
+    }
+
+    function compositeMultiplier(uint256 blockRewards, uint256 aggregatePowerUp)
+        internal
+        view
+        returns (uint256)
+    {
+        console.log("MiningCalculation->compositeMultiplier->blockRewards: ", blockRewards);
+        console.log("MiningCalculation->compositeMultiplier->aggregatePowerUp: ", aggregatePowerUp);
+        if (aggregatePowerUp == 0) {
+            return 0;
+        }
+        return
+            IporMath.divisionWithoutRound(
+                blockRewards * Constants.D18 * Constants.D10,
+                aggregatePowerUp
+            );
     }
 
     function calculateUserRewards(
@@ -105,6 +135,16 @@ library MiningCalculation {
         uint256 compositeMultiplier,
         uint256 userCompositeMultiplier
     ) internal view returns (uint256) {
+        console.log("MiningCalculation->calculateUserRewards->userIpTokens: ", userIpTokens);
+        console.log("MiningCalculation->calculateUserRewards->userPowerUp: ", userPowerUp);
+        console.log(
+            "MiningCalculation->calculateUserRewards->compositeMultiplier: ",
+            compositeMultiplier
+        );
+        console.log(
+            "MiningCalculation->calculateUserRewards->userCompositeMultiplier: ",
+            userCompositeMultiplier
+        );
         require(
             compositeMultiplier >= userCompositeMultiplier,
             MiningErrors.COMPOSITE_MULTIPLIER_GREATER_OR_EQUAL_THEN_USER_COMPOSITE_MULTIPLIER
@@ -112,11 +152,14 @@ library MiningCalculation {
         uint256 userRewards = userIpTokens *
             userPowerUp *
             (compositeMultiplier - userCompositeMultiplier);
-        return IporMath.division(userRewards, Constants.D54);
+        return IporMath.division(userRewards, Constants.D36);
     }
 
     //  On fraction we lost 0.00000000000000001
     function _toFixedPoint(uint256 number, uint256 decimals) internal view returns (bytes16) {
+        if (number % decimals > 0) {
+            number += 1;
+        }
         bytes16 nominator = ABDKMathQuad.fromUInt(number);
         bytes16 denominator = ABDKMathQuad.fromUInt(decimals);
         console.log("number: ", number);
