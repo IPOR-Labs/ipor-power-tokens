@@ -8,6 +8,8 @@ library Constants {
     uint256 public constant D8 = 1e8;
     uint256 public constant D10 = 1e10;
     uint256 public constant D18 = 1e18;
+    uint256 public constant D19 = 1e19;
+    uint256 public constant D45 = 1e45;
     int256 public constant D18_INT = 1e18;
     uint256 public constant D36 = 1e36;
     uint256 public constant D54 = 1e54;

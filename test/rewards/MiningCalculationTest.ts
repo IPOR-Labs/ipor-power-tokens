@@ -1,18 +1,11 @@
-import hre, { upgrades } from "hardhat";
+import hre from "hardhat";
 import chai from "chai";
 
 import { BigNumber } from "ethers";
 
 import { solidity } from "ethereum-waffle";
 import { MockMiningCalculation } from "../../types";
-import {
-    N1__0_18DEC,
-    N1__0_6DEC,
-    ZERO,
-    N0__1_18DEC,
-    TOTAL_SUPPLY_18_DECIMALS,
-    TOTAL_SUPPLY_6_DECIMALS,
-} from "../utils/Constants";
+import { N1__0_18DEC, ZERO, N0__1_18DEC } from "../utils/Constants";
 
 chai.use(solidity);
 const { expect } = chai;

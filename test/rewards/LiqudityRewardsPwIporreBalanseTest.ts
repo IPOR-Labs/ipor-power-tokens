@@ -80,7 +80,7 @@ describe("LiquidityRewards Stake and balance", () => {
         //    then
     });
 
-    it("Should be able to stake power token when proper data passed", async () => {
+    it("Should be able to stake power token", async () => {
         //    given
         const balancesBefore = await liquidityRewards.balanceOfDelegatedPwIpor(
             await admin.getAddress(),
@@ -117,7 +117,7 @@ describe("LiquidityRewards Stake and balance", () => {
                 [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
                 amounts
             )
-        ).to.be.revertedWith("Pausable: paused");
+        ).to.be.revertedWith("Passable: paused");
         //    then
     });
 });

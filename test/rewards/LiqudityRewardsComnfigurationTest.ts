@@ -12,7 +12,7 @@ const { expect } = chai;
 
 const randomAddress = "0x0B54FA10558caBBdd0D6df5b8667913C43567Bc5";
 
-describe("LiquidityRewards comnfiguration, deploy tests", () => {
+describe("LiquidityRewards configuration, deploy tests", () => {
     let tokens: Tokens;
     let accounts: Signer[];
 

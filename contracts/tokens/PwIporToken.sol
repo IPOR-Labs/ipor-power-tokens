@@ -100,7 +100,7 @@ contract PwIporToken is
         uint256 userBalance = _balanceOf(_msgSender());
         uint256 userDelegatedBalance = _delegatedBalance[_msgSender()];
         uint256 newUserDelegatedBalance = pwIporToDelegate + userDelegatedBalance;
-        require(userBalance >= newUserDelegatedBalance, MiningErrors.UNSTAKED_BALANCE_TOO_LOW);
+        require(userBalance >= newUserDelegatedBalance, MiningErrors.STAKED_BALANCE_TOO_LOW);
         _delegatedBalance[_msgSender()] = newUserDelegatedBalance;
         ILiquidityRewards(_liquidityRewards).delegatePwIpor(_msgSender(), assets, amounts);
 

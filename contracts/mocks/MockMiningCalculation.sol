@@ -38,14 +38,14 @@ contract MockMiningCalculation {
 
     function calculateAccruedRewards(
         uint256 blocNumber,
-        uint256 lastRebalancingBlockNumber,
+        uint256 lastRebalanceBlockNumber,
         uint256 blockRewords,
         uint256 previousAccruedRewards
     ) public view returns (uint256) {
         return
             MiningCalculation.calculateAccruedRewards(
                 blocNumber,
-                lastRebalancingBlockNumber,
+                lastRebalanceBlockNumber,
                 blockRewords,
                 previousAccruedRewards
             );

@@ -48,19 +48,18 @@ library MiningCalculation {
         uint256 previousUserIpToken,
         uint256 previousAggregatePowerUp
     ) internal view returns (uint256) {
-        //        todo fix to int
-        console.log("MiningCalculation->calculateAggregatePowerUp->userPowerUp: -", userPowerUp);
-        console.log("MiningCalculation->calculateAggregatePowerUp->userIpToken: -", userIpToken);
+        console.log("MiningCalculation->calculateAggregatePowerUp->userPowerUp: ", userPowerUp);
+        console.log("MiningCalculation->calculateAggregatePowerUp->userIpToken: ", userIpToken);
         console.log(
-            "MiningCalculation->calculateAggregatePowerUp->previousUserPowerUp: -",
+            "MiningCalculation->calculateAggregatePowerUp->previousUserPowerUp: ",
             previousUserPowerUp
         );
         console.log(
-            "MiningCalculation->calculateAggregatePowerUp->previousUserIpToken: -",
+            "MiningCalculation->calculateAggregatePowerUp->previousUserIpToken: ",
             previousUserIpToken
         );
         console.log(
-            "MiningCalculation->calculateAggregatePowerUp->previousAggregatePowerUp: -",
+            "MiningCalculation->calculateAggregatePowerUp->previousAggregatePowerUp: ",
             previousAggregatePowerUp
         );
 
@@ -71,8 +70,12 @@ library MiningCalculation {
 
         if (apu < 0) {
             console.log("MiningCalculation->calculateAggregatePowerUp->apu: -", (-apu).toUint256());
-
-            return previousAggregatePowerUp - IporMath.division((-apu).toUint256(), Constants.D18);
+            uint256 absApu = (-apu).toUint256();
+            require(
+                previousAggregatePowerUp >= absApu,
+                MiningErrors.AGGREGATE_POWER_UP_COULD_NOT_BE_NEGATIVE
+            );
+            return previousAggregatePowerUp - IporMath.division(absApu, Constants.D18);
         }
         console.log("MiningCalculation->calculateAggregatePowerUp->apu: ", (apu).toUint256());
 
@@ -81,20 +84,19 @@ library MiningCalculation {
 
     function calculateAccruedRewards(
         uint256 blocNumber,
-        uint256 lastRebalancingBlockNumber,
+        uint256 lastRebalanceBlockNumber,
         uint256 blockRewords,
         uint256 previousAccruedRewards
     ) internal view returns (uint256) {
         require(
-            blocNumber >= lastRebalancingBlockNumber,
+            blocNumber >= lastRebalanceBlockNumber,
             MiningErrors.BLOCK_NUMBER_GREATER_OR_EQUAL_THEN_PREVIOUS_BLOCK_NUMBER
         );
-        uint256 newRewords = (blocNumber - lastRebalancingBlockNumber) *
-            blockRewords *
-            Constants.D10;
+        uint256 newRewords = (blocNumber - lastRebalanceBlockNumber) * blockRewords * Constants.D10;
         return previousAccruedRewards + newRewords;
     }
 
+    // returns value with 27 decimals
     function compositeMultiplierCumulative(
         uint256 lastRebalanseBlockNumber,
         uint256 blockNumber,
@@ -112,6 +114,7 @@ library MiningCalculation {
             compositeMultiplier;
     }
 
+    // returns value with 27 decimals
     function compositeMultiplier(uint256 blockRewards, uint256 aggregatePowerUp)
         internal
         view
@@ -122,18 +125,14 @@ library MiningCalculation {
         if (aggregatePowerUp == 0) {
             return 0;
         }
-        return
-            IporMath.divisionWithoutRound(
-                blockRewards * Constants.D18 * Constants.D10,
-                aggregatePowerUp
-            );
+        return IporMath.division(blockRewards * Constants.D18 * Constants.D19, aggregatePowerUp);
     }
 
     function calculateUserRewards(
         uint256 userIpTokens,
         uint256 userPowerUp,
         uint256 compositeMultiplier,
-        uint256 userCompositeMultiplier
+        uint256 compositeMultiplierCumulative
     ) internal view returns (uint256) {
         console.log("MiningCalculation->calculateUserRewards->userIpTokens: ", userIpTokens);
         console.log("MiningCalculation->calculateUserRewards->userPowerUp: ", userPowerUp);
@@ -143,29 +142,27 @@ library MiningCalculation {
         );
         console.log(
             "MiningCalculation->calculateUserRewards->userCompositeMultiplier: ",
-            userCompositeMultiplier
+            compositeMultiplierCumulative
         );
         require(
-            compositeMultiplier >= userCompositeMultiplier,
+            compositeMultiplier >= compositeMultiplierCumulative,
             MiningErrors.COMPOSITE_MULTIPLIER_GREATER_OR_EQUAL_THEN_USER_COMPOSITE_MULTIPLIER
         );
         uint256 userRewards = userIpTokens *
             userPowerUp *
-            (compositeMultiplier - userCompositeMultiplier);
-        return IporMath.division(userRewards, Constants.D36);
+            (compositeMultiplier - compositeMultiplierCumulative);
+        return IporMath.division(userRewards, Constants.D45);
     }
 
-    //  On fraction we lost 0.00000000000000001
     function _toFixedPoint(uint256 number, uint256 decimals) internal view returns (bytes16) {
         if (number % decimals > 0) {
+            //            when we calculate we lost this value in conversion
             number += 1;
         }
         bytes16 nominator = ABDKMathQuad.fromUInt(number);
         bytes16 denominator = ABDKMathQuad.fromUInt(decimals);
-        console.log("number: ", number);
         bytes16 fraction = ABDKMathQuad.div(nominator, denominator);
         bytes16 test4 = ABDKMathQuad.mul(fraction, ABDKMathQuad.fromUInt(Constants.D18));
-        console.log("fraction: ", ABDKMathQuad.toUInt(test4));
         return fraction;
     }
 }

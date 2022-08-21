@@ -5,14 +5,6 @@ import { BigNumber } from "ethers";
 
 import { solidity } from "ethereum-waffle";
 import { MockMiningCalculation } from "../../types";
-import {
-    N1__0_18DEC,
-    N1__0_6DEC,
-    ZERO,
-    N0__1_18DEC,
-    TOTAL_SUPPLY_18_DECIMALS,
-    TOTAL_SUPPLY_6_DECIMALS,
-} from "../utils/Constants";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -24,69 +16,14 @@ describe("LiquidityRewards Stake and balance", () => {
     const verticalShift = BigNumber.from("400000000000000000");
     const horizontalShift = D18;
     let miningCalculation: MockMiningCalculation;
-    let lastBlockNumber = BigNumber.from("823");
-    let blockNumber = BigNumber.from("823");
-    let blockRewords = BigNumber.from("100000000");
 
     before(async () => {
         const MiningCalculation = await hre.ethers.getContractFactory("MockMiningCalculation");
         miningCalculation = (await MiningCalculation.deploy()) as MockMiningCalculation;
     });
 
-    const getBlockNumber = (): BigNumber => {
-        const newBlockNumber = blockNumber.add(one);
-        blockNumber = newBlockNumber;
-        return blockNumber;
-    };
-
-    // it("Should pass negative CM case", async () => {
-    //     let accruedRewards: BigNumber;
-    //     let compositeMultiplierGlobal: BigNumber;
-    //     let userPowerUp: BigNumber;
-    //     let userCompositeMultiplier: BigNumber;
-    //     //    SetUp blockReward
-    //     console.log("#################SetUp blockReward##################");
-    //     accruedRewards = await miningCalculation.calculateAccruedRewards(
-    //         blockNumber,
-    //         lastBlockNumber,
-    //         blockRewords,
-    //         zero
-    //     );
-    //     console.log("###accruedRewards: ", accruedRewards.toString());
-    //     console.log("###accruedRewards: ", accruedRewards.div(D18).toString());
-    //     compositeMultiplierGlobal = await miningCalculation.calculateCompositeMultiplier(
-    //         0,
-    //         accruedRewards,
-    //         0
-    //     );
-    //     console.log("###compositeMultiplierGlobal: ", compositeMultiplierGlobal.toString());
-    //     console.log(
-    //         "###compositeMultiplierGlobal: ",
-    //         compositeMultiplierGlobal.div(D18).toString()
-    //     );
-    //
-    //     console.log("#################SDelegate Power Token##################");
-    //     let newPowerTokenBalance = BigNumber.from(100).mul(D18);
-    //
-    //     userPowerUp = await miningCalculation.calculateUserPowerUp(
-    //         newPowerTokenBalance,
-    //         zero,
-    //         verticalShift,
-    //         horizontalShift
-    //     );
-    //     console.log("###userPowerUp: ", userPowerUp.toString());
-    //     console.log("###userPowerUp: ", userPowerUp.div(D18).toString());
-    //
-    //     userCompositeMultiplier = await miningCalculation.calculateUserCompositeMultiplier(
-    //         compositeMultiplierGlobal,
-    //         blockRewords,
-    //         zero
-    //     );
-    //     console.log("###userCompositeMultiplier: ", userCompositeMultiplier.toString());
-    //     console.log("###userCompositeMultiplier: ", userCompositeMultiplier.div(D18).toString());
-    // });
-
-    it("Should ", async () => {
+    //flow based on Łukasz's excel file
+    it("Should calculate rewards", async () => {
         const block1 = BigNumber.from("1");
         const blockRewards = BigNumber.from("300000000");
         const N3_0_D18 = BigNumber.from("3000000000000000000");
@@ -129,7 +66,7 @@ describe("LiquidityRewards Stake and balance", () => {
             aggregateBoost
         );
 
-        expect(compositeMultiplier).to.be.equal(BigNumber.from("21428571428571428"));
+        expect(compositeMultiplier).to.be.equal(BigNumber.from("21428571428571428571428571"));
 
         const compositeMultiplierCumulative = await miningCalculation.compositeMultiplierCumulative(
             zero,
@@ -138,7 +75,9 @@ describe("LiquidityRewards Stake and balance", () => {
             zero,
             compositeMultiplier
         );
-        expect(compositeMultiplierCumulative).to.be.equal(BigNumber.from("21428571428571428"));
+        expect(compositeMultiplierCumulative).to.be.equal(
+            BigNumber.from("21428571428571428571428571")
+        );
         const block1CompositeMultiplierCumulative = compositeMultiplierCumulative; // userOne
         const rewardsInBlock = await miningCalculation.calculateUserRewards(
             userOneIpToken,
@@ -146,7 +85,7 @@ describe("LiquidityRewards Stake and balance", () => {
             compositeMultiplierCumulative,
             user1compositeMultiplierCumulativeBefore
         );
-        expect(rewardsInBlock).to.be.equal(BigNumber.from("2999999999999999920"));
+        expect(rewardsInBlock).to.be.equal(BigNumber.from("3000000000000000000"));
 
         //Block 2 calculation
         const block2 = BigNumber.from("2");
@@ -171,7 +110,7 @@ describe("LiquidityRewards Stake and balance", () => {
 
         console.log(rewardsInBlock2UserOne.toString());
         expect(rewardsInBlock2UserOne, "Rewords userOne in block 2").to.be.equal(
-            BigNumber.from("5999999999999999840")
+            BigNumber.from("6000000000000000000")
         );
 
         //Block 3 calculation
@@ -212,7 +151,7 @@ describe("LiquidityRewards Stake and balance", () => {
             aggregateBoostBlock3
         );
 
-        expect(compositeMultiplierBlock3).to.be.equal(BigNumber.from("10714285714285714"));
+        expect(compositeMultiplierBlock3).to.be.equal(BigNumber.from("10714285714285714285714286"));
 
         const compositeMultiplierCumulativeBlock3 =
             await miningCalculation.compositeMultiplierCumulative(
@@ -224,7 +163,7 @@ describe("LiquidityRewards Stake and balance", () => {
             ); // user2
 
         expect(compositeMultiplierCumulativeBlock3).to.be.equal(
-            BigNumber.from("53571428571428570")
+            BigNumber.from("53571428571428571428571428")
         );
 
         const user2compositeMultiplierCumulativeBefore = compositeMultiplierCumulativeBlock2;
@@ -234,7 +173,7 @@ describe("LiquidityRewards Stake and balance", () => {
             compositeMultiplierCumulativeBlock3,
             user2compositeMultiplierCumulativeBefore
         );
-        expect(rewardsInBlock3User2).to.be.equal(BigNumber.from("1499999999999999960"));
+        expect(rewardsInBlock3User2).to.be.equal(BigNumber.from("1500000000000000000"));
 
         const rewardsInBlock3UserOne = await miningCalculation.calculateUserRewards(
             userOneIpToken,
@@ -245,7 +184,7 @@ describe("LiquidityRewards Stake and balance", () => {
 
         console.log(rewardsInBlock3UserOne.toString());
         expect(rewardsInBlock3UserOne, "Rewords userOne in block 3").to.be.equal(
-            BigNumber.from("7499999999999999800")
+            BigNumber.from("7500000000000000000")
         );
 
         //Block 4 calculation
@@ -279,10 +218,10 @@ describe("LiquidityRewards Stake and balance", () => {
 
         console.log(rewardsInBlock4UserTwo.toString());
         expect(rewardsInBlock4UserOne, "Rewords userOne in block 4").to.be.equal(
-            BigNumber.from("8999999999999999760")
+            BigNumber.from("9000000000000000000")
         );
         expect(rewardsInBlock4UserTwo, "Rewords userOne in block 4").to.be.equal(
-            BigNumber.from("2999999999999999920")
+            BigNumber.from("3000000000000000000")
         );
 
         //Block 5 calculation
@@ -320,7 +259,7 @@ describe("LiquidityRewards Stake and balance", () => {
             aggregateBoostBlock5
         );
 
-        expect(compositeMultiplierBlock5).to.be.equal(BigNumber.from("5719610401564160"));
+        expect(compositeMultiplierBlock5).to.be.equal(BigNumber.from("5719610401564160383976446"));
 
         const compositeMultiplierCumulativeBlock5 =
             await miningCalculation.compositeMultiplierCumulative(
@@ -332,7 +271,7 @@ describe("LiquidityRewards Stake and balance", () => {
             ); // user2
 
         expect(compositeMultiplierCumulativeBlock5).to.be.equal(
-            BigNumber.from("70005324687278444")
+            BigNumber.from("70005324687278446098262160")
         );
 
         const user3compositeMultiplierCumulativeBefore = compositeMultiplierCumulativeBlock4;
@@ -342,7 +281,7 @@ describe("LiquidityRewards Stake and balance", () => {
             compositeMultiplierCumulativeBlock5,
             user3compositeMultiplierCumulativeBefore
         );
-        expect(rewardsInBlock5User3).to.be.equal(BigNumber.from("1398509087562034999"));
+        expect(rewardsInBlock5User3).to.be.equal(BigNumber.from("1398509087562035092"));
 
         const rewardsInBlock5UserOne = await miningCalculation.calculateUserRewards(
             userOneIpToken,
@@ -353,7 +292,7 @@ describe("LiquidityRewards Stake and balance", () => {
 
         console.log(rewardsInBlock5UserOne.toString());
         expect(rewardsInBlock5UserOne, "Rewords userOne in block 3").to.be.equal(
-            BigNumber.from("9800745456218982160")
+            BigNumber.from("9800745456218982454")
         );
 
         const rewardsInBlock5UserTwo = await miningCalculation.calculateUserRewards(
@@ -364,12 +303,12 @@ describe("LiquidityRewards Stake and balance", () => {
         );
 
         expect(rewardsInBlock5UserTwo, "Rewords userOne in block 4").to.be.equal(
-            BigNumber.from("3800745456218982320")
+            BigNumber.from("3800745456218982454")
         );
 
         const sumBlock5 = rewardsInBlock5User3
             .add(rewardsInBlock5UserOne)
             .add(rewardsInBlock5UserTwo);
-        expect(sumBlock5).to.be.equal(BigNumber.from("14999999999999999479"));
+        expect(sumBlock5).to.be.equal(BigNumber.from("15000000000000000000"));
     });
 });

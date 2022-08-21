@@ -1,5 +1,6 @@
 import hre from "hardhat";
-import { Signer } from "ethers";
+import { BigNumber, Signer } from "ethers";
+import chai from "chai";
 
 import { DaiMockedToken, UsdcMockedToken, UsdtMockedToken, IpToken } from "../../types";
 
@@ -11,6 +12,8 @@ import {
     N1__0_6DEC,
 } from "./Constants";
 
+const { expect } = chai;
+
 export type Tokens = {
     tokenDai: DaiMockedToken;
     tokenUsdc: UsdcMockedToken;
@@ -18,6 +21,22 @@ export type Tokens = {
     ipTokenDai: IpToken;
     ipTokenUsdc: IpToken;
     ipTokenUsdt: IpToken;
+};
+
+export type GlobalParams = {
+    aggregatePowerUp: BigNumber;
+    accruedRewards: BigNumber;
+    compositeMultiplierInTheBlock: BigNumber;
+    compositeMultiplierCumulativeBeforeBlock: BigNumber;
+    blockNumber: number;
+    blockRewords: number;
+};
+
+export type UserParams = {
+    powerUp: BigNumber;
+    compositeMultiplierCumulative: BigNumber;
+    ipTokensBalance: BigNumber;
+    delegatedPowerTokenBalance: BigNumber;
 };
 
 export const getDeployedTokens = async (accounts: Signer[]): Promise<Tokens> => {
@@ -62,5 +81,71 @@ export const getDeployedTokens = async (accounts: Signer[]): Promise<Tokens> => 
         ipTokenDai,
         ipTokenUsdc,
         ipTokenUsdt,
+    };
+};
+
+export const extractGlobalParam = (value: any): GlobalParams => {
+    const aggregatePowerUp = value[0];
+    const accruedRewards = value[1];
+    const compositeMultiplierInTheBlock = value[2];
+    const compositeMultiplierCumulativeBeforeBlock = value[3];
+    const blockNumber = value[4];
+    const blockRewords = value[5];
+
+    return {
+        aggregatePowerUp,
+        accruedRewards,
+        compositeMultiplierInTheBlock,
+        compositeMultiplierCumulativeBeforeBlock,
+        blockNumber,
+        blockRewords,
+    };
+};
+
+export const expectGlobalParam = (
+    params: GlobalParams,
+    aggregatePowerUp: BigNumber,
+    accruedRewards: BigNumber,
+    compositeMultiplierInTheBlock: BigNumber,
+    compositeMultiplierCumulativeBeforeBlock: BigNumber,
+    blockNumber: number,
+    blockRewords: number
+): void => {
+    expect(params.aggregatePowerUp).to.be.equal(aggregatePowerUp);
+    expect(params.accruedRewards).to.be.equal(accruedRewards);
+    expect(params.compositeMultiplierInTheBlock).to.be.equal(compositeMultiplierInTheBlock);
+    expect(params.compositeMultiplierCumulativeBeforeBlock).to.be.equal(
+        compositeMultiplierCumulativeBeforeBlock
+    );
+    if (blockNumber !== -1) {
+        expect(params.blockNumber).to.be.equal(blockNumber);
+    }
+    expect(params.blockRewords).to.be.equal(blockRewords);
+};
+
+export const expectUserParam = (
+    params: UserParams,
+    powerUp: BigNumber,
+    compositeMultiplierCumulative: BigNumber,
+    ipTokensBalance: BigNumber,
+    delegatedPowerTokenBalance: BigNumber
+): void => {
+    expect(params.powerUp).to.be.equal(powerUp);
+    expect(params.compositeMultiplierCumulative).to.be.equal(compositeMultiplierCumulative);
+    expect(params.ipTokensBalance).to.be.equal(ipTokensBalance);
+    expect(params.delegatedPowerTokenBalance).to.be.equal(delegatedPowerTokenBalance);
+};
+
+export const extractMyParam = (value: any): UserParams => {
+    const powerUp = value[0];
+    const compositeMultiplierCumulative = value[1];
+    const ipTokensBalance = value[2];
+    const delegatedPowerTokenBalance = value[3];
+
+    return {
+        powerUp,
+        compositeMultiplierCumulative,
+        ipTokensBalance,
+        delegatedPowerTokenBalance,
     };
 };
