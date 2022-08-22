@@ -117,7 +117,7 @@ describe("LiquidityRewards Stake and balance", () => {
                 [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
                 amounts
             )
-        ).to.be.revertedWith("Passable: paused");
+        ).to.be.revertedWith("Pausable: paused");
         //    then
     });
 });

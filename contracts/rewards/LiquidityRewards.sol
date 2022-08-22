@@ -203,13 +203,6 @@ contract LiquidityRewards is
             "LiquidityRewards->stake->globalParamsOld.blockNumber: ",
             globalParams.blockNumber
         );
-        // if there is no PwIporToken we don't recalculate params
-        if (userParams.delegatedPwTokenBalance == 0) {
-            _usersParams[_msgSender()][asset].ipTokensBalance =
-                userParams.ipTokensBalance +
-                stakedIpTokens;
-            return;
-        }
 
         // TODO: assumption we start counting from first person who can get rewards
         if (globalParams.blockNumber == 0) {
