@@ -73,8 +73,8 @@ contract LiquidityRewards is
         return 1;
     }
 
-    //todo change name
     function userRewards(address asset) external view returns (uint256) {
+        console.log("LiquidityRewards->userRewards->block.number: ", block.number);
         return _userRewards(asset, _msgSender());
     }
 
@@ -192,7 +192,7 @@ contract LiquidityRewards is
         if (rewards > 0) {
             _claim(_msgSender(), asset, rewards);
         }
-
+        console.log("LiquidityRewards->stake->stakedIpTokens: ", stakedIpTokens);
         _rebalanceParams(userParams, globalParams, stakedIpTokens, 0, asset, _msgSender());
         // TODO: ADD event
     }
@@ -212,6 +212,7 @@ contract LiquidityRewards is
 
     function claim(address asset) external whenNotPaused {
         uint256 rewards = _userRewards(asset, _msgSender());
+        console.log("LiquidityRewards->claim->rewards: ", rewards);
         require(rewards > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
         _claim(_msgSender(), asset, rewards);
         // TODO: ADD event
@@ -273,6 +274,7 @@ contract LiquidityRewards is
         address asset,
         uint256 rewards
     ) internal {
+        console.log("LiquidityRewards->_claim->block.number: ", block.number);
         IPwIporToken(_getPwIpor()).receiveRewords(user, rewards);
 
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
@@ -404,7 +406,7 @@ contract LiquidityRewards is
         LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[user][asset];
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
         console.log(
-            "LiquidityRewards->stake->globalParamsOld.blockNumber: ",
+            "LiquidityRewards->_addPwIporToBalance->globalParamsOld.blockNumber: ",
             globalParams.blockNumber
         );
 
@@ -420,7 +422,9 @@ contract LiquidityRewards is
             globalParams.blockNumber = uint32(block.number);
         }
 
-        uint256 rewards = _userRewards(asset, _msgSender());
+        uint256 rewards = _userRewards(asset, user);
+
+        console.log("LiquidityRewards->_addPwIporToBalance->rewards: ", rewards);
 
         if (rewards > 0) {
             _claim(user, asset, rewards);

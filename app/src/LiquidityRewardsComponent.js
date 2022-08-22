@@ -600,11 +600,86 @@ export default ({ drizzle, drizzleState }) => (
                         <strong>Set rewards per block</strong> <br />
                         <small>1 = 100 000 000</small>
                     </td>
-                    <td colspan="2">
+                    <td colSpan="2">
                         <ContractForm
                             drizzle={drizzle}
                             contract="LiquidityRewards"
                             method="setRewardsPerBlock"
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>My Rewards</strong>
+                    </td>
+                    <td>
+                        <ContractData
+                            drizzle={drizzle}
+                            drizzleState={drizzleState}
+                            contract="LiquidityRewards"
+                            method="userRewards"
+                            methodArgs={[drizzle.contracts.IpTokenUsdt.address]}
+                            render={(value) => {
+                                console.error(value);
+                                return (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                );
+                            }}
+                        />
+                    </td>
+                    <td>
+                        <ContractData
+                            drizzle={drizzle}
+                            drizzleState={drizzleState}
+                            contract="LiquidityRewards"
+                            method="userRewards"
+                            methodArgs={[drizzle.contracts.IpTokenUsdc.address]}
+                            render={(value) => {
+                                console.error(value);
+                                return (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                );
+                            }}
+                        />
+                    </td>
+                    <td>
+                        <ContractData
+                            drizzle={drizzle}
+                            drizzleState={drizzleState}
+                            contract="LiquidityRewards"
+                            method="userRewards"
+                            methodArgs={[drizzle.contracts.IpTokenDai.address]}
+                            render={(value) => {
+                                console.error(value);
+                                return (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                );
+                            }}
+                        />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <strong>Claim</strong> <br />
+                    </td>
+                    <td colspan="2">
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="LiquidityRewards"
+                            method="claim"
                         />
                     </td>
                 </tr>

@@ -102,6 +102,12 @@ contract PwIporToken is
         uint256 oldUserBalance = _baseBalance[user];
         uint256 oldTotalSupply = _baseTotalSupply;
         uint256 exchangeRate = _exchangeRate();
+        console.log("PwIporToken->receiveRewords->_msgSender(): ", _msgSender());
+        console.log("PwIporToken->receiveRewords->amount: ", amount);
+        console.log(
+            "PwIporToken->receiveRewords->balanceOf(): ",
+            IERC20Upgradeable(_iporToken).balanceOf(_msgSender())
+        );
         IERC20Upgradeable(_iporToken).safeTransferFrom(_msgSender(), address(this), amount);
         uint256 newBaseTokens = IporMath.division(amount * Constants.D18, exchangeRate);
         _baseBalance[user] = oldUserBalance + newBaseTokens;

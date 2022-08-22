@@ -5,7 +5,7 @@ const { deployProxy, erc1967 } = require("@openzeppelin/truffle-upgrades");
 module.exports = async function (deployer, _network, addresses, LiquidityRewards, initialParams) {
     const liquidityRewardsProxy = await deployProxy(
         LiquidityRewards,
-        [initialParams.assets, initialParams.pwIporToken],
+        [initialParams.assets, initialParams.pwIporToken, initialParams.iporToken],
         {
             deployer: deployer,
             initializer: "initialize",

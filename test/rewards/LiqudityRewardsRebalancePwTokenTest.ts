@@ -90,6 +90,10 @@ describe("LiquidityRewards Stake and balance", () => {
             await userTwo.getAddress(),
             N1__0_18DEC.mul(BigNumber.from("10000"))
         );
+        await iporToken.transfer(
+            liquidityRewards.address,
+            N1__0_18DEC.mul(BigNumber.from("100000"))
+        );
         await pwIporToken.setLiquidityRewardsAddress(liquidityRewards.address);
     });
 

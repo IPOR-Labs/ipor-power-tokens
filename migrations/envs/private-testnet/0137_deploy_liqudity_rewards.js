@@ -8,11 +8,13 @@ module.exports = async function (deployer, _network, addresses) {
     const ipUsdc = await func.getValue(keys.ipUSDC);
     const ipDai = await func.getValue(keys.ipDAI);
     const pwIporToken = await func.getValue(keys.PwIporTokenProxy);
+    const iporToken = await func.getValue(keys.IPOR);
     const assets = [ipUsdt, ipUsdc, ipDai];
 
     const initialParams = {
         assets,
         pwIporToken,
+        iporToken,
     };
 
     const LiquidityRewards = artifacts.require("LiquidityRewards");
