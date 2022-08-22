@@ -39,6 +39,11 @@ contract PwIporToken is
         _disableInitializers();
     }
 
+    modifier onlyLiquidityRewards() {
+        require(_msgSender() == _liquidityRewards, MiningErrors.CALLER_NOT_LIQUIDITY_REWARDS);
+        _;
+    }
+
     function initialize(address iporToken) public initializer {
         __Pausable_init();
         __Ownable_init();
@@ -84,6 +89,22 @@ contract PwIporToken is
         IERC20Upgradeable(_iporToken).safeTransferFrom(_msgSender(), address(this), amount);
         uint256 newBaseTokens = IporMath.division(amount * Constants.D18, exchangeRate);
         _baseBalance[_msgSender()] = oldUserBalance + newBaseTokens;
+        _baseTotalSupply = oldTotalSupply + newBaseTokens;
+        // TODO: ADD Event
+    }
+
+    function receiveRewords(address user, uint256 amount)
+        external
+        whenNotPaused
+        onlyLiquidityRewards
+    {
+        require(amount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        uint256 oldUserBalance = _baseBalance[user];
+        uint256 oldTotalSupply = _baseTotalSupply;
+        uint256 exchangeRate = _exchangeRate();
+        IERC20Upgradeable(_iporToken).safeTransferFrom(_msgSender(), address(this), amount);
+        uint256 newBaseTokens = IporMath.division(amount * Constants.D18, exchangeRate);
+        _baseBalance[user] = oldUserBalance + newBaseTokens;
         _baseTotalSupply = oldTotalSupply + newBaseTokens;
         // TODO: ADD Event
     }

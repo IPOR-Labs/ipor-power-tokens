@@ -28,6 +28,7 @@ describe("LiquidityRewards configuration, deploy tests", () => {
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [],
             randomAddress,
+            tokens.ipTokenUsdt.address,
         ])) as LiquidityRewards;
         // then
         expect(liquidityRewards.address).to.be.not.undefined;
@@ -43,6 +44,7 @@ describe("LiquidityRewards configuration, deploy tests", () => {
             upgrades.deployProxy(LiquidityRewards, [
                 [],
                 "0x0000000000000000000000000000000000000000",
+                tokens.ipTokenUsdt.address,
             ])
         ).to.be.revertedWith("IPOR_000");
     });
@@ -54,6 +56,7 @@ describe("LiquidityRewards configuration, deploy tests", () => {
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
             randomAddress,
+            tokens.ipTokenUsdt.address,
         ])) as LiquidityRewards;
         // then
         const isDaiActive = await liquidityRewards.isAssetSupported(tokens.ipTokenDai.address);
@@ -72,6 +75,7 @@ describe("LiquidityRewards configuration, deploy tests", () => {
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [tokens.ipTokenDai.address],
             randomAddress,
+            tokens.ipTokenUsdt.address,
         ])) as LiquidityRewards;
         // then
         const isDaiActive = await liquidityRewards.isAssetSupported(tokens.ipTokenDai.address);
@@ -89,6 +93,7 @@ describe("LiquidityRewards configuration, deploy tests", () => {
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [],
             randomAddress,
+            tokens.ipTokenUsdt.address,
         ])) as LiquidityRewards;
         const isDaiActiveBefore = await liquidityRewards.isAssetSupported(
             tokens.ipTokenDai.address
@@ -126,6 +131,7 @@ describe("LiquidityRewards configuration, deploy tests", () => {
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [],
             randomAddress,
+            tokens.ipTokenUsdt.address,
         ])) as LiquidityRewards;
         const isUsdcActiveBefore = await liquidityRewards.isAssetSupported(
             tokens.ipTokenUsdc.address
@@ -145,6 +151,7 @@ describe("LiquidityRewards configuration, deploy tests", () => {
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [],
             randomAddress,
+            tokens.ipTokenUsdt.address,
         ])) as LiquidityRewards;
 
         const [admin, userOne] = accounts;
@@ -165,6 +172,7 @@ describe("LiquidityRewards configuration, deploy tests", () => {
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [],
             randomAddress,
+            tokens.ipTokenUsdt.address,
         ])) as LiquidityRewards;
 
         const [admin, userOne] = accounts;
@@ -183,6 +191,7 @@ describe("LiquidityRewards configuration, deploy tests", () => {
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [],
             randomAddress,
+            tokens.ipTokenUsdt.address,
         ])) as LiquidityRewards;
 
         const isPausedBefore = await liquidityRewards.paused();
@@ -201,6 +210,7 @@ describe("LiquidityRewards configuration, deploy tests", () => {
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [],
             randomAddress,
+            tokens.ipTokenUsdt.address,
         ])) as LiquidityRewards;
 
         const [admin, userOne] = accounts;
@@ -222,6 +232,7 @@ describe("LiquidityRewards configuration, deploy tests", () => {
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [],
             randomAddress,
+            tokens.ipTokenUsdt.address,
         ])) as LiquidityRewards;
         await liquidityRewards.pause();
         const isPausedBefore = await liquidityRewards.paused();
@@ -240,6 +251,7 @@ describe("LiquidityRewards configuration, deploy tests", () => {
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [],
             randomAddress,
+            tokens.ipTokenUsdt.address,
         ])) as LiquidityRewards;
 
         const [admin, userOne] = accounts;

@@ -52,6 +52,7 @@ describe("LiquidityRewards Stake and balance", () => {
         liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
             pwIporToken.address,
+            iporToken.address,
         ])) as LiquidityRewards;
 
         await tokens.ipTokenDai.approve(liquidityRewards.address, TOTAL_SUPPLY_18_DECIMALS);

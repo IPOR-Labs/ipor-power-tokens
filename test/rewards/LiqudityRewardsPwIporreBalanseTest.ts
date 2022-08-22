@@ -37,6 +37,7 @@ describe("LiquidityRewards Stake and balance", () => {
         liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
             await admin.getAddress(),
+            tokens.ipTokenUsdt.address,
         ])) as LiquidityRewards;
     });
 
@@ -117,7 +118,7 @@ describe("LiquidityRewards Stake and balance", () => {
                 [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
                 amounts
             )
-        ).to.be.revertedWith("Passable: paused");
+        ).to.be.revertedWith("Pausable: paused");
         //    then
     });
 });
