@@ -132,16 +132,16 @@ describe("LiquidityRewards Stake and balance", () => {
 
             expectGlobalParam(
                 extractGlobalParam(afterDelegatePwTokenGPR),
+                BigNumber.from("40000000000000000000"),
                 ZERO,
+                BigNumber.from("25000000000000000000000000"),
                 ZERO,
-                ZERO,
-                ZERO,
-                0,
+                -1,
                 100000000
             );
             expectUserParam(
                 extractMyParam(afterDelegatePwTokenUPR),
-                ZERO,
+                BigNumber.from("400000000000000000"),
                 ZERO,
                 stakedIpTokens,
                 ZERO
@@ -162,9 +162,9 @@ describe("LiquidityRewards Stake and balance", () => {
             expectGlobalParam(
                 extractGlobalParam(afterStakeIpTokensGPR),
                 BigNumber.from("140000000000000000000"),
-                ZERO,
+                BigNumber.from("1000000000000000000"),
                 BigNumber.from("7142857142857142857142857"),
-                ZERO,
+                BigNumber.from("25000000000000000000000000"),
                 -1,
                 100000000
             );
@@ -172,7 +172,7 @@ describe("LiquidityRewards Stake and balance", () => {
             expectUserParam(
                 extractMyParam(afterStakeIpTokensUPR),
                 BigNumber.from("1400000000000000000"),
-                ZERO,
+                BigNumber.from("25000000000000000000000000"),
                 stakedIpTokens,
                 delegatedIporToken
             );
@@ -223,7 +223,7 @@ describe("LiquidityRewards Stake and balance", () => {
                 .connect(userTwo)
                 .userRewards(tokens.ipTokenDai.address);
             expect(rewardsAdmin.add(rewardsUserOne).add(rewardsUserTwo)).to.be.equal(
-                BigNumber.from("305999999999999999999")
+                BigNumber.from("305652777777777777777") //TODO check it when we will get unstack ipToken
             );
         });
 
@@ -278,18 +278,18 @@ describe("LiquidityRewards Stake and balance", () => {
             expectGlobalParam(
                 globalParamsBefore,
                 BigNumber.from("140000000000000000000"),
-                ZERO,
+                BigNumber.from("1000000000000000000"),
                 BigNumber.from("7142857142857142857142857"),
-                ZERO,
+                BigNumber.from("25000000000000000000000000"),
                 -1,
                 100000000
             );
             expectGlobalParam(
                 globalParamsAfter,
                 BigNumber.from("140000000000000000000"),
-                BigNumber.from("101000000000000000000"),
+                BigNumber.from("102000000000000000000"),
                 ZERO,
-                BigNumber.from("721428571428571428571428557"),
+                BigNumber.from("746428571428571428571428557"),
                 -1,
                 0
             );
