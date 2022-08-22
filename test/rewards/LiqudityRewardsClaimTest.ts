@@ -191,10 +191,6 @@ describe("LiquidityRewards claim", () => {
             .balanceOf(await userOne.getAddress());
 
         await liquidityRewards.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokens);
-        console.log(
-            "#################: iporToken",
-            (await iporToken.balanceOf(liquidityRewards.address)).toString()
-        );
         await pwIporToken
             .connect(userOne)
             .delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
@@ -210,11 +206,6 @@ describe("LiquidityRewards claim", () => {
         const rewardsAfterFirstStake = await liquidityRewards
             .connect(userOne)
             .userRewards(tokens.ipTokenDai.address);
-
-        const userParam = await liquidityRewards
-            .connect(userOne)
-            .getMyParams(tokens.ipTokenDai.address);
-        console.table(extractMyParam(userParam));
 
         await pwIporToken
             .connect(userOne)
@@ -233,7 +224,9 @@ describe("LiquidityRewards claim", () => {
         expect(rewardsAfterSecondStake).to.be.equal(ZERO);
 
         expect(pwIporTokenBalanceBefore).to.be.equal(BigNumber.from("200000000000000000000"));
-        expect(pwIporTokenBalanceAfter1Stake).to.be.equal(BigNumber.from("200000000000000000000"));
-        expect(pwIporTokenBalanceAfter2Stake).to.be.equal(BigNumber.from("301000000000000000000"));
+        // 1 transfer when first delegateToRewards
+        expect(pwIporTokenBalanceAfter1Stake).to.be.equal(BigNumber.from("201000000000000000000"));
+        // 100 transfer after second delegateToRewards
+        expect(pwIporTokenBalanceAfter2Stake).to.be.equal(BigNumber.from("302000000000000000000"));
     });
 });
