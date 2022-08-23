@@ -69,13 +69,13 @@ library MiningCalculation {
             previousUserIpToken.toInt256();
 
         if (apu < 0) {
-            console.log("MiningCalculation->calculateAggregatePowerUp->apu: -", (-apu).toUint256());
-            uint256 absApu = (-apu).toUint256();
+            uint256 absApu = IporMath.division((-apu).toUint256(), Constants.D18);
+            console.log("MiningCalculation->calculateAggregatePowerUp->apu: -", absApu);
             require(
                 previousAggregatePowerUp >= absApu,
                 MiningErrors.AGGREGATE_POWER_UP_COULD_NOT_BE_NEGATIVE
             );
-            return previousAggregatePowerUp - IporMath.division(absApu, Constants.D18);
+            return previousAggregatePowerUp - absApu;
         }
         console.log("MiningCalculation->calculateAggregatePowerUp->apu: ", (apu).toUint256());
 
@@ -162,7 +162,6 @@ library MiningCalculation {
         bytes16 nominator = ABDKMathQuad.fromUInt(number);
         bytes16 denominator = ABDKMathQuad.fromUInt(decimals);
         bytes16 fraction = ABDKMathQuad.div(nominator, denominator);
-        bytes16 test4 = ABDKMathQuad.mul(fraction, ABDKMathQuad.fromUInt(Constants.D18));
         return fraction;
     }
 }

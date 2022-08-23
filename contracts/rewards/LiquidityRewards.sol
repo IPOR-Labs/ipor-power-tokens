@@ -26,6 +26,8 @@ contract LiquidityRewards is
     ILiquidityRewards
 {
     using SafeERC20Upgradeable for IERC20Upgradeable;
+    using SafeCast for uint256;
+    using SafeCast for int256;
     address private _pwIpor;
     mapping(address => bool) private _assets;
     uint256 internal constant _horizontalShift = 1000000000000000000;
@@ -80,6 +82,9 @@ contract LiquidityRewards is
 
     function getAccruedRewards(address asset) external view returns (uint256) {
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
+        if (globalParams.aggregatePowerUp == 0) {
+            return globalParams.accruedRewards;
+        }
         return
             MiningCalculation.calculateAccruedRewards(
                 block.number,
@@ -186,8 +191,45 @@ contract LiquidityRewards is
             _claim(_msgSender(), asset, rewards);
         }
         console.log("LiquidityRewards->stake->stakedIpTokens: ", stakedIpTokens);
-        _rebalanceParams(userParams, globalParams, stakedIpTokens, 0, asset, _msgSender());
+        uint256 ipTokensBalance = userParams.ipTokensBalance + stakedIpTokens;
+        _rebalanceParams(
+            userParams,
+            globalParams,
+            ipTokensBalance,
+            userParams.delegatedPwTokenBalance,
+            asset,
+            _msgSender()
+        );
         // TODO: ADD event
+    }
+
+    function unstake(address asset, uint256 unstakeAmount) external whenNotPaused {
+        require(_assets[asset], MiningErrors.ASSET_NOT_SUPPORTED);
+
+        uint256 rewards = _userRewards(asset, _msgSender());
+
+        console.log("LiquidityRewards->_addPwIporToBalance->rewards: ", rewards);
+
+        if (rewards > 0) {
+            _claim(_msgSender(), asset, rewards);
+        }
+        LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[_msgSender()][
+            asset
+        ];
+        LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
+
+        require(unstakeAmount <= userParams.ipTokensBalance, MiningErrors.STAKED_BALANCE_TOO_LOW);
+        uint256 ipTokensBalance = (userParams.ipTokensBalance.toInt256() - unstakeAmount.toInt256())
+            .toUint256();
+        _rebalanceParams(
+            userParams,
+            globalParams,
+            ipTokensBalance,
+            userParams.delegatedPwTokenBalance,
+            asset,
+            _msgSender()
+        );
+        ERC20(asset).transfer(_msgSender(), unstakeAmount);
     }
 
     //all per asset
@@ -273,7 +315,14 @@ contract LiquidityRewards is
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
         LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[user][asset];
 
-        _rebalanceParams(userParams, globalParams, 0, 0, asset, user);
+        _rebalanceParams(
+            userParams,
+            globalParams,
+            userParams.ipTokensBalance,
+            userParams.delegatedPwTokenBalance,
+            asset,
+            user
+        );
     }
 
     function _userRewards(address asset, address user) internal view returns (uint256) {
@@ -317,13 +366,11 @@ contract LiquidityRewards is
     function _rebalanceParams(
         LiquidityRewardsTypes.UserRewardsParams memory userParams,
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams,
-        uint256 newStakedIpTokens,
-        uint256 newDelegatedPwToken,
+        uint256 ipTokensBalance,
+        uint256 delegatedPwTokens,
         address asset,
         address user
     ) internal {
-        uint256 ipTokensBalance = userParams.ipTokensBalance + newStakedIpTokens;
-        uint256 delegatedPwTokens = userParams.delegatedPwTokenBalance + newDelegatedPwToken;
         uint256 userPowerUp = MiningCalculation.calculateUserPowerUp(
             delegatedPwTokens,
             ipTokensBalance,
@@ -362,12 +409,17 @@ contract LiquidityRewards is
         );
         console.log("LiquidityRewards->stake->aggregatePowerUp: ", aggregatePowerUp);
 
-        uint256 accruedRewards = MiningCalculation.calculateAccruedRewards(
-            block.number,
-            globalParams.blockNumber,
-            globalParams.blockRewords,
-            globalParams.accruedRewards
-        );
+        uint256 accruedRewards;
+        if (globalParams.aggregatePowerUp == 0) {
+            accruedRewards = globalParams.accruedRewards;
+        } else {
+            accruedRewards = MiningCalculation.calculateAccruedRewards(
+                block.number,
+                globalParams.blockNumber,
+                globalParams.blockRewords,
+                globalParams.accruedRewards
+            );
+        }
 
         console.log("LiquidityRewards->stake->accruedRewards: ", accruedRewards);
 
@@ -422,7 +474,17 @@ contract LiquidityRewards is
         if (rewards > 0) {
             _claim(user, asset, rewards);
         }
-        _rebalanceParams(userParams, globalParams, 0, delegatedPwTokens, asset, user);
+
+        uint256 delegatedPwTokens = userParams.delegatedPwTokenBalance + delegatedPwTokens;
+
+        _rebalanceParams(
+            userParams,
+            globalParams,
+            userParams.ipTokensBalance,
+            delegatedPwTokens,
+            asset,
+            user
+        );
         // TODO: ADD event
     }
 
