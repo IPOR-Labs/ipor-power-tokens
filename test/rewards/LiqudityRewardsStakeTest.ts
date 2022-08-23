@@ -17,6 +17,8 @@ import {
 chai.use(solidity);
 const { expect } = chai;
 
+const randomAddress = "0x0B54FA10558caBBdd0D6df5b8667913C43567Bc5";
+
 describe("LiquidityRewards Stake and balance", () => {
     let tokens: Tokens;
     let liquidityRewards: LiquidityRewards;
@@ -32,6 +34,7 @@ describe("LiquidityRewards Stake and balance", () => {
         const LiquidityRewards = await hre.ethers.getContractFactory("LiquidityRewards");
         liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
+            await admin.getAddress(),
         ])) as LiquidityRewards;
         tokens.ipTokenDai.approve(liquidityRewards.address, TOTAL_SUPPLY_18_DECIMALS);
         tokens.ipTokenDai
@@ -88,23 +91,6 @@ describe("LiquidityRewards Stake and balance", () => {
         expect(balanceAfter).to.be.equal(N1__0_18DEC);
     });
 
-    it("Should be able to stake twice ipToken(Dai)", async () => {
-        // given
-        const balanceBefore = await liquidityRewards
-            .connect(userOne)
-            .balanceOf(tokens.ipTokenDai.address);
-        // when
-        await liquidityRewards.connect(userOne).stake(tokens.ipTokenDai.address, N1__0_18DEC);
-        await liquidityRewards.connect(userOne).stake(tokens.ipTokenDai.address, N1__0_18DEC);
-        // then
-        const balanceAfter = await liquidityRewards
-            .connect(userOne)
-            .balanceOf(tokens.ipTokenDai.address);
-
-        expect(balanceBefore).to.be.equal(ZERO);
-        expect(balanceAfter).to.be.equal(N1__0_18DEC.mul(BigNumber.from("2")));
-    });
-
     it("Should be able to stake twice ipToken(usdc)", async () => {
         // given
         const balanceBefore = await liquidityRewards
@@ -131,7 +117,7 @@ describe("LiquidityRewards Stake and balance", () => {
         // when
         await expect(
             liquidityRewards.connect(userOne).stake(tokens.ipTokenUsdt.address, N1__0_6DEC)
-        ).to.be.revertedWith("IPOR_000");
+        ).to.be.revertedWith("IPOR_702");
         // then
         const balanceAfter = await liquidityRewards
             .connect(userOne)

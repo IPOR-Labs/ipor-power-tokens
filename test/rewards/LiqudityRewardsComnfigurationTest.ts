@@ -10,7 +10,9 @@ import { Tokens, getDeployedTokens } from "../utils/LiquidityRewardsUtils";
 chai.use(solidity);
 const { expect } = chai;
 
-describe("LiquidityRewards comnfiguration, deploy tests", () => {
+const randomAddress = "0x0B54FA10558caBBdd0D6df5b8667913C43567Bc5";
+
+describe("LiquidityRewards configuration, deploy tests", () => {
     let tokens: Tokens;
     let accounts: Signer[];
 
@@ -25,11 +27,24 @@ describe("LiquidityRewards comnfiguration, deploy tests", () => {
         // when
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [],
+            randomAddress,
         ])) as LiquidityRewards;
         // then
         expect(liquidityRewards.address).to.be.not.undefined;
         expect(liquidityRewards.address).to.be.not.null;
         expect(liquidityRewards.address).to.be.not.equal("");
+    });
+
+    it("Should not be able to deploy contract when pwIpor address is zero", async () => {
+        // given
+        const LiquidityRewards = await hre.ethers.getContractFactory("LiquidityRewards");
+        // when
+        await expect(
+            upgrades.deployProxy(LiquidityRewards, [
+                [],
+                "0x0000000000000000000000000000000000000000",
+            ])
+        ).to.be.revertedWith("IPOR_000");
     });
 
     it("Should deploy contract with 3 assets", async () => {
@@ -38,6 +53,7 @@ describe("LiquidityRewards comnfiguration, deploy tests", () => {
         // when
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
+            randomAddress,
         ])) as LiquidityRewards;
         // then
         const isDaiActive = await liquidityRewards.isAssetSupported(tokens.ipTokenDai.address);
@@ -55,6 +71,7 @@ describe("LiquidityRewards comnfiguration, deploy tests", () => {
         // when
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [tokens.ipTokenDai.address],
+            randomAddress,
         ])) as LiquidityRewards;
         // then
         const isDaiActive = await liquidityRewards.isAssetSupported(tokens.ipTokenDai.address);
@@ -71,6 +88,7 @@ describe("LiquidityRewards comnfiguration, deploy tests", () => {
         const LiquidityRewards = await hre.ethers.getContractFactory("LiquidityRewards");
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [],
+            randomAddress,
         ])) as LiquidityRewards;
         const isDaiActiveBefore = await liquidityRewards.isAssetSupported(
             tokens.ipTokenDai.address
@@ -107,6 +125,7 @@ describe("LiquidityRewards comnfiguration, deploy tests", () => {
         const LiquidityRewards = await hre.ethers.getContractFactory("LiquidityRewards");
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [],
+            randomAddress,
         ])) as LiquidityRewards;
         const isUsdcActiveBefore = await liquidityRewards.isAssetSupported(
             tokens.ipTokenUsdc.address
@@ -125,6 +144,7 @@ describe("LiquidityRewards comnfiguration, deploy tests", () => {
         const LiquidityRewards = await hre.ethers.getContractFactory("LiquidityRewards");
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [],
+            randomAddress,
         ])) as LiquidityRewards;
 
         const [admin, userOne] = accounts;
@@ -144,6 +164,7 @@ describe("LiquidityRewards comnfiguration, deploy tests", () => {
         const LiquidityRewards = await hre.ethers.getContractFactory("LiquidityRewards");
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [],
+            randomAddress,
         ])) as LiquidityRewards;
 
         const [admin, userOne] = accounts;
@@ -161,6 +182,7 @@ describe("LiquidityRewards comnfiguration, deploy tests", () => {
         const LiquidityRewards = await hre.ethers.getContractFactory("LiquidityRewards");
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [],
+            randomAddress,
         ])) as LiquidityRewards;
 
         const isPausedBefore = await liquidityRewards.paused();
@@ -178,6 +200,7 @@ describe("LiquidityRewards comnfiguration, deploy tests", () => {
         const LiquidityRewards = await hre.ethers.getContractFactory("LiquidityRewards");
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [],
+            randomAddress,
         ])) as LiquidityRewards;
 
         const [admin, userOne] = accounts;
@@ -198,6 +221,7 @@ describe("LiquidityRewards comnfiguration, deploy tests", () => {
         const LiquidityRewards = await hre.ethers.getContractFactory("LiquidityRewards");
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [],
+            randomAddress,
         ])) as LiquidityRewards;
         await liquidityRewards.pause();
         const isPausedBefore = await liquidityRewards.paused();
@@ -215,6 +239,7 @@ describe("LiquidityRewards comnfiguration, deploy tests", () => {
         const LiquidityRewards = await hre.ethers.getContractFactory("LiquidityRewards");
         const liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [],
+            randomAddress,
         ])) as LiquidityRewards;
 
         const [admin, userOne] = accounts;
