@@ -9,4 +9,6 @@ library MiningErrors {
     string public constant COMPOSITE_MULTIPLIER_GREATER_OR_EQUAL_THEN_USER_COMPOSITE_MULTIPLIER =
         "IPOR_704";
     string public constant AGGREGATE_POWER_UP_COULD_NOT_BE_NEGATIVE = "IPOR_705";
+    string public constant CALLER_NOT_LIQUIDITY_REWARDS = "IPOR_706";
+    string public constant NO_REWARDS_TO_CLAIM = "IPOR_707";
 }

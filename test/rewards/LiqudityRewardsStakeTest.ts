@@ -35,6 +35,7 @@ describe("LiquidityRewards Stake and balance", () => {
         liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
             await admin.getAddress(),
+            tokens.ipTokenUsdt.address,
         ])) as LiquidityRewards;
         tokens.ipTokenDai.approve(liquidityRewards.address, TOTAL_SUPPLY_18_DECIMALS);
         tokens.ipTokenDai
@@ -89,23 +90,6 @@ describe("LiquidityRewards Stake and balance", () => {
 
         expect(balanceBefore).to.be.equal(ZERO);
         expect(balanceAfter).to.be.equal(N1__0_18DEC);
-    });
-
-    it("Should be able to stake twice ipToken(usdc)", async () => {
-        // given
-        const balanceBefore = await liquidityRewards
-            .connect(userOne)
-            .balanceOf(tokens.ipTokenUsdc.address);
-        // when
-        await liquidityRewards.connect(userOne).stake(tokens.ipTokenUsdc.address, N1__0_6DEC);
-        await liquidityRewards.connect(userOne).stake(tokens.ipTokenUsdc.address, N1__0_6DEC);
-        // then
-        const balanceAfter = await liquidityRewards
-            .connect(userOne)
-            .balanceOf(tokens.ipTokenUsdc.address);
-
-        expect(balanceBefore).to.be.equal(ZERO);
-        expect(balanceAfter).to.be.equal(N1__0_6DEC.mul(BigNumber.from("2")));
     });
 
     it("Should not be able to stake when IpToken(usdt) is deactivated", async () => {

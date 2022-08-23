@@ -13,6 +13,8 @@ interface IPwIporToken {
 
     function stake(uint256 amount) external;
 
+    function receiveRewords(address user, uint256 amount) external;
+
     function balanceOf(address account) external view returns (uint256);
 
     function totalSupplyBase() external view returns (uint256);

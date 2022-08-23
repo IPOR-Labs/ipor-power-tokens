@@ -52,6 +52,7 @@ describe("LiquidityRewards Stake and balance", () => {
         liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
             pwIporToken.address,
+            iporToken.address,
         ])) as LiquidityRewards;
 
         await tokens.ipTokenDai.approve(liquidityRewards.address, TOTAL_SUPPLY_18_DECIMALS);
@@ -88,6 +89,10 @@ describe("LiquidityRewards Stake and balance", () => {
         await iporToken.transfer(
             await userTwo.getAddress(),
             N1__0_18DEC.mul(BigNumber.from("10000"))
+        );
+        await iporToken.transfer(
+            liquidityRewards.address,
+            N1__0_18DEC.mul(BigNumber.from("100000"))
         );
         await pwIporToken.setLiquidityRewardsAddress(liquidityRewards.address);
     });
