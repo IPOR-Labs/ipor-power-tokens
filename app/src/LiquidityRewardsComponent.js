@@ -771,8 +771,8 @@ export default ({ drizzle, drizzleState }) => (
             </table>
             <table className="table" align="center">
                 <tr>
-                    <th scope="col">Parameter</th>
-                    <th scope="col">action</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
                 </tr>
 
                 <tr>
@@ -786,6 +786,20 @@ export default ({ drizzle, drizzleState }) => (
                             drizzle={drizzle}
                             contract="LiquidityRewards"
                             method="stake"
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Unstake</strong>
+                        <br />
+                        <small>Unstake ipToken from LiquidityRewards contract</small>
+                    </td>
+                    <td>
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="LiquidityRewards"
+                            method="unstake"
                         />
                     </td>
                 </tr>
