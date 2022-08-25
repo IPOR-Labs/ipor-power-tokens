@@ -34,6 +34,8 @@ contract PwIporToken is
 
     uint256 private _baseTotalSupply;
 
+    uint256 private _withdrawalFee;
+
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
@@ -50,6 +52,7 @@ contract PwIporToken is
         __UUPSUpgradeable_init();
         require(iporToken != address(0), IporErrors.WRONG_ADDRESS);
         _iporToken = iporToken;
+        _withdrawalFee = Constants.D17 * 5;
     }
 
     function name() external pure returns (string memory) {
@@ -66,6 +69,15 @@ contract PwIporToken is
 
     function getVersion() external pure returns (uint256) {
         return 1;
+    }
+
+    function withdrawalFee() external view returns (uint256) {
+        return _withdrawalFee;
+    }
+
+    function setWithdrawalFee(uint256 withdrawalFee) external {
+        _withdrawalFee = withdrawalFee;
+        // TODO: ADD Event
     }
 
     function totalSupply() external view returns (uint256) {
@@ -106,7 +118,9 @@ contract PwIporToken is
         uint256 baseBalance = _baseBalance[_msgSender()];
         require(baseBalance >= baseAmountToUnstake, MiningErrors.BASE_BALANCE_TOO_LOW);
         _baseBalance[_msgSender()] = baseBalance - baseAmountToUnstake;
+
         _baseTotalSupply -= baseAmountToUnstake;
+
         console.log("PwIporToken->unstake-> amount", amount);
         console.log("PwIporToken->unstake-> baseBalance", baseBalance);
         console.log("PwIporToken->unstake-> balanceOfPwTokens", balanceOfPwTokens);
@@ -114,7 +128,10 @@ contract PwIporToken is
             "PwIporToken->unstake-> IporToken balance this",
             IERC20Upgradeable(_iporToken).balanceOf(address(this))
         );
-        IERC20Upgradeable(_iporToken).transfer(_msgSender(), amount);
+        IERC20Upgradeable(_iporToken).transfer(
+            _msgSender(),
+            _baseAmountToPwToken(_amountWithoutFee(baseAmountToUnstake), exchangeRate)
+        );
         // TODO: ADD Event
     }
 
@@ -192,7 +209,19 @@ contract PwIporToken is
     }
 
     function _balanceOf(address account) internal view returns (uint256) {
-        return IporMath.division(_baseBalance[account] * _exchangeRate(), Constants.D18);
+        return _baseAmountToPwToken(_baseBalance[account], _exchangeRate());
+    }
+
+    function _amountWithoutFee(uint256 baseAmount) internal view returns (uint256) {
+        return IporMath.division((Constants.D18 - _withdrawalFee) * baseAmount, Constants.D18);
+    }
+
+    function _baseAmountToPwToken(uint256 baseAmount, uint256 exchangeRate)
+        internal
+        view
+        returns (uint256)
+    {
+        return IporMath.division(baseAmount * exchangeRate, Constants.D18);
     }
 
     //solhint-disable no-empty-blocks
