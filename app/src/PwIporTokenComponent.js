@@ -189,6 +189,19 @@ export default ({ drizzle, drizzleState }) => {
                     </tr>
                     <tr>
                         <td>
+                            <strong>Unstake</strong>
+                            <br />
+                        </td>
+                        <td>
+                            <ContractForm
+                                drizzle={drizzle}
+                                contract="PwIporToken"
+                                method="unstake"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
                             <strong>Set LiquidityRewards address</strong>
                             <br />
                             <small>

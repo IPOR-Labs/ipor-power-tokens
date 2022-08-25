@@ -11,4 +11,6 @@ library MiningErrors {
     string public constant AGGREGATE_POWER_UP_COULD_NOT_BE_NEGATIVE = "IPOR_705";
     string public constant CALLER_NOT_LIQUIDITY_REWARDS = "IPOR_706";
     string public constant NO_REWARDS_TO_CLAIM = "IPOR_707";
+    string public constant BASE_BALANCE_TOO_LOW = "IPOR_708";
+    string public constant STAKE_AND_UNDELEGATED_BALANCE_TOO_LOW = "IPOR_709";
 }
