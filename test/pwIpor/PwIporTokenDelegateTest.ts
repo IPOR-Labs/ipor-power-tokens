@@ -39,6 +39,7 @@ describe("PwIporToken configuration, deploy tests", () => {
         liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
             pwIporToken.address,
+            iporToken.address,
         ])) as LiquidityRewards;
 
         await pwIporToken.setLiquidityRewardsAddress(liquidityRewards.address);

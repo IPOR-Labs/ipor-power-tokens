@@ -93,6 +93,31 @@ contract PwIporToken is
         // TODO: ADD Event
     }
 
+    function unstake(uint256 amount) external whenNotPaused {
+        require(amount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        uint256 exchangeRate = _exchangeRate();
+        uint256 delegatedBalance = _delegatedBalance[_msgSender()];
+        uint256 balanceOfPwTokens = _balanceOf(_msgSender());
+        //        This should not be negative
+        uint256 undelegatedPwTokens = balanceOfPwTokens - delegatedBalance;
+        require(undelegatedPwTokens >= amount, MiningErrors.STAKE_AND_UNDELEGATED_BALANCE_TOO_LOW);
+
+        uint256 baseAmountToUnstake = IporMath.division(amount * Constants.D18, exchangeRate);
+        uint256 baseBalance = _baseBalance[_msgSender()];
+        require(baseBalance >= baseAmountToUnstake, MiningErrors.BASE_BALANCE_TOO_LOW);
+        _baseBalance[_msgSender()] = baseBalance - baseAmountToUnstake;
+        _baseTotalSupply -= baseAmountToUnstake;
+        console.log("PwIporToken->unstake-> amount", amount);
+        console.log("PwIporToken->unstake-> baseBalance", baseBalance);
+        console.log("PwIporToken->unstake-> balanceOfPwTokens", balanceOfPwTokens);
+        console.log(
+            "PwIporToken->unstake-> IporToken balance this",
+            IERC20Upgradeable(_iporToken).balanceOf(address(this))
+        );
+        IERC20Upgradeable(_iporToken).transfer(_msgSender(), amount);
+        // TODO: ADD Event
+    }
+
     function receiveRewords(address user, uint256 amount)
         external
         whenNotPaused
@@ -124,10 +149,10 @@ contract PwIporToken is
         for (uint256 i = 0; i != amounts.length; i++) {
             pwIporToDelegate += amounts[i];
         }
-        uint256 userBalance = _balanceOf(_msgSender());
-        uint256 userDelegatedBalance = _delegatedBalance[_msgSender()];
-        uint256 newUserDelegatedBalance = pwIporToDelegate + userDelegatedBalance;
-        require(userBalance >= newUserDelegatedBalance, MiningErrors.STAKED_BALANCE_TOO_LOW);
+        uint256 balanceOfPwTokens = _balanceOf(_msgSender());
+        uint256 delegatedBalanceOfPwToken = _delegatedBalance[_msgSender()];
+        uint256 newUserDelegatedBalance = pwIporToDelegate + delegatedBalanceOfPwToken;
+        require(balanceOfPwTokens >= newUserDelegatedBalance, MiningErrors.STAKED_BALANCE_TOO_LOW);
         _delegatedBalance[_msgSender()] = newUserDelegatedBalance;
         ILiquidityRewards(_liquidityRewards).delegatePwIpor(_msgSender(), assets, amounts);
 
