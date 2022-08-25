@@ -179,6 +179,38 @@ export default ({ drizzle, drizzleState }) => {
                     </tr>
                     <tr>
                         <td>
+                            <strong>Withdrawal fee</strong>
+                        </td>
+                        <td>
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="PwIporToken"
+                                method="withdrawalFee"
+                                render={(value) => (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                )}
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Set withdrawal fee</strong>
+                        </td>
+                        <td>
+                            <ContractForm
+                                drizzle={drizzle}
+                                contract="PwIporToken"
+                                method="setWithdrawalFee"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
                             <strong>Stake</strong>
                             <br />
                             <small>Stake iporToken into PwIporToken contract</small>

@@ -11,6 +11,10 @@ interface IPwIporToken {
 
     function getVersion() external pure returns (uint256);
 
+    function withdrawalFee() external view returns (uint256);
+
+    function setWithdrawalFee(uint256 withdrawalFee) external;
+
     function stake(uint256 amount) external;
 
     function unstake(uint256 amount) external;
