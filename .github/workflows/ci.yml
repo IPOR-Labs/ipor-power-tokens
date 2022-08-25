@@ -13,7 +13,7 @@ jobs:
 #      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
   build-sc:
-    needs: notify
+#    needs: notify
     uses: ./.github/workflows/build-smart-contracts.yml
 
 #  build-java:
