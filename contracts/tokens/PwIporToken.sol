@@ -6,9 +6,10 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "../security/IporOwnableUpgradeable.sol";
 import "../interfaces/IPwIporToken.sol";
 import "../interfaces/ILiquidityRewards.sol";
-import "../security/IporOwnableUpgradeable.sol";
+import "../interfaces/types/PwIporTokenTypes.sol";
 import "../libraries/errors/IporErrors.sol";
 import "../libraries/errors/MiningErrors.sol";
 import "../libraries/Constants.sol";
@@ -16,7 +17,6 @@ import "../libraries/math/IporMath.sol";
 //TODO: remove at the end
 
 import "hardhat/console.sol";
-import "../interfaces/types/PwIporTokenTypes.sol";
 
 contract PwIporToken is
     Initializable,
@@ -156,7 +156,6 @@ contract PwIporToken is
         _coolDowns[_msgSender()] = PwIporTokenTypes.PwCoolDown(0, 0);
     }
 
-    //TODO: add tests for this
     function redeem() external whenNotPaused {
         PwIporTokenTypes.PwCoolDown memory coolDown = _coolDowns[_msgSender()];
         require(block.timestamp >= coolDown.coolDownFinish, MiningErrors.COOL_DOWN_NOT_FINISH);
