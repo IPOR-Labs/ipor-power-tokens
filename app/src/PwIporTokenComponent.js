@@ -315,6 +315,95 @@ export default ({ drizzle, drizzleState }) => {
                     </tr>
                 </table>
             </div>
+
+            <br />
+            <br />
+            <h3>
+                <small>Cool down</small>
+            </h3>
+            <br />
+            <br />
+            <div className="row">
+                <table className="table" align="center">
+                    <tr>
+                        <td>
+                            <strong>Active Cool down</strong>
+                        </td>
+                        <td>
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="PwIporToken"
+                                method="activeCoolDown"
+                                render={(value) => (
+                                    <div>
+                                        <table>
+                                            <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                                <td>when cool down finish</td>
+                                                <td style={{ "padding-left": "1rem" }}>
+                                                    {value[0] == 0
+                                                        ? "-"
+                                                        : new Date(
+                                                              value[0] * 1000
+                                                          ).toLocaleDateString() +
+                                                          " " +
+                                                          new Date(
+                                                              value[0] * 1000
+                                                          ).toLocaleTimeString()}
+                                                </td>
+                                            </tr>
+                                            <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                                <td>Amount</td>
+                                                <td style={{ "padding-left": "1rem" }}>
+                                                    {value[1] / 1000000000000000000}
+                                                    <br />
+                                                    <small>{value[1]}</small>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                )}
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Set cool down</strong>
+                        </td>
+                        <td>
+                            <ContractForm
+                                drizzle={drizzle}
+                                contract="PwIporToken"
+                                method="coolDown"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Cancel cool down</strong>
+                        </td>
+                        <td>
+                            <ContractForm
+                                drizzle={drizzle}
+                                contract="PwIporToken"
+                                method="cancelCoolDown"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Redeem cool down</strong>
+                        </td>
+                        <td>
+                            <ContractForm
+                                drizzle={drizzle}
+                                contract="PwIporToken"
+                                method="redeem"
+                            />
+                        </td>
+                    </tr>
+                </table>
+            </div>
         </div>
     );
 };

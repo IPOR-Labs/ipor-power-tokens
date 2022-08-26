@@ -125,6 +125,7 @@ export const USER_SUPPLY_6_DECIMALS = BigNumber.from("10000000").mul(N1__0_6DEC)
 // #################################################################################
 export const YEAR_IN_SECONDS = BigNumber.from("31536000");
 export const MONTH_IN_SECONDS = BigNumber.from(60 * 60 * 24 * 30);
+export const COOLDOWN_SECONDS = BigNumber.from(7 * 24 * 50 * 60);
 export const PERIOD_25_DAYS_IN_SECONDS = BigNumber.from(60 * 60 * 24 * 25);
 export const PERIOD_6_HOURS_IN_SECONDS = BigNumber.from(60 * 60 * 6);
 export const SWAP_DEFAULT_PERIOD_IN_SECONDS = "2419200"; //60 * 60 * 24 * 28

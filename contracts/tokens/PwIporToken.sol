@@ -6,9 +6,10 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "../security/IporOwnableUpgradeable.sol";
 import "../interfaces/IPwIporToken.sol";
 import "../interfaces/ILiquidityRewards.sol";
-import "../security/IporOwnableUpgradeable.sol";
+import "../interfaces/types/PwIporTokenTypes.sol";
 import "../libraries/errors/IporErrors.sol";
 import "../libraries/errors/MiningErrors.sol";
 import "../libraries/Constants.sol";
@@ -32,9 +33,13 @@ contract PwIporToken is
     //    balance in pwTokens
     mapping(address => uint256) private _delegatedBalance;
 
+    //    usserAddres
+    mapping(address => PwIporTokenTypes.PwCoolDown) _coolDowns;
+
     uint256 private _baseTotalSupply;
 
     uint256 private _withdrawalFee;
+    uint256 public constant COOL_DOWN_SECONDS = 2 * 7 * 24 * 60 * 60;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -75,7 +80,7 @@ contract PwIporToken is
         return _withdrawalFee;
     }
 
-    function setWithdrawalFee(uint256 withdrawalFee) external {
+    function setWithdrawalFee(uint256 withdrawalFee) external onlyOwner {
         _withdrawalFee = withdrawalFee;
         // TODO: ADD Event
     }
@@ -108,10 +113,9 @@ contract PwIporToken is
     function unstake(uint256 amount) external whenNotPaused {
         require(amount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
         uint256 exchangeRate = _exchangeRate();
-        uint256 delegatedBalance = _delegatedBalance[_msgSender()];
         uint256 balanceOfPwTokens = _balanceOf(_msgSender());
         //        This should not be negative
-        uint256 undelegatedPwTokens = balanceOfPwTokens - delegatedBalance;
+        uint256 undelegatedPwTokens = _availablePwTokens(_msgSender(), exchangeRate);
         require(undelegatedPwTokens >= amount, MiningErrors.STAKE_AND_UNDELEGATED_BALANCE_TOO_LOW);
 
         uint256 baseAmountToUnstake = IporMath.division(amount * Constants.D18, exchangeRate);
@@ -133,6 +137,47 @@ contract PwIporToken is
             _baseAmountToPwToken(_amountWithoutFee(baseAmountToUnstake), exchangeRate)
         );
         // TODO: ADD Event
+    }
+
+    function coolDown(uint256 amount) external whenNotPaused {
+        require(amount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        uint256 exchangeRate = _exchangeRate();
+        uint256 availablePwTokens = _baseAmountToPwToken(_baseBalance[_msgSender()], exchangeRate) -
+            _delegatedBalance[_msgSender()];
+        require(availablePwTokens >= amount, MiningErrors.STAKE_AND_UNDELEGATED_BALANCE_TOO_LOW);
+
+        _coolDowns[_msgSender()] = PwIporTokenTypes.PwCoolDown(
+            block.timestamp + COOL_DOWN_SECONDS,
+            amount
+        );
+    }
+
+    function cancelCoolDown() external whenNotPaused {
+        _coolDowns[_msgSender()] = PwIporTokenTypes.PwCoolDown(0, 0);
+    }
+
+    function redeem() external whenNotPaused {
+        PwIporTokenTypes.PwCoolDown memory coolDown = _coolDowns[_msgSender()];
+        require(block.timestamp >= coolDown.coolDownFinish, MiningErrors.COOL_DOWN_NOT_FINISH);
+        uint256 exchangeRate = _exchangeRate();
+        uint256 amount = coolDown.amount;
+
+        uint256 baseAmountToUnstake = IporMath.division(amount * Constants.D18, exchangeRate);
+        uint256 baseBalance = _baseBalance[_msgSender()];
+        require(baseBalance >= baseAmountToUnstake, MiningErrors.BASE_BALANCE_TOO_LOW);
+        _baseBalance[_msgSender()] = baseBalance - baseAmountToUnstake;
+
+        _baseTotalSupply -= baseAmountToUnstake;
+        IERC20Upgradeable(_iporToken).transfer(
+            _msgSender(),
+            _baseAmountToPwToken(amount, exchangeRate)
+        );
+        _coolDowns[_msgSender()] = PwIporTokenTypes.PwCoolDown(0, 0);
+        // TODO: ADD Event
+    }
+
+    function activeCoolDown() external view returns (PwIporTokenTypes.PwCoolDown memory) {
+        return _coolDowns[_msgSender()];
     }
 
     function receiveRewords(address user, uint256 amount)
@@ -166,11 +211,14 @@ contract PwIporToken is
         for (uint256 i = 0; i != amounts.length; i++) {
             pwIporToDelegate += amounts[i];
         }
-        uint256 balanceOfPwTokens = _balanceOf(_msgSender());
-        uint256 delegatedBalanceOfPwToken = _delegatedBalance[_msgSender()];
-        uint256 newUserDelegatedBalance = pwIporToDelegate + delegatedBalanceOfPwToken;
-        require(balanceOfPwTokens >= newUserDelegatedBalance, MiningErrors.STAKED_BALANCE_TOO_LOW);
-        _delegatedBalance[_msgSender()] = newUserDelegatedBalance;
+
+        uint256 availablePwTokenToDelegate = _availablePwTokens(_msgSender(), _exchangeRate());
+
+        require(
+            availablePwTokenToDelegate >= pwIporToDelegate,
+            MiningErrors.STAKED_BALANCE_TOO_LOW
+        );
+        _delegatedBalance[_msgSender()] += pwIporToDelegate;
         ILiquidityRewards(_liquidityRewards).delegatePwIpor(_msgSender(), assets, amounts);
 
         // TODO: ADD Event
@@ -222,6 +270,17 @@ contract PwIporToken is
         returns (uint256)
     {
         return IporMath.division(baseAmount * exchangeRate, Constants.D18);
+    }
+
+    function _availablePwTokens(address user, uint256 exchangeRate)
+        internal
+        view
+        returns (uint256)
+    {
+        return
+            _baseAmountToPwToken(_baseBalance[user], exchangeRate) -
+            _delegatedBalance[user] -
+            _coolDowns[user].amount;
     }
 
     //solhint-disable no-empty-blocks
