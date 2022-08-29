@@ -185,12 +185,12 @@ contract PwIporToken is
         whenNotPaused
         onlyLiquidityRewards
     {
+        console.log("PwIporToken->receiveRewords->amount: ", amount);
         require(amount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
         uint256 oldUserBalance = _baseBalance[user];
         uint256 oldTotalSupply = _baseTotalSupply;
         uint256 exchangeRate = _exchangeRate();
         console.log("PwIporToken->receiveRewords->_msgSender(): ", _msgSender());
-        console.log("PwIporToken->receiveRewords->amount: ", amount);
         console.log(
             "PwIporToken->receiveRewords->balanceOf(): ",
             IERC20Upgradeable(_iporToken).balanceOf(_msgSender())
@@ -220,6 +220,15 @@ contract PwIporToken is
         );
         _delegatedBalance[_msgSender()] += pwIporToDelegate;
         ILiquidityRewards(_liquidityRewards).delegatePwIpor(_msgSender(), assets, amounts);
+
+        // TODO: ADD Event
+    }
+
+    function withdrawFromDelegation(address asset, uint256 amount) external whenNotPaused {
+        require(amount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(_delegatedBalance[_msgSender()] >= amount, MiningErrors.DELEGATED_BALANCE_TOO_LOW);
+        _delegatedBalance[_msgSender()] -= amount;
+        ILiquidityRewards(_liquidityRewards).withdrawFromDelegation(_msgSender(), asset, amount);
 
         // TODO: ADD Event
     }

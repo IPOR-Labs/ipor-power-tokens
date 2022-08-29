@@ -13,6 +13,12 @@ interface ILiquidityRewards {
         uint256[] memory amounts
     ) external;
 
+    function withdrawFromDelegation(
+        address user,
+        address asset,
+        uint256 amount
+    ) external;
+
     function isAssetSupported(address asset) external view returns (bool);
 
     function addAsset(address asset) external;

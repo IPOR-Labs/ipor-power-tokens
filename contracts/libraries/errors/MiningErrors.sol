@@ -14,4 +14,5 @@ library MiningErrors {
     string public constant BASE_BALANCE_TOO_LOW = "IPOR_708";
     string public constant STAKE_AND_UNDELEGATED_BALANCE_TOO_LOW = "IPOR_709";
     string public constant COOL_DOWN_NOT_FINISH = "IPOR_709";
+    string public constant DELEGATED_BALANCE_TOO_LOW = "IPOR_710";
 }

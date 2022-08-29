@@ -9,7 +9,9 @@ export const LEG_RECEIVE_FIXED = BigNumber.from("1");
 // #################################################################################
 
 export const N1__0_18DEC = BigNumber.from("1000000000000000000");
+export const N2__0_18DEC = BigNumber.from("2000000000000000000");
 export const N0__1_18DEC = BigNumber.from("100000000000000000");
+export const N0__5_18DEC = BigNumber.from("500000000000000000");
 export const N0__01_18DEC = BigNumber.from("10000000000000000");
 export const N0__001_18DEC = BigNumber.from("1000000000000000");
 export const N0__000_1_18DEC = BigNumber.from("100000000000000");

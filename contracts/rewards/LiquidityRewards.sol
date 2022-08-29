@@ -245,6 +245,33 @@ contract LiquidityRewards is
         // TODO: ADD event
     }
 
+    function withdrawFromDelegation(
+        address user,
+        address asset,
+        uint256 amount
+    ) external onlyPwIpor whenNotPaused {
+        require(_assets[asset], MiningErrors.ASSET_NOT_SUPPORTED);
+        uint256 rewards = _userRewards(asset, user);
+
+        LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
+        LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[user][asset];
+        require(
+            userParams.delegatedPwTokenBalance >= amount,
+            MiningErrors.DELEGATED_BALANCE_TOO_LOW
+        );
+        if (rewards > 0) {
+            IPwIporToken(_getPwIpor()).receiveRewords(user, rewards);
+        }
+        _rebalanceParams(
+            userParams,
+            globalParams,
+            userParams.ipTokensBalance,
+            userParams.delegatedPwTokenBalance - amount,
+            asset,
+            user
+        );
+    }
+
     function claim(address asset) external whenNotPaused {
         uint256 rewards = _userRewards(asset, _msgSender());
         console.log("LiquidityRewards->claim->rewards: ", rewards);
