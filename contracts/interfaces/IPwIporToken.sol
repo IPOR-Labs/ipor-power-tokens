@@ -27,6 +27,10 @@ interface IPwIporToken {
 
     function redeem() external;
 
+    function delegateToRewards(address[] memory assets, uint256[] memory amounts) external;
+
+    function withdrawFromDelegation(address asset, uint256 amount) external;
+
     function activeCoolDown() external view returns (PwIporTokenTypes.PwCoolDown memory);
 
     function receiveRewords(address user, uint256 amount) external;
