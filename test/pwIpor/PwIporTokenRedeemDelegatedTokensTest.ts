@@ -80,7 +80,7 @@ describe("PwIporToken configuration, deploy tests", () => {
         ).to.be.revertedWith("IPOR_710");
     });
 
-    it.only("Should withdraw tokens when delegate more tokens", async () => {
+    it("Should withdraw tokens when delegate more tokens", async () => {
         //    given
         const [admin] = accounts;
         await pwIporToken.stake(N2__0_18DEC);
