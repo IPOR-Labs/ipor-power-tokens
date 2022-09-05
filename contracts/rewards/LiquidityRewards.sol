@@ -14,6 +14,7 @@ import "../libraries/Constants.sol";
 import "../interfaces/ILiquidityRewards.sol";
 import "../interfaces/types/LiquidityRewardsTypes.sol";
 import "../interfaces/IPwIporToken.sol";
+import "../interfaces/IPwIporTokenInternal.sol";
 import "../tokens/IporToken.sol";
 //TODO: remove at the end
 import "hardhat/console.sol";
@@ -260,7 +261,7 @@ contract LiquidityRewards is
             MiningErrors.DELEGATED_BALANCE_TOO_LOW
         );
         if (rewards > 0) {
-            IPwIporToken(_getPwIpor()).receiveRewords(user, rewards);
+            IPwIporTokenInternal(_getPwIpor()).receiveRewords(user, rewards);
         }
         _rebalanceParams(
             userParams,
@@ -337,7 +338,7 @@ contract LiquidityRewards is
         uint256 rewards
     ) internal {
         console.log("LiquidityRewards->_claim->block.number: ", block.number);
-        IPwIporToken(_getPwIpor()).receiveRewords(user, rewards);
+        IPwIporTokenInternal(_getPwIpor()).receiveRewords(user, rewards);
 
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
         LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[user][asset];

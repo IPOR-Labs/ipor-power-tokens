@@ -68,7 +68,7 @@ interface IMiltonStorage {
     ) external view returns (uint256 totalCount, IporTypes.IporSwapMemory[] memory swaps);
 
     /// @notice Gets active Receive-Fixed swaps for a given account address.
-    /// @param account account address
+    /// @param account address
     /// @param offset offset for paging
     /// @param chunkSize page size for paging
     /// @return totalCount total number of active Receive Fixed swaps

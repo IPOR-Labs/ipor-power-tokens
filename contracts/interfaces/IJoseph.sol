@@ -46,7 +46,7 @@ interface IJoseph {
         uint256 ipTokenAmount
     );
 
-    /// @notice Emitted when `to` accound executes redeem ipTokens
+    /// @notice Emitted when `to` account executes redeem ipTokens
     event Redeem(
         /// @notice moment in which ipTokens were redeemed by `to` account
         uint256 timestamp,
