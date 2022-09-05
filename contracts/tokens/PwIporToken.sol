@@ -224,11 +224,13 @@ contract PwIporToken is
         whenNotPaused
         onlyLiquidityRewards
     {
+        // We need this value before transfer tokens
+        uint256 exchangeRate = _exchangeRate();
         require(amount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         IERC20Upgradeable(_iporToken).safeTransferFrom(_msgSender(), address(this), amount);
 
-        uint256 newBaseTokens = IporMath.division(amount * Constants.D18, _exchangeRate());
+        uint256 newBaseTokens = IporMath.division(amount * Constants.D18, exchangeRate);
         _baseBalance[user] += newBaseTokens;
         _baseTotalSupply += newBaseTokens;
 
