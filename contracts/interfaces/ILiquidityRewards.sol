@@ -21,22 +21,6 @@ interface ILiquidityRewards {
     /// @return accrued rewards, represented in 18 decimals.
     function accruedRewards(address asset) external view returns (uint256);
 
-    /// @notice fetch global params for asset
-    /// @param asset address for which asset should calculate rewards
-    /// @return {LiquidityRewardsTypes.GlobalRewardsParams}
-    function globalParams(address asset)
-        external
-        view
-        returns (LiquidityRewardsTypes.GlobalRewardsParams memory);
-
-    /// @notice fetch user params for asset
-    /// @param asset address for which asset should calculate rewards
-    /// @return {LiquidityRewardsTypes.UserRewardsParams}
-    function userParams(address asset)
-        external
-        view
-        returns (LiquidityRewardsTypes.UserRewardsParams memory);
-
     /// @notice fetch rewords per block for asset
     /// @param asset address for which asset should fetch constant
     function rewardsPerBlock(address asset) external view returns (uint32);
@@ -62,41 +46,75 @@ interface ILiquidityRewards {
 
     //    -------------------------------------------
     //    write
-    /// @notice method setup rewords per block
-    /// @param asset address for which one should setup rewords per block
-    /// @param rewardsValue new value of rewards per block
-    function setRewardsPerBlock(address asset, uint32 rewardsValue) external;
-
-    //    -------------------------------------------
-    //    Events
-
-    /// @notice Emitted when user change rewards per block
-    /// @param timestamp moment when method was execute
-    /// @param user account address
-    /// @param newRewardsPerBlock new value of rewards per block, represented in 8 decimals.
-    event RewardsPerBlockChanged(uint256 timestamp, address user, uint256 newRewardsPerBlock);
-
-    //
-
+    /// @notice method allowed to stake ipTokens into rewards contract
+    /// @param asset address of ipToken which should be stake
+    /// @param amount of ipTokens to stake, represented in 18 decimals
     function stake(address asset, uint256 amount) external;
 
+    /// @notice method allowed to unstake ipTokens from rewards contract
+    /// @param asset address of ipToken which should be stake
+    /// @param amount of ipTokens to stake, represented in 18 decimals
+    function unstake(address asset, uint256 amount) external;
+
+    /// @notice method allowed to delegate power token to rewards contract
+    /// @param user address which one delegate power tokens
+    /// @param assets to which power tokens should be delegated
+    /// @param amounts which should be assigns to assets , represented in 18 decimals
     function delegatePwIpor(
         address user,
         address[] memory assets,
         uint256[] memory amounts
     ) external;
 
+    /// @notice method allowed to withdraw power token from rewards contract
+    /// @param user address which one delegate power tokens
+    /// @param asset from which you want to withdraw tokens
+    /// @param amount to withdraw, represented in 18 decimals
     function withdrawFromDelegation(
         address user,
         address asset,
         uint256 amount
     ) external;
 
-    function addAsset(address asset) external;
+    /// @notice method allowed to claim rewords per asset
+    /// @param asset from which you want claim rewords
+    function claim(address asset) external;
 
-    function removeAsset(address asset) external;
+    //    -------------------------------------------
+    //    Events
 
-    function pause() external;
+    /// @notice Emitted when user stake ipToken
+    /// @param timestamp moment when method was execute
+    /// @param user account address
+    /// @param asset address of ipToken which should be stake
+    /// @param amount of ipTokens to stake, represented in 18 decimals
+    event StakeIpTokens(uint256 timestamp, address user, address asset, uint256 amount);
 
-    function unpause() external;
+    /// @notice Emitted when user unstake ipTokens
+    /// @param timestamp moment when method was execute
+    /// @param user account address
+    /// @param asset address of ipToken which should be stake
+    /// @param amount of ipTokens to stake, represented in 18 decimals
+    event UnstakeIpTokens(uint256 timestamp, address user, address asset, uint256 amount);
+
+    /// @notice Emitted when user delegate power token to rewards contract
+    /// @param timestamp moment when method was execute
+    /// @param user account address
+    /// @param asset address of ipToken which should be unstake
+    /// @param amount of ipTokens to unstake, represented in 18 decimals
+    event AddPwIporToBalance(uint256 timestamp, address user, address asset, uint256 amount);
+
+    /// @notice Emitted when user withdraw power token from rewards contract
+    /// @param timestamp moment when method was execute
+    /// @param user account address
+    /// @param asset address of ipToken
+    /// @param amount of power token to withdraw, represented in 18 decimals
+    event WithdrawFromDelegation(uint256 timestamp, address user, address asset, uint256 amount);
+
+    /// @notice Emitted when user claim rewards
+    /// @param timestamp moment when method was execute
+    /// @param user account address
+    /// @param asset address of ipToken
+    /// @param rewards amount, represented in 18 decimals
+    event Claim(uint256 timestamp, address user, address asset, uint256 rewards);
 }

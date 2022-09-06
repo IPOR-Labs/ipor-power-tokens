@@ -12,6 +12,7 @@ import "../libraries/errors/MiningErrors.sol";
 import "../libraries/math/MiningCalculation.sol";
 import "../libraries/Constants.sol";
 import "../interfaces/ILiquidityRewards.sol";
+import "../interfaces/ILiquidityRewardsInternal.sol";
 import "../interfaces/types/LiquidityRewardsTypes.sol";
 import "../interfaces/IPwIporToken.sol";
 import "../interfaces/IPwIporTokenInternal.sol";
@@ -24,6 +25,7 @@ contract LiquidityRewards is
     PausableUpgradeable,
     UUPSUpgradeable,
     IporOwnableUpgradeable,
+    ILiquidityRewardsInternal,
     ILiquidityRewards
 {
     using SafeERC20Upgradeable for IERC20Upgradeable;
@@ -75,7 +77,6 @@ contract LiquidityRewards is
     }
 
     function userRewards(address asset) external view override returns (uint256) {
-        console.log("LiquidityRewards->userRewards->block.number: ", block.number);
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
         LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[_msgSender()][
             asset
@@ -119,7 +120,6 @@ contract LiquidityRewards is
         return _globalParameters[asset].blockRewords;
     }
 
-    //    TODO
     function balanceOfDelegatedPwIpor(address user, address[] memory requestAssets)
         external
         view
@@ -147,19 +147,18 @@ contract LiquidityRewards is
         return _usersParams[_msgSender()][asset].ipTokensBalance;
     }
 
-    //    all per asset
-    function stake(address asset, uint256 stakedIpTokens) external whenNotPaused {
-        require(stakedIpTokens != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+    function stake(address asset, uint256 amount) external override whenNotPaused {
+        require(amount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
         require(_assets[asset], MiningErrors.ASSET_NOT_SUPPORTED);
 
-        IERC20Upgradeable(asset).safeTransferFrom(_msgSender(), address(this), stakedIpTokens);
+        IERC20Upgradeable(asset).safeTransferFrom(_msgSender(), address(this), amount);
 
         LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[_msgSender()][
             asset
         ];
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
 
-        // TODO: assumption we start counting from first person who can get rewards
+        // assumption we start counting from first person who can get rewards
         if (globalParams.blockNumber == 0) {
             globalParams.blockNumber = uint32(block.number);
         }
@@ -170,58 +169,55 @@ contract LiquidityRewards is
             _claim(_msgSender(), asset, rewards, userParams, globalParams);
         }
 
-        uint256 ipTokensBalance = userParams.ipTokensBalance + stakedIpTokens;
-
         _rebalanceParams(
             userParams,
             globalParams,
-            ipTokensBalance,
+            userParams.ipTokensBalance + amount,
             userParams.delegatedPwTokenBalance,
             asset,
             _msgSender()
         );
-        // TODO: ADD event
+        emit StakeIpTokens(block.timestamp, _msgSender(), asset, amount);
     }
 
-    function unstake(address asset, uint256 unstakeAmount) external whenNotPaused {
+    function unstake(address asset, uint256 amount) external override whenNotPaused {
         require(_assets[asset], MiningErrors.ASSET_NOT_SUPPORTED);
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
         LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[_msgSender()][
             asset
         ];
-        uint256 rewards = _userRewards(userParams, globalParams);
 
-        console.log("LiquidityRewards->_addPwIporToBalance->rewards: ", rewards);
+        uint256 rewards = _userRewards(userParams, globalParams);
 
         if (rewards > 0) {
             _claim(_msgSender(), asset, rewards, userParams, globalParams);
         }
 
-        require(unstakeAmount <= userParams.ipTokensBalance, MiningErrors.STAKED_BALANCE_TOO_LOW);
-        uint256 ipTokensBalance = (userParams.ipTokensBalance.toInt256() - unstakeAmount.toInt256())
-            .toUint256();
+        require(amount <= userParams.ipTokensBalance, MiningErrors.STAKED_BALANCE_TOO_LOW);
+
         _rebalanceParams(
             userParams,
             globalParams,
-            ipTokensBalance,
+            userParams.ipTokensBalance - amount,
             userParams.delegatedPwTokenBalance,
             asset,
             _msgSender()
         );
-        ERC20(asset).transfer(_msgSender(), unstakeAmount);
+
+        IERC20Upgradeable(asset).transfer(_msgSender(), amount);
+
+        emit UnstakeIpTokens(block.timestamp, _msgSender(), asset, amount);
     }
 
-    //all per asset
     function delegatePwIpor(
         address user,
         address[] memory assets,
         uint256[] memory amounts
-    ) external onlyPwIpor whenNotPaused {
+    ) external override onlyPwIpor whenNotPaused {
         for (uint256 i = 0; i != assets.length; i++) {
             require(_assets[assets[i]], MiningErrors.ASSET_NOT_SUPPORTED);
             _addPwIporToBalance(user, assets[i], amounts[i]);
         }
-        // TODO: ADD event
     }
 
     function withdrawFromDelegation(
@@ -230,14 +226,14 @@ contract LiquidityRewards is
         uint256 amount
     ) external onlyPwIpor whenNotPaused {
         require(_assets[asset], MiningErrors.ASSET_NOT_SUPPORTED);
-        LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
         LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[user][asset];
-        uint256 rewards = _userRewards(userParams, globalParams);
-
         require(
             userParams.delegatedPwTokenBalance >= amount,
             MiningErrors.DELEGATED_BALANCE_TOO_LOW
         );
+        LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
+        uint256 rewards = _userRewards(userParams, globalParams);
+
         if (rewards > 0) {
             IPwIporTokenInternal(_getPwIpor()).receiveRewords(user, rewards);
         }
@@ -249,17 +245,19 @@ contract LiquidityRewards is
             asset,
             user
         );
+
+        emit WithdrawFromDelegation(block.timestamp, user, asset, amount);
     }
 
-    function claim(address asset) external whenNotPaused {
-        LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
+    function claim(address asset) external override whenNotPaused {
         LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[_msgSender()][
             asset
         ];
+        LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
 
         uint256 rewards = _userRewards(userParams, globalParams);
-        console.log("LiquidityRewards->claim->rewards: ", rewards);
         require(rewards > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
+
         _claim(_msgSender(), asset, rewards, userParams, globalParams);
         _rebalanceParams(
             userParams,
@@ -269,10 +267,11 @@ contract LiquidityRewards is
             asset,
             _msgSender()
         );
-        // TODO: ADD event
+
+        emit Claim(block.timestamp, _msgSender(), asset, rewards);
     }
 
-    function setRewardsPerBlock(address asset, uint32 rewardsValue) external onlyOwner {
+    function setRewardsPerBlock(address asset, uint32 rewardsValue) external override onlyOwner {
         require(_assets[asset], MiningErrors.ASSET_NOT_SUPPORTED);
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
 
@@ -314,20 +313,20 @@ contract LiquidityRewards is
             asset,
             LiquidityRewardsTypes.GlobalRewardsParams(0, 0, 0, 0, 0, uint32(Constants.D8))
         );
-        // TODO: ADD event
+        emit AssetAdded(block.timestamp, _msgSender(), asset);
     }
 
-    function removeAsset(address asset) external onlyOwner {
+    function removeAsset(address asset) external override onlyOwner {
         require(asset != address(0), IporErrors.WRONG_ADDRESS);
         _assets[asset] = false;
-        // TODO: ADD event
+        emit AssetRemoved(block.timestamp, _msgSender(), asset);
     }
 
-    function pause() external onlyOwner {
+    function pause() external override onlyOwner {
         _pause();
     }
 
-    function unpause() external onlyOwner {
+    function unpause() external override onlyOwner {
         _unpause();
     }
 
@@ -338,7 +337,6 @@ contract LiquidityRewards is
         LiquidityRewardsTypes.UserRewardsParams memory userParams,
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams
     ) internal {
-        console.log("LiquidityRewards->_claim->block.number: ", block.number);
         IPwIporTokenInternal(_getPwIpor()).receiveRewords(user, rewards);
     }
 
@@ -381,17 +379,11 @@ contract LiquidityRewards is
             _verticalShift(),
             _horizontalShift()
         );
-        console.log("LiquidityRewards->stake->userPowerUp: ", userPowerUp);
 
         uint256 compositeMultiplierCumulativeBeforeBlock = globalParams
             .compositeMultiplierCumulativeBeforeBlock +
             (block.number - globalParams.blockNumber) *
             globalParams.compositeMultiplierInTheBlock;
-
-        console.log(
-            "LiquidityRewards->stake->compositeMultiplierCumulativeBeforeBlock: ",
-            compositeMultiplierCumulativeBeforeBlock
-        );
 
         _saveUserParams(
             user,
@@ -411,7 +403,6 @@ contract LiquidityRewards is
             userParams.ipTokensBalance,
             globalParams.aggregatePowerUp
         );
-        console.log("LiquidityRewards->stake->aggregatePowerUp: ", aggregatePowerUp);
 
         uint256 accruedRewards;
         if (globalParams.aggregatePowerUp == 0) {
@@ -425,14 +416,10 @@ contract LiquidityRewards is
             );
         }
 
-        console.log("LiquidityRewards->stake->accruedRewards: ", accruedRewards);
-
         uint256 compositeMultiplier = MiningCalculation.compositeMultiplier(
             globalParams.blockRewords,
             aggregatePowerUp
         );
-
-        console.log("LiquidityRewards->stake->compositeMultiplier: ", compositeMultiplier);
 
         _saveGlobalParams(
             asset,
@@ -450,46 +437,34 @@ contract LiquidityRewards is
     function _addPwIporToBalance(
         address user,
         address asset,
-        uint256 delegatedPwTokens
+        uint256 amount
     ) internal {
         LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[user][asset];
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
-        console.log(
-            "LiquidityRewards->_addPwIporToBalance->globalParamsOld.blockNumber: ",
-            globalParams.blockNumber
-        );
 
         if (userParams.ipTokensBalance == 0) {
             _usersParams[user][asset].delegatedPwTokenBalance =
                 userParams.delegatedPwTokenBalance +
-                delegatedPwTokens;
+                amount;
+            emit AddPwIporToBalance(block.timestamp, user, asset, amount);
             return;
         }
 
-        // TODO: assumption we start counting from first person who stake pwToken and ipToken rewards
-        if (globalParams.blockNumber == 0) {
-            globalParams.blockNumber = uint32(block.number);
-        }
-
         uint256 rewards = _userRewards(userParams, globalParams);
-
-        console.log("LiquidityRewards->_addPwIporToBalance->rewards: ", rewards);
 
         if (rewards > 0) {
             _claim(user, asset, rewards, userParams, globalParams);
         }
 
-        uint256 delegatedPwTokens = userParams.delegatedPwTokenBalance + delegatedPwTokens;
-
         _rebalanceParams(
             userParams,
             globalParams,
             userParams.ipTokensBalance,
-            delegatedPwTokens,
+            userParams.delegatedPwTokenBalance + amount,
             asset,
             user
         );
-        // TODO: ADD event
+        emit AddPwIporToBalance(block.timestamp, user, asset, amount);
     }
 
     function _horizontalShift() internal pure returns (uint256) {
