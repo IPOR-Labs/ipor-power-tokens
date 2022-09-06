@@ -167,7 +167,7 @@ contract LiquidityRewards is
         uint256 rewards = _userRewards(userParams, globalParams);
 
         if (rewards > 0) {
-            _claim(_msgSender(), asset, rewards);
+            _claim(_msgSender(), asset, rewards, userParams, globalParams);
         }
 
         uint256 ipTokensBalance = userParams.ipTokensBalance + stakedIpTokens;
@@ -194,7 +194,7 @@ contract LiquidityRewards is
         console.log("LiquidityRewards->_addPwIporToBalance->rewards: ", rewards);
 
         if (rewards > 0) {
-            _claim(_msgSender(), asset, rewards);
+            _claim(_msgSender(), asset, rewards, userParams, globalParams);
         }
 
         require(unstakeAmount <= userParams.ipTokensBalance, MiningErrors.STAKED_BALANCE_TOO_LOW);
@@ -260,7 +260,15 @@ contract LiquidityRewards is
         uint256 rewards = _userRewards(userParams, globalParams);
         console.log("LiquidityRewards->claim->rewards: ", rewards);
         require(rewards > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
-        _claim(_msgSender(), asset, rewards);
+        _claim(_msgSender(), asset, rewards, userParams, globalParams);
+        _rebalanceParams(
+            userParams,
+            globalParams,
+            userParams.ipTokensBalance,
+            userParams.delegatedPwTokenBalance,
+            asset,
+            _msgSender()
+        );
         // TODO: ADD event
     }
 
@@ -326,22 +334,12 @@ contract LiquidityRewards is
     function _claim(
         address user,
         address asset,
-        uint256 rewards
+        uint256 rewards,
+        LiquidityRewardsTypes.UserRewardsParams memory userParams,
+        LiquidityRewardsTypes.GlobalRewardsParams memory globalParams
     ) internal {
         console.log("LiquidityRewards->_claim->block.number: ", block.number);
         IPwIporTokenInternal(_getPwIpor()).receiveRewords(user, rewards);
-
-        LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
-        LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[user][asset];
-
-        _rebalanceParams(
-            userParams,
-            globalParams,
-            userParams.ipTokensBalance,
-            userParams.delegatedPwTokenBalance,
-            asset,
-            user
-        );
     }
 
     function _userRewards(
@@ -478,7 +476,7 @@ contract LiquidityRewards is
         console.log("LiquidityRewards->_addPwIporToBalance->rewards: ", rewards);
 
         if (rewards > 0) {
-            _claim(user, asset, rewards);
+            _claim(user, asset, rewards, userParams, globalParams);
         }
 
         uint256 delegatedPwTokens = userParams.delegatedPwTokenBalance + delegatedPwTokens;
