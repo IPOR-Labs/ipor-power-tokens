@@ -31,8 +31,6 @@ contract LiquidityRewards is
     using SafeCast for int256;
     address private _pwIpor;
     mapping(address => bool) private _assets;
-    uint256 internal constant _horizontalShift = 1000000000000000000;
-    uint256 internal constant _verticalShift = 400000000000000000;
 
     //  asset address -> global parameters for asset
     mapping(address => LiquidityRewardsTypes.GlobalRewardsParams) private _globalParameters;
@@ -72,16 +70,20 @@ contract LiquidityRewards is
         _;
     }
 
-    function getVersion() external pure returns (uint256) {
+    function getVersion() external pure override returns (uint256) {
         return 1;
     }
 
-    function userRewards(address asset) external view returns (uint256) {
+    function userRewards(address asset) external view override returns (uint256) {
         console.log("LiquidityRewards->userRewards->block.number: ", block.number);
-        return _userRewards(asset, _msgSender());
+        LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
+        LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[_msgSender()][
+            asset
+        ];
+        return _userRewards(userParams, globalParams);
     }
 
-    function getAccruedRewards(address asset) external view returns (uint256) {
+    function accruedRewards(address asset) external view override returns (uint256) {
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
         if (globalParams.aggregatePowerUp == 0) {
             return globalParams.accruedRewards;
@@ -95,76 +97,54 @@ contract LiquidityRewards is
             );
     }
 
-    function getGlobalParams(address asset)
+    function globalParams(address asset)
         external
         view
+        override
         returns (LiquidityRewardsTypes.GlobalRewardsParams memory)
     {
         return _globalParameters[asset];
     }
 
-    //    global per asset
-    function setRewardsPerBlock(address asset, uint32 rewardsValue) external onlyOwner {
-        require(_assets[asset], MiningErrors.ASSET_NOT_SUPPORTED);
-        LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
-        console.log(
-            "LiquidityRewards->setRewardsPerBlock->globalParamsOld.blockNumber: ",
-            globalParams.blockNumber
-        );
-
-        uint256 compositeMultiplierCumulativeBeforeBlock = globalParams
-            .compositeMultiplierCumulativeBeforeBlock +
-            (block.number - globalParams.blockNumber) *
-            globalParams.compositeMultiplierInTheBlock;
-
-        console.log(
-            "LiquidityRewards->setRewardsPerBlock->compositeMultiplierCumulativeBeforeBlock: ",
-            compositeMultiplierCumulativeBeforeBlock
-        );
-
-        uint256 accruedRewards = MiningCalculation.calculateAccruedRewards(
-            uint32(block.number),
-            globalParams.blockNumber,
-            globalParams.blockRewords,
-            globalParams.accruedRewards
-        );
-
-        console.log("LiquidityRewards->setRewardsPerBlock->accruedRewards: ", accruedRewards);
-
-        uint256 compositeMultiplier = MiningCalculation.compositeMultiplier(
-            rewardsValue,
-            globalParams.aggregatePowerUp
-        );
-
-        console.log(
-            "LiquidityRewards->setRewardsPerBlock->compositeMultiplier: ",
-            compositeMultiplier
-        );
-
-        _saveGlobalParams(
-            asset,
-            LiquidityRewardsTypes.GlobalRewardsParams(
-                globalParams.aggregatePowerUp,
-                accruedRewards,
-                compositeMultiplier,
-                compositeMultiplierCumulativeBeforeBlock,
-                uint32(block.number),
-                rewardsValue
-            )
-        );
-        // TODO: ADD event
-    }
-
-    function getMyParams(address asset)
+    function userParams(address asset)
         external
         view
+        override
         returns (LiquidityRewardsTypes.UserRewardsParams memory)
     {
         return _usersParams[_msgSender()][asset];
     }
 
-    function getRewardsPerBlock(address asset) external view returns (uint32) {
+    function rewardsPerBlock(address asset) external view override returns (uint32) {
         return _globalParameters[asset].blockRewords;
+    }
+
+    //    TODO
+    function balanceOfDelegatedPwIpor(address user, address[] memory requestAssets)
+        external
+        view
+        override
+        returns (LiquidityRewardsTypes.BalanceOfDelegatedPwIpor memory)
+    {
+        LiquidityRewardsTypes.DelegatedPwIpor[]
+            memory balances = new LiquidityRewardsTypes.DelegatedPwIpor[](requestAssets.length);
+        for (uint256 i = 0; i != requestAssets.length; i++) {
+            address asset = requestAssets[i];
+            require(_assets[asset], MiningErrors.ASSET_NOT_SUPPORTED);
+            balances[i] = LiquidityRewardsTypes.DelegatedPwIpor(
+                asset,
+                _usersParams[user][asset].delegatedPwTokenBalance
+            );
+        }
+        return LiquidityRewardsTypes.BalanceOfDelegatedPwIpor(balances);
+    }
+
+    function isAssetSupported(address asset) external view override returns (bool) {
+        return _assets[asset];
+    }
+
+    function balanceOf(address asset) external view override returns (uint256) {
+        return _usersParams[_msgSender()][asset].ipTokensBalance;
     }
 
     //    all per asset
@@ -173,26 +153,25 @@ contract LiquidityRewards is
         require(_assets[asset], MiningErrors.ASSET_NOT_SUPPORTED);
 
         IERC20Upgradeable(asset).safeTransferFrom(_msgSender(), address(this), stakedIpTokens);
+
         LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[_msgSender()][
             asset
         ];
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
-        console.log(
-            "LiquidityRewards->stake->globalParamsOld.blockNumber: ",
-            globalParams.blockNumber
-        );
 
         // TODO: assumption we start counting from first person who can get rewards
         if (globalParams.blockNumber == 0) {
             globalParams.blockNumber = uint32(block.number);
         }
-        uint256 rewards = _userRewards(asset, _msgSender());
+
+        uint256 rewards = _userRewards(userParams, globalParams);
 
         if (rewards > 0) {
             _claim(_msgSender(), asset, rewards);
         }
-        console.log("LiquidityRewards->stake->stakedIpTokens: ", stakedIpTokens);
+
         uint256 ipTokensBalance = userParams.ipTokensBalance + stakedIpTokens;
+
         _rebalanceParams(
             userParams,
             globalParams,
@@ -206,18 +185,17 @@ contract LiquidityRewards is
 
     function unstake(address asset, uint256 unstakeAmount) external whenNotPaused {
         require(_assets[asset], MiningErrors.ASSET_NOT_SUPPORTED);
-
-        uint256 rewards = _userRewards(asset, _msgSender());
+        LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
+        LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[_msgSender()][
+            asset
+        ];
+        uint256 rewards = _userRewards(userParams, globalParams);
 
         console.log("LiquidityRewards->_addPwIporToBalance->rewards: ", rewards);
 
         if (rewards > 0) {
             _claim(_msgSender(), asset, rewards);
         }
-        LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[_msgSender()][
-            asset
-        ];
-        LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
 
         require(unstakeAmount <= userParams.ipTokensBalance, MiningErrors.STAKED_BALANCE_TOO_LOW);
         uint256 ipTokensBalance = (userParams.ipTokensBalance.toInt256() - unstakeAmount.toInt256())
@@ -252,10 +230,10 @@ contract LiquidityRewards is
         uint256 amount
     ) external onlyPwIpor whenNotPaused {
         require(_assets[asset], MiningErrors.ASSET_NOT_SUPPORTED);
-        uint256 rewards = _userRewards(asset, user);
-
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
         LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[user][asset];
+        uint256 rewards = _userRewards(userParams, globalParams);
+
         require(
             userParams.delegatedPwTokenBalance >= amount,
             MiningErrors.DELEGATED_BALANCE_TOO_LOW
@@ -274,34 +252,51 @@ contract LiquidityRewards is
     }
 
     function claim(address asset) external whenNotPaused {
-        uint256 rewards = _userRewards(asset, _msgSender());
+        LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
+        LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[_msgSender()][
+            asset
+        ];
+
+        uint256 rewards = _userRewards(userParams, globalParams);
         console.log("LiquidityRewards->claim->rewards: ", rewards);
         require(rewards > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
         _claim(_msgSender(), asset, rewards);
         // TODO: ADD event
     }
 
-    function balanceOfDelegatedPwIpor(address user, address[] memory requestAssets)
-        external
-        view
-        returns (LiquidityRewardsTypes.BalanceOfDelegatedPwIpor memory)
-    {
-        LiquidityRewardsTypes.DelegatedPwIpor[]
-            memory balances = new LiquidityRewardsTypes.DelegatedPwIpor[](requestAssets.length);
-        for (uint256 i = 0; i != requestAssets.length; i++) {
-            address asset = requestAssets[i];
-            require(_assets[asset], MiningErrors.ASSET_NOT_SUPPORTED);
-            LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[user][asset];
-            balances[i] = LiquidityRewardsTypes.DelegatedPwIpor(
-                asset,
-                userParams.delegatedPwTokenBalance
-            );
-        }
-        return LiquidityRewardsTypes.BalanceOfDelegatedPwIpor(balances);
-    }
+    function setRewardsPerBlock(address asset, uint32 rewardsValue) external onlyOwner {
+        require(_assets[asset], MiningErrors.ASSET_NOT_SUPPORTED);
+        LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
 
-    function isAssetSupported(address asset) external view returns (bool) {
-        return _assets[asset];
+        uint256 compositeMultiplierCumulativeBeforeBlock = globalParams
+            .compositeMultiplierCumulativeBeforeBlock +
+            (block.number - globalParams.blockNumber) *
+            globalParams.compositeMultiplierInTheBlock;
+
+        uint256 accruedRewards = MiningCalculation.calculateAccruedRewards(
+            uint32(block.number),
+            globalParams.blockNumber,
+            globalParams.blockRewords,
+            globalParams.accruedRewards
+        );
+
+        uint256 compositeMultiplier = MiningCalculation.compositeMultiplier(
+            rewardsValue,
+            globalParams.aggregatePowerUp
+        );
+
+        _saveGlobalParams(
+            asset,
+            LiquidityRewardsTypes.GlobalRewardsParams(
+                globalParams.aggregatePowerUp,
+                accruedRewards,
+                compositeMultiplier,
+                compositeMultiplierCumulativeBeforeBlock,
+                uint32(block.number),
+                rewardsValue
+            )
+        );
+        emit RewardsPerBlockChanged(block.timestamp, _msgSender(), rewardsValue);
     }
 
     function addAsset(address asset) external onlyOwner whenNotPaused {
@@ -318,10 +313,6 @@ contract LiquidityRewards is
         require(asset != address(0), IporErrors.WRONG_ADDRESS);
         _assets[asset] = false;
         // TODO: ADD event
-    }
-
-    function balanceOf(address asset) external view returns (uint256) {
-        return _usersParams[_msgSender()][asset].ipTokensBalance;
     }
 
     function pause() external onlyOwner {
@@ -353,25 +344,14 @@ contract LiquidityRewards is
         );
     }
 
-    function _userRewards(address asset, address user) internal view returns (uint256) {
-        LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[asset];
-        LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[user][asset];
-
-        console.log(
-            "LiquidityRewards->calculateUserRewards->globalParamsOld.compositeMultiplierInTheBlock: ",
-            globalParams.compositeMultiplierInTheBlock
-        );
-        console.log("LiquidityRewards->calculateUserRewards->block.number: ", block.number);
-
+    function _userRewards(
+        LiquidityRewardsTypes.UserRewardsParams memory userParams,
+        LiquidityRewardsTypes.GlobalRewardsParams memory globalParams
+    ) internal view returns (uint256) {
         uint256 compositeMultiplierCumulativeBeforeBlock = globalParams
             .compositeMultiplierCumulativeBeforeBlock +
             (block.number - globalParams.blockNumber) *
             globalParams.compositeMultiplierInTheBlock;
-
-        console.log(
-            "LiquidityRewards->calculateUserRewards->compositeMultiplierCumulative: ",
-            compositeMultiplierCumulativeBeforeBlock + globalParams.compositeMultiplierInTheBlock
-        );
 
         uint256 accruedRewards = MiningCalculation.calculateAccruedRewards(
             block.number,
@@ -379,8 +359,6 @@ contract LiquidityRewards is
             globalParams.blockRewords,
             globalParams.accruedRewards
         );
-
-        console.log("LiquidityRewards->calculateUserRewards->accruedRewards: ", accruedRewards);
 
         return
             MiningCalculation.calculateUserRewards(
@@ -402,8 +380,8 @@ contract LiquidityRewards is
         uint256 userPowerUp = MiningCalculation.calculateUserPowerUp(
             delegatedPwTokens,
             ipTokensBalance,
-            _verticalShift,
-            _horizontalShift
+            _verticalShift(),
+            _horizontalShift()
         );
         console.log("LiquidityRewards->stake->userPowerUp: ", userPowerUp);
 
@@ -495,7 +473,7 @@ contract LiquidityRewards is
             globalParams.blockNumber = uint32(block.number);
         }
 
-        uint256 rewards = _userRewards(asset, user);
+        uint256 rewards = _userRewards(userParams, globalParams);
 
         console.log("LiquidityRewards->_addPwIporToBalance->rewards: ", rewards);
 
@@ -514,6 +492,14 @@ contract LiquidityRewards is
             user
         );
         // TODO: ADD event
+    }
+
+    function _horizontalShift() internal pure returns (uint256) {
+        return 1000000000000000000;
+    }
+
+    function _verticalShift() internal pure returns (uint256) {
+        return 400000000000000000;
     }
 
     function _getPwIpor() internal view returns (address) {
