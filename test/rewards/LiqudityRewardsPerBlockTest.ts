@@ -35,13 +35,13 @@ describe("LiquidityRewards Stake and balance", () => {
 
     it("Should set up one asset", async () => {
         //    given
-        const rewardsBefore = await liquidityRewards.getRewardsPerBlock(tokens.ipTokenUsdc.address);
+        const rewardsBefore = await liquidityRewards.rewardsPerBlock(tokens.ipTokenUsdc.address);
 
         //    when
         await liquidityRewards.setRewardsPerBlock(tokens.ipTokenUsdc.address, N2_0_8D);
 
         //    then
-        const rewardsAfter = await liquidityRewards.getRewardsPerBlock(tokens.ipTokenUsdc.address);
+        const rewardsAfter = await liquidityRewards.rewardsPerBlock(tokens.ipTokenUsdc.address);
 
         expect(rewardsBefore).to.be.equal(N1_0_8D);
         expect(rewardsAfter).to.be.equal(N2_0_8D);
@@ -49,13 +49,11 @@ describe("LiquidityRewards Stake and balance", () => {
 
     it("Should setup 3 asset", async () => {
         //    given
-        const rewardsDaiBefore = await liquidityRewards.getRewardsPerBlock(
-            tokens.ipTokenDai.address
-        );
-        const rewardsUsdcBefore = await liquidityRewards.getRewardsPerBlock(
+        const rewardsDaiBefore = await liquidityRewards.rewardsPerBlock(tokens.ipTokenDai.address);
+        const rewardsUsdcBefore = await liquidityRewards.rewardsPerBlock(
             tokens.ipTokenUsdc.address
         );
-        const rewardsUsdtBefore = await liquidityRewards.getRewardsPerBlock(
+        const rewardsUsdtBefore = await liquidityRewards.rewardsPerBlock(
             tokens.ipTokenUsdt.address
         );
 
@@ -65,15 +63,9 @@ describe("LiquidityRewards Stake and balance", () => {
         await liquidityRewards.setRewardsPerBlock(tokens.ipTokenUsdt.address, N0_1_8D);
 
         //    then
-        const rewardsDaiAfter = await liquidityRewards.getRewardsPerBlock(
-            tokens.ipTokenDai.address
-        );
-        const rewardsUsdcAfter = await liquidityRewards.getRewardsPerBlock(
-            tokens.ipTokenUsdc.address
-        );
-        const rewardsUsdtAfter = await liquidityRewards.getRewardsPerBlock(
-            tokens.ipTokenUsdt.address
-        );
+        const rewardsDaiAfter = await liquidityRewards.rewardsPerBlock(tokens.ipTokenDai.address);
+        const rewardsUsdcAfter = await liquidityRewards.rewardsPerBlock(tokens.ipTokenUsdc.address);
+        const rewardsUsdtAfter = await liquidityRewards.rewardsPerBlock(tokens.ipTokenUsdt.address);
 
         expect(rewardsDaiBefore).to.be.equal(N1_0_8D);
         expect(rewardsUsdcBefore).to.be.equal(N1_0_8D);
@@ -86,9 +78,7 @@ describe("LiquidityRewards Stake and balance", () => {
 
     it("Should not be able to update value when not owner", async () => {
         //    given
-        const rewardsDaiBefore = await liquidityRewards.getRewardsPerBlock(
-            tokens.ipTokenDai.address
-        );
+        const rewardsDaiBefore = await liquidityRewards.rewardsPerBlock(tokens.ipTokenDai.address);
 
         //    when
         await expect(
@@ -96,9 +86,7 @@ describe("LiquidityRewards Stake and balance", () => {
         ).to.be.revertedWith("Ownable: caller is not the owner");
 
         //    then
-        const rewardsDaiAfter = await liquidityRewards.getRewardsPerBlock(
-            tokens.ipTokenDai.address
-        );
+        const rewardsDaiAfter = await liquidityRewards.rewardsPerBlock(tokens.ipTokenDai.address);
 
         expect(rewardsDaiBefore).to.be.equal(N1_0_8D);
         expect(rewardsDaiAfter).to.be.equal(N1_0_8D);

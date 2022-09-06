@@ -151,11 +151,6 @@ contract PwIporToken is
         _baseBalance[_msgSender()] -= baseAmountToUnstake;
         _baseTotalSupply -= baseAmountToUnstake;
 
-        console.log("PwIporToken->unstake-> amount", amount);
-        console.log(
-            "PwIporToken->unstake-> IporToken balance this",
-            IERC20Upgradeable(_iporToken).balanceOf(address(this))
-        );
         uint256 amountToTransfer = _baseAmountToPwToken(
             _amountWithoutFee(baseAmountToUnstake),
             exchangeRate

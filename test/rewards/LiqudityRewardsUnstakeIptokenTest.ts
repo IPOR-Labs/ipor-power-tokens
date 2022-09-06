@@ -121,20 +121,18 @@ describe("LiquidityRewards claim", () => {
 
         await liquidityRewards.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokens);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
-        const globalParamsBefore = await liquidityRewards.getGlobalParams(
-            tokens.ipTokenDai.address
-        );
+        const globalParamsBefore = await liquidityRewards.globalParams(tokens.ipTokenDai.address);
         const userParamsBefore = await liquidityRewards
             .connect(userOne)
-            .getMyParams(tokens.ipTokenDai.address);
+            .userParams(tokens.ipTokenDai.address);
         const ipTokenBalanceBefore = await tokens.ipTokenDai.balanceOf(await userOne.getAddress());
         //    when
         await liquidityRewards.connect(userOne).unstake(tokens.ipTokenDai.address, stakedIpTokens);
         //    then
-        const globalParamsAfter = await liquidityRewards.getGlobalParams(tokens.ipTokenDai.address);
+        const globalParamsAfter = await liquidityRewards.globalParams(tokens.ipTokenDai.address);
         const userParamsAfter = await liquidityRewards
             .connect(userOne)
-            .getMyParams(tokens.ipTokenDai.address);
+            .userParams(tokens.ipTokenDai.address);
         const ipTokenBalanceAfter = await tokens.ipTokenDai.balanceOf(await userOne.getAddress());
 
         const pwIporTokenBalanceAfter = await pwIporToken
@@ -213,7 +211,7 @@ describe("LiquidityRewards claim", () => {
         await liquidityRewards.connect(userOne).unstake(tokens.ipTokenDai.address, stakedIpTokens);
         await liquidityRewards.connect(userTwo).unstake(tokens.ipTokenDai.address, stakedIpTokens);
         //    then
-        const globalParamsAfter = await liquidityRewards.getGlobalParams(tokens.ipTokenDai.address);
+        const globalParamsAfter = await liquidityRewards.globalParams(tokens.ipTokenDai.address);
         expectGlobalParam(
             extractGlobalParam(globalParamsAfter),
             ZERO,
@@ -320,7 +318,7 @@ describe("LiquidityRewards claim", () => {
             .connect(userTwo)
             .unstake(tokens.ipTokenDai.address, N1__0_18DEC.mul(BigNumber.from("20")));
         //    then
-        const globalParamsAfter = await liquidityRewards.getGlobalParams(tokens.ipTokenDai.address);
+        const globalParamsAfter = await liquidityRewards.globalParams(tokens.ipTokenDai.address);
         expect(extractGlobalParam(globalParamsAfter).aggregatePowerUp).to.be.equal(ZERO);
     });
 
@@ -329,7 +327,7 @@ describe("LiquidityRewards claim", () => {
         const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
 
-        const accruedRewardsBefore = await liquidityRewards.getAccruedRewards(
+        const accruedRewardsBefore = await liquidityRewards.accruedRewards(
             tokens.ipTokenDai.address
         );
         await pwIporToken.connect(userOne).stake(delegatedIporToken);
@@ -345,7 +343,7 @@ describe("LiquidityRewards claim", () => {
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
         await liquidityRewards.connect(userOne).unstake(tokens.ipTokenDai.address, stakedIpTokens);
 
-        const accruedRewardsAfter1Unstake = await liquidityRewards.getAccruedRewards(
+        const accruedRewardsAfter1Unstake = await liquidityRewards.accruedRewards(
             tokens.ipTokenDai.address
         );
         const pwIporTokenBalanceAfter1Unstake = await pwIporToken
@@ -353,19 +351,19 @@ describe("LiquidityRewards claim", () => {
             .balanceOf(await userOne.getAddress());
 
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
-        const accruedRewardsAfter1UnstakePlus100Mine = await liquidityRewards.getAccruedRewards(
+        const accruedRewardsAfter1UnstakePlus100Mine = await liquidityRewards.accruedRewards(
             tokens.ipTokenDai.address
         );
         await liquidityRewards.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokens);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
         await liquidityRewards.connect(userOne).unstake(tokens.ipTokenDai.address, stakedIpTokens);
-        const accruedRewardsAfter2Unstake = await liquidityRewards.getAccruedRewards(
+        const accruedRewardsAfter2Unstake = await liquidityRewards.accruedRewards(
             tokens.ipTokenDai.address
         );
 
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
-        const accruedRewardsAfter2UnstakePlus100Mine = await liquidityRewards.getAccruedRewards(
+        const accruedRewardsAfter2UnstakePlus100Mine = await liquidityRewards.accruedRewards(
             tokens.ipTokenDai.address
         );
 

@@ -15,18 +15,18 @@ library LiquidityRewardsTypes {
     struct GlobalRewardsParams {
         uint256 aggregatePowerUp;
         uint256 accruedRewards;
-        //        value with 27 decimals
+        // represented in 27 decimals
         uint256 compositeMultiplierInTheBlock;
-        //        value with 27 decimals
+        // represented in 27 decimals
         uint256 compositeMultiplierCumulativeBeforeBlock;
         uint32 blockNumber;
-        //        value with 8 decimals
+        // represented in 8 decimals
         uint32 blockRewords;
     }
 
     struct UserRewardsParams {
         uint256 powerUp;
-        //        value with 27 decimals
+        // represented in 27 decimals
         uint256 compositeMultiplierCumulative;
         uint256 ipTokensBalance;
         uint256 delegatedPwTokenBalance;

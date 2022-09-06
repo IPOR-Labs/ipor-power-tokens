@@ -19,10 +19,6 @@ library MiningCalculation {
         uint256 verticalShift,
         uint256 horizontalShift
     ) internal view returns (uint256) {
-        console.log("MiningCalculation->calculateUserPowerUp->pwToken: ", pwToken);
-        console.log("MiningCalculation->calculateUserPowerUp->ipToken: ", ipToken);
-        console.log("MiningCalculation->calculateUserPowerUp->verticalShift: ", verticalShift);
-        console.log("MiningCalculation->calculateUserPowerUp->horizontalShift: ", horizontalShift);
         if (ipToken == 0) {
             return 0;
         }
@@ -48,21 +44,6 @@ library MiningCalculation {
         uint256 previousUserIpToken,
         uint256 previousAggregatePowerUp
     ) internal view returns (uint256) {
-        console.log("MiningCalculation->calculateAggregatePowerUp->userPowerUp: ", userPowerUp);
-        console.log("MiningCalculation->calculateAggregatePowerUp->userIpToken: ", userIpToken);
-        console.log(
-            "MiningCalculation->calculateAggregatePowerUp->previousUserPowerUp: ",
-            previousUserPowerUp
-        );
-        console.log(
-            "MiningCalculation->calculateAggregatePowerUp->previousUserIpToken: ",
-            previousUserIpToken
-        );
-        console.log(
-            "MiningCalculation->calculateAggregatePowerUp->previousAggregatePowerUp: ",
-            previousAggregatePowerUp
-        );
-
         int256 apu = userPowerUp.toInt256() *
             userIpToken.toInt256() -
             previousUserPowerUp.toInt256() *
@@ -70,15 +51,12 @@ library MiningCalculation {
 
         if (apu < 0) {
             uint256 absApu = IporMath.division((-apu).toUint256(), Constants.D18);
-            console.log("MiningCalculation->calculateAggregatePowerUp->apu: -", absApu);
             require(
                 previousAggregatePowerUp >= absApu,
                 MiningErrors.AGGREGATE_POWER_UP_COULD_NOT_BE_NEGATIVE
             );
             return previousAggregatePowerUp - absApu;
         }
-        console.log("MiningCalculation->calculateAggregatePowerUp->apu: ", (apu).toUint256());
-
         return previousAggregatePowerUp + IporMath.division(apu.toUint256(), Constants.D18);
     }
 
@@ -120,8 +98,6 @@ library MiningCalculation {
         view
         returns (uint256)
     {
-        console.log("MiningCalculation->compositeMultiplier->blockRewards: ", blockRewards);
-        console.log("MiningCalculation->compositeMultiplier->aggregatePowerUp: ", aggregatePowerUp);
         if (aggregatePowerUp == 0) {
             return 0;
         }
@@ -134,16 +110,6 @@ library MiningCalculation {
         uint256 compositeMultiplier,
         uint256 compositeMultiplierCumulative
     ) internal view returns (uint256) {
-        console.log("MiningCalculation->calculateUserRewards->userIpTokens: ", userIpTokens);
-        console.log("MiningCalculation->calculateUserRewards->userPowerUp: ", userPowerUp);
-        console.log(
-            "MiningCalculation->calculateUserRewards->compositeMultiplier: ",
-            compositeMultiplier
-        );
-        console.log(
-            "MiningCalculation->calculateUserRewards->userCompositeMultiplier: ",
-            compositeMultiplierCumulative
-        );
         require(
             compositeMultiplier >= compositeMultiplierCumulative,
             MiningErrors.COMPOSITE_MULTIPLIER_GREATER_OR_EQUAL_THEN_USER_COMPOSITE_MULTIPLIER
