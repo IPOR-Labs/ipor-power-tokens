@@ -280,12 +280,17 @@ contract LiquidityRewards is
             (block.number - globalParams.blockNumber) *
             globalParams.compositeMultiplierInTheBlock;
 
-        uint256 accruedRewards = MiningCalculation.calculateAccruedRewards(
-            uint32(block.number),
-            globalParams.blockNumber,
-            globalParams.blockRewords,
-            globalParams.accruedRewards
-        );
+        uint256 accruedRewards;
+        if (globalParams.aggregatePowerUp != 0) {
+            accruedRewards = MiningCalculation.calculateAccruedRewards(
+                uint32(block.number),
+                globalParams.blockNumber,
+                globalParams.blockRewords,
+                globalParams.accruedRewards
+            );
+        } else {
+            accruedRewards = globalParams.accruedRewards;
+        }
 
         uint256 compositeMultiplier = MiningCalculation.compositeMultiplier(
             rewardsValue,
@@ -405,6 +410,7 @@ contract LiquidityRewards is
         );
 
         uint256 accruedRewards;
+        //        check if we should update rewards, it should happened when at least one users stake ipTokens
         if (globalParams.aggregatePowerUp == 0) {
             accruedRewards = globalParams.accruedRewards;
         } else {

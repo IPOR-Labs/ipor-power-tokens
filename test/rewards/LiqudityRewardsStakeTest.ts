@@ -5,7 +5,7 @@ import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
 import { LiquidityRewards } from "../../types";
-import { Tokens, getDeployedTokens } from "../utils/LiquidityRewardsUtils";
+import { Tokens, getDeployedTokens, extractGlobalParam } from "../utils/LiquidityRewardsUtils";
 import {
     N1__0_18DEC,
     N1__0_6DEC,
@@ -71,7 +71,7 @@ describe("LiquidityRewards Stake and balance", () => {
         ).to.be.revertedWith("ERC20: insufficient allowance");
         // then
         const balanceAfter = await liquidityRewards.balanceOf(tokens.ipTokenDai.address);
-
+        // we dont
         expect(balanceBefore).to.be.equal(ZERO);
         expect(balanceAfter).to.be.equal(ZERO);
     });

@@ -105,6 +105,10 @@ contract PwIporToken is
         return _delegatedBalance[account];
     }
 
+    function liquidityRewards() external view override returns (address) {
+        return _liquidityRewards;
+    }
+
     function setWithdrawalFee(uint256 withdrawalFee) external override onlyOwner {
         _withdrawalFee = withdrawalFee;
         emit WithdrawalFee(block.timestamp, _msgSender(), withdrawalFee);

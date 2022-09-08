@@ -11,6 +11,9 @@ interface IPwIporTokenInternal {
     /// @return Current exchange rate between power token and the base value, represented in 18 decimals.
     function exchangeRate() external view returns (uint256);
 
+    /// @notice method return actual address of liquidity rewards contract
+    function liquidityRewards() external view returns (address);
+
     /// @notice Method setup unstake fee
     /// @param withdrawalFee percent of fee, represented in 18 decimals.
     function setWithdrawalFee(uint256 withdrawalFee) external;
