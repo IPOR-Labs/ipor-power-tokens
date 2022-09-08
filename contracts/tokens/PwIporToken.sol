@@ -273,15 +273,15 @@ contract PwIporToken is
     }
 
     function _exchangeRate() internal view returns (uint256) {
-        uint256 totalSupply = _baseTotalSupply;
-        if (totalSupply == 0) {
+        uint256 baseTotalSupply = _baseTotalSupply;
+        if (baseTotalSupply == 0) {
             return Constants.D18;
         }
         uint256 balanceOfIporToken = IERC20Upgradeable(_iporToken).balanceOf(address(this));
         if (balanceOfIporToken == 0) {
             return Constants.D18;
         }
-        return IporMath.division(balanceOfIporToken * Constants.D18, totalSupply);
+        return IporMath.division(balanceOfIporToken * Constants.D18, baseTotalSupply);
     }
 
     function _balanceOf(address account) internal view returns (uint256) {
