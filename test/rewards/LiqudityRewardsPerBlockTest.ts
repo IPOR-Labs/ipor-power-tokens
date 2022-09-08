@@ -5,7 +5,8 @@ import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
 import { LiquidityRewards } from "../../types";
-import { Tokens, getDeployedTokens } from "../utils/LiquidityRewardsUtils";
+import { Tokens, getDeployedTokens, extractGlobalParam } from "../utils/LiquidityRewardsUtils";
+import { ZERO } from "../utils/Constants";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -45,6 +46,24 @@ describe("LiquidityRewards Stake and balance", () => {
 
         expect(rewardsBefore).to.be.equal(N1_0_8D);
         expect(rewardsAfter).to.be.equal(N2_0_8D);
+    });
+
+    it("Should not update Accrued rewards when update block rewords", async () => {
+        //    given
+        const rewardsBefore = await liquidityRewards.rewardsPerBlock(tokens.ipTokenUsdc.address);
+        const globalParamsBefore = await liquidityRewards.globalParams(tokens.ipTokenUsdc.address);
+
+        //    when
+        await liquidityRewards.setRewardsPerBlock(tokens.ipTokenUsdc.address, N2_0_8D);
+
+        //    then
+        const rewardsAfter = await liquidityRewards.rewardsPerBlock(tokens.ipTokenUsdc.address);
+        const globalParamsAfter = await liquidityRewards.globalParams(tokens.ipTokenUsdc.address);
+
+        expect(rewardsBefore).to.be.equal(N1_0_8D);
+        expect(rewardsAfter).to.be.equal(N2_0_8D);
+        expect(extractGlobalParam(globalParamsBefore).accruedRewards).to.be.equal(ZERO);
+        expect(extractGlobalParam(globalParamsAfter).accruedRewards).to.be.equal(ZERO);
     });
 
     it("Should setup 3 asset", async () => {

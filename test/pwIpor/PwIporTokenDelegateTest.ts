@@ -7,7 +7,7 @@ import { solidity } from "ethereum-waffle";
 import { IporToken, PwIporToken, LiquidityRewards } from "../../types";
 import { N1__0_18DEC, ZERO, TOTAL_SUPPLY_18_DECIMALS, N0__1_18DEC } from "../utils/Constants";
 import { it } from "mocha";
-import { getDeployedTokens, Tokens } from "../utils/LiquidityRewardsUtils";
+import { extractGlobalParam, getDeployedTokens, Tokens } from "../utils/LiquidityRewardsUtils";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -85,8 +85,10 @@ describe("PwIporToken configuration, deploy tests", () => {
         const delegatedBalanceBefore = await pwIporToken.delegatedBalanceOf(
             await admin.getAddress()
         );
+
         //    when
         await pwIporToken.delegateToRewards([tokens.ipTokenDai.address], [N0__1_18DEC]);
+
         //    then
         const delegatedBalanceAfter = await pwIporToken.delegatedBalanceOf(
             await admin.getAddress()
