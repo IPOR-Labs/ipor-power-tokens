@@ -12,73 +12,73 @@ interface ILiquidityRewards {
     function getVersion() external pure returns (uint256);
 
     /// @notice Calculate user rewords
-    /// @param asset address for which asset should calculate rewards
+    /// @param ipAsset address for which asset should calculate rewards
     /// @return Current user rewards, represented in 18 decimals.
-    function userRewards(address asset) external view returns (uint256);
+    function userRewards(address ipAsset) external view returns (uint256);
 
     /// @notice Calculate accrued rewords
-    /// @param asset address for which asset should calculate rewards
+    /// @param ipAsset address for which asset should calculate rewards
     /// @return accrued rewards, represented in 18 decimals.
-    function accruedRewards(address asset) external view returns (uint256);
+    function accruedRewards(address ipAsset) external view returns (uint256);
 
     /// @notice fetch rewords per block for asset
-    /// @param asset address for which asset should fetch constant
-    function rewardsPerBlock(address asset) external view returns (uint32);
+    /// @param ipAsset address for which asset should fetch constant
+    function rewardsPerBlock(address ipAsset) external view returns (uint32);
 
     /// @notice fetch balance of power tokens related to asset(ipToken)
-    /// @param user address for which we want get balance
-    /// @param requestAssets list of assets addresses(ipTokens) for which we want fetch balances
+    /// @param account address for which we want get balance
+    /// @param requestIpAssets list of assets addresses(ipTokens) for which we want fetch balances
     /// @return {LiquidityRewardsTypes.BalanceOfDelegatedPwIpor}
-    function balanceOfDelegatedPwIpor(address user, address[] memory requestAssets)
+    function balanceOfDelegatedPwIpor(address account, address[] memory requestIpAssets)
         external
         view
         returns (LiquidityRewardsTypes.BalanceOfDelegatedPwIpor memory);
 
     /// @notice check if asset is supported
-    /// @param asset address of ipToken to check
+    /// @param ipAsset address of ipToken to check
     /// @return true if is supported, false otherwise
-    function isAssetSupported(address asset) external view returns (bool);
+    function isAssetSupported(address ipAsset) external view returns (bool);
 
     /// @notice check balance of staked ipTokens
-    /// @param asset address of ipToken
+    /// @param ipAsset address of ipToken
     /// @return balance of ipToken stake
-    function balanceOf(address asset) external view returns (uint256);
+    function balanceOf(address ipAsset) external view returns (uint256);
 
     //    -------------------------------------------
     //    write
     /// @notice method allowed to stake ipTokens into rewards contract
-    /// @param asset address of ipToken which should be stake
-    /// @param amount of ipTokens to stake, represented in 18 decimals
-    function stake(address asset, uint256 amount) external;
+    /// @param ipAsset address of ipToken which should be stake
+    /// @param ipTokenAmount of ipTokens to stake, represented in 18 decimals
+    function stake(address ipAsset, uint256 ipTokenAmount) external;
 
     /// @notice method allowed to unstake ipTokens from rewards contract
-    /// @param asset address of ipToken which should be stake
-    /// @param amount of ipTokens to stake, represented in 18 decimals
-    function unstake(address asset, uint256 amount) external;
+    /// @param ipAsset address of ipToken which should be stake
+    /// @param ipTokenAmount of ipTokens to stake, represented in 18 decimals
+    function unstake(address ipAsset, uint256 ipTokenAmount) external;
 
     /// @notice method allowed to delegate power token to rewards contract
-    /// @param user address which one delegate power tokens
-    /// @param assets to which power tokens should be delegated
-    /// @param amounts which should be assigns to assets , represented in 18 decimals
+    /// @param account address which one delegate power tokens
+    /// @param ipAssets to which power tokens should be delegated
+    /// @param pwTokenAmounts which should be assigns to assets , represented in 18 decimals
     function delegatePwIpor(
-        address user,
-        address[] memory assets,
-        uint256[] memory amounts
+        address account,
+        address[] memory ipAssets,
+        uint256[] memory pwTokenAmounts
     ) external;
 
     /// @notice method allowed to withdraw power token from rewards contract
-    /// @param user address which one delegate power tokens
-    /// @param asset from which you want to withdraw tokens
-    /// @param amount to withdraw, represented in 18 decimals
+    /// @param account address which one delegate power tokens
+    /// @param ipAsset from which you want to withdraw tokens
+    /// @param pwTokenAmount to withdraw, represented in 18 decimals
     function withdrawFromDelegation(
-        address user,
-        address asset,
-        uint256 amount
+        address account,
+        address ipAsset,
+        uint256 pwTokenAmount
     ) external;
 
     /// @notice method allowed to claim rewords per asset
-    /// @param asset from which you want claim rewords
-    function claim(address asset) external;
+    /// @param ipAsset from which you want claim rewords
+    function claim(address ipAsset) external;
 
     //    -------------------------------------------
     //    Events
