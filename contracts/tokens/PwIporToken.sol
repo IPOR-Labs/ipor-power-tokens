@@ -125,29 +125,39 @@ contract PwIporToken is
         emit LiquidityRewardsAddressChanged(block.timestamp, _msgSender(), liquidityRewards);
     }
 
-    function stake(uint256 amount) external override whenNotPaused {
-        require(amount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+    function stake(uint256 iporTokenAmount) external override whenNotPaused {
+        require(iporTokenAmount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         uint256 exchangeRate = _exchangeRate();
 
-        IERC20Upgradeable(_iporToken).safeTransferFrom(_msgSender(), address(this), amount);
+        IERC20Upgradeable(_iporToken).safeTransferFrom(
+            _msgSender(),
+            address(this),
+            iporTokenAmount
+        );
 
-        uint256 newBaseTokens = IporMath.division(amount * Constants.D18, exchangeRate);
+        uint256 newBaseTokens = IporMath.division(iporTokenAmount * Constants.D18, exchangeRate);
 
         _baseBalance[_msgSender()] += newBaseTokens;
         _baseTotalSupply += newBaseTokens;
 
-        emit Stake(block.timestamp, _msgSender(), amount, exchangeRate, newBaseTokens);
+        emit Stake(block.timestamp, _msgSender(), iporTokenAmount, exchangeRate, newBaseTokens);
     }
 
-    function unstake(uint256 amount) external override whenNotPaused {
-        require(amount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+    function unstake(uint256 pwTokenAmount) external override whenNotPaused {
+        require(pwTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         uint256 exchangeRate = _exchangeRate();
         uint256 undelegatedPwTokens = _availablePwTokens(_msgSender(), exchangeRate);
-        require(undelegatedPwTokens >= amount, MiningErrors.STAKE_AND_UNDELEGATED_BALANCE_TOO_LOW);
+        require(
+            undelegatedPwTokens >= pwTokenAmount,
+            MiningErrors.STAKE_AND_UNDELEGATED_BALANCE_TOO_LOW
+        );
 
-        uint256 baseAmountToUnstake = IporMath.division(amount * Constants.D18, exchangeRate);
+        uint256 baseAmountToUnstake = IporMath.division(
+            pwTokenAmount * Constants.D18,
+            exchangeRate
+        );
         require(
             _baseBalance[_msgSender()] >= baseAmountToUnstake,
             MiningErrors.BASE_BALANCE_TOO_LOW
@@ -163,27 +173,35 @@ contract PwIporToken is
         emit Unstake(
             block.timestamp,
             _msgSender(),
-            amount,
+            pwTokenAmount,
             exchangeRate,
-            amount - amountToTransfer
+            pwTokenAmount - amountToTransfer
         );
     }
 
-    function coolDown(uint256 amount) external override whenNotPaused {
-        require(amount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+    function coolDown(uint256 pwTokenAmount) external override whenNotPaused {
+        require(pwTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         uint256 availablePwTokens = _baseAmountToPwToken(
             _baseBalance[_msgSender()],
             _exchangeRate()
         ) - _delegatedBalance[_msgSender()];
 
-        require(availablePwTokens >= amount, MiningErrors.STAKE_AND_UNDELEGATED_BALANCE_TOO_LOW);
+        require(
+            availablePwTokens >= pwTokenAmount,
+            MiningErrors.STAKE_AND_UNDELEGATED_BALANCE_TOO_LOW
+        );
 
         _coolDowns[_msgSender()] = PwIporTokenTypes.PwCoolDown(
             block.timestamp + COOL_DOWN_SECONDS,
-            amount
+            pwTokenAmount
         );
-        emit CoolDown(block.timestamp, _msgSender(), amount, block.timestamp + COOL_DOWN_SECONDS);
+        emit CoolDown(
+            block.timestamp,
+            _msgSender(),
+            pwTokenAmount,
+            block.timestamp + COOL_DOWN_SECONDS
+        );
     }
 
     function cancelCoolDown() external override whenNotPaused {
@@ -194,6 +212,7 @@ contract PwIporToken is
     function redeem() external override whenNotPaused {
         PwIporTokenTypes.PwCoolDown memory coolDown = _coolDowns[_msgSender()];
         require(block.timestamp >= coolDown.coolDownFinish, MiningErrors.COOL_DOWN_NOT_FINISH);
+        require(coolDown.amount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         uint256 exchangeRate = _exchangeRate();
         uint256 baseAmountToUnstake = IporMath.division(
@@ -208,16 +227,14 @@ contract PwIporToken is
 
         _baseBalance[_msgSender()] -= baseAmountToUnstake;
         _baseTotalSupply -= baseAmountToUnstake;
-        IERC20Upgradeable(_iporToken).transfer(
-            _msgSender(),
-            _baseAmountToPwToken(coolDown.amount, exchangeRate)
-        );
         _coolDowns[_msgSender()] = PwIporTokenTypes.PwCoolDown(0, 0);
+
+        IERC20Upgradeable(_iporToken).transfer(_msgSender(), coolDown.amount);
 
         emit Redeem(block.timestamp, _msgSender(), coolDown.amount);
     }
 
-    function receiveRewords(address user, uint256 amount)
+    function receiveRewards(address account, uint256 iporTokenAmount)
         external
         override
         whenNotPaused
@@ -225,26 +242,30 @@ contract PwIporToken is
     {
         // We need this value before transfer tokens
         uint256 exchangeRate = _exchangeRate();
-        require(amount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(iporTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
-        IERC20Upgradeable(_iporToken).safeTransferFrom(_msgSender(), address(this), amount);
+        IERC20Upgradeable(_iporToken).safeTransferFrom(
+            _msgSender(),
+            address(this),
+            iporTokenAmount
+        );
 
-        uint256 newBaseTokens = IporMath.division(amount * Constants.D18, exchangeRate);
-        _baseBalance[user] += newBaseTokens;
+        uint256 newBaseTokens = IporMath.division(iporTokenAmount * Constants.D18, exchangeRate);
+        _baseBalance[account] += newBaseTokens;
         _baseTotalSupply += newBaseTokens;
 
-        emit ReceiveRewords(block.timestamp, user, amount);
+        emit ReceiveRewards(block.timestamp, account, iporTokenAmount);
     }
 
-    function delegateToRewards(address[] memory assets, uint256[] memory amounts)
+    function delegateToRewards(address[] memory ipAssets, uint256[] memory pwTokensAmounts)
         external
         override
         whenNotPaused
     {
-        require(assets.length == amounts.length, IporErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
+        require(ipAssets.length == pwTokensAmounts.length, IporErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
         uint256 pwIporToDelegate;
-        for (uint256 i = 0; i != amounts.length; i++) {
-            pwIporToDelegate += amounts[i];
+        for (uint256 i = 0; i != pwTokensAmounts.length; i++) {
+            pwIporToDelegate += pwTokensAmounts[i];
         }
 
         require(
@@ -253,19 +274,30 @@ contract PwIporToken is
         );
 
         _delegatedBalance[_msgSender()] += pwIporToDelegate;
-        ILiquidityRewards(_liquidityRewards).delegatePwIpor(_msgSender(), assets, amounts);
+        ILiquidityRewards(_liquidityRewards).delegatePwIpor(
+            _msgSender(),
+            ipAssets,
+            pwTokensAmounts
+        );
 
-        emit DelegateToReward(block.timestamp, _msgSender(), assets, amounts);
+        emit DelegateToReward(block.timestamp, _msgSender(), ipAssets, pwTokensAmounts);
     }
 
-    function withdrawFromDelegation(address asset, uint256 amount) external whenNotPaused {
-        require(amount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
-        require(_delegatedBalance[_msgSender()] >= amount, MiningErrors.DELEGATED_BALANCE_TOO_LOW);
+    function withdrawFromDelegation(address ipAsset, uint256 pwTokenAmount) external whenNotPaused {
+        require(pwTokenAmount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(
+            _delegatedBalance[_msgSender()] >= pwTokenAmount,
+            MiningErrors.DELEGATED_BALANCE_TOO_LOW
+        );
 
-        ILiquidityRewards(_liquidityRewards).withdrawFromDelegation(_msgSender(), asset, amount);
-        _delegatedBalance[_msgSender()] -= amount;
+        ILiquidityRewards(_liquidityRewards).withdrawFromDelegation(
+            _msgSender(),
+            ipAsset,
+            pwTokenAmount
+        );
+        _delegatedBalance[_msgSender()] -= pwTokenAmount;
 
-        emit WithdrawFromDelegation(block.timestamp, _msgSender(), asset, amount);
+        emit WithdrawFromDelegation(block.timestamp, _msgSender(), ipAsset, pwTokenAmount);
     }
 
     function pause() external override onlyOwner {

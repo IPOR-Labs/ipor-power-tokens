@@ -97,10 +97,6 @@ describe("LiquidityRewards Stake and balance", () => {
                 compositeMultiplier,
                 compositeMultiplier
             );
-        console.log(
-            "############### compositeMultiplierCumulativeBlock2:  ",
-            compositeMultiplierCumulativeBlock2.toString()
-        );
         const rewardsInBlock2UserOne = await miningCalculation.calculateUserRewards(
             userOneIpToken,
             userPowerUp,
@@ -108,7 +104,6 @@ describe("LiquidityRewards Stake and balance", () => {
             user1compositeMultiplierCumulativeBefore
         );
 
-        console.log(rewardsInBlock2UserOne.toString());
         expect(rewardsInBlock2UserOne, "Rewords userOne in block 2").to.be.equal(
             BigNumber.from("6000000000000000000")
         );
@@ -125,7 +120,6 @@ describe("LiquidityRewards Stake and balance", () => {
             blockRewards,
             accruedRewards
         );
-        console.log("################: ", accruedRewardsBlok3.toString());
         expect(accruedRewardsBlok3).to.be.equal(BigNumber.from("9").mul(D18));
 
         const userPowerUpUserTwo = await miningCalculation.calculateUserPowerUp(
@@ -182,7 +176,6 @@ describe("LiquidityRewards Stake and balance", () => {
             user1compositeMultiplierCumulativeBefore
         );
 
-        console.log(rewardsInBlock3UserOne.toString());
         expect(rewardsInBlock3UserOne, "Rewords userOne in block 3").to.be.equal(
             BigNumber.from("7500000000000000000")
         );
@@ -197,10 +190,6 @@ describe("LiquidityRewards Stake and balance", () => {
                 compositeMultiplierBlock3,
                 compositeMultiplierBlock3
             );
-        console.log(
-            "############### compositeMultiplierCumulativeBlock4:  ",
-            compositeMultiplierCumulativeBlock4.toString()
-        );
 
         const rewardsInBlock4UserOne = await miningCalculation.calculateUserRewards(
             userOneIpToken,
@@ -216,7 +205,6 @@ describe("LiquidityRewards Stake and balance", () => {
             user2compositeMultiplierCumulativeBefore
         );
 
-        console.log(rewardsInBlock4UserTwo.toString());
         expect(rewardsInBlock4UserOne, "Rewords userOne in block 4").to.be.equal(
             BigNumber.from("9000000000000000000")
         );
@@ -233,7 +221,6 @@ describe("LiquidityRewards Stake and balance", () => {
             blockRewards,
             accruedRewardsBlok3
         );
-        console.log("################: ", accruedRewardsBlok5.toString());
         expect(accruedRewardsBlok5).to.be.equal(BigNumber.from("15").mul(D18));
 
         const userPowerUpUserThree = await miningCalculation.calculateUserPowerUp(
@@ -290,7 +277,6 @@ describe("LiquidityRewards Stake and balance", () => {
             user1compositeMultiplierCumulativeBefore
         );
 
-        console.log(rewardsInBlock5UserOne.toString());
         expect(rewardsInBlock5UserOne, "Rewords userOne in block 3").to.be.equal(
             BigNumber.from("9800745456218982454")
         );

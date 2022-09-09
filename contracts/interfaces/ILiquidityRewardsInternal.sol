@@ -5,34 +5,34 @@ import "./types/LiquidityRewardsTypes.sol";
 
 /// @title
 interface ILiquidityRewardsInternal {
-    /// @notice fetch global params for asset
-    /// @param asset address for which asset should calculate rewards
+    /// @notice fetch global params for ipAsset
+    /// @param ipAsset address for which ipAsset should calculate rewards
     /// @return {LiquidityRewardsTypes.GlobalRewardsParams}
-    function globalParams(address asset)
+    function globalParams(address ipAsset)
         external
         view
         returns (LiquidityRewardsTypes.GlobalRewardsParams memory);
 
-    /// @notice fetch user params for asset
-    /// @param asset address for which asset should calculate rewards
+    /// @notice fetch user params for ipAsset
+    /// @param ipAsset address for which ipAsset should calculate rewards
     /// @return {LiquidityRewardsTypes.UserRewardsParams}
-    function userParams(address asset)
+    function userParams(address ipAsset)
         external
         view
         returns (LiquidityRewardsTypes.UserRewardsParams memory);
 
     /// @notice method setup rewords per block
-    /// @param asset address for which one should setup rewords per block
-    /// @param rewardsValue new value of rewards per block
-    function setRewardsPerBlock(address asset, uint32 rewardsValue) external;
+    /// @param ipAsset address for which one should setup rewords per block
+    /// @param rewardsValue new value of rewards per block, represented in 8 decimals
+    function setRewardsPerBlock(address ipAsset, uint32 rewardsValue) external;
 
     /// @notice method allowed to add new asset(ipToken)
-    /// @param asset address of ipToken
-    function addAsset(address asset) external;
+    /// @param ipAsset address of ipToken
+    function addAsset(address ipAsset) external;
 
     /// @notice method allowed to remove asset
-    /// @param asset address of ipToken
-    function removeAsset(address asset) external;
+    /// @param ipAsset address of ipToken
+    function removeAsset(address ipAsset) external;
 
     /// @notice Pauses current smart contract, it can be executed only by the Owner
     /// @dev Emits {Paused} event.
