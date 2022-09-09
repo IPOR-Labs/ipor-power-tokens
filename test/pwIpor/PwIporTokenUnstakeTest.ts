@@ -77,8 +77,6 @@ describe("PwIporToken unstake", () => {
         const balanceBefore = await pwIporToken.balanceOf(adminAddress);
         const totalSupplyBefore = await pwIporToken.totalSupplyBase();
         const iporBalanceBefore = await iporToken.balanceOf(adminAddress);
-        console.log("######## balanceBefore ", balanceBefore.toString());
-        console.log("######## totalSupplyBefore ", totalSupplyBefore.toString());
 
         // when
         await pwIporToken.unstake(N1__0_18DEC);

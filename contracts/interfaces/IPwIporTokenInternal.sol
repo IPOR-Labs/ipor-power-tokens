@@ -25,7 +25,7 @@ interface IPwIporTokenInternal {
     /// @notice method allowed to transfer rewords from LiquidityRewards contracts to balance of user
     /// @param user - address of user who received rewords
     /// @param amount - amount of rewords, represented in 18 decimals.
-    function receiveRewords(address user, uint256 amount) external;
+    function receiveRewards(address user, uint256 amount) external;
 
     /// @notice Pauses current smart contract, it can be executed only by the Owner
     /// @dev Emits {Paused} event.

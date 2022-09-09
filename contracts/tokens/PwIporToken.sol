@@ -194,6 +194,7 @@ contract PwIporToken is
     function redeem() external override whenNotPaused {
         PwIporTokenTypes.PwCoolDown memory coolDown = _coolDowns[_msgSender()];
         require(block.timestamp >= coolDown.coolDownFinish, MiningErrors.COOL_DOWN_NOT_FINISH);
+        require(coolDown.amount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         uint256 exchangeRate = _exchangeRate();
         uint256 baseAmountToUnstake = IporMath.division(
@@ -208,16 +209,14 @@ contract PwIporToken is
 
         _baseBalance[_msgSender()] -= baseAmountToUnstake;
         _baseTotalSupply -= baseAmountToUnstake;
-        IERC20Upgradeable(_iporToken).transfer(
-            _msgSender(),
-            _baseAmountToPwToken(coolDown.amount, exchangeRate)
-        );
         _coolDowns[_msgSender()] = PwIporTokenTypes.PwCoolDown(0, 0);
+
+        IERC20Upgradeable(_iporToken).transfer(_msgSender(), coolDown.amount);
 
         emit Redeem(block.timestamp, _msgSender(), coolDown.amount);
     }
 
-    function receiveRewords(address user, uint256 amount)
+    function receiveRewards(address user, uint256 amount)
         external
         override
         whenNotPaused
@@ -225,7 +224,7 @@ contract PwIporToken is
     {
         // We need this value before transfer tokens
         uint256 exchangeRate = _exchangeRate();
-        require(amount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(amount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         IERC20Upgradeable(_iporToken).safeTransferFrom(_msgSender(), address(this), amount);
 
@@ -233,7 +232,7 @@ contract PwIporToken is
         _baseBalance[user] += newBaseTokens;
         _baseTotalSupply += newBaseTokens;
 
-        emit ReceiveRewords(block.timestamp, user, amount);
+        emit ReceiveRewards(block.timestamp, user, amount);
     }
 
     function delegateToRewards(address[] memory assets, uint256[] memory amounts)

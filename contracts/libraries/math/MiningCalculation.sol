@@ -104,6 +104,7 @@ library MiningCalculation {
         return IporMath.division(blockRewards * Constants.D18 * Constants.D19, aggregatePowerUp);
     }
 
+    //todo: change names of cmc
     function calculateUserRewards(
         uint256 userIpTokens,
         uint256 userPowerUp,

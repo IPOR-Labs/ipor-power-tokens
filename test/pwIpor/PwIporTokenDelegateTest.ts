@@ -97,7 +97,6 @@ describe("PwIporToken configuration, deploy tests", () => {
             tokens.ipTokenDai.address,
         ]);
 
-        console.log(balance[0][0]["amount"]);
         expect(delegatedBalanceBefore).to.be.equal(ZERO);
         expect(delegatedBalanceAfter).to.be.equal(N0__1_18DEC);
     });

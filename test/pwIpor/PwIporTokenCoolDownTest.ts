@@ -263,4 +263,39 @@ describe("PwIporToken unstake", () => {
         expect(pwBalanceBefore).to.be.equal(N1__0_18DEC);
         expect(pwBalanceAfter).to.be.equal(N0__5_18DEC);
     });
+
+    it("Should be able to redeem cool down tokens when 2 weeks pass and exchange rate changed", async () => {
+        // given
+        const twoWeekesInSeconds = 2 * 7 * 24 * 60 * 60;
+        const adminAddress = await accounts[0].getAddress();
+        const nowInSeconds = getTimeInSeconds();
+        await pwIporToken.stake(N1__0_18DEC);
+        const pwBalanceBefore = await pwIporToken.balanceOf(adminAddress);
+
+        await pwIporToken.coolDown(N0__5_18DEC);
+        await iporToken.transfer(pwIporToken.address, N1__0_18DEC);
+
+        const coolDownBefore = await pwIporToken.activeCoolDown();
+        const iporTokenBalanceBefore = await iporToken.balanceOf(adminAddress);
+
+        // when
+        await hre.network.provider.send("evm_increaseTime", [twoWeekesInSeconds + 1]);
+        await pwIporToken.redeem();
+
+        // then
+        const coolDownAfter = await pwIporToken.activeCoolDown();
+        const pwBalanceAfter = await pwIporToken.balanceOf(adminAddress);
+        const iporTokenBalanceAfter = await iporToken.balanceOf(adminAddress);
+
+        expect(coolDownBefore.coolDownFinish.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
+        expect(coolDownBefore.amount).to.be.equal(N0__5_18DEC);
+
+        expect(coolDownAfter.coolDownFinish).to.be.equal(ZERO);
+        expect(coolDownAfter.amount).to.be.equal(ZERO);
+
+        expect(pwBalanceBefore).to.be.equal(N1__0_18DEC);
+        expect(pwBalanceAfter).to.be.equal(N1__0_18DEC.add(N0__5_18DEC));
+
+        expect(iporTokenBalanceAfter).to.be.equal(iporTokenBalanceBefore.add(N0__5_18DEC));
+    });
 });

@@ -179,7 +179,6 @@ describe("LiquidityRewards claim", () => {
 
     it("Should count proper rewards when one user stake pwTokens twice", async () => {
         //    given
-        console.error("######### ", await userOne.getAddress());
         const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
 
@@ -199,10 +198,6 @@ describe("LiquidityRewards claim", () => {
         const pwIporTokenBalanceAfter1Stake = await pwIporToken
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
-        console.log(
-            "#################: iporToken",
-            (await iporToken.balanceOf(liquidityRewards.address)).toString()
-        );
         const rewardsAfterFirstStake = await liquidityRewards
             .connect(userOne)
             .userRewards(tokens.ipTokenDai.address);

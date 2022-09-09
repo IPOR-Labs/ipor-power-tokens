@@ -235,7 +235,7 @@ contract LiquidityRewards is
         uint256 rewards = _userRewards(userParams, globalParams);
 
         if (rewards > 0) {
-            IPwIporTokenInternal(_getPwIpor()).receiveRewords(user, rewards);
+            IPwIporTokenInternal(_getPwIpor()).receiveRewards(user, rewards);
         }
         _rebalanceParams(
             userParams,
@@ -342,7 +342,7 @@ contract LiquidityRewards is
         LiquidityRewardsTypes.UserRewardsParams memory userParams,
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams
     ) internal {
-        IPwIporTokenInternal(_getPwIpor()).receiveRewords(user, rewards);
+        IPwIporTokenInternal(_getPwIpor()).receiveRewards(user, rewards);
     }
 
     function _userRewards(

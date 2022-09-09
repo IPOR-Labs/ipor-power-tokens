@@ -113,7 +113,7 @@ interface IPwIporToken {
     /// @param timestamp moment when method was execute
     /// @param user account address
     /// @param amount of power token received from liquidityRewards
-    event ReceiveRewords(uint256 timestamp, address user, uint256 amount);
+    event ReceiveRewards(uint256 timestamp, address user, uint256 amount);
 
     /// @notice Emitted when user delegated tokens to liquidityRewards contract
     /// @param timestamp moment when method was execute
