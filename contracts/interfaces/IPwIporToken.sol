@@ -41,16 +41,16 @@ interface IPwIporToken {
     function delegatedBalanceOf(address account) external view returns (uint256);
 
     /// @notice The method allowed to Stake IPOR Tokens and receive Power tokens.
-    /// @param amount IPOR tokens which sender want to stake inside the PwIporToken
-    function stake(uint256 amount) external;
+    /// @param iporTokenAmount IPOR tokens which sender want to stake inside the PwIporToken
+    function stake(uint256 iporTokenAmount) external;
 
     /// @notice The method allowed one to unstake IPOR Tokens, there is a fee if one wants to unstake without cooling down
-    /// @param amount IPOR tokens which sender want to stake inside the PwIporToken
-    function unstake(uint256 amount) external;
+    /// @param pwTokenAmount IPOR tokens which sender want to stake inside the PwIporToken
+    function unstake(uint256 pwTokenAmount) external;
 
     /// @notice The method allowed to freeze power tokens before withdraw Ipor tokens to avoid fees
-    /// @param amount power tokens which sender want to freeze
-    function coolDown(uint256 amount) external;
+    /// @param pwTokenAmount power tokens which sender want to freeze
+    function coolDown(uint256 pwTokenAmount) external;
 
     /// @notice The method allowed to cancel cool down
     function cancelCoolDown() external;
@@ -59,73 +59,84 @@ interface IPwIporToken {
     function redeem() external;
 
     /// @notice The method allowed to delegate power token to rewards
-    /// @param assets - list of assets to which one want delegate tokens
-    /// @param amounts - list of amount which one want delegate
-    function delegateToRewards(address[] memory assets, uint256[] memory amounts) external;
+    /// @param ipAssets - list of assets to which one want delegate tokens
+    /// @param pwTokensAmounts - list of amount which one want delegate
+    function delegateToRewards(address[] memory ipAssets, uint256[] memory pwTokensAmounts)
+        external;
 
     /// @notice The method allowed to withdraw power tokens from delegation
-    /// @param asset - asset from which one want withdraw tokens
-    /// @param amount - amount which one want withdraw
-    function withdrawFromDelegation(address asset, uint256 amount) external;
+    /// @param ipAsset - asset from which one want withdraw tokens
+    /// @param pwTokenAmount - amount which one want withdraw
+    function withdrawFromDelegation(address ipAsset, uint256 pwTokenAmount) external;
 
     /// @notice Emitted when user stake IPOR tokens
     /// @param timestamp moment when method was execute
-    /// @param user account address
-    /// @param amount of ipor token which should be stake into contract
+    /// @param account address
+    /// @param iporTokenAmount of ipor token which should be stake into contract
     /// @param exchangeRate which was used to calculate base amount
     /// @param newBaseTokens amount of new base value
     event Stake(
         uint256 timestamp,
-        address user,
-        uint256 amount,
+        address account,
+        uint256 iporTokenAmount,
         uint256 exchangeRate,
         uint256 newBaseTokens
     );
 
     /// @notice Emitted when user unstake IPOR tokens
     /// @param timestamp moment when method was execute
-    /// @param user account address
-    /// @param amount of ipor token which was call to unstake
+    /// @param account address
+    /// @param iporTokenAmount of ipor token which was call to unstake
     /// @param exchangeRate which was used to calculate base amount
     /// @param fee value which was subtract from amount
     event Unstake(
         uint256 timestamp,
-        address user,
-        uint256 amount,
+        address account,
+        uint256 iporTokenAmount,
         uint256 exchangeRate,
         uint256 fee
     );
 
     /// @notice Emitted when user setup coolDown
     /// @param timestamp moment when method was execute
-    /// @param user account address
-    /// @param amount of ipor token which was call to unstake
+    /// @param account address
+    /// @param pwTokenAmount of ipor token which was call to unstake
     /// @param finishTimestamp time when user will be able to redeem tokens without fee
-    event CoolDown(uint256 timestamp, address user, uint256 amount, uint256 finishTimestamp);
+    event CoolDown(
+        uint256 timestamp,
+        address account,
+        uint256 pwTokenAmount,
+        uint256 finishTimestamp
+    );
 
     /// @notice Emitted when user redeem tokens after cool down
     /// @param timestamp moment when method was execute
-    /// @param user account address
-    /// @param amount of ipor token was transferred to user
-    event Redeem(uint256 timestamp, address user, uint256 amount);
+    /// @param account address
+    /// @param iporTokenAmount of ipor token was transferred to user
+    event Redeem(uint256 timestamp, address account, uint256 iporTokenAmount);
 
     /// @notice Emitted when user received rewards from liquidityRewards contract
     /// @param timestamp moment when method was execute
-    /// @param user account address
-    /// @param amount of power token received from liquidityRewards
-    event ReceiveRewards(uint256 timestamp, address user, uint256 amount);
+    /// @param account address
+    /// @param iporTokenAmount of power token received from liquidityRewards
+    event ReceiveRewards(uint256 timestamp, address account, uint256 iporTokenAmount);
 
     /// @notice Emitted when user delegated tokens to liquidityRewards contract
     /// @param timestamp moment when method was execute
-    /// @param user account address
+    /// @param account address
     /// @param assets list of asset to delegate power tokens
     /// @param amounts list of value how tokens should be delegated by asset
-    event DelegateToReward(uint256 timestamp, address user, address[] assets, uint256[] amounts);
+    event DelegateToReward(uint256 timestamp, address account, address[] assets, uint256[] amounts);
 
     /// @notice Emitted when user withdraw tokens from delegated
     /// @param timestamp moment when method was execute
-    /// @param user account address
-    /// @param asset list of asset to delegate power tokens
-    /// @param amount list of value how tokens should be delegated by asset
-    event WithdrawFromDelegation(uint256 timestamp, address user, address asset, uint256 amount);
+    /// @param account address
+    /// @param ipAsset list of asset to delegate power tokens
+    /// @param pwTokenAmount list of value how tokens should be delegated by asset
+    event WithdrawFromDelegation(
+        uint256 timestamp,
+        address account,
+        address ipAsset,
+        uint256 pwTokenAmount
+    );
 }
