@@ -51,6 +51,10 @@ library MiningCalculation {
 
         if (apu < 0) {
             uint256 absApu = IporMath.division((-apu).toUint256(), Constants.D18);
+            //   last unstake iptokens we can have rounding error
+            if (previousAggregatePowerUp < absApu && previousAggregatePowerUp + 100 >= absApu) {
+                return 0;
+            }
             require(
                 previousAggregatePowerUp >= absApu,
                 MiningErrors.AGGREGATE_POWER_UP_COULD_NOT_BE_NEGATIVE
