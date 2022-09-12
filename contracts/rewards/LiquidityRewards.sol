@@ -20,6 +20,7 @@ import "../tokens/IporToken.sol";
 //TODO: remove at the end
 import "hardhat/console.sol";
 
+// TODO: ipAsset -> ipToken
 contract LiquidityRewards is
     Initializable,
     PausableUpgradeable,
@@ -76,6 +77,7 @@ contract LiquidityRewards is
         return 1;
     }
 
+    // TODO: userRewards -> accountRewards
     function userRewards(address ipAsset) external view override returns (uint256) {
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[ipAsset];
         LiquidityRewardsTypes.UserRewardsParams memory userParams = _usersParams[_msgSender()][
@@ -107,6 +109,7 @@ contract LiquidityRewards is
         return _globalParameters[ipAsset];
     }
 
+    //todo account
     function userParams(address ipAsset)
         external
         view
@@ -148,7 +151,7 @@ contract LiquidityRewards is
     }
 
     function stake(address ipAsset, uint256 ipTokenAmount) external override whenNotPaused {
-        require(ipTokenAmount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(ipTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
         require(_assets[ipAsset], MiningErrors.ASSET_NOT_SUPPORTED);
 
         IERC20Upgradeable(ipAsset).safeTransferFrom(_msgSender(), address(this), ipTokenAmount);
@@ -160,7 +163,7 @@ contract LiquidityRewards is
 
         // assumption we start counting from first person who can get rewards
         if (globalParams.blockNumber == 0) {
-            globalParams.blockNumber = uint32(block.number);
+            globalParams.blockNumber = block.number.toUint32();
         }
 
         uint256 rewards = _userRewards(userParams, globalParams);
@@ -283,7 +286,7 @@ contract LiquidityRewards is
         uint256 accruedRewards;
         if (globalParams.aggregatePowerUp != 0) {
             accruedRewards = MiningCalculation.calculateAccruedRewards(
-                uint32(block.number),
+                block.number.toUint32(),
                 globalParams.blockNumber,
                 globalParams.blockRewords,
                 globalParams.accruedRewards
@@ -304,7 +307,7 @@ contract LiquidityRewards is
                 accruedRewards,
                 compositeMultiplier,
                 compositeMultiplierCumulativeBeforeBlock,
-                uint32(block.number),
+                block.number.toUint32(),
                 rewardsValue
             )
         );
@@ -353,13 +356,6 @@ contract LiquidityRewards is
             .compositeMultiplierCumulativeBeforeBlock +
             (block.number - globalParams.blockNumber) *
             globalParams.compositeMultiplierInTheBlock;
-
-        uint256 accruedRewards = MiningCalculation.calculateAccruedRewards(
-            block.number,
-            globalParams.blockNumber,
-            globalParams.blockRewords,
-            globalParams.accruedRewards
-        );
 
         return
             MiningCalculation.calculateUserRewards(
@@ -434,7 +430,7 @@ contract LiquidityRewards is
                 accruedRewards,
                 compositeMultiplier,
                 compositeMultiplierCumulativeBeforeBlock,
-                uint32(block.number),
+                block.number.toUint32(),
                 globalParams.blockRewords
             )
         );

@@ -88,7 +88,7 @@ export default {
         ],
     },
     mocha: {
-        timeout: 40000,
+        timeout: 100000,
         parallel: true,
         jobs,
     },

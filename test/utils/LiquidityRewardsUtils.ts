@@ -40,7 +40,7 @@ export type UserParams = {
 };
 
 export const getDeployedTokens = async (accounts: Signer[]): Promise<Tokens> => {
-    const [admin, userOne, userTwo] = accounts;
+    const [admin, userOne, userTwo, userThree] = accounts;
     const UsdtMockedToken = await hre.ethers.getContractFactory("UsdtMockedToken");
     const UsdcMockedToken = await hre.ethers.getContractFactory("UsdcMockedToken");
     const DaiMockedToken = await hre.ethers.getContractFactory("DaiMockedToken");
@@ -74,6 +74,10 @@ export const getDeployedTokens = async (accounts: Signer[]): Promise<Tokens> => 
     await ipTokenDai.mint(await userTwo.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
     await ipTokenUsdc.mint(await userTwo.getAddress(), N1__0_6DEC.mul(USD_1_000_000));
     await ipTokenUsdt.mint(await userTwo.getAddress(), N1__0_6DEC.mul(USD_1_000_000));
+
+    await ipTokenDai.mint(await userThree.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
+    await ipTokenUsdc.mint(await userThree.getAddress(), N1__0_6DEC.mul(USD_1_000_000));
+    await ipTokenUsdt.mint(await userThree.getAddress(), N1__0_6DEC.mul(USD_1_000_000));
     return {
         tokenDai,
         tokenUsdc,
