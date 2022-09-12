@@ -528,7 +528,7 @@ describe("LiquidityRewards claim", () => {
 
         expect(accruedRewardsBefore).to.be.equal(ZERO);
 
-        expect(allRewardsMinusUsersRewards.lt(BigNumber.from("1000"))).to.be.true;
+        expect(allRewardsMinusUsersRewards.lt(BigNumber.from("100000"))).to.be.true;
         expect(pwTokenExchangeRateBefore).to.be.equal(pwTokenExchangeRateAfter);
     });
 });
