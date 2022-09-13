@@ -22,9 +22,9 @@ interface IPwIporTokenInternal {
     /// @param liquidityRewards - new address of LiquidityRewards contract
     function setLiquidityRewardsAddress(address liquidityRewards) external;
 
-    /// @notice method allowed to transfer rewords from LiquidityRewards contracts to balance of user
-    /// @param account - address of user who received rewords
-    /// @param iporTokenAmount - amount of rewords, represented in 18 decimals.
+    /// @notice method allowed to transfer rewards from LiquidityRewards contracts to balance of user
+    /// @param account - address of user who received rewards
+    /// @param iporTokenAmount - amount of rewards, represented in 18 decimals.
     function receiveRewards(address account, uint256 iporTokenAmount) external;
 
     /// @notice Pauses current smart contract, it can be executed only by the Owner

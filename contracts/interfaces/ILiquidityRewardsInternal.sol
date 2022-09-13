@@ -21,8 +21,8 @@ interface ILiquidityRewardsInternal {
         view
         returns (LiquidityRewardsTypes.AccountRewardsParams memory);
 
-    /// @notice method setup rewords per block
-    /// @param ipToken address for which one should setup rewords per block
+    /// @notice method setup rewards per block
+    /// @param ipToken address for which one should setup rewards per block
     /// @param rewardsValue new value of rewards per block, represented in 8 decimals
     function setRewardsPerBlock(address ipToken, uint32 rewardsValue) external;
 

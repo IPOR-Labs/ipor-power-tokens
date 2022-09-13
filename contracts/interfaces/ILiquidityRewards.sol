@@ -11,17 +11,17 @@ interface ILiquidityRewards {
     /// @return Current Liquidity Rewards version
     function getVersion() external pure returns (uint256);
 
-    /// @notice Calculate user rewords
+    /// @notice Calculate user rewards
     /// @param ipToken address for which asset should calculate rewards
     /// @return Current user rewards, represented in 18 decimals.
     function userRewards(address ipToken) external view returns (uint256);
 
-    /// @notice Calculate accrued rewords
+    /// @notice Calculate accrued rewards
     /// @param ipToken address for which asset should calculate rewards
     /// @return accrued rewards, represented in 18 decimals.
     function accruedRewards(address ipToken) external view returns (uint256);
 
-    /// @notice fetch rewords per block for asset
+    /// @notice fetch rewards per block for asset
     /// @param ipToken address for which asset should fetch constant
     function rewardsPerBlock(address ipToken) external view returns (uint32);
 
@@ -76,8 +76,8 @@ interface ILiquidityRewards {
         uint256 pwTokenAmount
     ) external;
 
-    /// @notice method allowed to claim rewords per asset
-    /// @param ipToken from which you want claim rewords
+    /// @notice method allowed to claim rewards per asset
+    /// @param ipToken from which you want claim rewards
     function claim(address ipToken) external;
 
     //    -------------------------------------------

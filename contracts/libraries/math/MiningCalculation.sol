@@ -67,15 +67,15 @@ library MiningCalculation {
     function calculateAccruedRewards(
         uint256 blocNumber,
         uint256 lastRebalanceBlockNumber,
-        uint256 blockRewords,
+        uint256 blockRewards,
         uint256 previousAccruedRewards
     ) internal view returns (uint256) {
         require(
             blocNumber >= lastRebalanceBlockNumber,
             MiningErrors.BLOCK_NUMBER_GREATER_OR_EQUAL_THEN_PREVIOUS_BLOCK_NUMBER
         );
-        uint256 newRewords = (blocNumber - lastRebalanceBlockNumber) * blockRewords * Constants.D10;
-        return previousAccruedRewards + newRewords;
+        uint256 newRewards = (blocNumber - lastRebalanceBlockNumber) * blockRewards * Constants.D10;
+        return previousAccruedRewards + newRewards;
     }
 
     // returns value with 27 decimals

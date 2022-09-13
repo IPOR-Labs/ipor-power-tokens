@@ -29,7 +29,7 @@ export type GlobalParams = {
     compositeMultiplierInTheBlock: BigNumber;
     compositeMultiplierCumulativeBeforeBlock: BigNumber;
     blockNumber: number;
-    blockRewords: number;
+    blockRewards: number;
 };
 
 export type UserParams = {
@@ -94,7 +94,7 @@ export const extractGlobalParam = (value: any): GlobalParams => {
     const compositeMultiplierInTheBlock = value[2];
     const compositeMultiplierCumulativeBeforeBlock = value[3];
     const blockNumber = value[4];
-    const blockRewords = value[5];
+    const blockRewards = value[5];
 
     return {
         aggregatePowerUp,
@@ -102,7 +102,7 @@ export const extractGlobalParam = (value: any): GlobalParams => {
         compositeMultiplierInTheBlock,
         compositeMultiplierCumulativeBeforeBlock,
         blockNumber,
-        blockRewords,
+        blockRewards,
     };
 };
 
@@ -113,7 +113,7 @@ export const expectGlobalParam = (
     compositeMultiplierInTheBlock: BigNumber,
     compositeMultiplierCumulativeBeforeBlock: BigNumber,
     blockNumber: number,
-    blockRewords: number
+    blockRewards: number
 ): void => {
     expect(params.aggregatePowerUp).to.be.equal(aggregatePowerUp);
     expect(params.accruedRewards).to.be.equal(accruedRewards);
@@ -124,7 +124,7 @@ export const expectGlobalParam = (
     if (blockNumber !== -1) {
         expect(params.blockNumber).to.be.equal(blockNumber);
     }
-    expect(params.blockRewords).to.be.equal(blockRewords);
+    expect(params.blockRewards).to.be.equal(blockRewards);
 };
 
 export const expectUserParam = (

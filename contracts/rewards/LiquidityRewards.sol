@@ -94,7 +94,7 @@ contract LiquidityRewards is
             MiningCalculation.calculateAccruedRewards(
                 block.number,
                 globalParams.blockNumber,
-                globalParams.blockRewords,
+                globalParams.blockRewards,
                 globalParams.accruedRewards
             );
     }
@@ -119,7 +119,7 @@ contract LiquidityRewards is
     }
 
     function rewardsPerBlock(address ipToken) external view override returns (uint32) {
-        return _globalParameters[ipToken].blockRewords;
+        return _globalParameters[ipToken].blockRewards;
     }
 
     function balanceOfDelegatedPwIpor(address account, address[] memory requestIpTokens)
@@ -292,7 +292,7 @@ contract LiquidityRewards is
             accruedRewards = MiningCalculation.calculateAccruedRewards(
                 block.number.toUint32(),
                 globalParams.blockNumber,
-                globalParams.blockRewords,
+                globalParams.blockRewards,
                 globalParams.accruedRewards
             );
         } else {
@@ -417,13 +417,13 @@ contract LiquidityRewards is
             accruedRewards = MiningCalculation.calculateAccruedRewards(
                 block.number,
                 globalParams.blockNumber,
-                globalParams.blockRewords,
+                globalParams.blockRewards,
                 globalParams.accruedRewards
             );
         }
 
         uint256 compositeMultiplier = MiningCalculation.compositeMultiplier(
-            globalParams.blockRewords,
+            globalParams.blockRewards,
             aggregatePowerUp
         );
 
@@ -435,7 +435,7 @@ contract LiquidityRewards is
                 compositeMultiplier,
                 compositeMultiplierCumulativeBeforeBlock,
                 block.number.toUint32(),
-                globalParams.blockRewords
+                globalParams.blockRewards
             )
         );
     }
