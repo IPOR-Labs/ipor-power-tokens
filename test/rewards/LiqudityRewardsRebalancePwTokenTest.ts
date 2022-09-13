@@ -106,7 +106,7 @@ describe("LiquidityRewards Stake and balance", () => {
             const initGlobalParamResponse = await liquidityRewards.globalParams(
                 tokens.ipTokenDai.address
             );
-            const initUserParamResponse = await liquidityRewards.userParams(
+            const initUserParamResponse = await liquidityRewards.accountParams(
                 tokens.ipTokenDai.address
             );
             expectGlobalParam(
@@ -126,7 +126,7 @@ describe("LiquidityRewards Stake and balance", () => {
             const afterDelegatePwTokenGPR = await liquidityRewards.globalParams(
                 tokens.ipTokenDai.address
             );
-            const afterDelegatePwTokenUPR = await liquidityRewards.userParams(
+            const afterDelegatePwTokenUPR = await liquidityRewards.accountParams(
                 tokens.ipTokenDai.address
             );
 
@@ -155,7 +155,7 @@ describe("LiquidityRewards Stake and balance", () => {
             const afterStakeIpTokensGPR = await liquidityRewards.globalParams(
                 tokens.ipTokenDai.address
             );
-            const afterStakeIpTokensUPR = await liquidityRewards.userParams(
+            const afterStakeIpTokensUPR = await liquidityRewards.accountParams(
                 tokens.ipTokenDai.address
             );
 

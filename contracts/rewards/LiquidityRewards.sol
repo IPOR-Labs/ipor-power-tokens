@@ -36,7 +36,7 @@ contract LiquidityRewards is
 
     //  asset address -> global parameters for asset
     mapping(address => LiquidityRewardsTypes.GlobalRewardsParams) private _globalParameters;
-    //  user address => asset address => users params
+    //  account address => ipToken address => account params
     mapping(address => mapping(address => LiquidityRewardsTypes.AccountRewardsParams)) _accountsParams;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
@@ -82,7 +82,7 @@ contract LiquidityRewards is
         LiquidityRewardsTypes.AccountRewardsParams memory accountParams = _accountsParams[
             _msgSender()
         ][ipToken];
-        return _userRewards(accountParams, globalParams);
+        return _accountRewards(accountParams, globalParams);
     }
 
     function accruedRewards(address ipToken) external view override returns (uint256) {
@@ -109,7 +109,7 @@ contract LiquidityRewards is
     }
 
     //todo account
-    function userParams(address ipToken)
+    function accountParams(address ipToken)
         external
         view
         override
@@ -165,7 +165,7 @@ contract LiquidityRewards is
             globalParams.blockNumber = block.number.toUint32();
         }
 
-        uint256 rewards = _userRewards(accountParams, globalParams);
+        uint256 rewards = _accountRewards(accountParams, globalParams);
 
         if (rewards > 0) {
             _claim(_msgSender(), ipToken, rewards, accountParams, globalParams);
@@ -189,7 +189,7 @@ contract LiquidityRewards is
             _msgSender()
         ][ipToken];
 
-        uint256 rewards = _userRewards(accountParams, globalParams);
+        uint256 rewards = _accountRewards(accountParams, globalParams);
 
         if (rewards > 0) {
             _claim(_msgSender(), ipToken, rewards, accountParams, globalParams);
@@ -239,7 +239,7 @@ contract LiquidityRewards is
             MiningErrors.DELEGATED_BALANCE_TOO_LOW
         );
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[ipToken];
-        uint256 rewards = _userRewards(accountParams, globalParams);
+        uint256 rewards = _accountRewards(accountParams, globalParams);
 
         if (rewards > 0) {
             IPwIporTokenInternal(_getPwIpor()).receiveRewards(account, rewards);
@@ -262,7 +262,7 @@ contract LiquidityRewards is
         ][ipToken];
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[ipToken];
 
-        uint256 rewards = _userRewards(accountParams, globalParams);
+        uint256 rewards = _accountRewards(accountParams, globalParams);
         require(rewards > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
 
         _claim(_msgSender(), ipToken, rewards, accountParams, globalParams);
@@ -352,7 +352,7 @@ contract LiquidityRewards is
         IPwIporTokenInternal(_getPwIpor()).receiveRewards(account, rewards);
     }
 
-    function _userRewards(
+    function _accountRewards(
         LiquidityRewardsTypes.AccountRewardsParams memory accountParams,
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams
     ) internal view returns (uint256) {
@@ -362,7 +362,7 @@ contract LiquidityRewards is
             globalParams.compositeMultiplierInTheBlock;
 
         return
-            MiningCalculation.calculateUserRewards(
+            MiningCalculation.calculateAccountRewards(
                 accountParams.ipTokensBalance,
                 accountParams.powerUp,
                 compositeMultiplierCumulativeBeforeBlock,
@@ -378,7 +378,7 @@ contract LiquidityRewards is
         address ipToken,
         address account
     ) internal {
-        uint256 userPowerUp = MiningCalculation.calculateUserPowerUp(
+        uint256 accountPowerUp = MiningCalculation.calculateAccountPowerUp(
             delegatedPwTokens,
             ipTokensBalance,
             _verticalShift(),
@@ -390,11 +390,11 @@ contract LiquidityRewards is
             (block.number - globalParams.blockNumber) *
             globalParams.compositeMultiplierInTheBlock;
 
-        _saveUserParams(
+        _saveAccountParams(
             account,
             ipToken,
             LiquidityRewardsTypes.AccountRewardsParams(
-                userPowerUp,
+                accountPowerUp,
                 compositeMultiplierCumulativeBeforeBlock,
                 ipTokensBalance,
                 delegatedPwTokens
@@ -402,7 +402,7 @@ contract LiquidityRewards is
         );
 
         uint256 aggregatePowerUp = MiningCalculation.calculateAggregatePowerUp(
-            userPowerUp,
+            accountPowerUp,
             ipTokensBalance,
             accountParams.powerUp,
             accountParams.ipTokensBalance,
@@ -410,7 +410,7 @@ contract LiquidityRewards is
         );
 
         uint256 accruedRewards;
-        //        check if we should update rewards, it should happened when at least one users stake ipTokens
+        //        check if we should update rewards, it should happened when at least one accounts stake ipTokens
         if (globalParams.aggregatePowerUp == 0) {
             accruedRewards = globalParams.accruedRewards;
         } else {
@@ -458,7 +458,7 @@ contract LiquidityRewards is
             return;
         }
 
-        uint256 rewards = _userRewards(accountParams, globalParams);
+        uint256 rewards = _accountRewards(accountParams, globalParams);
 
         if (rewards > 0) {
             _claim(account, ipToken, rewards, accountParams, globalParams);
@@ -487,7 +487,7 @@ contract LiquidityRewards is
         return _pwIpor;
     }
 
-    function _saveUserParams(
+    function _saveAccountParams(
         address account,
         address ipToken,
         LiquidityRewardsTypes.AccountRewardsParams memory params

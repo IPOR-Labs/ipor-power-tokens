@@ -16,7 +16,7 @@ interface ILiquidityRewardsInternal {
     /// @notice fetch user params for ipAsset
     /// @param ipToken address for which ipAsset should calculate rewards
     /// @return {LiquidityRewardsTypes.AccountRewardsParams}
-    function userParams(address ipToken)
+    function accountParams(address ipToken)
         external
         view
         returns (LiquidityRewardsTypes.AccountRewardsParams memory);

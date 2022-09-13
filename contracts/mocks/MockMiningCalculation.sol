@@ -11,7 +11,7 @@ contract MockMiningCalculation {
         uint256 horizontalShift
     ) public view returns (uint256) {
         return
-            MiningCalculation.calculateUserPowerUp(
+            MiningCalculation.calculateAccountPowerUp(
                 pwToken,
                 ipToken,
                 verticalShift,
@@ -83,7 +83,7 @@ contract MockMiningCalculation {
         uint256 userCompositeMultiplier
     ) public view returns (uint256) {
         return
-            MiningCalculation.calculateUserRewards(
+            MiningCalculation.calculateAccountRewards(
                 userIpTokens,
                 userPowerUp,
                 compositeMultiplier,
