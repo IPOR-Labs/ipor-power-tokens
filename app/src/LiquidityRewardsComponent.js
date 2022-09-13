@@ -166,7 +166,7 @@ export default ({ drizzle, drizzleState }) => (
                                             <td style={{ "padding-left": "1rem" }}>{value[4]}</td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
-                                            <td>Block rewords</td>
+                                            <td>Block rewards</td>
                                             <td style={{ "padding-left": "1rem" }}>
                                                 {value[5] / 100000000}
                                                 <br />
@@ -225,7 +225,7 @@ export default ({ drizzle, drizzleState }) => (
                                             <td style={{ "padding-left": "1rem" }}>{value[4]}</td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
-                                            <td>Block rewords</td>
+                                            <td>Block rewards</td>
                                             <td style={{ "padding-left": "1rem" }}>
                                                 {value[5] / 100000000}
                                                 <br />
@@ -284,7 +284,7 @@ export default ({ drizzle, drizzleState }) => (
                                             <td style={{ "padding-left": "1rem" }}>{value[4]}</td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
-                                            <td>Block rewords</td>
+                                            <td>Block rewards</td>
                                             <td style={{ "padding-left": "1rem" }}>
                                                 {value[5] / 100000000}
                                                 <br />
@@ -837,7 +837,7 @@ export default ({ drizzle, drizzleState }) => (
                         <strong>My Rewards</strong>
                         <br />
                         <small>
-                            Amount of rewords which user can claim from liquidity rewards contract
+                            Amount of rewards which user can claim from liquidity rewards contract
                             <br /> represented in 18 decimals
                         </small>
                     </td>

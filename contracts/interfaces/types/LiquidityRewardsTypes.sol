@@ -21,10 +21,10 @@ library LiquidityRewardsTypes {
         uint256 compositeMultiplierCumulativeBeforeBlock;
         uint32 blockNumber;
         // represented in 8 decimals
-        uint32 blockRewords;
+        uint32 blockRewards;
     }
 
-    struct UserRewardsParams {
+    struct AccountRewardsParams {
         uint256 powerUp;
         // represented in 27 decimals
         uint256 compositeMultiplierCumulative;

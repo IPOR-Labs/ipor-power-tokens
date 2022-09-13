@@ -31,11 +31,11 @@ contract PwIporToken is
 
     address private _iporToken;
     address private _liquidityRewards;
-    // user address -> amount 18 decimals
+    // account address -> amount 18 decimals
     mapping(address => uint256) private _baseBalance;
-    // user address -> amount 18 decimals
+    // account address -> amount 18 decimals
     mapping(address => uint256) private _delegatedBalance;
-    // user address -> {coolDownFinish, amount
+    // account address -> {coolDownFinish, amount}
     mapping(address => PwIporTokenTypes.PwCoolDown) _coolDowns;
     uint256 private _baseTotalSupply;
     uint256 private _withdrawalFee;
@@ -66,7 +66,7 @@ contract PwIporToken is
     }
 
     function symbol() external pure override returns (string memory) {
-        return "PwIPOR";
+        return "pwIPOR";
     }
 
     function decimals() external pure override returns (uint8) {
@@ -179,8 +179,8 @@ contract PwIporToken is
         );
     }
 
-    function coolDown(uint256 pwTokenAmount) external override whenNotPaused {
-        require(pwTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+    function coolDown(uint256 pwIporAmount) external override whenNotPaused {
+        require(pwIporAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         uint256 availablePwTokens = _baseAmountToPwToken(
             _baseBalance[_msgSender()],
@@ -188,18 +188,18 @@ contract PwIporToken is
         ) - _delegatedBalance[_msgSender()];
 
         require(
-            availablePwTokens >= pwTokenAmount,
+            availablePwTokens >= pwIporAmount,
             MiningErrors.STAKE_AND_UNDELEGATED_BALANCE_TOO_LOW
         );
 
         _coolDowns[_msgSender()] = PwIporTokenTypes.PwCoolDown(
             block.timestamp + COOL_DOWN_SECONDS,
-            pwTokenAmount
+            pwIporAmount
         );
         emit CoolDown(
             block.timestamp,
             _msgSender(),
-            pwTokenAmount,
+            pwIporAmount,
             block.timestamp + COOL_DOWN_SECONDS
         );
     }
@@ -257,15 +257,15 @@ contract PwIporToken is
         emit ReceiveRewards(block.timestamp, account, iporTokenAmount);
     }
 
-    function delegateToRewards(address[] memory ipAssets, uint256[] memory pwTokensAmounts)
+    function delegateToRewards(address[] memory ipTokens, uint256[] memory pwIporAmounts)
         external
         override
         whenNotPaused
     {
-        require(ipAssets.length == pwTokensAmounts.length, IporErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
+        require(ipTokens.length == pwIporAmounts.length, IporErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
         uint256 pwIporToDelegate;
-        for (uint256 i = 0; i != pwTokensAmounts.length; i++) {
-            pwIporToDelegate += pwTokensAmounts[i];
+        for (uint256 i = 0; i != pwIporAmounts.length; i++) {
+            pwIporToDelegate += pwIporAmounts[i];
         }
 
         require(
@@ -274,30 +274,26 @@ contract PwIporToken is
         );
 
         _delegatedBalance[_msgSender()] += pwIporToDelegate;
-        ILiquidityRewards(_liquidityRewards).delegatePwIpor(
-            _msgSender(),
-            ipAssets,
-            pwTokensAmounts
-        );
+        ILiquidityRewards(_liquidityRewards).delegatePwIpor(_msgSender(), ipTokens, pwIporAmounts);
 
-        emit DelegateToReward(block.timestamp, _msgSender(), ipAssets, pwTokensAmounts);
+        emit DelegateToReward(block.timestamp, _msgSender(), ipTokens, pwIporAmounts);
     }
 
-    function withdrawFromDelegation(address ipAsset, uint256 pwTokenAmount) external whenNotPaused {
-        require(pwTokenAmount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+    function withdrawFromDelegation(address ipToken, uint256 pwIporAmount) external whenNotPaused {
+        require(pwIporAmount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
         require(
-            _delegatedBalance[_msgSender()] >= pwTokenAmount,
+            _delegatedBalance[_msgSender()] >= pwIporAmount,
             MiningErrors.DELEGATED_BALANCE_TOO_LOW
         );
 
         ILiquidityRewards(_liquidityRewards).withdrawFromDelegation(
             _msgSender(),
-            ipAsset,
-            pwTokenAmount
+            ipToken,
+            pwIporAmount
         );
-        _delegatedBalance[_msgSender()] -= pwTokenAmount;
+        _delegatedBalance[_msgSender()] -= pwIporAmount;
 
-        emit WithdrawFromDelegation(block.timestamp, _msgSender(), ipAsset, pwTokenAmount);
+        emit WithdrawFromDelegation(block.timestamp, _msgSender(), ipToken, pwIporAmount);
     }
 
     function pause() external override onlyOwner {
@@ -336,15 +332,15 @@ contract PwIporToken is
         return IporMath.division(baseAmount * exchangeRate, Constants.D18);
     }
 
-    function _availablePwTokens(address user, uint256 exchangeRate)
+    function _availablePwTokens(address account, uint256 exchangeRate)
         internal
         view
         returns (uint256)
     {
         return
-            _baseAmountToPwToken(_baseBalance[user], exchangeRate) -
-            _delegatedBalance[user] -
-            _coolDowns[user].amount;
+            _baseAmountToPwToken(_baseBalance[account], exchangeRate) -
+            _delegatedBalance[account] -
+            _coolDowns[account].amount;
     }
 
     //solhint-disable no-empty-blocks

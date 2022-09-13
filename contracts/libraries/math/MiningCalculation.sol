@@ -13,7 +13,7 @@ library MiningCalculation {
     using SafeCast for uint256;
     using SafeCast for int256;
 
-    function calculateUserPowerUp(
+    function calculateAccountPowerUp(
         uint256 pwToken,
         uint256 ipToken,
         uint256 verticalShift,
@@ -38,20 +38,20 @@ library MiningCalculation {
     }
 
     function calculateAggregatePowerUp(
-        uint256 userPowerUp,
-        uint256 userIpToken,
-        uint256 previousUserPowerUp,
-        uint256 previousUserIpToken,
+        uint256 accountPowerUp,
+        uint256 accountIpToken,
+        uint256 previousAccountPowerUp,
+        uint256 previousAccountIpToken,
         uint256 previousAggregatePowerUp
     ) internal view returns (uint256) {
-        int256 apu = userPowerUp.toInt256() *
-            userIpToken.toInt256() -
-            previousUserPowerUp.toInt256() *
-            previousUserIpToken.toInt256();
+        int256 apu = accountPowerUp.toInt256() *
+            accountIpToken.toInt256() -
+            previousAccountPowerUp.toInt256() *
+            previousAccountIpToken.toInt256();
 
         if (apu < 0) {
             uint256 absApu = IporMath.division((-apu).toUint256(), Constants.D18);
-            //   last unstake iptokens we can have rounding error
+            //   last unstake ipTokens we can have rounding error
             if (previousAggregatePowerUp < absApu && previousAggregatePowerUp + 100 >= absApu) {
                 return 0;
             }
@@ -67,15 +67,15 @@ library MiningCalculation {
     function calculateAccruedRewards(
         uint256 blocNumber,
         uint256 lastRebalanceBlockNumber,
-        uint256 blockRewords,
+        uint256 blockRewards,
         uint256 previousAccruedRewards
     ) internal view returns (uint256) {
         require(
             blocNumber >= lastRebalanceBlockNumber,
             MiningErrors.BLOCK_NUMBER_GREATER_OR_EQUAL_THEN_PREVIOUS_BLOCK_NUMBER
         );
-        uint256 newRewords = (blocNumber - lastRebalanceBlockNumber) * blockRewords * Constants.D10;
-        return previousAccruedRewards + newRewords;
+        uint256 newRewards = (blocNumber - lastRebalanceBlockNumber) * blockRewards * Constants.D10;
+        return previousAccruedRewards + newRewards;
     }
 
     // returns value with 27 decimals
@@ -108,20 +108,19 @@ library MiningCalculation {
         return IporMath.division(blockRewards * Constants.D18 * Constants.D19, aggregatePowerUp);
     }
 
-    //todo: change names of cmc
-    function calculateUserRewards(
-        uint256 userIpTokens,
-        uint256 userPowerUp,
-        uint256 compositeMultiplier,
-        uint256 compositeMultiplierCumulative
+    function calculateAccountRewards(
+        uint256 accountIpTokens,
+        uint256 accountPowerUp,
+        uint256 compositeMultiplierCumulative,
+        uint256 accountCompositeMultiplierCumulative
     ) internal view returns (uint256) {
         require(
-            compositeMultiplier >= compositeMultiplierCumulative,
+            compositeMultiplierCumulative >= accountCompositeMultiplierCumulative,
             MiningErrors.COMPOSITE_MULTIPLIER_GREATER_OR_EQUAL_THEN_USER_COMPOSITE_MULTIPLIER
         );
-        uint256 userRewards = userIpTokens *
-            userPowerUp *
-            (compositeMultiplier - compositeMultiplierCumulative);
+        uint256 userRewards = accountIpTokens *
+            accountPowerUp *
+            (compositeMultiplierCumulative - accountCompositeMultiplierCumulative);
         return IporMath.division(userRewards, Constants.D45);
     }
 

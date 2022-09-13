@@ -124,7 +124,7 @@ describe("LiquidityRewards claim", () => {
         const globalParamsBefore = await liquidityRewards.globalParams(tokens.ipTokenDai.address);
         const userParamsBefore = await liquidityRewards
             .connect(userOne)
-            .userParams(tokens.ipTokenDai.address);
+            .accountParams(tokens.ipTokenDai.address);
         const ipTokenBalanceBefore = await tokens.ipTokenDai.balanceOf(await userOne.getAddress());
         //    when
         await liquidityRewards.connect(userOne).unstake(tokens.ipTokenDai.address, stakedIpTokens);
@@ -132,7 +132,7 @@ describe("LiquidityRewards claim", () => {
         const globalParamsAfter = await liquidityRewards.globalParams(tokens.ipTokenDai.address);
         const userParamsAfter = await liquidityRewards
             .connect(userOne)
-            .userParams(tokens.ipTokenDai.address);
+            .accountParams(tokens.ipTokenDai.address);
         const ipTokenBalanceAfter = await tokens.ipTokenDai.balanceOf(await userOne.getAddress());
 
         const pwIporTokenBalanceAfter = await pwIporToken
