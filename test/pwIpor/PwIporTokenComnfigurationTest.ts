@@ -33,7 +33,7 @@ describe("PwIporToken comnfiguration, deploy tests", () => {
         ])) as PwIporToken;
         // then
         expect(await pwIporToken.name()).to.be.equal("Power IPOR");
-        expect(await pwIporToken.symbol()).to.be.equal("PwIPOR");
+        expect(await pwIporToken.symbol()).to.be.equal("pwIPOR");
         expect(await pwIporToken.decimals()).to.be.equal(BigNumber.from("18"));
     });
 
