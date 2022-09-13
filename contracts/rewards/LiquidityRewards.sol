@@ -37,7 +37,7 @@ contract LiquidityRewards is
     //  asset address -> global parameters for asset
     mapping(address => LiquidityRewardsTypes.GlobalRewardsParams) private _globalParameters;
     //  user address => asset address => users params
-    mapping(address => mapping(address => LiquidityRewardsTypes.UserRewardsParams)) _accountsParams;
+    mapping(address => mapping(address => LiquidityRewardsTypes.AccountRewardsParams)) _accountsParams;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -79,7 +79,7 @@ contract LiquidityRewards is
     // TODO: userRewards -> accountRewards
     function userRewards(address ipToken) external view override returns (uint256) {
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[ipToken];
-        LiquidityRewardsTypes.UserRewardsParams memory accountParams = _accountsParams[
+        LiquidityRewardsTypes.AccountRewardsParams memory accountParams = _accountsParams[
             _msgSender()
         ][ipToken];
         return _userRewards(accountParams, globalParams);
@@ -113,7 +113,7 @@ contract LiquidityRewards is
         external
         view
         override
-        returns (LiquidityRewardsTypes.UserRewardsParams memory)
+        returns (LiquidityRewardsTypes.AccountRewardsParams memory)
     {
         return _accountsParams[_msgSender()][ipToken];
     }
@@ -155,7 +155,7 @@ contract LiquidityRewards is
 
         IERC20Upgradeable(ipToken).safeTransferFrom(_msgSender(), address(this), ipTokenAmount);
 
-        LiquidityRewardsTypes.UserRewardsParams memory accountParams = _accountsParams[
+        LiquidityRewardsTypes.AccountRewardsParams memory accountParams = _accountsParams[
             _msgSender()
         ][ipToken];
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[ipToken];
@@ -185,7 +185,7 @@ contract LiquidityRewards is
     function unstake(address ipToken, uint256 ipTokenAmount) external override whenNotPaused {
         require(_ipTokens[ipToken], MiningErrors.ASSET_NOT_SUPPORTED);
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[ipToken];
-        LiquidityRewardsTypes.UserRewardsParams memory accountParams = _accountsParams[
+        LiquidityRewardsTypes.AccountRewardsParams memory accountParams = _accountsParams[
             _msgSender()
         ][ipToken];
 
@@ -231,7 +231,7 @@ contract LiquidityRewards is
         uint256 pwTokenAmount
     ) external onlyPwIpor whenNotPaused {
         require(_ipTokens[ipToken], MiningErrors.ASSET_NOT_SUPPORTED);
-        LiquidityRewardsTypes.UserRewardsParams memory accountParams = _accountsParams[account][
+        LiquidityRewardsTypes.AccountRewardsParams memory accountParams = _accountsParams[account][
             ipToken
         ];
         require(
@@ -257,7 +257,7 @@ contract LiquidityRewards is
     }
 
     function claim(address ipToken) external override whenNotPaused {
-        LiquidityRewardsTypes.UserRewardsParams memory accountParams = _accountsParams[
+        LiquidityRewardsTypes.AccountRewardsParams memory accountParams = _accountsParams[
             _msgSender()
         ][ipToken];
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[ipToken];
@@ -346,14 +346,14 @@ contract LiquidityRewards is
         address account,
         address ipToken,
         uint256 rewards,
-        LiquidityRewardsTypes.UserRewardsParams memory accountParams,
+        LiquidityRewardsTypes.AccountRewardsParams memory accountParams,
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams
     ) internal {
         IPwIporTokenInternal(_getPwIpor()).receiveRewards(account, rewards);
     }
 
     function _userRewards(
-        LiquidityRewardsTypes.UserRewardsParams memory accountParams,
+        LiquidityRewardsTypes.AccountRewardsParams memory accountParams,
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams
     ) internal view returns (uint256) {
         uint256 compositeMultiplierCumulativeBeforeBlock = globalParams
@@ -371,7 +371,7 @@ contract LiquidityRewards is
     }
 
     function _rebalanceParams(
-        LiquidityRewardsTypes.UserRewardsParams memory accountParams,
+        LiquidityRewardsTypes.AccountRewardsParams memory accountParams,
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams,
         uint256 ipTokensBalance,
         uint256 delegatedPwTokens,
@@ -393,7 +393,7 @@ contract LiquidityRewards is
         _saveUserParams(
             account,
             ipToken,
-            LiquidityRewardsTypes.UserRewardsParams(
+            LiquidityRewardsTypes.AccountRewardsParams(
                 userPowerUp,
                 compositeMultiplierCumulativeBeforeBlock,
                 ipTokensBalance,
@@ -445,7 +445,7 @@ contract LiquidityRewards is
         address ipToken,
         uint256 pwTokenAmount
     ) internal {
-        LiquidityRewardsTypes.UserRewardsParams memory accountParams = _accountsParams[account][
+        LiquidityRewardsTypes.AccountRewardsParams memory accountParams = _accountsParams[account][
             ipToken
         ];
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[ipToken];
@@ -490,7 +490,7 @@ contract LiquidityRewards is
     function _saveUserParams(
         address account,
         address ipToken,
-        LiquidityRewardsTypes.UserRewardsParams memory params
+        LiquidityRewardsTypes.AccountRewardsParams memory params
     ) internal virtual {
         _accountsParams[account][ipToken] = params;
     }

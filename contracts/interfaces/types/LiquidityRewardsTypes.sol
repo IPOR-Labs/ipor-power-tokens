@@ -24,7 +24,7 @@ library LiquidityRewardsTypes {
         uint32 blockRewords;
     }
 
-    struct UserRewardsParams {
+    struct AccountRewardsParams {
         uint256 powerUp;
         // represented in 27 decimals
         uint256 compositeMultiplierCumulative;
