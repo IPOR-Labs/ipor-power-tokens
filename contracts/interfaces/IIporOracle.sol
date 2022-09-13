@@ -76,7 +76,7 @@ interface IIporOracle {
     /// @param updateTimestamp Time for which exponential moving average and exponential weighted moving variance was calculated
     /// @param exponentialMovingAverage initial Exponential Moving Average for this asset
     /// @param exponentialWeightedMovingVariance initial Exponential Weighted Moving Variance for asset.
-    function addAsset(
+    function addIpToken(
         address newAsset,
         uint256 updateTimestamp,
         uint256 exponentialMovingAverage,
@@ -85,7 +85,7 @@ interface IIporOracle {
 
     /// @notice Removes asset which IPOR Protocol will not support. Function available only for Owner.
     /// @param asset  underlying / stablecoin address which currenlty is supported by IPOR Protocol.
-    function removeAsset(address asset) external;
+    function removeIpToken(address asset) external;
 
     /// @notice Pauses current smart contract, it can be executed only by the Owner
     /// @dev Emits {Paused} event from IporOracle.

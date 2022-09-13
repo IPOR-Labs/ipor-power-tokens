@@ -9,7 +9,7 @@ import { MockMiningCalculation } from "../../types";
 chai.use(solidity);
 const { expect } = chai;
 
-describe("LiquidityRewards Stake and balance", () => {
+describe("John Stake and balance", () => {
     const one = BigNumber.from(1);
     const zero = BigNumber.from(0);
     const D18 = BigNumber.from("1000000000000000000");

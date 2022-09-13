@@ -88,7 +88,7 @@ describe("IporOracle", () => {
     });
 
     it("Should removed asset", async () => {
-        await expect(_iporOracle.removeAsset(_tokenDai.address))
+        await expect(_iporOracle.removeIpToken(_tokenDai.address))
             .emit(_iporOracle, "IporIndexRemoveAsset")
             .withArgs(_tokenDai.address);
     });
@@ -140,12 +140,12 @@ describe("IporOracle", () => {
         );
 
         await assertError(
-            _iporOracle.connect(admin).addAsset(await userThree.getAddress(), 0, 0, 0),
+            _iporOracle.connect(admin).addIpToken(await userThree.getAddress(), 0, 0, 0),
             "Pausable: paused"
         );
 
         await assertError(
-            _iporOracle.connect(admin).removeAsset(await userThree.getAddress()),
+            _iporOracle.connect(admin).removeIpToken(await userThree.getAddress()),
             "Pausable: paused"
         );
 
@@ -879,7 +879,7 @@ describe("IporOracle", () => {
 
     it("Should throw error when add asset twice", async () => {
         //when
-        await expect(_iporOracle.addAsset(_tokenUsdc.address, 0, 0, 0)).to.be.revertedWith(
+        await expect(_iporOracle.addIpToken(_tokenUsdc.address, 0, 0, 0)).to.be.revertedWith(
             "IPOR_201"
         );
     });

@@ -2,9 +2,9 @@
 pragma solidity 0.8.15;
 
 /// @title Struct used across liquidity rewards.
-library LiquidityRewardsTypes {
+library JohnTypes {
     struct DelegatedPwIpor {
-        address asset;
+        address ipToken;
         uint256 amount;
     }
 

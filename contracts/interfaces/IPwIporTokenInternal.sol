@@ -12,17 +12,17 @@ interface IPwIporTokenInternal {
     function exchangeRate() external view returns (uint256);
 
     /// @notice method return actual address of liquidity rewards contract
-    function liquidityRewards() external view returns (address);
+    function getJohn() external view returns (address);
 
     /// @notice Method setup unstake fee
     /// @param withdrawalFee percent of fee, represented in 18 decimals.
     function setWithdrawalFee(uint256 withdrawalFee) external;
 
-    /// @notice method setup address of LiquidityRewards
-    /// @param liquidityRewards - new address of LiquidityRewards contract
-    function setLiquidityRewardsAddress(address liquidityRewards) external;
+    /// @notice method setup address of John
+    /// @param john - new address of John contract
+    function setJohn(address john) external;
 
-    /// @notice method allowed to transfer rewards from LiquidityRewards contracts to balance of user
+    /// @notice method allowed to transfer rewards from John contracts to balance of user
     /// @param account - address of user who received rewards
     /// @param iporTokenAmount - amount of rewards, represented in 18 decimals.
     function receiveRewards(address account, uint256 iporTokenAmount) external;
@@ -41,13 +41,9 @@ interface IPwIporTokenInternal {
     /// @param fee new value of fee, represented in 18 decimals
     event WithdrawalFee(uint256 timestamp, address sender, uint256 fee);
 
-    /// @notice Emitted when new LiquidityRewardsAddress is setup
+    /// @notice Emitted when new JohnAddress is setup
     /// @param timestamp moment when set new fee
     /// @param sender account address
-    /// @param newLiquidityRewardsAddress address of rewards address
-    event LiquidityRewardsAddressChanged(
-        uint256 timestamp,
-        address sender,
-        address newLiquidityRewardsAddress
-    );
+    /// @param newJohnAddress address of rewards address
+    event JohnAddressChanged(uint256 timestamp, address sender, address newJohnAddress);
 }

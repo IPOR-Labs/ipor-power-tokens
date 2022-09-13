@@ -4,10 +4,10 @@ import chai from "chai";
 import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { IporToken, PwIporToken, LiquidityRewards } from "../../types";
+import { IporToken, PwIporToken, John } from "../../types";
 import { N1__0_18DEC, ZERO, TOTAL_SUPPLY_18_DECIMALS, N0__1_18DEC } from "../utils/Constants";
 import { it } from "mocha";
-import { extractGlobalParam, getDeployedTokens, Tokens } from "../utils/LiquidityRewardsUtils";
+import { extractGlobalParam, getDeployedTokens, Tokens } from "../utils/JohnUtils";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -18,7 +18,7 @@ describe("PwIporToken configuration, deploy tests", () => {
     let iporToken: IporToken;
     let pwIporToken: PwIporToken;
     let tokens: Tokens;
-    let liquidityRewards: LiquidityRewards;
+    let john: John;
 
     before(async () => {
         accounts = await ethers.getSigners();
@@ -35,14 +35,14 @@ describe("PwIporToken configuration, deploy tests", () => {
         const PwIporToken = await ethers.getContractFactory("PwIporToken");
         pwIporToken = (await upgrades.deployProxy(PwIporToken, [iporToken.address])) as PwIporToken;
         await iporToken.increaseAllowance(pwIporToken.address, TOTAL_SUPPLY_18_DECIMALS);
-        const LiquidityRewards = await hre.ethers.getContractFactory("LiquidityRewards");
-        liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
+        const John = await hre.ethers.getContractFactory("John");
+        john = (await upgrades.deployProxy(John, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
             pwIporToken.address,
             iporToken.address,
-        ])) as LiquidityRewards;
+        ])) as John;
 
-        await pwIporToken.setLiquidityRewardsAddress(liquidityRewards.address);
+        await pwIporToken.setJohn(john.address);
     });
 
     it("Should revert transaction when mismatch arrays", async () => {
@@ -93,7 +93,7 @@ describe("PwIporToken configuration, deploy tests", () => {
         const delegatedBalanceAfter = await pwIporToken.delegatedBalanceOf(
             await admin.getAddress()
         );
-        const balance = await liquidityRewards.balanceOfDelegatedPwIpor(await admin.getAddress(), [
+        const balance = await john.balanceOfDelegatedPwIpor(await admin.getAddress(), [
             tokens.ipTokenDai.address,
         ]);
 
