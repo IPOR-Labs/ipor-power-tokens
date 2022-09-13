@@ -6,33 +6,33 @@ import "./types/LiquidityRewardsTypes.sol";
 /// @title
 interface ILiquidityRewardsInternal {
     /// @notice fetch global params for ipAsset
-    /// @param ipAsset address for which ipAsset should calculate rewards
+    /// @param ipToken address for which ipAsset should calculate rewards
     /// @return {LiquidityRewardsTypes.GlobalRewardsParams}
-    function globalParams(address ipAsset)
+    function globalParams(address ipToken)
         external
         view
         returns (LiquidityRewardsTypes.GlobalRewardsParams memory);
 
     /// @notice fetch user params for ipAsset
-    /// @param ipAsset address for which ipAsset should calculate rewards
+    /// @param ipToken address for which ipAsset should calculate rewards
     /// @return {LiquidityRewardsTypes.UserRewardsParams}
-    function userParams(address ipAsset)
+    function userParams(address ipToken)
         external
         view
         returns (LiquidityRewardsTypes.UserRewardsParams memory);
 
     /// @notice method setup rewords per block
-    /// @param ipAsset address for which one should setup rewords per block
+    /// @param ipToken address for which one should setup rewords per block
     /// @param rewardsValue new value of rewards per block, represented in 8 decimals
-    function setRewardsPerBlock(address ipAsset, uint32 rewardsValue) external;
+    function setRewardsPerBlock(address ipToken, uint32 rewardsValue) external;
 
     /// @notice method allowed to add new asset(ipToken)
-    /// @param ipAsset address of ipToken
-    function addAsset(address ipAsset) external;
+    /// @param ipToken address of ipToken
+    function addAsset(address ipToken) external;
 
     /// @notice method allowed to remove asset
-    /// @param ipAsset address of ipToken
-    function removeAsset(address ipAsset) external;
+    /// @param ipToken address of ipToken
+    function removeAsset(address ipToken) external;
 
     /// @notice Pauses current smart contract, it can be executed only by the Owner
     /// @dev Emits {Paused} event.
@@ -47,19 +47,19 @@ interface ILiquidityRewardsInternal {
 
     /// @notice Emitted when user change rewards per block
     /// @param timestamp moment when method was execute
-    /// @param user account address
+    /// @param account account address
     /// @param newRewardsPerBlock new value of rewards per block, represented in 8 decimals
-    event RewardsPerBlockChanged(uint256 timestamp, address user, uint256 newRewardsPerBlock);
+    event RewardsPerBlockChanged(uint256 timestamp, address account, uint256 newRewardsPerBlock);
 
     /// @notice Emitted when user added new asset
     /// @param timestamp moment when method was execute
-    /// @param user account address
-    /// @param asset address of ipToken
-    event AssetAdded(uint256 timestamp, address user, address asset);
+    /// @param account address
+    /// @param ipToken address of ipToken
+    event AssetAdded(uint256 timestamp, address account, address ipToken);
 
     /// @notice Emitted when user removed asset
     /// @param timestamp moment when method was execute
-    /// @param user account address
-    /// @param asset address of ipToken
-    event AssetRemoved(uint256 timestamp, address user, address asset);
+    /// @param account address
+    /// @param ipToken address of ipToken
+    event AssetRemoved(uint256 timestamp, address account, address ipToken);
 }
