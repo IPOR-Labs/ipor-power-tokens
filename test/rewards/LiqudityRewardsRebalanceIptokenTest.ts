@@ -176,7 +176,7 @@ describe("LiquidityRewards Stake and balance", () => {
                 delegatedIporToken
             );
 
-            const rewards = await liquidityRewards.userRewards(tokens.ipTokenDai.address);
+            const rewards = await liquidityRewards.accountRewards(tokens.ipTokenDai.address);
             expect(rewards).to.be.equal(BigNumber.from("100000000000000000000"));
         });
 
@@ -214,13 +214,13 @@ describe("LiquidityRewards Stake and balance", () => {
 
             //    then
 
-            const rewardsAdmin = await liquidityRewards.userRewards(tokens.ipTokenDai.address);
+            const rewardsAdmin = await liquidityRewards.accountRewards(tokens.ipTokenDai.address);
             const rewardsUserOne = await liquidityRewards
                 .connect(userOne)
-                .userRewards(tokens.ipTokenDai.address);
+                .accountRewards(tokens.ipTokenDai.address);
             const rewardsUserTwo = await liquidityRewards
                 .connect(userTwo)
-                .userRewards(tokens.ipTokenDai.address);
+                .accountRewards(tokens.ipTokenDai.address);
             expect(rewardsAdmin.add(rewardsUserOne).add(rewardsUserTwo)).to.be.equal(
                 BigNumber.from("305999999999999999999")
             );
@@ -237,14 +237,14 @@ describe("LiquidityRewards Stake and balance", () => {
             await liquidityRewards.stake(tokens.ipTokenDai.address, stakedIpTokens);
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
-            const rewardsAfterFirstStake = await liquidityRewards.userRewards(
+            const rewardsAfterFirstStake = await liquidityRewards.accountRewards(
                 tokens.ipTokenDai.address
             );
 
             await liquidityRewards.stake(tokens.ipTokenDai.address, stakedIpTokens);
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
-            const rewardsAfterSecondStake = await liquidityRewards.userRewards(
+            const rewardsAfterSecondStake = await liquidityRewards.accountRewards(
                 tokens.ipTokenDai.address
             );
             //    then
@@ -311,7 +311,9 @@ describe("LiquidityRewards Stake and balance", () => {
             const accruedRewardsBefore = await liquidityRewards.accruedRewards(
                 tokens.ipTokenDai.address
             );
-            const userRewardsBefore = await liquidityRewards.userRewards(tokens.ipTokenDai.address);
+            const accountRewardsBefore = await liquidityRewards.accountRewards(
+                tokens.ipTokenDai.address
+            );
 
             //    when
             await liquidityRewards.setRewardsPerBlock(
@@ -324,11 +326,13 @@ describe("LiquidityRewards Stake and balance", () => {
             const accruedRewardsAfter = await liquidityRewards.accruedRewards(
                 tokens.ipTokenDai.address
             );
-            const userRewardsAfter = await liquidityRewards.userRewards(tokens.ipTokenDai.address);
+            const accountRewardsAfter = await liquidityRewards.accountRewards(
+                tokens.ipTokenDai.address
+            );
 
             expect(accruedRewardsBefore).to.be.equal(BigNumber.from("100000000000000000000"));
-            expect(userRewardsBefore).to.be.equal(BigNumber.from("100000000000000000000"));
-            expect(userRewardsAfter).to.be.equal(BigNumber.from("301000000000000000000"));
+            expect(accountRewardsBefore).to.be.equal(BigNumber.from("100000000000000000000"));
+            expect(accountRewardsAfter).to.be.equal(BigNumber.from("301000000000000000000"));
             expect(accruedRewardsAfter).to.be.equal(BigNumber.from("301000000000000000000"));
         });
 
@@ -343,7 +347,9 @@ describe("LiquidityRewards Stake and balance", () => {
             const accruedRewardsBefore = await liquidityRewards.accruedRewards(
                 tokens.ipTokenDai.address
             );
-            const userRewardsBefore = await liquidityRewards.userRewards(tokens.ipTokenDai.address);
+            const accountRewardsBefore = await liquidityRewards.accountRewards(
+                tokens.ipTokenDai.address
+            );
 
             //    when
             await liquidityRewards.setRewardsPerBlock(
@@ -356,11 +362,13 @@ describe("LiquidityRewards Stake and balance", () => {
             const accruedRewardsAfter = await liquidityRewards.accruedRewards(
                 tokens.ipTokenDai.address
             );
-            const userRewardsAfter = await liquidityRewards.userRewards(tokens.ipTokenDai.address);
+            const accountRewardsAfter = await liquidityRewards.accountRewards(
+                tokens.ipTokenDai.address
+            );
 
             expect(accruedRewardsBefore).to.be.equal(BigNumber.from("100000000000000000000"));
-            expect(userRewardsBefore).to.be.equal(BigNumber.from("100000000000000000000"));
-            expect(userRewardsAfter).to.be.equal(BigNumber.from("151000000000000000000"));
+            expect(accountRewardsBefore).to.be.equal(BigNumber.from("100000000000000000000"));
+            expect(accountRewardsAfter).to.be.equal(BigNumber.from("151000000000000000000"));
             expect(accruedRewardsAfter).to.be.equal(BigNumber.from("151000000000000000000"));
         });
     });

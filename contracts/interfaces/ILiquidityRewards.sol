@@ -14,7 +14,7 @@ interface ILiquidityRewards {
     /// @notice Calculate user rewards
     /// @param ipToken address for which asset should calculate rewards
     /// @return Current user rewards, represented in 18 decimals.
-    function userRewards(address ipToken) external view returns (uint256);
+    function accountRewards(address ipToken) external view returns (uint256);
 
     /// @notice Calculate accrued rewards
     /// @param ipToken address for which asset should calculate rewards

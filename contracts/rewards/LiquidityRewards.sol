@@ -76,8 +76,7 @@ contract LiquidityRewards is
         return 1;
     }
 
-    // TODO: userRewards -> accountRewards
-    function userRewards(address ipToken) external view override returns (uint256) {
+    function accountRewards(address ipToken) external view override returns (uint256) {
         LiquidityRewardsTypes.GlobalRewardsParams memory globalParams = _globalParameters[ipToken];
         LiquidityRewardsTypes.AccountRewardsParams memory accountParams = _accountsParams[
             _msgSender()
@@ -108,7 +107,6 @@ contract LiquidityRewards is
         return _globalParameters[ipToken];
     }
 
-    //todo account
     function accountParams(address ipToken)
         external
         view

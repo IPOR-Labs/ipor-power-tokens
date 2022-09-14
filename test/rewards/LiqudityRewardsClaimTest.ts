@@ -156,7 +156,7 @@ describe("LiquidityRewards claim", () => {
 
         const rewardsAfterFirstStake = await liquidityRewards
             .connect(userOne)
-            .userRewards(tokens.ipTokenDai.address);
+            .accountRewards(tokens.ipTokenDai.address);
 
         await liquidityRewards.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokens);
 
@@ -167,7 +167,7 @@ describe("LiquidityRewards claim", () => {
 
         const rewardsAfterSecondStake = await liquidityRewards
             .connect(userOne)
-            .userRewards(tokens.ipTokenDai.address);
+            .accountRewards(tokens.ipTokenDai.address);
 
         expect(rewardsAfterFirstStake).to.be.equal(BigNumber.from("100000000000000000000"));
         expect(rewardsAfterSecondStake).to.be.equal(ZERO);
@@ -200,7 +200,7 @@ describe("LiquidityRewards claim", () => {
             .balanceOf(await userOne.getAddress());
         const rewardsAfterFirstStake = await liquidityRewards
             .connect(userOne)
-            .userRewards(tokens.ipTokenDai.address);
+            .accountRewards(tokens.ipTokenDai.address);
 
         await pwIporToken
             .connect(userOne)
@@ -208,7 +208,7 @@ describe("LiquidityRewards claim", () => {
 
         const rewardsAfterSecondStake = await liquidityRewards
             .connect(userOne)
-            .userRewards(tokens.ipTokenDai.address);
+            .accountRewards(tokens.ipTokenDai.address);
         //    then
 
         const pwIporTokenBalanceAfter2Stake = await pwIporToken

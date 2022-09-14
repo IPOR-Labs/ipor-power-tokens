@@ -222,13 +222,13 @@ describe("LiquidityRewards claim", () => {
             100000000
         );
 
-        const rewardsAdmin = await liquidityRewards.userRewards(tokens.ipTokenDai.address);
+        const rewardsAdmin = await liquidityRewards.accountRewards(tokens.ipTokenDai.address);
         const rewardsUserOne = await liquidityRewards
             .connect(userOne)
-            .userRewards(tokens.ipTokenDai.address);
+            .accountRewards(tokens.ipTokenDai.address);
         const rewardsUserTwo = await liquidityRewards
             .connect(userTwo)
-            .userRewards(tokens.ipTokenDai.address);
+            .accountRewards(tokens.ipTokenDai.address);
         expect(rewardsAdmin.add(rewardsUserOne).add(rewardsUserTwo)).to.be.equal(ZERO);
     });
 
@@ -369,7 +369,9 @@ describe("LiquidityRewards claim", () => {
 
         //    then
 
-        const userRewardsAfter = await liquidityRewards.userRewards(tokens.ipTokenDai.address);
+        const accountRewardsAfter = await liquidityRewards.accountRewards(
+            tokens.ipTokenDai.address
+        );
         const pwIporTokenBalanceAfter = await pwIporToken
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
@@ -389,6 +391,6 @@ describe("LiquidityRewards claim", () => {
             BigNumber.from("201000000000000000000")
         );
         expect(pwIporTokenBalanceAfter).to.be.equal(BigNumber.from("302000000000000000000"));
-        expect(userRewardsAfter).to.be.equal(ZERO);
+        expect(accountRewardsAfter).to.be.equal(ZERO);
     });
 });

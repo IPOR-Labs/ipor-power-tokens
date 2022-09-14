@@ -177,7 +177,7 @@ describe("LiquidityRewards Stake and balance", () => {
                 delegatedIporToken
             );
 
-            const rewards = await liquidityRewards.userRewards(tokens.ipTokenDai.address);
+            const rewards = await liquidityRewards.accountRewards(tokens.ipTokenDai.address);
             expect(rewards).to.be.equal(BigNumber.from("100000000000000000000"));
         });
 
@@ -215,13 +215,13 @@ describe("LiquidityRewards Stake and balance", () => {
 
             //    then
 
-            const rewardsAdmin = await liquidityRewards.userRewards(tokens.ipTokenDai.address);
+            const rewardsAdmin = await liquidityRewards.accountRewards(tokens.ipTokenDai.address);
             const rewardsUserOne = await liquidityRewards
                 .connect(userOne)
-                .userRewards(tokens.ipTokenDai.address);
+                .accountRewards(tokens.ipTokenDai.address);
             const rewardsUserTwo = await liquidityRewards
                 .connect(userTwo)
-                .userRewards(tokens.ipTokenDai.address);
+                .accountRewards(tokens.ipTokenDai.address);
             expect(rewardsAdmin.add(rewardsUserOne).add(rewardsUserTwo)).to.be.equal(
                 BigNumber.from("305652777777777777777") //TODO check it when we will get unstack ipToken
             );
@@ -238,7 +238,7 @@ describe("LiquidityRewards Stake and balance", () => {
             await pwIporToken.delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
-            const rewardsAfterFirstStake = await liquidityRewards.userRewards(
+            const rewardsAfterFirstStake = await liquidityRewards.accountRewards(
                 tokens.ipTokenDai.address
             );
 
@@ -246,7 +246,7 @@ describe("LiquidityRewards Stake and balance", () => {
 
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
-            const rewardsAfterSecondStake = await liquidityRewards.userRewards(
+            const rewardsAfterSecondStake = await liquidityRewards.accountRewards(
                 tokens.ipTokenDai.address
             );
             //    then
