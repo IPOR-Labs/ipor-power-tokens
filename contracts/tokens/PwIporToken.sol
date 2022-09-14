@@ -43,6 +43,11 @@ contract PwIporToken is
     uint256 private _baseTotalSupply;
     uint256 private _withdrawalFee;
 
+    modifier onlyJohn() {
+        require(_msgSender() == _john, MiningErrors.CALLER_NOT_JOHN);
+        _;
+    }
+
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
@@ -57,9 +62,8 @@ contract PwIporToken is
         _withdrawalFee = Constants.D17 * 5;
     }
 
-    modifier onlyJohn() {
-        require(_msgSender() == _john, MiningErrors.CALLER_NOT_JOHN);
-        _;
+    function getVersion() external pure override returns (uint256) {
+        return 1;
     }
 
     function name() external pure override returns (string memory) {
@@ -74,14 +78,6 @@ contract PwIporToken is
         return 18;
     }
 
-    function getVersion() external pure override returns (uint256) {
-        return 1;
-    }
-
-    function withdrawalFee() external view override returns (uint256) {
-        return _withdrawalFee;
-    }
-
     function totalSupply() external view override returns (uint256) {
         return IporMath.division(_baseTotalSupply * _exchangeRate(), Constants.D18);
     }
@@ -90,12 +86,16 @@ contract PwIporToken is
         return _baseTotalSupply;
     }
 
-    function activeCoolDown() external view returns (PwIporTokenTypes.PwCoolDown memory) {
-        return _coolDowns[_msgSender()];
-    }
-
     function balanceOf(address account) external view override returns (uint256) {
         return _balanceOf(account);
+    }
+
+    function withdrawalFee() external view override returns (uint256) {
+        return _withdrawalFee;
+    }
+
+    function activeCoolDown() external view returns (PwIporTokenTypes.PwCoolDown memory) {
+        return _coolDowns[_msgSender()];
     }
 
     function exchangeRate() external view override returns (uint256) {
@@ -115,12 +115,14 @@ contract PwIporToken is
         emit WithdrawalFee(block.timestamp, _msgSender(), withdrawalFee);
     }
 
-    function setJohn(address john) external override onlyOwner whenNotPaused {
-        require(john != address(0), IporErrors.WRONG_ADDRESS);
-        _john = john;
-        emit JohnAddressChanged(block.timestamp, _msgSender(), john);
+    function setJohn(address newJohnAddr) external override onlyOwner whenNotPaused {
+        require(newJohnAddr != address(0), IporErrors.WRONG_ADDRESS);
+		address oldJohnAddr = _john;
+        _john = newJohnAddr;
+        emit JohnChanged(_msgSender(), oldJohnAddr, newJohnAddr);
     }
 
+	//TODO: secure against reentrancy
     function stake(uint256 iporTokenAmount) external override whenNotPaused {
         require(iporTokenAmount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
@@ -140,6 +142,7 @@ contract PwIporToken is
         emit Stake(block.timestamp, _msgSender(), iporTokenAmount, exchangeRate, newBaseTokens);
     }
 
+	//TODO: secure against reentrancy
     function unstake(uint256 pwTokenAmount) external override whenNotPaused {
         require(pwTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
@@ -318,7 +321,7 @@ contract PwIporToken is
 
     function _baseAmountToPwToken(uint256 baseAmount, uint256 exchangeRate)
         internal
-        view
+        pure
         returns (uint256)
     {
         return IporMath.division(baseAmount * exchangeRate, Constants.D18);

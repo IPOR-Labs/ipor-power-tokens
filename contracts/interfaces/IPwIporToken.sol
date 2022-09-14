@@ -6,17 +6,13 @@ import "./types/PwIporTokenTypes.sol";
 /// @title Interface for interaction with PwIporToken - smart contract responsible
 /// for managing Power Ipor token and Ipor Token and delegation to John contracts.
 interface IPwIporToken {
-    /// @notice Returns current version of Power Ipor Token
-    /// @return Current Power Ipor Tokenr version
-    function getVersion() external pure returns (uint256);
-
-    /// @return  Returns the name of the token.
+    /// @return Returns the name of the token.
     function name() external pure returns (string memory);
 
-    /// @return  Returns the symbol of the token, usually a shorter version of the
+    /// @return Returns the symbol of the token.
     function symbol() external pure returns (string memory);
 
-    /// @return   Returns the number of decimals 18 used to get its user representation.
+    /// @return Returns the number of decimals 18 used to get its user representation.
     function decimals() external pure returns (uint8);
 
     /// @notice Total supply of power tokens
