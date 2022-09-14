@@ -10,7 +10,7 @@ import { N1__0_18DEC, ZERO, N0__1_18DEC } from "../utils/Constants";
 chai.use(solidity);
 const { expect } = chai;
 
-describe("LiquidityRewards Stake and balance", () => {
+describe("John Stake and balance", () => {
     let miningCalculation: MockMiningCalculation;
 
     before(async () => {

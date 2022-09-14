@@ -4,7 +4,7 @@ import chai from "chai";
 import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { IporToken, LiquidityRewards, PwIporToken } from "../../types";
+import { IporToken, John, PwIporToken } from "../../types";
 import {
     N1__0_18DEC,
     ZERO,
@@ -13,7 +13,7 @@ import {
     COOLDOWN_SECONDS,
 } from "../utils/Constants";
 import { it } from "mocha";
-import { getDeployedTokens, Tokens } from "../utils/LiquidityRewardsUtils";
+import { getDeployedTokens, Tokens } from "../utils/JohnUtils";
 import exp from "constants";
 
 chai.use(solidity);
@@ -31,7 +31,7 @@ describe("PwIporToken unstake", () => {
     let iporToken: IporToken;
     let pwIporToken: PwIporToken;
     let tokens: Tokens;
-    let liquidityRewards: LiquidityRewards;
+    let john: John;
 
     before(async () => {
         accounts = await ethers.getSigners();
@@ -48,14 +48,14 @@ describe("PwIporToken unstake", () => {
         const PwIporToken = await ethers.getContractFactory("PwIporToken");
         pwIporToken = (await upgrades.deployProxy(PwIporToken, [iporToken.address])) as PwIporToken;
         await iporToken.increaseAllowance(pwIporToken.address, TOTAL_SUPPLY_18_DECIMALS);
-        const LiquidityRewards = await hre.ethers.getContractFactory("LiquidityRewards");
-        liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
+        const John = await hre.ethers.getContractFactory("John");
+        john = (await upgrades.deployProxy(John, [
             [tokens.ipTokenDai.address],
             pwIporToken.address,
             iporToken.address,
-        ])) as LiquidityRewards;
+        ])) as John;
 
-        await pwIporToken.setLiquidityRewardsAddress(liquidityRewards.address);
+        await pwIporToken.setJohn(john.address);
     });
 
     it("Should not be able coolDown when amount is zero", async () => {
@@ -83,7 +83,7 @@ describe("PwIporToken unstake", () => {
         const coolDownBefore = await pwIporToken.activeCoolDown();
 
         // when
-        await expect(pwIporToken.coolDown(N2__0_18DEC)).to.be.revertedWith("IPOR_709");
+        await expect(pwIporToken.coolDown(N2__0_18DEC)).to.be.revertedWith("IPOR_707");
 
         // then
         const coolDownAfter = await pwIporToken.activeCoolDown();
@@ -167,7 +167,7 @@ describe("PwIporToken unstake", () => {
         const balanceBefore = await pwIporToken.balanceOf(adminAddress);
         // when
 
-        await expect(pwIporToken.unstake(N0__5_18DEC)).to.be.revertedWith("IPOR_709");
+        await expect(pwIporToken.unstake(N0__5_18DEC)).to.be.revertedWith("IPOR_707");
 
         // then
         const coolDownAfter = await pwIporToken.activeCoolDown();
@@ -197,7 +197,7 @@ describe("PwIporToken unstake", () => {
 
         await expect(
             pwIporToken.delegateToRewards([tokens.ipTokenDai.address], [N0__5_18DEC])
-        ).to.be.revertedWith("IPOR_700");
+        ).to.be.revertedWith("IPOR_705");
 
         // then
         const coolDownAfter = await pwIporToken.activeCoolDown();

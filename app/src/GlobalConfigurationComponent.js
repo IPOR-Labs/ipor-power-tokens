@@ -308,13 +308,13 @@ export default ({ drizzle, drizzleState }) => (
                 </td>
             </tr>
             <tr>
-                <td>LiquidityRewards</td>
-                <td>{drizzle.contracts.LiquidityRewards.address}</td>
+                <td>John</td>
+                <td>{drizzle.contracts.John.address}</td>
                 <td>
                     <ContractData
                         drizzle={drizzle}
                         drizzleState={drizzleState}
-                        contract="LiquidityRewards"
+                        contract="John"
                         method="getVersion"
                     />
                 </td>
@@ -1185,26 +1185,22 @@ export default ({ drizzle, drizzleState }) => (
             </tr>
             <tr>
                 <td>Liquidity Rewards</td>
-                <td>{drizzle.contracts.LiquidityRewards.address}</td>
+                <td>{drizzle.contracts.John.address}</td>
                 <td>
                     <ContractData
                         drizzle={drizzle}
                         drizzleState={drizzleState}
-                        contract="LiquidityRewards"
+                        contract="John"
                         method="owner"
                     />
                 </td>
                 <td>
-                    <ContractForm
-                        drizzle={drizzle}
-                        contract="LiquidityRewards"
-                        method="transferOwnership"
-                    />
+                    <ContractForm drizzle={drizzle} contract="John" method="transferOwnership" />
                 </td>
                 <td>
                     <ContractForm
                         drizzle={drizzle}
-                        contract="LiquidityRewards"
+                        contract="John"
                         method="confirmTransferOwnership"
                     />
                 </td>
@@ -1655,20 +1651,20 @@ export default ({ drizzle, drizzleState }) => (
             </tr>
             <tr>
                 <td>Liquidity Rewards</td>
-                <td>{drizzle.contracts.LiquidityRewards.address}</td>
+                <td>{drizzle.contracts.John.address}</td>
                 <td>
                     <ContractData
                         drizzle={drizzle}
                         drizzleState={drizzleState}
-                        contract="LiquidityRewards"
+                        contract="John"
                         method="paused"
                     />
                 </td>
                 <td>
-                    <ContractForm drizzle={drizzle} contract="LiquidityRewards" method="pause" />
+                    <ContractForm drizzle={drizzle} contract="John" method="pause" />
                 </td>
                 <td>
-                    <ContractForm drizzle={drizzle} contract="LiquidityRewards" method="unpause" />
+                    <ContractForm drizzle={drizzle} contract="John" method="unpause" />
                 </td>
             </tr>
             <tr>

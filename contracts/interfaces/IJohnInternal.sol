@@ -1,38 +1,42 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.15;
 
-import "./types/LiquidityRewardsTypes.sol";
+import "./types/JohnTypes.sol";
 
 /// @title
-interface ILiquidityRewardsInternal {
-    /// @notice fetch global params for ipAsset
-    /// @param ipToken address for which ipAsset should calculate rewards
-    /// @return {LiquidityRewardsTypes.GlobalRewardsParams}
+interface IJohnInternal {
+    /// @notice Returns current version of John (Liquidity Rewards) contract
+    /// @return Current John (Liquidity Rewards) version
+    function getVersion() external pure returns (uint256);
+
+    /// @notice fetch global params for ipToken
+    /// @param ipToken address for which ipToken should calculate rewards
+    /// @return {JohnTypes.GlobalRewardsParams}
     function globalParams(address ipToken)
         external
         view
-        returns (LiquidityRewardsTypes.GlobalRewardsParams memory);
+        returns (JohnTypes.GlobalRewardsParams memory);
 
-    /// @notice fetch user params for ipAsset
-    /// @param ipToken address for which ipAsset should calculate rewards
-    /// @return {LiquidityRewardsTypes.AccountRewardsParams}
+    /// @notice fetch user params for ipToken
+    /// @param ipToken address for which ipToken should calculate rewards
+    /// @return {JohnTypes.AccountRewardsParams}
     function accountParams(address ipToken)
         external
         view
-        returns (LiquidityRewardsTypes.AccountRewardsParams memory);
+        returns (JohnTypes.AccountRewardsParams memory);
 
     /// @notice method setup rewards per block
     /// @param ipToken address for which one should setup rewards per block
     /// @param rewardsValue new value of rewards per block, represented in 8 decimals
     function setRewardsPerBlock(address ipToken, uint32 rewardsValue) external;
 
-    /// @notice method allowed to add new asset(ipToken)
+    /// @notice method allowed to add new token(ipToken)
     /// @param ipToken address of ipToken
-    function addAsset(address ipToken) external;
+    function addIpToken(address ipToken) external;
 
-    /// @notice method allowed to remove asset
+    /// @notice method allowed to remove token
     /// @param ipToken address of ipToken
-    function removeAsset(address ipToken) external;
+    function removeIpToken(address ipToken) external;
 
     /// @notice Pauses current smart contract, it can be executed only by the Owner
     /// @dev Emits {Paused} event.
@@ -45,21 +49,21 @@ interface ILiquidityRewardsInternal {
     //    -------------------------------------------
     //    Events
 
-    /// @notice Emitted when user change rewards per block
+    /// @notice Emitted when Owner change rewards per block
     /// @param timestamp moment when method was execute
     /// @param account account address
     /// @param newRewardsPerBlock new value of rewards per block, represented in 8 decimals
     event RewardsPerBlockChanged(uint256 timestamp, address account, uint256 newRewardsPerBlock);
 
-    /// @notice Emitted when user added new asset
+    /// @notice Emitted when user added new token
     /// @param timestamp moment when method was execute
     /// @param account address
     /// @param ipToken address of ipToken
-    event AssetAdded(uint256 timestamp, address account, address ipToken);
+    event IpTokenAdded(uint256 timestamp, address account, address ipToken);
 
-    /// @notice Emitted when user removed asset
+    /// @notice Emitted when user removed token
     /// @param timestamp moment when method was execute
     /// @param account address
     /// @param ipToken address of ipToken
-    event AssetRemoved(uint256 timestamp, address account, address ipToken);
+    event IpTokenRemoved(uint256 timestamp, address account, address ipToken);
 }

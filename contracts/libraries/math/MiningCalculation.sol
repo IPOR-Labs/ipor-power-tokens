@@ -72,7 +72,7 @@ library MiningCalculation {
     ) internal view returns (uint256) {
         require(
             blocNumber >= lastRebalanceBlockNumber,
-            MiningErrors.BLOCK_NUMBER_GREATER_OR_EQUAL_THEN_PREVIOUS_BLOCK_NUMBER
+            MiningErrors.BLOCK_NUMBER_GREATER_OR_EQUAL_THAN_PREVIOUS_BLOCK_NUMBER
         );
         uint256 newRewards = (blocNumber - lastRebalanceBlockNumber) * blockRewards * Constants.D10;
         return previousAccruedRewards + newRewards;
@@ -116,12 +116,12 @@ library MiningCalculation {
     ) internal view returns (uint256) {
         require(
             compositeMultiplierCumulative >= accountCompositeMultiplierCumulative,
-            MiningErrors.COMPOSITE_MULTIPLIER_GREATER_OR_EQUAL_THEN_USER_COMPOSITE_MULTIPLIER
+            MiningErrors.COMPOSITE_MULTIPLIER_GREATER_OR_EQUAL_THAN_ACCOUNT_COMPOSITE_MULTIPLIER
         );
-        uint256 userRewards = accountIpTokens *
+        uint256 accountRewards = accountIpTokens *
             accountPowerUp *
             (compositeMultiplierCumulative - accountCompositeMultiplierCumulative);
-        return IporMath.division(userRewards, Constants.D45);
+        return IporMath.division(accountRewards, Constants.D45);
     }
 
     function _toFixedPoint(uint256 number, uint256 decimals) internal view returns (bytes16) {

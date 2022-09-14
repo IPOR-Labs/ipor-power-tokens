@@ -9,7 +9,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeab
 import "../security/IporOwnableUpgradeable.sol";
 import "../interfaces/IPwIporTokenInternal.sol";
 import "../interfaces/IPwIporToken.sol";
-import "../interfaces/ILiquidityRewards.sol";
+import "../interfaces/IJohn.sol";
 import "../interfaces/types/PwIporTokenTypes.sol";
 import "../libraries/errors/IporErrors.sol";
 import "../libraries/errors/MiningErrors.sol";
@@ -29,18 +29,24 @@ contract PwIporToken is
 {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
+    // 2 weeks
+    uint256 public constant COOL_DOWN_IN_SECONDS = 2 * 7 * 24 * 60 * 60;
+
+    address private _john;
     address private _iporToken;
-    address private _liquidityRewards;
     // account address -> amount 18 decimals
     mapping(address => uint256) private _baseBalance;
     // account address -> amount 18 decimals
     mapping(address => uint256) private _delegatedBalance;
     // account address -> {coolDownFinish, amount}
-    mapping(address => PwIporTokenTypes.PwCoolDown) _coolDowns;
+    mapping(address => PwIporTokenTypes.PwCoolDown) private _coolDowns;
     uint256 private _baseTotalSupply;
     uint256 private _withdrawalFee;
-    // 2 weeks
-    uint256 public constant COOL_DOWN_SECONDS = 2 * 7 * 24 * 60 * 60;
+
+    modifier onlyJohn() {
+        require(_msgSender() == _john, MiningErrors.CALLER_NOT_JOHN);
+        _;
+    }
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -56,9 +62,8 @@ contract PwIporToken is
         _withdrawalFee = Constants.D17 * 5;
     }
 
-    modifier onlyLiquidityRewards() {
-        require(_msgSender() == _liquidityRewards, MiningErrors.CALLER_NOT_LIQUIDITY_REWARDS);
-        _;
+    function getVersion() external pure override returns (uint256) {
+        return 1;
     }
 
     function name() external pure override returns (string memory) {
@@ -73,14 +78,6 @@ contract PwIporToken is
         return 18;
     }
 
-    function getVersion() external pure override returns (uint256) {
-        return 1;
-    }
-
-    function withdrawalFee() external view override returns (uint256) {
-        return _withdrawalFee;
-    }
-
     function totalSupply() external view override returns (uint256) {
         return IporMath.division(_baseTotalSupply * _exchangeRate(), Constants.D18);
     }
@@ -89,12 +86,16 @@ contract PwIporToken is
         return _baseTotalSupply;
     }
 
-    function activeCoolDown() external view returns (PwIporTokenTypes.PwCoolDown memory) {
-        return _coolDowns[_msgSender()];
-    }
-
     function balanceOf(address account) external view override returns (uint256) {
         return _balanceOf(account);
+    }
+
+    function withdrawalFee() external view override returns (uint256) {
+        return _withdrawalFee;
+    }
+
+    function activeCoolDown() external view returns (PwIporTokenTypes.PwCoolDown memory) {
+        return _coolDowns[_msgSender()];
     }
 
     function exchangeRate() external view override returns (uint256) {
@@ -105,8 +106,8 @@ contract PwIporToken is
         return _delegatedBalance[account];
     }
 
-    function liquidityRewards() external view override returns (address) {
-        return _liquidityRewards;
+    function getJohn() external view override returns (address) {
+        return _john;
     }
 
     function setWithdrawalFee(uint256 withdrawalFee) external override onlyOwner {
@@ -114,17 +115,14 @@ contract PwIporToken is
         emit WithdrawalFee(block.timestamp, _msgSender(), withdrawalFee);
     }
 
-    function setLiquidityRewardsAddress(address liquidityRewards)
-        external
-        override
-        onlyOwner
-        whenNotPaused
-    {
-        require(liquidityRewards != address(0), IporErrors.WRONG_ADDRESS);
-        _liquidityRewards = liquidityRewards;
-        emit LiquidityRewardsAddressChanged(block.timestamp, _msgSender(), liquidityRewards);
+    function setJohn(address newJohnAddr) external override onlyOwner whenNotPaused {
+        require(newJohnAddr != address(0), IporErrors.WRONG_ADDRESS);
+		address oldJohnAddr = _john;
+        _john = newJohnAddr;
+        emit JohnChanged(_msgSender(), oldJohnAddr, newJohnAddr);
     }
 
+	//TODO: secure against reentrancy
     function stake(uint256 iporTokenAmount) external override whenNotPaused {
         require(iporTokenAmount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
@@ -144,6 +142,7 @@ contract PwIporToken is
         emit Stake(block.timestamp, _msgSender(), iporTokenAmount, exchangeRate, newBaseTokens);
     }
 
+	//TODO: secure against reentrancy
     function unstake(uint256 pwTokenAmount) external override whenNotPaused {
         require(pwTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
@@ -193,14 +192,14 @@ contract PwIporToken is
         );
 
         _coolDowns[_msgSender()] = PwIporTokenTypes.PwCoolDown(
-            block.timestamp + COOL_DOWN_SECONDS,
+            block.timestamp + COOL_DOWN_IN_SECONDS,
             pwIporAmount
         );
         emit CoolDown(
             block.timestamp,
             _msgSender(),
             pwIporAmount,
-            block.timestamp + COOL_DOWN_SECONDS
+            block.timestamp + COOL_DOWN_IN_SECONDS
         );
     }
 
@@ -238,7 +237,7 @@ contract PwIporToken is
         external
         override
         whenNotPaused
-        onlyLiquidityRewards
+        onlyJohn
     {
         // We need this value before transfer tokens
         uint256 exchangeRate = _exchangeRate();
@@ -274,7 +273,7 @@ contract PwIporToken is
         );
 
         _delegatedBalance[_msgSender()] += pwIporToDelegate;
-        ILiquidityRewards(_liquidityRewards).delegatePwIpor(_msgSender(), ipTokens, pwIporAmounts);
+        IJohn(_john).delegatePwIpor(_msgSender(), ipTokens, pwIporAmounts);
 
         emit DelegateToReward(block.timestamp, _msgSender(), ipTokens, pwIporAmounts);
     }
@@ -286,11 +285,7 @@ contract PwIporToken is
             MiningErrors.DELEGATED_BALANCE_TOO_LOW
         );
 
-        ILiquidityRewards(_liquidityRewards).withdrawFromDelegation(
-            _msgSender(),
-            ipToken,
-            pwIporAmount
-        );
+        IJohn(_john).withdrawFromDelegation(_msgSender(), ipToken, pwIporAmount);
         _delegatedBalance[_msgSender()] -= pwIporAmount;
 
         emit WithdrawFromDelegation(block.timestamp, _msgSender(), ipToken, pwIporAmount);
@@ -326,7 +321,7 @@ contract PwIporToken is
 
     function _baseAmountToPwToken(uint256 baseAmount, uint256 exchangeRate)
         internal
-        view
+        pure
         returns (uint256)
     {
         return IporMath.division(baseAmount * exchangeRate, Constants.D18);

@@ -1,20 +1,19 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.15;
 
-import "./types/LiquidityRewardsTypes.sol";
+import "./types/JohnTypes.sol";
 
 /// @title
-interface ILiquidityRewards {
-    //    ----------------------------------------------
-    //    Read
-    /// @notice Returns current version of Liquidity Rewards contract
-    /// @return Current Liquidity Rewards version
-    function getVersion() external pure returns (uint256);
+interface IJohn {   
+	/// @notice check balance of staked ipTokens
+    /// @param ipToken address of ipToken
+    /// @return balance of ipToken stake
+    function balanceOf(address ipToken) external view returns (uint256);
 
-    /// @notice Calculate user rewards
+    /// @notice Calculate account rewards
     /// @param ipToken address for which asset should calculate rewards
-    /// @return Current user rewards, represented in 18 decimals.
-    function userRewards(address ipToken) external view returns (uint256);
+    /// @return Current account rewards, represented in 18 decimals.
+    function accountRewards(address ipToken) external view returns (uint256);
 
     /// @notice Calculate accrued rewards
     /// @param ipToken address for which asset should calculate rewards
@@ -25,24 +24,21 @@ interface ILiquidityRewards {
     /// @param ipToken address for which asset should fetch constant
     function rewardsPerBlock(address ipToken) external view returns (uint32);
 
-    /// @notice fetch balance of power tokens related to asset(ipToken)
+    /// @notice fetch balance of power tokens related to token(ipToken)
     /// @param account address for which we want get balance
-    /// @param requestIpTokens list of ipTokens addresses(ipTokens) for which we want fetch balances
-    /// @return {LiquidityRewardsTypes.BalanceOfDelegatedPwIpor}
-    function balanceOfDelegatedPwIpor(address account, address[] memory requestIpTokens)
+    /// @param ipTokens list of ipTokens addresses(ipTokens) for which we want fetch balances
+    /// @return {JohnTypes.BalanceOfDelegatedPwIpor}
+    function balanceOfDelegatedPwIpor(address account, address[] memory ipTokens)
         external
         view
-        returns (LiquidityRewardsTypes.BalanceOfDelegatedPwIpor memory);
+        returns (JohnTypes.BalanceOfDelegatedPwIpor memory);
 
-    /// @notice check if asset is supported
+    /// @notice check if ipToken is supported
     /// @param ipToken address of ipToken to check
     /// @return true if is supported, false otherwise
-    function isAssetSupported(address ipToken) external view returns (bool);
+    function isIpTokenSupported(address ipToken) external view returns (bool);
 
-    /// @notice check balance of staked ipTokens
-    /// @param ipToken address of ipToken
-    /// @return balance of ipToken stake
-    function balanceOf(address ipToken) external view returns (uint256);
+    
 
     //    -------------------------------------------
     //    write

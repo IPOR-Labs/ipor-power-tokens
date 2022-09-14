@@ -4,40 +4,36 @@ pragma solidity 0.8.15;
 import "./types/PwIporTokenTypes.sol";
 
 /// @title Interface for interaction with PwIporToken - smart contract responsible
-/// for managing Power Ipor token and Ipor Token and delegation to LiquidityRewards contracts.
+/// for managing Power Ipor token and Ipor Token and delegation to John contracts.
 interface IPwIporToken {
-    /// @return  Returns the name of the token.
+    /// @return Returns the name of the token.
     function name() external pure returns (string memory);
 
-    /// @return  Returns the symbol of the token, usually a shorter version of the
+    /// @return Returns the symbol of the token.
     function symbol() external pure returns (string memory);
 
-    /// @return   Returns the number of decimals 18 used to get its user representation.
+    /// @return Returns the number of decimals 18 used to get its user representation.
     function decimals() external pure returns (uint8);
-
-    /// @notice Returns current version of Power Ipor Token
-    /// @return Current Power Ipor Tokenr version
-    function getVersion() external pure returns (uint256);
-
-    /// @notice Returns withdrawal fee which it gets while unstake without cooling down
-    /// @return Percent of fee in 18 decimal
-    function withdrawalFee() external view returns (uint256);
 
     /// @notice Total supply of power tokens
     /// @return Total supply of power tokens in 18 decimals
     function totalSupply() external view returns (uint256);
+
+    /// @param account address for which we want to know the balance of power tokens
+    /// @return Returns the amount of power tokens owned by `account`.
+    function balanceOf(address account) external view returns (uint256);
+
+    /// @notice Returns withdrawal fee which it gets while unstake without cooling down
+    /// @return Percent of fee in 18 decimal
+    function withdrawalFee() external view returns (uint256);
 
     /// @notice State of active cool down for the user. If PwIporTokenTypes.PwCoolDown contains only zeros
     /// it represents no active cool down
     /// @return Object PwIporTokenTypes.PwCoolDown which represents active cool down
     function activeCoolDown() external view returns (PwIporTokenTypes.PwCoolDown memory);
 
-    /// @param account address for which we want to know the balance of power tokens
-    /// @return Returns the amount of power tokens owned by `account`.
-    function balanceOf(address account) external view returns (uint256);
-
     /// @param account address for which we want to know the balance of delegated power tokens to rewards contract
-    /// @return  Returns the amount of power tokens owned by `account` and delegated to LiquidityRewards contracts.
+    /// @return  Returns the amount of power tokens owned by `account` and delegated to John contracts.
     function delegatedBalanceOf(address account) external view returns (uint256);
 
     /// @notice The method allowed to Stake IPOR Tokens and receive Power tokens.
@@ -59,15 +55,15 @@ interface IPwIporToken {
     function redeem() external;
 
     /// @notice The method allowed to delegate power token to rewards
-    /// @param ipAssets - list of assets to which one want delegate tokens
+    /// @param ipTokens - list of ipTokens to which one want delegate tokens
     /// @param pwTokensAmounts - list of amount which one want delegate
-    function delegateToRewards(address[] memory ipAssets, uint256[] memory pwTokensAmounts)
+    function delegateToRewards(address[] memory ipTokens, uint256[] memory pwTokensAmounts)
         external;
 
     /// @notice The method allowed to withdraw power tokens from delegation
-    /// @param ipAsset - asset from which one want withdraw tokens
+    /// @param ipToken - ipToken from which one want withdraw tokens
     /// @param pwTokenAmount - amount which one want withdraw
-    function withdrawFromDelegation(address ipAsset, uint256 pwTokenAmount) external;
+    function withdrawFromDelegation(address ipToken, uint256 pwTokenAmount) external;
 
     /// @notice Emitted when user stake IPOR tokens
     /// @param timestamp moment when method was execute
@@ -115,28 +111,33 @@ interface IPwIporToken {
     /// @param iporTokenAmount of ipor token was transferred to user
     event Redeem(uint256 timestamp, address account, uint256 iporTokenAmount);
 
-    /// @notice Emitted when user received rewards from liquidityRewards contract
+    /// @notice Emitted when user received rewards from john contract
     /// @param timestamp moment when method was execute
     /// @param account address
-    /// @param iporTokenAmount of power token received from liquidityRewards
+    /// @param iporTokenAmount of power token received from john
     event ReceiveRewards(uint256 timestamp, address account, uint256 iporTokenAmount);
 
-    /// @notice Emitted when user delegated tokens to liquidityRewards contract
+    /// @notice Emitted when user delegated tokens to john contract
     /// @param timestamp moment when method was execute
     /// @param account address
-    /// @param assets list of asset to delegate power tokens
+    /// @param ipTokens list of token to delegate power tokens
     /// @param amounts list of value how tokens should be delegated by asset
-    event DelegateToReward(uint256 timestamp, address account, address[] assets, uint256[] amounts);
+    event DelegateToReward(
+        uint256 timestamp,
+        address account,
+        address[] ipTokens,
+        uint256[] amounts
+    );
 
     /// @notice Emitted when user withdraw tokens from delegated
     /// @param timestamp moment when method was execute
     /// @param account address
-    /// @param ipAsset list of asset to delegate power tokens
+    /// @param ipToken list of asset to delegate power tokens
     /// @param pwTokenAmount list of value how tokens should be delegated by asset
     event WithdrawFromDelegation(
         uint256 timestamp,
         address account,
-        address ipAsset,
+        address ipToken,
         uint256 pwTokenAmount
     );
 }
