@@ -83,7 +83,7 @@ describe("PwIporToken unstake", () => {
         const coolDownBefore = await pwIporToken.activeCoolDown();
 
         // when
-        await expect(pwIporToken.coolDown(N2__0_18DEC)).to.be.revertedWith("IPOR_709");
+        await expect(pwIporToken.coolDown(N2__0_18DEC)).to.be.revertedWith("IPOR_707");
 
         // then
         const coolDownAfter = await pwIporToken.activeCoolDown();
@@ -167,7 +167,7 @@ describe("PwIporToken unstake", () => {
         const balanceBefore = await pwIporToken.balanceOf(adminAddress);
         // when
 
-        await expect(pwIporToken.unstake(N0__5_18DEC)).to.be.revertedWith("IPOR_709");
+        await expect(pwIporToken.unstake(N0__5_18DEC)).to.be.revertedWith("IPOR_707");
 
         // then
         const coolDownAfter = await pwIporToken.activeCoolDown();
@@ -197,7 +197,7 @@ describe("PwIporToken unstake", () => {
 
         await expect(
             pwIporToken.delegateToRewards([tokens.ipTokenDai.address], [N0__5_18DEC])
-        ).to.be.revertedWith("IPOR_700");
+        ).to.be.revertedWith("IPOR_705");
 
         // then
         const coolDownAfter = await pwIporToken.activeCoolDown();

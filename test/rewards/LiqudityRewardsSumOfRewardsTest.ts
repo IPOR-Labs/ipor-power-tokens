@@ -84,7 +84,7 @@ describe("John claim", () => {
     it("Should not claim when no stake ipTokens", async () => {
         //    given
         //    when
-        await expect(john.claim(tokens.ipTokenDai.address)).to.be.revertedWith("IPOR_707");
+        await expect(john.claim(tokens.ipTokenDai.address)).to.be.revertedWith("IPOR_708");
     });
 
     it("Should unstake all ipTokens", async () => {

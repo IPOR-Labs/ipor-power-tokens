@@ -62,10 +62,10 @@ describe("PwIporToken configuration, deploy tests", () => {
         //    when
         await expect(
             pwIporToken.delegateToRewards([await admin.getAddress()], [N1__0_18DEC])
-        ).to.be.revertedWith("IPOR_700");
+        ).to.be.revertedWith("IPOR_705");
     });
 
-    it("Should revert transaction when insufficient number of tokens to stake, two assets ", async () => {
+    it("Should revert transaction when insufficient number of tokens to stake, two assets", async () => {
         //    given
         await pwIporToken.stake(N1__0_18DEC);
         const [admin, userOne] = accounts;
@@ -75,7 +75,7 @@ describe("PwIporToken configuration, deploy tests", () => {
                 [tokens.tokenDai.address, tokens.tokenUsdc.address],
                 [N1__0_18DEC, N0__1_18DEC]
             )
-        ).to.be.revertedWith("IPOR_700");
+        ).to.be.revertedWith("IPOR_705");
     });
 
     it("Should be able to stake into one asset when pass one asset", async () => {

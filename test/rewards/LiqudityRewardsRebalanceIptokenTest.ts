@@ -221,7 +221,7 @@ describe("John Stake and balance", () => {
             //    given
             //    when
             await expect(john.setRewardsPerBlock(randomAddress, ZERO)).to.be.revertedWith(
-                "IPOR_702"
+                "IPOR_701"
             );
         });
 

@@ -64,7 +64,7 @@ describe("John Stake and balance", () => {
                     [tokens.ipTokenDai.address],
                     [N1__0_18DEC]
                 )
-        ).to.be.revertedWith("IPOR_701");
+        ).to.be.revertedWith("IPOR_702");
         //    then
     });
 
@@ -73,7 +73,7 @@ describe("John Stake and balance", () => {
         //    when
         await expect(
             john.delegatePwIpor(await admin.getAddress(), [tokens.tokenDai.address], [N1__0_18DEC])
-        ).to.be.revertedWith("IPOR_702");
+        ).to.be.revertedWith("IPOR_701");
         //    then
     });
 

@@ -67,7 +67,7 @@ describe("PwIporToken configuration, deploy tests", () => {
         //    when
         await expect(
             pwIporToken.withdrawFromDelegation(tokens.ipTokenDai.address, N0__1_18DEC)
-        ).to.be.revertedWith("IPOR_710");
+        ).to.be.revertedWith("IPOR_706");
     });
 
     it("Should revert transaction when delegate amount is less then withdraw amont", async () => {
@@ -77,7 +77,7 @@ describe("PwIporToken configuration, deploy tests", () => {
         //    when
         await expect(
             pwIporToken.withdrawFromDelegation(tokens.ipTokenDai.address, N0__5_18DEC)
-        ).to.be.revertedWith("IPOR_710");
+        ).to.be.revertedWith("IPOR_706");
     });
 
     it("Should withdraw tokens when delegate more tokens", async () => {

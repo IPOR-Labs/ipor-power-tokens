@@ -102,7 +102,7 @@ describe("PwIporToken unstake", () => {
         );
         //    when
         await expect(pwIporToken.unstake(N0__1_18DEC.mul(BigNumber.from("6")))).to.be.revertedWith(
-            "IPOR_709"
+            "IPOR_707"
         );
     });
 

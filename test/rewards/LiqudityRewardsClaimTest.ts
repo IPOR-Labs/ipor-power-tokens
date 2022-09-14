@@ -5,14 +5,7 @@ import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
 import { John, IporToken, PwIporToken } from "../../types";
-import {
-    Tokens,
-    getDeployedTokens,
-    extractGlobalParam,
-    expectGlobalParam,
-    expectUserParam,
-    extractMyParam,
-} from "../utils/JohnUtils";
+import { Tokens, getDeployedTokens } from "../utils/JohnUtils";
 import {
     N1__0_18DEC,
     ZERO,
@@ -84,7 +77,7 @@ describe("John claim", () => {
     it("Should not claim when no stake ipTokens", async () => {
         //    given
         //    when
-        await expect(john.claim(tokens.ipTokenDai.address)).to.be.revertedWith("IPOR_707");
+        await expect(john.claim(tokens.ipTokenDai.address)).to.be.revertedWith("IPOR_708");
     });
 
     it("Should claim rewards when 100 blocks were mint", async () => {
