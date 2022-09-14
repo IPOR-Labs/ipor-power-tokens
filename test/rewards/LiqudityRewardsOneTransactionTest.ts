@@ -25,6 +25,8 @@ import {
     TOTAL_SUPPLY_18_DECIMALS,
     TOTAL_SUPPLY_6_DECIMALS,
     USD_1_000_000,
+    N0__1_18DEC,
+    N2__0_18DEC,
 } from "../utils/Constants";
 
 chai.use(solidity);
@@ -97,8 +99,6 @@ describe("LiquidityRewards claim", () => {
 
     it("Should has the same account params when 2 user stake ipTokens in one transaction", async () => {
         //    given
-        const agent1AccountParamsBefore = await agent1.accountParams(tokens.ipTokenDai.address);
-        const agent2AccountParamsBefore = await agent2.accountParams(tokens.ipTokenDai.address);
         //    when
         await liquidityRewardsTestAction.stakeIporToken(
             [agent1.address, agent2.address],
@@ -119,17 +119,154 @@ describe("LiquidityRewards claim", () => {
         const agent2AccountParamsAfter = await agent2.accountParams(tokens.ipTokenDai.address);
         const agent1After = extractMyParam(agent1AccountParamsAfter);
         const agent2After = extractMyParam(agent2AccountParamsAfter);
-        console.table({
-            powerUp: agent1After.powerUp.toString(),
-            compositeMultiplierCumulative: agent1After.compositeMultiplierCumulative.toString(),
-            ipTokensBalance: agent1After.ipTokensBalance.toString(),
-            delegatedPowerTokenBalance: agent1After.delegatedPowerTokenBalance.toString(),
+
+        expect(agent1After.powerUp).to.be.equal(agent2After.powerUp);
+        expect(agent1After.compositeMultiplierCumulative).to.be.equal(
+            agent2After.compositeMultiplierCumulative
+        );
+        expect(agent1After.ipTokensBalance).to.be.equal(agent2After.ipTokensBalance);
+        expect(agent1After.delegatedPowerTokenBalance).to.be.equal(
+            agent2After.delegatedPowerTokenBalance
+        );
+    });
+
+    it("Should has the same rewards when 2 user unstake ipTokens in one transaction", async () => {
+        //    given
+        await liquidityRewardsTestAction.stakeIporToken(
+            [agent1.address, agent2.address],
+            [N1__0_18DEC, N1__0_18DEC]
+        );
+        await liquidityRewardsTestAction.delegateToRewards(
+            [agent1.address, agent2.address],
+            [[tokens.ipTokenDai.address], [tokens.ipTokenDai.address]],
+            [[N1__0_18DEC], [N1__0_18DEC]]
+        );
+        await liquidityRewardsTestAction.stakeIpToken(
+            [agent1.address, agent2.address],
+            tokens.ipTokenDai.address,
+            [N1__0_18DEC, N1__0_18DEC]
+        );
+
+        await hre.network.provider.send("hardhat_mine", ["0x64"]);
+        //    when
+        await liquidityRewardsTestAction.unstakeIpToken(
+            [agent1.address, agent2.address],
+            [tokens.ipTokenDai.address, tokens.ipTokenDai.address],
+            [N1__0_18DEC, N1__0_18DEC]
+        );
+        //    then
+
+        const agent1AccountParamsAfter = await agent1.accountParams(tokens.ipTokenDai.address);
+        const agent2AccountParamsAfter = await agent2.accountParams(tokens.ipTokenDai.address);
+        const agent1PwTokenBalanceAfter = await pwIporToken.balanceOf(agent1.address);
+        const agent2PwTokenBalanceAfter = await pwIporToken.balanceOf(agent2.address);
+        const agent1After = extractMyParam(agent1AccountParamsAfter);
+        const agent2After = extractMyParam(agent2AccountParamsAfter);
+
+        expect(agent1After.powerUp).to.be.equal(agent2After.powerUp);
+        expect(agent1After.compositeMultiplierCumulative).to.be.equal(
+            agent2After.compositeMultiplierCumulative
+        );
+        expect(agent1After.ipTokensBalance).to.be.equal(agent2After.ipTokensBalance);
+        expect(agent1After.delegatedPowerTokenBalance).to.be.equal(
+            agent2After.delegatedPowerTokenBalance
+        );
+        expect(agent1PwTokenBalanceAfter).to.be.equal(agent2PwTokenBalanceAfter);
+        expect(agent1PwTokenBalanceAfter).to.be.equal(N0__1_18DEC.mul(BigNumber.from(515)));
+    });
+
+    describe("Should not depends on order of unstake", () => {
+        let agent1PwTokenBalanceAfter: BigNumber;
+        let agent2PwTokenBalanceAfter: BigNumber;
+
+        it("Should unstake agent 1 and agent 2", async () => {
+            //    given
+            await liquidityRewardsTestAction.stakeIporToken(
+                [agent1.address, agent2.address],
+                [N1__0_18DEC, N1__0_18DEC]
+            );
+            await liquidityRewardsTestAction.delegateToRewards(
+                [agent1.address, agent2.address],
+                [[tokens.ipTokenDai.address], [tokens.ipTokenDai.address]],
+                [[N1__0_18DEC], [N1__0_18DEC]]
+            );
+            await liquidityRewardsTestAction.stakeIpToken(
+                [agent1.address, agent2.address],
+                tokens.ipTokenDai.address,
+                [N1__0_18DEC, N0__1_18DEC]
+            );
+
+            await hre.network.provider.send("hardhat_mine", ["0x64"]);
+
+            //    when
+            await liquidityRewardsTestAction.unstakeIpToken(
+                [agent1.address, agent2.address],
+                [tokens.ipTokenDai.address, tokens.ipTokenDai.address],
+                [N1__0_18DEC, N0__1_18DEC]
+            );
+
+            //    then
+            const agent1AccountParamsAfter = await agent1.accountParams(tokens.ipTokenDai.address);
+            const agent2AccountParamsAfter = await agent2.accountParams(tokens.ipTokenDai.address);
+            agent1PwTokenBalanceAfter = await pwIporToken.balanceOf(agent1.address);
+            agent2PwTokenBalanceAfter = await pwIporToken.balanceOf(agent2.address);
+            const agent1After = extractMyParam(agent1AccountParamsAfter);
+            const agent2After = extractMyParam(agent2AccountParamsAfter);
+            const accruedRewards = await liquidityRewards.accruedRewards(tokens.ipTokenDai.address);
+            const differencesBetweenRewords = accruedRewards
+                .sub(agent2PwTokenBalanceAfter)
+                .sub(agent1PwTokenBalanceAfter)
+                .sub(N2__0_18DEC);
+
+            expect(agent1After.powerUp).to.be.equal(ZERO);
+            expect(agent1After.compositeMultiplierCumulative).to.be.equal(
+                BigNumber.from("56552751597425393915610288180")
+            );
+            expect(agent1After.ipTokensBalance).to.be.equal(ZERO);
+            expect(agent1After.delegatedPowerTokenBalance).to.be.equal(N1__0_18DEC);
+            expect(agent1PwTokenBalanceAfter).to.be.equal(BigNumber.from("80173852236395551482"));
+
+            expect(agent2After.powerUp).to.be.equal(ZERO);
+            expect(agent2After.compositeMultiplierCumulative).to.be.equal(
+                BigNumber.from("56552751597425393915610288180")
+            );
+            expect(agent2After.ipTokensBalance).to.be.equal(ZERO);
+            expect(agent2After.delegatedPowerTokenBalance).to.be.equal(N1__0_18DEC);
+            expect(agent2PwTokenBalanceAfter).to.be.equal(BigNumber.from("22826147763604448541"));
+
+            expect(differencesBetweenRewords.lte(BigNumber.from("100"))).to.be.true;
         });
-        console.table({
-            powerUp: agent2After.powerUp.toString(),
-            compositeMultiplierCumulative: agent2After.compositeMultiplierCumulative.toString(),
-            ipTokensBalance: agent2After.ipTokensBalance.toString(),
-            delegatedPowerTokenBalance: agent2After.delegatedPowerTokenBalance.toString(),
+
+        it("Should unstake agent 2 and agent 1", async () => {
+            //    given
+            await liquidityRewardsTestAction.stakeIporToken(
+                [agent1.address, agent2.address],
+                [N1__0_18DEC, N1__0_18DEC]
+            );
+            await liquidityRewardsTestAction.delegateToRewards(
+                [agent1.address, agent2.address],
+                [[tokens.ipTokenDai.address], [tokens.ipTokenDai.address]],
+                [[N1__0_18DEC], [N1__0_18DEC]]
+            );
+            await liquidityRewardsTestAction.stakeIpToken(
+                [agent1.address, agent2.address],
+                tokens.ipTokenDai.address,
+                [N1__0_18DEC, N0__1_18DEC]
+            );
+            await hre.network.provider.send("hardhat_mine", ["0x64"]);
+            //    when
+            await liquidityRewardsTestAction.unstakeIpToken(
+                [agent2.address, agent1.address],
+                [tokens.ipTokenDai.address, tokens.ipTokenDai.address],
+                [N0__1_18DEC, N1__0_18DEC]
+            );
+
+            //    then
+            const agent1PwTokenBalanceCase2After = await pwIporToken.balanceOf(agent1.address);
+            const agent2PwTokenBalanceCase2After = await pwIporToken.balanceOf(agent2.address);
+
+            expect(agent1PwTokenBalanceAfter).to.be.equal(agent1PwTokenBalanceCase2After);
+            expect(agent2PwTokenBalanceAfter).to.be.equal(agent2PwTokenBalanceCase2After);
         });
     });
 });
