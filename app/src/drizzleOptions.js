@@ -72,7 +72,7 @@ import MockTestnetStrategyCompoundUsdt from "./contracts/MockTestnetStrategyComp
 import MockTestnetStrategyCompoundUsdc from "./contracts/MockTestnetStrategyCompoundUsdc.json";
 import MockTestnetStrategyCompoundDai from "./contracts/MockTestnetStrategyCompoundDai.json";
 
-import LiquidityRewards from "./contracts/LiquidityRewards.json";
+import John from "./contracts/John.json";
 import IporToken from "./contracts/IporToken.json";
 import PwIporToken from "./contracts/PwIporToken.json";
 
@@ -325,7 +325,7 @@ let options = {
         MiltonFacadeDataProvider,
         IporOracleFacadeDataProvider,
 
-        LiquidityRewards,
+        John,
         IporToken,
         PwIporToken,
     ],

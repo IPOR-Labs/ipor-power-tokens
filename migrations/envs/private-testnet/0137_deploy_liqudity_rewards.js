@@ -17,8 +17,8 @@ module.exports = async function (deployer, _network, addresses) {
         iporToken,
     };
 
-    const LiquidityRewards = artifacts.require("LiquidityRewards");
-    await script(deployer, _network, addresses, LiquidityRewards, initialParams);
+    const John = artifacts.require("John");
+    await script(deployer, _network, addresses, John, initialParams);
 
     await func.updateLastCompletedMigration();
 };

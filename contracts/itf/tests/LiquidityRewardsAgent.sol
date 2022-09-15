@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.15;
 
-import "../../rewards/LiquidityRewards.sol";
+import "../../rewards/John.sol";
 import "../../tokens/PwIporToken.sol";
 
 contract LiquidityRewardsAgent {
-    LiquidityRewards private _liquidityRewards;
+    John private _john;
     PwIporToken private _pwToken;
 
     constructor(
@@ -14,7 +14,7 @@ contract LiquidityRewardsAgent {
         address ipToken,
         address iporToken
     ) {
-        _liquidityRewards = LiquidityRewards(liquidityRewards);
+        _john = John(liquidityRewards);
         _pwToken = PwIporToken(pwToken);
         IERC20(ipToken).approve(liquidityRewards, Constants.MAX_VALUE);
         IERC20(iporToken).approve(pwToken, Constants.MAX_VALUE);
@@ -23,39 +23,39 @@ contract LiquidityRewardsAgent {
     //    interact with LiquidityRewards
 
     function stakeIpToken(address ipToken, uint256 ipTokenAmount) external {
-        _liquidityRewards.stake(ipToken, ipTokenAmount);
+        _john.stake(ipToken, ipTokenAmount);
     }
 
     function unstakeIpToken(address ipToken, uint256 ipTokenAmount) external {
-        _liquidityRewards.unstake(ipToken, ipTokenAmount);
+        _john.unstake(ipToken, ipTokenAmount);
     }
 
     function accountRewards(address ipToken) external view returns (uint256) {
-        return _liquidityRewards.accountRewards(ipToken);
+        return _john.accountRewards(ipToken);
     }
 
     function accountParams(address ipToken)
         external
         view
-        returns (LiquidityRewardsTypes.AccountRewardsParams memory)
+        returns (JohnTypes.AccountRewardsParams memory)
     {
-        return _liquidityRewards.accountParams(ipToken);
+        return _john.accountParams(ipToken);
     }
 
     function balanceOfDelegatedPwIpor(address account, address[] memory requestIpTokens)
         external
         view
-        returns (LiquidityRewardsTypes.BalanceOfDelegatedPwIpor memory)
+        returns (JohnTypes.BalanceOfDelegatedPwIpor memory)
     {
-        return _liquidityRewards.balanceOfDelegatedPwIpor(account, requestIpTokens);
+        return _john.balanceOfDelegatedPwIpor(account, requestIpTokens);
     }
 
     function balanceOf(address ipToken) external view returns (uint256) {
-        return _liquidityRewards.balanceOf(ipToken);
+        return _john.balanceOf(ipToken);
     }
 
     function claim(address ipToken) external {
-        _liquidityRewards.claim(ipToken);
+        _john.claim(ipToken);
     }
 
     //    interact with pwToken

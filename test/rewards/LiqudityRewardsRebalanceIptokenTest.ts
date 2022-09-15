@@ -4,7 +4,7 @@ import chai from "chai";
 import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { LiquidityRewards, IporToken, PwIporToken } from "../../types";
+import { John, IporToken, PwIporToken } from "../../types";
 import {
     Tokens,
     getDeployedTokens,
@@ -12,7 +12,7 @@ import {
     expectGlobalParam,
     expectUserParam,
     extractMyParam,
-} from "../utils/LiquidityRewardsUtils";
+} from "../utils/JohnUtils";
 import {
     N1__0_18DEC,
     ZERO,
@@ -25,9 +25,9 @@ const { expect } = chai;
 
 const randomAddress = "0x0B54FA10558caBBdd0D6df5b8667913C43567Bc5";
 
-describe("LiquidityRewards Stake and balance", () => {
+describe("John Stake and balance", () => {
     let tokens: Tokens;
-    let liquidityRewards: LiquidityRewards;
+    let john: John;
     let admin: Signer, userOne: Signer, userTwo: Signer, userThree: Signer;
     let iporToken: IporToken;
     let pwIporToken: PwIporToken;
@@ -48,36 +48,24 @@ describe("LiquidityRewards Stake and balance", () => {
         const PwIporToken = await hre.ethers.getContractFactory("PwIporToken");
         pwIporToken = (await upgrades.deployProxy(PwIporToken, [iporToken.address])) as PwIporToken;
 
-        const LiquidityRewards = await hre.ethers.getContractFactory("LiquidityRewards");
-        liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
+        const John = await hre.ethers.getContractFactory("John");
+        john = (await upgrades.deployProxy(John, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
             pwIporToken.address,
             iporToken.address,
-        ])) as LiquidityRewards;
+        ])) as John;
 
-        await tokens.ipTokenDai.approve(liquidityRewards.address, TOTAL_SUPPLY_18_DECIMALS);
-        await tokens.ipTokenDai
-            .connect(userOne)
-            .approve(liquidityRewards.address, TOTAL_SUPPLY_18_DECIMALS);
-        await tokens.ipTokenDai
-            .connect(userTwo)
-            .approve(liquidityRewards.address, TOTAL_SUPPLY_18_DECIMALS);
+        await tokens.ipTokenDai.approve(john.address, TOTAL_SUPPLY_18_DECIMALS);
+        await tokens.ipTokenDai.connect(userOne).approve(john.address, TOTAL_SUPPLY_18_DECIMALS);
+        await tokens.ipTokenDai.connect(userTwo).approve(john.address, TOTAL_SUPPLY_18_DECIMALS);
 
-        await tokens.ipTokenUsdc.approve(liquidityRewards.address, TOTAL_SUPPLY_6_DECIMALS);
-        await tokens.ipTokenUsdc
-            .connect(userOne)
-            .approve(liquidityRewards.address, TOTAL_SUPPLY_6_DECIMALS);
-        await tokens.ipTokenUsdc
-            .connect(userTwo)
-            .approve(liquidityRewards.address, TOTAL_SUPPLY_6_DECIMALS);
+        await tokens.ipTokenUsdc.approve(john.address, TOTAL_SUPPLY_6_DECIMALS);
+        await tokens.ipTokenUsdc.connect(userOne).approve(john.address, TOTAL_SUPPLY_6_DECIMALS);
+        await tokens.ipTokenUsdc.connect(userTwo).approve(john.address, TOTAL_SUPPLY_6_DECIMALS);
 
-        await tokens.ipTokenUsdt.approve(liquidityRewards.address, TOTAL_SUPPLY_6_DECIMALS);
-        await tokens.ipTokenUsdt
-            .connect(userOne)
-            .approve(liquidityRewards.address, TOTAL_SUPPLY_6_DECIMALS);
-        await tokens.ipTokenUsdt
-            .connect(userTwo)
-            .approve(liquidityRewards.address, TOTAL_SUPPLY_6_DECIMALS);
+        await tokens.ipTokenUsdt.approve(john.address, TOTAL_SUPPLY_6_DECIMALS);
+        await tokens.ipTokenUsdt.connect(userOne).approve(john.address, TOTAL_SUPPLY_6_DECIMALS);
+        await tokens.ipTokenUsdt.connect(userTwo).approve(john.address, TOTAL_SUPPLY_6_DECIMALS);
 
         await iporToken.approve(pwIporToken.address, TOTAL_SUPPLY_18_DECIMALS);
         await iporToken.connect(userOne).approve(pwIporToken.address, TOTAL_SUPPLY_18_DECIMALS);
@@ -91,11 +79,8 @@ describe("LiquidityRewards Stake and balance", () => {
             await userTwo.getAddress(),
             N1__0_18DEC.mul(BigNumber.from("10000"))
         );
-        await iporToken.transfer(
-            liquidityRewards.address,
-            N1__0_18DEC.mul(BigNumber.from("10000"))
-        );
-        await pwIporToken.setLiquidityRewardsAddress(liquidityRewards.address);
+        await iporToken.transfer(john.address, N1__0_18DEC.mul(BigNumber.from("10000")));
+        await pwIporToken.setJohn(john.address);
     });
 
     describe("Rebalance on stake iToken", () => {
@@ -104,12 +89,8 @@ describe("LiquidityRewards Stake and balance", () => {
             const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
             const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
 
-            const initGlobalParamResponse = await liquidityRewards.globalParams(
-                tokens.ipTokenDai.address
-            );
-            const initUserParamResponse = await liquidityRewards.accountParams(
-                tokens.ipTokenDai.address
-            );
+            const initGlobalParamResponse = await john.globalParams(tokens.ipTokenDai.address);
+            const initUserParamResponse = await john.accountParams(tokens.ipTokenDai.address);
             expectGlobalParam(
                 extractGlobalParam(initGlobalParamResponse),
                 ZERO,
@@ -124,12 +105,8 @@ describe("LiquidityRewards Stake and balance", () => {
             await pwIporToken.stake(delegatedIporToken);
             await pwIporToken.delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
 
-            const afterDelegatePwTokenGPR = await liquidityRewards.globalParams(
-                tokens.ipTokenDai.address
-            );
-            const afterDelegatePwTokenUPR = await liquidityRewards.accountParams(
-                tokens.ipTokenDai.address
-            );
+            const afterDelegatePwTokenGPR = await john.globalParams(tokens.ipTokenDai.address);
+            const afterDelegatePwTokenUPR = await john.accountParams(tokens.ipTokenDai.address);
 
             expectGlobalParam(
                 extractGlobalParam(afterDelegatePwTokenGPR),
@@ -148,15 +125,11 @@ describe("LiquidityRewards Stake and balance", () => {
                 delegatedIporToken
             );
             //    when
-            await liquidityRewards.stake(tokens.ipTokenDai.address, stakedIpTokens);
+            await john.stake(tokens.ipTokenDai.address, stakedIpTokens);
             //    then
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
-            const afterStakeIpTokensGPR = await liquidityRewards.globalParams(
-                tokens.ipTokenDai.address
-            );
-            const afterStakeIpTokensUPR = await liquidityRewards.accountParams(
-                tokens.ipTokenDai.address
-            );
+            const afterStakeIpTokensGPR = await john.globalParams(tokens.ipTokenDai.address);
+            const afterStakeIpTokensUPR = await john.accountParams(tokens.ipTokenDai.address);
 
             expectGlobalParam(
                 extractGlobalParam(afterStakeIpTokensGPR),
@@ -176,7 +149,7 @@ describe("LiquidityRewards Stake and balance", () => {
                 delegatedIporToken
             );
 
-            const rewards = await liquidityRewards.accountRewards(tokens.ipTokenDai.address);
+            const rewards = await john.accountRewards(tokens.ipTokenDai.address);
             expect(rewards).to.be.equal(BigNumber.from("100000000000000000000"));
         });
 
@@ -189,7 +162,7 @@ describe("LiquidityRewards Stake and balance", () => {
             // Admin
             await pwIporToken.stake(delegatedIporToken);
             await pwIporToken.delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
-            await liquidityRewards.stake(tokens.ipTokenDai.address, stakedIpTokens);
+            await john.stake(tokens.ipTokenDai.address, stakedIpTokens);
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
             // UserOne
@@ -197,9 +170,7 @@ describe("LiquidityRewards Stake and balance", () => {
             await pwIporToken
                 .connect(userOne)
                 .delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
-            await liquidityRewards
-                .connect(userOne)
-                .stake(tokens.ipTokenDai.address, stakedIpTokens);
+            await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokens);
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
             // UserTwo
@@ -207,18 +178,16 @@ describe("LiquidityRewards Stake and balance", () => {
             await pwIporToken
                 .connect(userTwo)
                 .delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
-            await liquidityRewards
-                .connect(userTwo)
-                .stake(tokens.ipTokenDai.address, stakedIpTokens);
+            await john.connect(userTwo).stake(tokens.ipTokenDai.address, stakedIpTokens);
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
             //    then
 
-            const rewardsAdmin = await liquidityRewards.accountRewards(tokens.ipTokenDai.address);
-            const rewardsUserOne = await liquidityRewards
+            const rewardsAdmin = await john.accountRewards(tokens.ipTokenDai.address);
+            const rewardsUserOne = await john
                 .connect(userOne)
                 .accountRewards(tokens.ipTokenDai.address);
-            const rewardsUserTwo = await liquidityRewards
+            const rewardsUserTwo = await john
                 .connect(userTwo)
                 .accountRewards(tokens.ipTokenDai.address);
             expect(rewardsAdmin.add(rewardsUserOne).add(rewardsUserTwo)).to.be.equal(
@@ -234,19 +203,15 @@ describe("LiquidityRewards Stake and balance", () => {
             //    when
             await pwIporToken.stake(delegatedIporToken);
             await pwIporToken.delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
-            await liquidityRewards.stake(tokens.ipTokenDai.address, stakedIpTokens);
+            await john.stake(tokens.ipTokenDai.address, stakedIpTokens);
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
-            const rewardsAfterFirstStake = await liquidityRewards.accountRewards(
-                tokens.ipTokenDai.address
-            );
+            const rewardsAfterFirstStake = await john.accountRewards(tokens.ipTokenDai.address);
 
-            await liquidityRewards.stake(tokens.ipTokenDai.address, stakedIpTokens);
+            await john.stake(tokens.ipTokenDai.address, stakedIpTokens);
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
-            const rewardsAfterSecondStake = await liquidityRewards.accountRewards(
-                tokens.ipTokenDai.address
-            );
+            const rewardsAfterSecondStake = await john.accountRewards(tokens.ipTokenDai.address);
             //    then
             expect(rewardsAfterFirstStake).to.be.equal(BigNumber.from("100000000000000000000"));
             expect(rewardsAfterSecondStake).to.be.equal(BigNumber.from("100000000000000000000"));
@@ -255,9 +220,9 @@ describe("LiquidityRewards Stake and balance", () => {
         it("should should not be set new block reward when asset not active", async () => {
             //    given
             //    when
-            await expect(
-                liquidityRewards.setRewardsPerBlock(randomAddress, ZERO)
-            ).to.be.revertedWith("IPOR_702");
+            await expect(john.setRewardsPerBlock(randomAddress, ZERO)).to.be.revertedWith(
+                "IPOR_701"
+            );
         });
 
         it("Should recalculate global params when block rewards changed ", async () => {
@@ -266,19 +231,15 @@ describe("LiquidityRewards Stake and balance", () => {
             const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
             await pwIporToken.stake(delegatedIporToken);
             await pwIporToken.delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
-            await liquidityRewards.stake(tokens.ipTokenDai.address, stakedIpTokens);
+            await john.stake(tokens.ipTokenDai.address, stakedIpTokens);
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
-            const globalParamsBefore = await liquidityRewards.globalParams(
-                tokens.ipTokenDai.address
-            );
+            const globalParamsBefore = await john.globalParams(tokens.ipTokenDai.address);
 
             //    when
-            await liquidityRewards.setRewardsPerBlock(tokens.ipTokenDai.address, ZERO);
+            await john.setRewardsPerBlock(tokens.ipTokenDai.address, ZERO);
 
             // then
-            const globalParamsAfter = await liquidityRewards.globalParams(
-                tokens.ipTokenDai.address
-            );
+            const globalParamsAfter = await john.globalParams(tokens.ipTokenDai.address);
 
             expectGlobalParam(
                 globalParamsBefore,
@@ -306,29 +267,18 @@ describe("LiquidityRewards Stake and balance", () => {
             const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
             await pwIporToken.stake(delegatedIporToken);
             await pwIporToken.delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
-            await liquidityRewards.stake(tokens.ipTokenDai.address, stakedIpTokens);
+            await john.stake(tokens.ipTokenDai.address, stakedIpTokens);
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
-            const accruedRewardsBefore = await liquidityRewards.accruedRewards(
-                tokens.ipTokenDai.address
-            );
-            const accountRewardsBefore = await liquidityRewards.accountRewards(
-                tokens.ipTokenDai.address
-            );
+            const accruedRewardsBefore = await john.accruedRewards(tokens.ipTokenDai.address);
+            const accountRewardsBefore = await john.accountRewards(tokens.ipTokenDai.address);
 
             //    when
-            await liquidityRewards.setRewardsPerBlock(
-                tokens.ipTokenDai.address,
-                BigNumber.from("200000000")
-            );
+            await john.setRewardsPerBlock(tokens.ipTokenDai.address, BigNumber.from("200000000"));
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
             // then
-            const accruedRewardsAfter = await liquidityRewards.accruedRewards(
-                tokens.ipTokenDai.address
-            );
-            const accountRewardsAfter = await liquidityRewards.accountRewards(
-                tokens.ipTokenDai.address
-            );
+            const accruedRewardsAfter = await john.accruedRewards(tokens.ipTokenDai.address);
+            const accountRewardsAfter = await john.accountRewards(tokens.ipTokenDai.address);
 
             expect(accruedRewardsBefore).to.be.equal(BigNumber.from("100000000000000000000"));
             expect(accountRewardsBefore).to.be.equal(BigNumber.from("100000000000000000000"));
@@ -342,29 +292,18 @@ describe("LiquidityRewards Stake and balance", () => {
             const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
             await pwIporToken.stake(delegatedIporToken);
             await pwIporToken.delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
-            await liquidityRewards.stake(tokens.ipTokenDai.address, stakedIpTokens);
+            await john.stake(tokens.ipTokenDai.address, stakedIpTokens);
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
-            const accruedRewardsBefore = await liquidityRewards.accruedRewards(
-                tokens.ipTokenDai.address
-            );
-            const accountRewardsBefore = await liquidityRewards.accountRewards(
-                tokens.ipTokenDai.address
-            );
+            const accruedRewardsBefore = await john.accruedRewards(tokens.ipTokenDai.address);
+            const accountRewardsBefore = await john.accountRewards(tokens.ipTokenDai.address);
 
             //    when
-            await liquidityRewards.setRewardsPerBlock(
-                tokens.ipTokenDai.address,
-                BigNumber.from("50000000")
-            );
+            await john.setRewardsPerBlock(tokens.ipTokenDai.address, BigNumber.from("50000000"));
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
             // then
-            const accruedRewardsAfter = await liquidityRewards.accruedRewards(
-                tokens.ipTokenDai.address
-            );
-            const accountRewardsAfter = await liquidityRewards.accountRewards(
-                tokens.ipTokenDai.address
-            );
+            const accruedRewardsAfter = await john.accruedRewards(tokens.ipTokenDai.address);
+            const accountRewardsAfter = await john.accountRewards(tokens.ipTokenDai.address);
 
             expect(accruedRewardsBefore).to.be.equal(BigNumber.from("100000000000000000000"));
             expect(accountRewardsBefore).to.be.equal(BigNumber.from("100000000000000000000"));

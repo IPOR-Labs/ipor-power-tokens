@@ -14,7 +14,7 @@ import MiltonSpreadConfigurationComponent from "./MiltonSpreadConfigurationCompo
 import GlobalConfigurationComponent from "./GlobalConfigurationComponent";
 import FaucetComponent from "./FaucetComponent";
 import FrontendComponent from "./FrontendComponent";
-import LiquidityRewardsComponent from "./LiquidityRewardsComponent";
+import JohnComponent from "./JohnComponent";
 import PwIporTokenComponent from "./PwIporTokenComponent";
 
 require("dotenv").config({ path: "../../.env" });
@@ -113,8 +113,8 @@ export default ({ drizzle, drizzleState }) => {
                     <FrontendComponent drizzle={drizzle} drizzleState={drizzleState} />
                 </Tab>
 
-                <Tab eventKey="LiquidityRewards" title="Liquidity Rewards">
-                    <LiquidityRewardsComponent drizzle={drizzle} drizzleState={drizzleState} />
+                <Tab eventKey="John" title="Liquidity Rewards">
+                    <JohnComponent drizzle={drizzle} drizzleState={drizzleState} />
                 </Tab>
 
                 <Tab eventKey="PwIporToken" title="Power Ipor">
