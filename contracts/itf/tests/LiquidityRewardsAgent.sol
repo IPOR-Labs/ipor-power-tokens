@@ -31,7 +31,7 @@ contract LiquidityRewardsAgent {
     }
 
     function accountRewards(address ipToken) external view returns (uint256) {
-        return _liquidityRewards.accruedRewards(ipToken);
+        return _liquidityRewards.accountRewards(ipToken);
     }
 
     function accountParams(address ipToken)

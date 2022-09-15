@@ -31,9 +31,16 @@ if (fork_enabled == "true") {
         },
     };
 } else {
-    networks.hardhat = {
-        allowUnlimitedContractSize: true,
-    };
+    networks: {
+        hardhat: {
+            allowUnlimitedContractSize: true;
+            mining: {
+                mempool: {
+                    order: "fifo";
+                }
+            }
+        }
+    }
 }
 
 networks.hardhatfork = {

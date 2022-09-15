@@ -88,4 +88,28 @@ contract LiquidityRewardsTestAction {
             );
         }
     }
+
+    //  Test action
+
+    function depositAndWithdrawIporTokensAndIpToken(
+        address account,
+        address[] memory ipTokens,
+        uint256[] memory iporAmounts,
+        uint256[] memory ipTokenAmounts
+    ) external {
+        LiquidityRewardsAgent(account).delegateToRewards(ipTokens, iporAmounts);
+        LiquidityRewardsAgent(account).stakeIpToken(ipTokens[0], ipTokenAmounts[0]);
+        LiquidityRewardsAgent(account).withdrawFromDelegation(ipTokens[0], iporAmounts[0]);
+        LiquidityRewardsAgent(account).unstakeIpToken(ipTokens[0], ipTokenAmounts[0]);
+    }
+
+    function depositIporTokensAndIpToken(
+        address account,
+        address[] memory ipTokens,
+        uint256[] memory iporAmounts,
+        uint256[] memory ipTokenAmounts
+    ) external {
+        LiquidityRewardsAgent(account).delegateToRewards(ipTokens, iporAmounts);
+        LiquidityRewardsAgent(account).stakeIpToken(ipTokens[0], ipTokenAmounts[0]);
+    }
 }

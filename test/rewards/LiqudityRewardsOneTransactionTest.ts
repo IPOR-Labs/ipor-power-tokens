@@ -1,4 +1,4 @@
-import hre, { upgrades } from "hardhat";
+import hre, { upgrades, network } from "hardhat";
 import chai from "chai";
 
 import { BigNumber, Signer } from "ethers";
@@ -11,19 +11,11 @@ import {
     LiquidityRewardsTestAction,
     LiquidityRewardsAgent,
 } from "../../types";
-import {
-    Tokens,
-    getDeployedTokens,
-    extractGlobalParam,
-    expectGlobalParam,
-    expectUserParam,
-    extractMyParam,
-} from "../utils/LiquidityRewardsUtils";
+import { Tokens, getDeployedTokens, extractMyParam } from "../utils/LiquidityRewardsUtils";
 import {
     N1__0_18DEC,
     ZERO,
     TOTAL_SUPPLY_18_DECIMALS,
-    TOTAL_SUPPLY_6_DECIMALS,
     USD_1_000_000,
     N0__1_18DEC,
     N2__0_18DEC,
@@ -173,6 +165,204 @@ describe("LiquidityRewards claim", () => {
         );
         expect(agent1PwTokenBalanceAfter).to.be.equal(agent2PwTokenBalanceAfter);
         expect(agent1PwTokenBalanceAfter).to.be.equal(N0__1_18DEC.mul(BigNumber.from(515)));
+    });
+
+    it("Should not get any rewards if stake and unstake in one transaction", async () => {
+        //    given
+        const ipDai = tokens.ipTokenDai.address;
+        const N100__0_18DEC = N1__0_18DEC.mul(BigNumber.from("100"));
+        const N1000__0_18DEC = N1__0_18DEC.mul(BigNumber.from("1000"));
+
+        await agent1.stakeIporToken(N1000__0_18DEC);
+        await tokens.ipTokenDai
+            .connect(userOne)
+            .approve(liquidityRewards.address, TOTAL_SUPPLY_18_DECIMALS);
+        await iporToken.connect(userOne).approve(pwIporToken.address, TOTAL_SUPPLY_18_DECIMALS);
+        await iporToken.transfer(
+            await userOne.getAddress(),
+            N1__0_18DEC.mul(BigNumber.from("10000"))
+        );
+        await pwIporToken.connect(userOne).stake(N100__0_18DEC);
+        await pwIporToken.connect(userOne).delegateToRewards([ipDai], [N100__0_18DEC]);
+        await liquidityRewards.connect(userOne).stake(ipDai, N1000__0_18DEC);
+        const agent1IpTokenBalanceBefore = await tokens.ipTokenDai.balanceOf(agent1.address);
+        const agent1IporTokenBalanceBefore = await iporToken.balanceOf(agent1.address);
+        const userOneIpTokenBalanceBefore = await tokens.ipTokenDai.balanceOf(
+            await userOne.getAddress()
+        );
+        const userOneIporTokenBalanceBefore = await iporToken.balanceOf(await userOne.getAddress());
+
+        const accruedRewardsBefore = await liquidityRewards.accruedRewards(ipDai);
+        const userOnePwTokenBalanceBefore = await pwIporToken.balanceOf(await userOne.getAddress());
+        const agent1PwTokenBalanceBefore = await pwIporToken.balanceOf(agent1.address);
+        const exchangeRateBefore = await pwIporToken.exchangeRate();
+        await hre.network.provider.send("hardhat_mine", ["0x64"]);
+        //    when
+
+        await liquidityRewardsTestAction.depositAndWithdrawIporTokensAndIpToken(
+            agent1.address,
+            [ipDai],
+            [N100__0_18DEC],
+            [N1000__0_18DEC]
+        );
+        await hre.network.provider.send("hardhat_mine", ["0x64"]);
+        await liquidityRewardsTestAction.depositAndWithdrawIporTokensAndIpToken(
+            agent1.address,
+            [ipDai],
+            [N100__0_18DEC],
+            [N1000__0_18DEC]
+        );
+        await hre.network.provider.send("hardhat_mine", ["0x64"]);
+        await liquidityRewardsTestAction.depositAndWithdrawIporTokensAndIpToken(
+            agent1.address,
+            [ipDai],
+            [N100__0_18DEC],
+            [N1000__0_18DEC]
+        );
+        await hre.network.provider.send("hardhat_mine", ["0x64"]);
+        //    then
+        await liquidityRewards.connect(userOne).unstake(ipDai, N1000__0_18DEC);
+
+        const agent1IpTokenBalanceAfter = await tokens.ipTokenDai.balanceOf(agent1.address);
+        const agent1IporTokenBalanceAfter = await iporToken.balanceOf(agent1.address);
+        const userOneIpTokenBalanceAfter = await tokens.ipTokenDai.balanceOf(
+            await userOne.getAddress()
+        );
+        const userOneIporTokenBalanceAfter = await iporToken.balanceOf(await userOne.getAddress());
+
+        const accruedRewardsAfter = await liquidityRewards.accruedRewards(ipDai);
+        const userOnePwTokenBalanceAfter = await pwIporToken.balanceOf(await userOne.getAddress());
+        const agent1PwTokenBalanceAfter = await pwIporToken.balanceOf(agent1.address);
+        const exchangeRateAfter = await pwIporToken.exchangeRate();
+
+        expect(accruedRewardsBefore).to.be.equal(ZERO);
+        expect(accruedRewardsAfter).to.be.equal(N1__0_18DEC.mul(BigNumber.from("404")));
+
+        expect(agent1IpTokenBalanceBefore).to.be.equal(agent1IpTokenBalanceAfter);
+        expect(agent1IpTokenBalanceBefore).to.be.equal(agent1IpTokenBalanceAfter);
+        expect(agent1IporTokenBalanceBefore).to.be.equal(agent1IporTokenBalanceAfter);
+        expect(agent1PwTokenBalanceBefore).to.be.equal(agent1PwTokenBalanceBefore);
+
+        expect(userOneIpTokenBalanceBefore).to.be.equal(
+            userOneIpTokenBalanceAfter.sub(N1000__0_18DEC)
+        );
+        expect(userOneIporTokenBalanceBefore).to.be.equal(userOneIporTokenBalanceAfter);
+        expect(userOnePwTokenBalanceBefore).to.be.equal(N100__0_18DEC);
+        expect(userOnePwTokenBalanceAfter).to.be.equal(
+            accruedRewardsAfter.add(userOnePwTokenBalanceBefore)
+        );
+    });
+
+    it("Should transfer all rewards to one user when 2 users concurrently stake, one withdraws", async () => {
+        //    given
+        const ipDai = tokens.ipTokenDai.address;
+        const N100__0_18DEC = N1__0_18DEC.mul(BigNumber.from("100"));
+        const N1000__0_18DEC = N1__0_18DEC.mul(BigNumber.from("1000"));
+
+        await agent1.stakeIporToken(N100__0_18DEC);
+        await agent2.stakeIporToken(N100__0_18DEC);
+
+        await hre.network.provider.send("hardhat_mine", ["0x64"]);
+        await network.provider.send("evm_setAutomine", [false]);
+
+        //    when
+        await liquidityRewardsTestAction.depositAndWithdrawIporTokensAndIpToken(
+            agent1.address,
+            [ipDai],
+            [N100__0_18DEC],
+            [N1000__0_18DEC]
+        );
+        await liquidityRewardsTestAction.depositIporTokensAndIpToken(
+            agent2.address,
+            [ipDai],
+            [N100__0_18DEC],
+            [N1000__0_18DEC]
+        );
+        const pendingBlockBeforeMine = await network.provider.send("eth_getBlockByNumber", [
+            "pending",
+            false,
+        ]);
+        await hre.network.provider.send("evm_mine");
+        const transactionBlockNumber = (await hre.ethers.provider.getBlock("latest")).number;
+
+        const pendingBlockAfterMine = await network.provider.send("eth_getBlockByNumber", [
+            "pending",
+            false,
+        ]);
+        await hre.network.provider.send("evm_mine");
+
+        //    then
+        const blockNumberAfterTransaction = (await hre.ethers.provider.getBlock("latest")).number;
+        const agent1Rewards = await agent1.accountRewards(ipDai);
+        const agent2Rewards = await agent2.accountRewards(ipDai);
+
+        expect(pendingBlockBeforeMine.transactions.length).to.be.equal(2);
+        expect(pendingBlockAfterMine.transactions.length).to.be.equal(0);
+        expect(blockNumberAfterTransaction).to.be.equal(transactionBlockNumber + 1);
+        expect(agent1Rewards).to.be.equal(ZERO);
+        expect(agent2Rewards).to.be.equal(N1__0_18DEC);
+
+        await network.provider.send("evm_setAutomine", [true]);
+    });
+
+    it("Should get proper number of rewards when rewards per block change", async () => {
+        //    given
+        const ipDai = tokens.ipTokenDai.address;
+        const N1000__0_18DEC = N1__0_18DEC.mul(BigNumber.from("1000"));
+
+        const agent1PwTokenBalanceBefore = await pwIporToken.balanceOf(agent1.address);
+        const agent2PwTokenBalanceBefore = await pwIporToken.balanceOf(agent2.address);
+        const blockRewardsInitial = await liquidityRewards.rewardsPerBlock(ipDai);
+
+        await hre.network.provider.send("hardhat_mine", ["0x64"]);
+        await network.provider.send("evm_setAutomine", [false]);
+
+        //    when
+        await agent1.stakeIpToken(ipDai, N1000__0_18DEC);
+        await hre.network.provider.send("evm_mine");
+
+        const agent1StakeIpTokensInBlock = (await hre.ethers.provider.getBlock("latest")).number;
+        await hre.network.provider.send("hardhat_mine", ["0xA"]);
+        await liquidityRewards.setRewardsPerBlock(ipDai, BigNumber.from("50000000"));
+        await agent2.stakeIpToken(ipDai, N1000__0_18DEC);
+        await hre.network.provider.send("evm_mine");
+
+        const blockRewardsAfterBlock11 = await liquidityRewards.rewardsPerBlock(ipDai);
+        const agent2StakeIpTokensInBlock = (await hre.ethers.provider.getBlock("latest")).number;
+        const agent1RewardsInBlock11 = await agent1.accountRewards(ipDai);
+        await hre.network.provider.send("hardhat_mine", ["0x9"]);
+        const blockNumberBeforeUnstake = (await hre.ethers.provider.getBlock("latest")).number;
+        const agent1RewardsInBlock20 = await agent1.accountRewards(ipDai);
+        const agent2RewardsInBlock20 = await agent2.accountRewards(ipDai);
+
+        await liquidityRewards.setRewardsPerBlock(ipDai, BigNumber.from("1000000000"));
+        await agent1.unstakeIpToken(ipDai, N1000__0_18DEC);
+        await agent2.unstakeIpToken(ipDai, N1000__0_18DEC);
+        await hre.network.provider.send("evm_mine");
+        const unstakeBlockNumber = (await hre.ethers.provider.getBlock("latest")).number;
+        const blockRewardsAfterBlock21 = await liquidityRewards.rewardsPerBlock(ipDai);
+
+        //    then
+
+        const agent1PwTokenBalanceAfter = await pwIporToken.balanceOf(agent1.address);
+        const agent2PwTokenBalanceAfter = await pwIporToken.balanceOf(agent2.address);
+
+        const agent1Rewards = agent1PwTokenBalanceAfter.sub(agent1PwTokenBalanceBefore);
+        const agent2Rewards = agent2PwTokenBalanceAfter.sub(agent2PwTokenBalanceBefore);
+
+        expect(blockRewardsInitial).to.be.equal(BigNumber.from("100000000"));
+        expect(agent2StakeIpTokensInBlock).to.be.equal(agent1StakeIpTokensInBlock + 11);
+        expect(agent1RewardsInBlock11).to.be.equal(N1__0_18DEC.mul(BigNumber.from("11")));
+        expect(blockRewardsAfterBlock11).to.be.equal(BigNumber.from("50000000"));
+        expect(blockNumberBeforeUnstake).to.be.equal(agent1StakeIpTokensInBlock + 20);
+        expect(agent1RewardsInBlock20).to.be.equal(BigNumber.from("13250000000000000000"));
+        expect(agent2RewardsInBlock20).to.be.equal(BigNumber.from("2250000000000000000"));
+        expect(unstakeBlockNumber).to.be.equal(agent1StakeIpTokensInBlock + 21);
+        expect(agent1Rewards).to.be.equal(BigNumber.from("13500000000000000000"));
+        expect(agent2Rewards).to.be.equal(BigNumber.from("2500000000000000000"));
+        expect(blockRewardsAfterBlock21).to.be.equal(BigNumber.from("1000000000"));
+
+        await network.provider.send("evm_setAutomine", [true]);
     });
 
     describe("Should not depends on order of unstake", () => {
