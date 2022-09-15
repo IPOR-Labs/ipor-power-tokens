@@ -10,17 +10,17 @@ contract LiquidityRewardsAgent {
 
     constructor(
         address pwToken,
-        address liquidityRewards,
+        address john,
         address ipToken,
         address iporToken
     ) {
-        _john = John(liquidityRewards);
+        _john = John(john);
         _pwToken = PwIporToken(pwToken);
         IERC20(ipToken).approve(liquidityRewards, Constants.MAX_VALUE);
         IERC20(iporToken).approve(pwToken, Constants.MAX_VALUE);
     }
 
-    //    interact with LiquidityRewards
+    //    interact with John
 
     function stakeIpToken(address ipToken, uint256 ipTokenAmount) external {
         _john.stake(ipToken, ipTokenAmount);
