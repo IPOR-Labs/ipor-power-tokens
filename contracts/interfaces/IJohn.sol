@@ -4,7 +4,7 @@ pragma solidity 0.8.15;
 import "./types/JohnTypes.sol";
 
 /// @title
-interface IJohn {   
+interface IJohn {
 	/// @notice check balance of staked ipTokens
     /// @param ipToken address of ipToken
     /// @return balance of ipToken stake
@@ -38,7 +38,7 @@ interface IJohn {
     /// @return true if is supported, false otherwise
     function isIpTokenSupported(address ipToken) external view returns (bool);
 
-    
+
 
     //    -------------------------------------------
     //    write
