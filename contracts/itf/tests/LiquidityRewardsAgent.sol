@@ -16,7 +16,7 @@ contract LiquidityRewardsAgent {
     ) {
         _john = John(john);
         _pwToken = PwIporToken(pwToken);
-        IERC20(ipToken).approve(liquidityRewards, Constants.MAX_VALUE);
+        IERC20(ipToken).approve(john, Constants.MAX_VALUE);
         IERC20(iporToken).approve(pwToken, Constants.MAX_VALUE);
     }
 
