@@ -5,13 +5,13 @@ import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
 import {
-    LiquidityRewards,
+    John,
     IporToken,
     PwIporToken,
     LiquidityRewardsTestAction,
     LiquidityRewardsAgent,
 } from "../../types";
-import { Tokens, getDeployedTokens, extractMyParam } from "../utils/LiquidityRewardsUtils";
+import { Tokens, getDeployedTokens, extractMyParam } from "../utils/JohnUtils";
 import {
     N1__0_18DEC,
     ZERO,
@@ -26,7 +26,7 @@ const { expect } = chai;
 
 describe("LiquidityRewards claim", () => {
     let tokens: Tokens;
-    let liquidityRewards: LiquidityRewards;
+    let liquidityRewards: John;
     let admin: Signer, userOne: Signer, userTwo: Signer, userThree: Signer;
     let iporToken: IporToken;
     let pwIporToken: PwIporToken;
@@ -49,12 +49,12 @@ describe("LiquidityRewards claim", () => {
         const PwIporToken = await hre.ethers.getContractFactory("PwIporToken");
         pwIporToken = (await upgrades.deployProxy(PwIporToken, [iporToken.address])) as PwIporToken;
 
-        const LiquidityRewards = await hre.ethers.getContractFactory("LiquidityRewards");
-        liquidityRewards = (await upgrades.deployProxy(LiquidityRewards, [
+        const John = await hre.ethers.getContractFactory("John");
+        liquidityRewards = (await upgrades.deployProxy(John, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
             pwIporToken.address,
             iporToken.address,
-        ])) as LiquidityRewards;
+        ])) as John;
 
         const LiquidityRewardsTestAction = await hre.ethers.getContractFactory(
             "LiquidityRewardsTestAction"
@@ -86,7 +86,7 @@ describe("LiquidityRewards claim", () => {
             liquidityRewards.address,
             N1__0_18DEC.mul(BigNumber.from("100000"))
         );
-        await pwIporToken.setLiquidityRewardsAddress(liquidityRewards.address);
+        await pwIporToken.setJohn(liquidityRewards.address);
     });
 
     it("Should has the same account params when 2 user stake ipTokens in one transaction", async () => {
