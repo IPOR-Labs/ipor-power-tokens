@@ -6,6 +6,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "../security/IporOwnableUpgradeable.sol";
 import "../interfaces/IPwIporTokenInternal.sol";
 import "../interfaces/IPwIporToken.sol";
@@ -23,6 +24,7 @@ contract PwIporToken is
     Initializable,
     PausableUpgradeable,
     UUPSUpgradeable,
+    ReentrancyGuardUpgradeable,
     IporOwnableUpgradeable,
     IPwIporTokenInternal,
     IPwIporToken
@@ -117,13 +119,12 @@ contract PwIporToken is
 
     function setJohn(address newJohnAddr) external override onlyOwner whenNotPaused {
         require(newJohnAddr != address(0), IporErrors.WRONG_ADDRESS);
-		address oldJohnAddr = _john;
+        address oldJohnAddr = _john;
         _john = newJohnAddr;
         emit JohnChanged(_msgSender(), oldJohnAddr, newJohnAddr);
     }
 
-	//TODO: secure against reentrancy
-    function stake(uint256 iporTokenAmount) external override whenNotPaused {
+    function stake(uint256 iporTokenAmount) external override whenNotPaused nonReentrant {
         require(iporTokenAmount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         uint256 exchangeRate = _exchangeRate();
@@ -142,8 +143,7 @@ contract PwIporToken is
         emit Stake(block.timestamp, _msgSender(), iporTokenAmount, exchangeRate, newBaseTokens);
     }
 
-	//TODO: secure against reentrancy
-    function unstake(uint256 pwTokenAmount) external override whenNotPaused {
+    function unstake(uint256 pwTokenAmount) external override whenNotPaused nonReentrant {
         require(pwTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         uint256 exchangeRate = _exchangeRate();
@@ -208,7 +208,7 @@ contract PwIporToken is
         emit CoolDown(block.timestamp, _msgSender(), 0, 0);
     }
 
-    function redeem() external override whenNotPaused {
+    function redeem() external override whenNotPaused nonReentrant {
         PwIporTokenTypes.PwCoolDown memory coolDown = _coolDowns[_msgSender()];
         require(block.timestamp >= coolDown.coolDownFinish, MiningErrors.COOL_DOWN_NOT_FINISH);
         require(coolDown.amount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
@@ -260,6 +260,7 @@ contract PwIporToken is
         external
         override
         whenNotPaused
+        nonReentrant
     {
         require(ipTokens.length == pwIporAmounts.length, IporErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
         uint256 pwIporToDelegate;
@@ -278,7 +279,11 @@ contract PwIporToken is
         emit DelegateToReward(block.timestamp, _msgSender(), ipTokens, pwIporAmounts);
     }
 
-    function withdrawFromDelegation(address ipToken, uint256 pwIporAmount) external whenNotPaused {
+    function withdrawFromDelegation(address ipToken, uint256 pwIporAmount)
+        external
+        whenNotPaused
+        nonReentrant
+    {
         require(pwIporAmount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
         require(
             _delegatedBalance[_msgSender()] >= pwIporAmount,
