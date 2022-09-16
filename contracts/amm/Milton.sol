@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.15;
+pragma solidity 0.8.16;
 
 import "../interfaces/types/AmmTypes.sol";
 import "../libraries/math/IporMath.sol";
@@ -29,7 +29,13 @@ abstract contract Milton is MiltonInternal, IMilton {
     using SafeCast for int256;
     using IporSwapLogic for IporTypes.IporSwapMemory;
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     /**
+     * @param paused - Initial flag to determine if smart contract is paused or not
      * @param asset - Instance of Milton is initialised in the context of the given ERC20 asset. Every trasaction is by the default scoped to that ERC20.
      * @param iporOracle - Address of Oracle treated as the source of true IPOR rate.
      * @param miltonStorage - Address of contract responsible for managing the state of Milton.
@@ -39,13 +45,16 @@ abstract contract Milton is MiltonInternal, IMilton {
      **/
 
     function initialize(
+        bool paused,
         address asset,
         address iporOracle,
         address miltonStorage,
         address miltonSpreadModel,
         address stanley
     ) public initializer {
+        __Pausable_init();
         __Ownable_init();
+        __UUPSUpgradeable_init();
 
         require(asset != address(0), IporErrors.WRONG_ADDRESS);
         require(iporOracle != address(0), IporErrors.WRONG_ADDRESS);
@@ -53,6 +62,10 @@ abstract contract Milton is MiltonInternal, IMilton {
         require(miltonSpreadModel != address(0), IporErrors.WRONG_ADDRESS);
         require(stanley != address(0), IporErrors.WRONG_ADDRESS);
         require(_getDecimals() == ERC20Upgradeable(asset).decimals(), IporErrors.WRONG_DECIMALS);
+
+        if (paused) {
+            _pause();
+        }
 
         _miltonStorage = IMiltonStorage(miltonStorage);
         _miltonSpreadModel = IMiltonSpreadModel(miltonSpreadModel);
@@ -205,7 +218,7 @@ abstract contract Milton is MiltonInternal, IMilton {
         uint256 swapId,
         uint256 closeTimestamp
     ) internal {
-        require(swapId != 0, MiltonErrors.INCORRECT_SWAP_ID);
+        require(swapId > 0, MiltonErrors.INCORRECT_SWAP_ID);
 
         IporTypes.IporSwapMemory memory iporSwap = _getMiltonStorage().getSwapPayFixed(swapId);
 
@@ -219,7 +232,7 @@ abstract contract Milton is MiltonInternal, IMilton {
         uint256 swapId,
         uint256 closeTimestamp
     ) internal {
-        require(swapId != 0, MiltonErrors.INCORRECT_SWAP_ID);
+        require(swapId > 0, MiltonErrors.INCORRECT_SWAP_ID);
 
         IporTypes.IporSwapMemory memory iporSwap = _getMiltonStorage().getSwapReceiveFixed(swapId);
 
@@ -247,7 +260,7 @@ abstract contract Milton is MiltonInternal, IMilton {
         _transferLiquidationDepositAmount(_msgSender(), payoutForLiquidator);
     }
 
-    function _calculateIncomeFeeValue(int256 payoff) internal pure returns (uint256) {
+    function _calculateIncomeFeeValue(int256 payoff) internal view returns (uint256) {
         return
             IporMath.division(IporMath.absoluteValue(payoff) * _getIncomeFeeRate(), Constants.D18);
     }
@@ -275,7 +288,7 @@ abstract contract Milton is MiltonInternal, IMilton {
         uint256 totalAmount,
         uint256 leverage
     ) internal view returns (AmmMiltonTypes.BeforeOpenSwapStruct memory bosStruct) {
-        require(totalAmount != 0, MiltonErrors.TOTAL_AMOUNT_TOO_LOW);
+        require(totalAmount > 0, MiltonErrors.TOTAL_AMOUNT_TOO_LOW);
 
         require(
             IERC20Upgradeable(_asset).balanceOf(_msgSender()) >= totalAmount,
@@ -374,7 +387,7 @@ abstract contract Milton is MiltonInternal, IMilton {
         );
 
         require(
-            acceptableFixedInterestRate != 0 && quoteValue <= acceptableFixedInterestRate,
+            acceptableFixedInterestRate > 0 && quoteValue <= acceptableFixedInterestRate,
             MiltonErrors.ACCEPTABLE_FIXED_INTEREST_RATE_EXCEEDED
         );
 
@@ -400,7 +413,6 @@ abstract contract Milton is MiltonInternal, IMilton {
             newSwap,
             _getIporPublicationFee()
         );
-
         IERC20Upgradeable(_asset).safeTransferFrom(_msgSender(), address(this), totalAmount);
 
         _emitOpenSwapEvent(
@@ -491,11 +503,11 @@ abstract contract Milton is MiltonInternal, IMilton {
         uint256 totalLiquidityPoolBalance,
         uint256 collateralPerLegBalance,
         uint256 totalCollateralBalance
-    ) internal pure {
+    ) internal view {
         uint256 utilizationRate;
         uint256 utilizationRatePerLeg;
 
-        if (totalLiquidityPoolBalance != 0) {
+        if (totalLiquidityPoolBalance > 0) {
             utilizationRate = IporMath.division(
                 totalCollateralBalance * Constants.D18,
                 totalLiquidityPoolBalance
@@ -667,7 +679,7 @@ abstract contract Milton is MiltonInternal, IMilton {
 
         for (uint256 i = 0; i < swapIds.length; i++) {
             uint256 swapId = swapIds[i];
-            require(swapId != 0, MiltonErrors.INCORRECT_SWAP_ID);
+            require(swapId > 0, MiltonErrors.INCORRECT_SWAP_ID);
 
             IporTypes.IporSwapMemory memory iporSwap = _getMiltonStorage().getSwapPayFixed(swapId);
 
@@ -696,7 +708,7 @@ abstract contract Milton is MiltonInternal, IMilton {
 
         for (uint256 i = 0; i < swapIds.length; i++) {
             uint256 swapId = swapIds[i];
-            require(swapId != 0, MiltonErrors.INCORRECT_SWAP_ID);
+            require(swapId > 0, MiltonErrors.INCORRECT_SWAP_ID);
 
             IporTypes.IporSwapMemory memory iporSwap = _getMiltonStorage().getSwapReceiveFixed(
                 swapId
@@ -720,7 +732,7 @@ abstract contract Milton is MiltonInternal, IMilton {
      * @param derivativeItem - Derivative struct
      * @param payoff - Net earnings of the derivative. Can be positive (swap has a possitive earnings) or negative (swap looses)
      * @param incomeFeeValue - amount of fee calculated based on payoff.
-     * @param _calculationTimestamp - Time for which the calculations in this funciton are run
+     * @param calculationTimestamp - Time for which the calculations in this funciton are run
      * @param cfgMinLiquidationThresholdToCloseBeforeMaturity - Minimal profit to loss required to put the swap up for the liquidation by non-byer regardless of maturity
      * @param cfgSecondsBeforeMaturityWhenPositionCanBeClosed - Time before the appointed maturity allowing the liquidation of the swap
      * for more information on liquidations refer to the documentation https://ipor-labs.gitbook.io/ipor-labs/automated-market-maker/liquidations
@@ -730,7 +742,7 @@ abstract contract Milton is MiltonInternal, IMilton {
         IporTypes.IporSwapMemory memory derivativeItem,
         int256 payoff,
         uint256 incomeFeeValue,
-        uint256 _calculationTimestamp,
+        uint256 calculationTimestamp,
         uint256 cfgMinLiquidationThresholdToCloseBeforeMaturity,
         uint256 cfgSecondsBeforeMaturityWhenPositionCanBeClosed
     ) internal returns (uint256 transferredToBuyer, uint256 payoutForLiquidator) {
@@ -744,7 +756,7 @@ abstract contract Milton is MiltonInternal, IMilton {
             //verify if sender is an owner of swap. If not then check if maturity has been reached - if not then reject, if yes then close even if not an owner
             if (_msgSender() != derivativeItem.buyer) {
                 require(
-                    _calculationTimestamp >=
+                    calculationTimestamp >=
                         derivativeItem.endTimestamp -
                             cfgSecondsBeforeMaturityWhenPositionCanBeClosed,
                     MiltonErrors.CANNOT_CLOSE_SWAP_SENDER_IS_NOT_BUYER_AND_NO_MATURITY
@@ -792,7 +804,7 @@ abstract contract Milton is MiltonInternal, IMilton {
             payoutForLiquidator = liquidationDepositAmount;
         }
 
-        if (transferAmount != 0) {
+        if (transferAmount > 0) {
             uint256 transferAmountAssetDecimals = IporMath.convertWadToAssetDecimals(
                 transferAmount,
                 decimals
@@ -810,7 +822,7 @@ abstract contract Milton is MiltonInternal, IMilton {
     function _transferLiquidationDepositAmount(address liquidator, uint256 liquidationDepositAmount)
         internal
     {
-        if (liquidationDepositAmount != 0) {
+        if (liquidationDepositAmount > 0) {
             IERC20Upgradeable(_asset).safeTransfer(
                 liquidator,
                 IporMath.convertWadToAssetDecimals(liquidationDepositAmount, _getDecimals())
@@ -821,7 +833,6 @@ abstract contract Milton is MiltonInternal, IMilton {
     /**
      * @notice Function run at the time of the contract upgrade via proxy. Available only to the contract's owner.
      **/
-
     //solhint-disable no-empty-blocks
     function _authorizeUpgrade(address) internal override onlyOwner {}
 }

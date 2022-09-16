@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.15;
+pragma solidity 0.8.16;
 
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
@@ -21,7 +22,13 @@ import "./libraries/DecayFactorCalculation.sol";
  *
  * @author IPOR Labs
  */
-contract IporOracle is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgradeable, IIporOracle {
+contract IporOracle is
+    Initializable,
+    PausableUpgradeable,
+    UUPSUpgradeable,
+    IporOwnableUpgradeable,
+    IIporOracle
+{
     using SafeCast for uint256;
     using IporLogic for IporOracleTypes.IPOR;
 
@@ -34,13 +41,20 @@ contract IporOracle is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgradea
         _;
     }
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(
         address[] memory assets,
         uint32[] memory updateTimestamps,
         uint64[] memory exponentialMovingAverages,
         uint64[] memory exponentialWeightedMovingVariances
     ) public initializer {
+        __Pausable_init();
         __Ownable_init();
+        __UUPSUpgradeable_init();
 
         uint256 assetsLength = assets.length;
 
@@ -58,7 +72,7 @@ contract IporOracle is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgradea
     }
 
     function getVersion() external pure virtual override returns (uint256) {
-        return 1;
+        return 2;
     }
 
     function getIndex(address asset)
@@ -74,7 +88,7 @@ contract IporOracle is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgradea
         )
     {
         IporOracleTypes.IPOR memory ipor = _indexes[asset];
-        require(ipor.quasiIbtPrice != 0, IporOracleErrors.ASSET_NOT_SUPPORTED);
+        require(ipor.quasiIbtPrice > 0, IporOracleErrors.ASSET_NOT_SUPPORTED);
         return (
             indexValue = ipor.indexValue,
             ibtPrice = IporMath.division(ipor.quasiIbtPrice, Constants.YEAR_IN_SECONDS),
@@ -92,7 +106,7 @@ contract IporOracle is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgradea
         returns (IporTypes.AccruedIpor memory accruedIpor)
     {
         IporOracleTypes.IPOR memory ipor = _indexes[asset];
-        require(ipor.quasiIbtPrice != 0, IporOracleErrors.ASSET_NOT_SUPPORTED);
+        require(ipor.quasiIbtPrice > 0, IporOracleErrors.ASSET_NOT_SUPPORTED);
 
         accruedIpor = IporTypes.AccruedIpor(
             ipor.indexValue,
@@ -176,7 +190,7 @@ contract IporOracle is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgradea
 
     function removeAsset(address asset) external override onlyOwner whenNotPaused {
         require(asset != address(0), IporErrors.WRONG_ADDRESS);
-        require(_indexes[asset].quasiIbtPrice != 0, IporOracleErrors.ASSET_NOT_SUPPORTED);
+        require(_indexes[asset].quasiIbtPrice > 0, IporOracleErrors.ASSET_NOT_SUPPORTED);
         delete _indexes[asset];
         emit IporIndexRemoveAsset(asset);
     }
@@ -207,7 +221,7 @@ contract IporOracle is UUPSUpgradeable, IporOwnableUpgradeable, PausableUpgradea
         uint256 updateTimestamp
     ) internal {
         IporOracleTypes.IPOR memory ipor = _indexes[asset];
-        require(ipor.quasiIbtPrice != 0, IporOracleErrors.ASSET_NOT_SUPPORTED);
+        require(ipor.quasiIbtPrice > 0, IporOracleErrors.ASSET_NOT_SUPPORTED);
         require(
             ipor.lastUpdateTimestamp <= updateTimestamp,
             IporOracleErrors.INDEX_TIMESTAMP_HIGHER_THAN_ACCRUE_TIMESTAMP

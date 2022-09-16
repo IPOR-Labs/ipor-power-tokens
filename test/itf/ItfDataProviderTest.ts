@@ -1,4 +1,4 @@
-import hre, { ethers } from "hardhat";
+import hre, { ethers, upgrades } from "hardhat";
 import chai from "chai";
 import { Signer, BigNumber } from "ethers";
 import { PERCENTAGE_5_18DEC, N1__0_6DEC } from "../utils/Constants";
@@ -6,9 +6,9 @@ import { PERCENTAGE_5_18DEC, N1__0_6DEC } from "../utils/Constants";
 import { MockStanleyCase } from "../utils/StanleyUtils";
 import { JosephUsdcMockCases, JosephUsdtMockCases, JosephDaiMockCases } from "../utils/JosephUtils";
 
-import { ItfDataProvider, MockBaseMiltonSpreadModel } from "../../types";
+import { ItfDataProvider, MockBaseMiltonSpreadModelDai } from "../../types";
 import {
-    prepareMockMiltonSpreadModel,
+    prepareMockMiltonSpreadModelDai,
     MiltonUsdcCase,
     MiltonUsdtCase,
     MiltonDaiCase,
@@ -19,7 +19,7 @@ import { TestData, prepareTestData } from "../utils/DataUtils";
 const { expect } = chai;
 
 describe("ItfDataProvider - smoke tests", () => {
-    let miltonSpreadModel: MockBaseMiltonSpreadModel;
+    let miltonSpreadModel: MockBaseMiltonSpreadModelDai;
     let admin: Signer,
         userOne: Signer,
         userTwo: Signer,
@@ -32,7 +32,7 @@ describe("ItfDataProvider - smoke tests", () => {
     before(async () => {
         [admin, userOne, userTwo, userThree, liquidityProvider, miltonStorageAddress] =
             await hre.ethers.getSigners();
-        miltonSpreadModel = await prepareMockMiltonSpreadModel();
+        miltonSpreadModel = await prepareMockMiltonSpreadModelDai();
         testData = await prepareTestData(
             BigNumber.from(Math.floor(Date.now() / 1000)),
             [admin, userOne, userTwo, userThree, liquidityProvider, miltonStorageAddress],
@@ -47,11 +47,35 @@ describe("ItfDataProvider - smoke tests", () => {
             JosephUsdtMockCases.CASE0,
             JosephDaiMockCases.CASE0
         );
-    });
 
-    beforeEach(async () => {
+        const { miltonUsdc, tokenUsdc, iporOracle, miltonStorageUsdc, josephUsdc } = testData;
+
+        if (
+            miltonUsdc === undefined ||
+            tokenUsdc === undefined ||
+            iporOracle === undefined ||
+            miltonStorageUsdc === undefined ||
+            miltonSpreadModel === undefined ||
+            josephUsdc === undefined
+        ) {
+            expect(true).to.be.false;
+            return;
+        }
+
         const ItfDataProvider = await ethers.getContractFactory("ItfDataProvider");
-        itfDataProvider = (await ItfDataProvider.deploy()) as ItfDataProvider;
+        itfDataProvider = (await upgrades.deployProxy(
+            ItfDataProvider,
+            [
+                [tokenUsdc.address],
+                [miltonUsdc.address],
+                [miltonStorageUsdc.address],
+                iporOracle.address,
+                [miltonSpreadModel.address],
+            ],
+            {
+                kind: "uups",
+            }
+        )) as ItfDataProvider;
     });
 
     it("Should collect data from iporOracle for ITF", async () => {
@@ -75,13 +99,7 @@ describe("ItfDataProvider - smoke tests", () => {
         await tokenUsdc.approve(josephUsdc.address, liquidityAmount);
         await tokenUsdc.approve(miltonUsdc.address, liquidityAmount);
         await josephUsdc.provideLiquidity(liquidityAmount);
-        await itfDataProvider.initialize(
-            [tokenUsdc.address],
-            [miltonUsdc.address],
-            [miltonStorageUsdc.address],
-            iporOracle.address,
-            miltonSpreadModel.address
-        );
+
         const calculateTimestamp = Math.floor(Date.now() / 1000);
 
         // when
@@ -95,7 +113,9 @@ describe("ItfDataProvider - smoke tests", () => {
         );
         const miltonStorageData = await itfDataProvider.getMiltonStorageData(tokenUsdc.address);
 
-        const miltonSpreadModelData = await itfDataProvider.getMiltonSpreadModelData();
+        const miltonSpreadModelData = await itfDataProvider.getMiltonSpreadModelData(
+            tokenUsdc.address
+        );
 
         const ammData = await itfDataProvider.getAmmData(
             Math.floor(Date.now() / 1000),
