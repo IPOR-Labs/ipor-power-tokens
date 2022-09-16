@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.15;
+pragma solidity 0.8.16;
 
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "../../libraries/errors/IporErrors.sol";
 import "../../libraries/errors/StanleyErrors.sol";
 
@@ -11,10 +12,11 @@ import "../../security/IporOwnableUpgradeable.sol";
 import "../../interfaces/IStrategy.sol";
 
 abstract contract StrategyCore is
-    UUPSUpgradeable,
-    ReentrancyGuardUpgradeable,
-    IporOwnableUpgradeable,
+    Initializable,
     PausableUpgradeable,
+    ReentrancyGuardUpgradeable,
+    UUPSUpgradeable,
+    IporOwnableUpgradeable,
     IStrategy
 {
     address internal _asset;
@@ -34,7 +36,7 @@ abstract contract StrategyCore is
     }
 
     function getVersion() external pure override returns (uint256) {
-        return 1;
+        return 2;
     }
 
     function getAsset() external view override returns (address) {
@@ -59,11 +61,19 @@ abstract contract StrategyCore is
         emit StanleyChanged(_msgSender(), oldStanley, newStanley);
     }
 
+    function getTreasuryManager() external view override returns (address) {
+        return _treasuryManager;
+    }
+
     function setTreasuryManager(address manager) external whenNotPaused onlyOwner {
         require(manager != address(0), IporErrors.WRONG_ADDRESS);
         address oldTreasuryManager = _treasuryManager;
         _treasuryManager = manager;
         emit TreasuryManagerChanged(_msgSender(), oldTreasuryManager, manager);
+    }
+
+    function getTreasury() external view override returns (address) {
+        return _treasury;
     }
 
     function setTreasury(address newTreasury) external whenNotPaused onlyTreasuryManager {

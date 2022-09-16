@@ -290,12 +290,12 @@ export default ({ drizzle, drizzleState }) => (
             <tr>
                 <td>TestnetFaucet</td>
                 <td>
-                    {process.env.REACT_APP_ENV_PROFILE !== "mainnet"
+                    {process.env.REACT_APP_ENV_PROFILE !== "mainnet.ipor.io"
                         ? drizzle.contracts.TestnetFaucet.address
                         : "NONE"}
                 </td>
                 <td>
-                    {process.env.REACT_APP_ENV_PROFILE !== "mainnet" ? (
+                    {process.env.REACT_APP_ENV_PROFILE !== "mainnet.ipor.io" ? (
                         <ContractData
                             drizzle={drizzle}
                             drizzleState={drizzleState}
@@ -573,27 +573,81 @@ export default ({ drizzle, drizzleState }) => (
                 </td>
             </tr>
             <tr>
-                <td>Milton Spread Model</td>
-                <td>{drizzle.contracts.MiltonSpreadModel.address}</td>
+                <td>Milton Spread Model USDT</td>
+                <td>{drizzle.contracts.MiltonSpreadModelUsdt.address}</td>
                 <td>
                     <ContractData
                         drizzle={drizzle}
                         drizzleState={drizzleState}
-                        contract="MiltonSpreadModel"
+                        contract="MiltonSpreadModelUsdt"
                         method="owner"
                     />
                 </td>
                 <td>
                     <ContractForm
                         drizzle={drizzle}
-                        contract="MiltonSpreadModel"
+                        contract="MiltonSpreadModelUsdt"
                         method="transferOwnership"
                     />
                 </td>
                 <td>
                     <ContractForm
                         drizzle={drizzle}
-                        contract="MiltonSpreadModel"
+                        contract="MiltonSpreadModelUsdt"
+                        method="confirmTransferOwnership"
+                    />
+                </td>
+            </tr>
+
+            <tr>
+                <td>Milton Spread Model USDC</td>
+                <td>{drizzle.contracts.MiltonSpreadModelUsdc.address}</td>
+                <td>
+                    <ContractData
+                        drizzle={drizzle}
+                        drizzleState={drizzleState}
+                        contract="MiltonSpreadModelUsdc"
+                        method="owner"
+                    />
+                </td>
+                <td>
+                    <ContractForm
+                        drizzle={drizzle}
+                        contract="MiltonSpreadModelUsdc"
+                        method="transferOwnership"
+                    />
+                </td>
+                <td>
+                    <ContractForm
+                        drizzle={drizzle}
+                        contract="MiltonSpreadModelUsdc"
+                        method="confirmTransferOwnership"
+                    />
+                </td>
+            </tr>
+
+            <tr>
+                <td>Milton Spread Model DAI</td>
+                <td>{drizzle.contracts.MiltonSpreadModelDai.address}</td>
+                <td>
+                    <ContractData
+                        drizzle={drizzle}
+                        drizzleState={drizzleState}
+                        contract="MiltonSpreadModelDai"
+                        method="owner"
+                    />
+                </td>
+                <td>
+                    <ContractForm
+                        drizzle={drizzle}
+                        contract="MiltonSpreadModelDai"
+                        method="transferOwnership"
+                    />
+                </td>
+                <td>
+                    <ContractForm
+                        drizzle={drizzle}
+                        contract="MiltonSpreadModelDai"
                         method="confirmTransferOwnership"
                     />
                 </td>
@@ -1023,7 +1077,11 @@ export default ({ drizzle, drizzleState }) => (
             )} */}
 
             <tr>
-                <td>Mock Testnet Strategy Aave Usdt</td>
+                <td>
+                    {process.env.REACT_APP_ENV_PROFILE !== "mainnet.ipor.io"
+                        ? "Mock Testnet Strategy Aave USDT"
+                        : "Strategy Aave USDT"}
+                </td>
                 <td>{drizzle.contracts.DrizzleStrategyAaveUsdt.address}</td>
                 <td>
                     <ContractData
@@ -1050,7 +1108,11 @@ export default ({ drizzle, drizzleState }) => (
             </tr>
 
             <tr>
-                <td>Mock Testnet Strategy Aave Usdc</td>
+                <td>
+                    {process.env.REACT_APP_ENV_PROFILE !== "mainnet.ipor.io"
+                        ? "Mock Testnet Strategy Aave USDC"
+                        : "Strategy Aave USDC"}
+                </td>
                 <td>{drizzle.contracts.DrizzleStrategyAaveUsdc.address}</td>
                 <td>
                     <ContractData
@@ -1077,7 +1139,11 @@ export default ({ drizzle, drizzleState }) => (
             </tr>
 
             <tr>
-                <td>Mock Testnet Strategy Aave Dai</td>
+                <td>
+                    {process.env.REACT_APP_ENV_PROFILE !== "mainnet.ipor.io"
+                        ? "Mock Testnet Strategy Aave DAI"
+                        : "Strategy Aave DAI"}
+                </td>
                 <td>{drizzle.contracts.DrizzleStrategyAaveDai.address}</td>
                 <td>
                     <ContractData
@@ -1104,7 +1170,11 @@ export default ({ drizzle, drizzleState }) => (
             </tr>
 
             <tr>
-                <td>Mock Testnet Strategy Compound Usdt</td>
+                <td>
+                    {process.env.REACT_APP_ENV_PROFILE !== "mainnet.ipor.io"
+                        ? "Mock Testnet Strategy Compound USDT"
+                        : "Strategy Compound USDT"}
+                </td>
                 <td>{drizzle.contracts.DrizzleStrategyCompoundUsdt.address}</td>
                 <td>
                     <ContractData
@@ -1131,7 +1201,11 @@ export default ({ drizzle, drizzleState }) => (
             </tr>
 
             <tr>
-                <td>Mock Testnet Strategy Compound Usdc</td>
+                <td>
+                    {process.env.REACT_APP_ENV_PROFILE !== "mainnet.ipor.io"
+                        ? "Mock Testnet Strategy Compound USDC"
+                        : "Strategy Compound USDC"}
+                </td>
                 <td>{drizzle.contracts.DrizzleStrategyCompoundUsdc.address}</td>
                 <td>
                     <ContractData
@@ -1158,7 +1232,11 @@ export default ({ drizzle, drizzleState }) => (
             </tr>
 
             <tr>
-                <td>Mock Testnet Strategy Compound Dai</td>
+                <td>
+                    {process.env.REACT_APP_ENV_PROFILE !== "mainnet.ipor.io"
+                        ? "Mock Testnet Strategy Compound DAI"
+                        : "Strategy Compound DAI"}
+                </td>
                 <td>{drizzle.contracts.DrizzleStrategyCompoundDai.address}</td>
                 <td>
                     <ContractData
@@ -1489,7 +1567,11 @@ export default ({ drizzle, drizzleState }) => (
             </tr>
 
             <tr>
-                <td>Mock Testnet Strategy Aave Usdt</td>
+                <td>
+                    {process.env.REACT_APP_ENV_PROFILE !== "mainnet.ipor.io"
+                        ? "Mock Testnet Strategy Aave Usdt"
+                        : "Strategy Aave Usdt"}
+                </td>
                 <td>{drizzle.contracts.DrizzleStrategyAaveUsdt.address}</td>
                 <td>
                     <ContractData
@@ -1516,7 +1598,11 @@ export default ({ drizzle, drizzleState }) => (
             </tr>
 
             <tr>
-                <td>Mock Testnet Strategy Aave Usdc</td>
+                <td>
+                    {process.env.REACT_APP_ENV_PROFILE !== "mainnet.ipor.io"
+                        ? "Mock Testnet Strategy Aave Usdc"
+                        : "Strategy Aave Usdc"}
+                </td>
                 <td>{drizzle.contracts.DrizzleStrategyAaveUsdc.address}</td>
                 <td>
                     <ContractData
@@ -1543,7 +1629,11 @@ export default ({ drizzle, drizzleState }) => (
             </tr>
 
             <tr>
-                <td>Mock Testnet Strategy Aave Dai</td>
+                <td>
+                    {process.env.REACT_APP_ENV_PROFILE !== "mainnet.ipor.io"
+                        ? "Mock Testnet Strategy Aave Dai"
+                        : "Strategy Aave Dai"}
+                </td>
                 <td>{drizzle.contracts.DrizzleStrategyAaveDai.address}</td>
                 <td>
                     <ContractData
@@ -1570,7 +1660,11 @@ export default ({ drizzle, drizzleState }) => (
             </tr>
 
             <tr>
-                <td>Mock Testnet Strategy Compound Usdt</td>
+                <td>
+                    {process.env.REACT_APP_ENV_PROFILE !== "mainnet.ipor.io"
+                        ? "Mock Testnet Strategy Compound Usdt"
+                        : "Strategy Compound Usdt"}
+                </td>
                 <td>{drizzle.contracts.DrizzleStrategyCompoundUsdt.address}</td>
                 <td>
                     <ContractData
@@ -1597,7 +1691,11 @@ export default ({ drizzle, drizzleState }) => (
             </tr>
 
             <tr>
-                <td>Mock Testnet Strategy Compound Usdc</td>
+                <td>
+                    {process.env.REACT_APP_ENV_PROFILE !== "mainnet.ipor.io"
+                        ? "Mock Testnet Strategy Compound Usdc"
+                        : "Strategy Compound Usdc"}
+                </td>
                 <td>{drizzle.contracts.DrizzleStrategyCompoundUsdc.address}</td>
                 <td>
                     <ContractData
@@ -1624,7 +1722,11 @@ export default ({ drizzle, drizzleState }) => (
             </tr>
 
             <tr>
-                <td>Mock Testnet Strategy Compound Dai</td>
+                <td>
+                    {process.env.REACT_APP_ENV_PROFILE !== "mainnet.ipor.io"
+                        ? "Mock Testnet Strategy Compound Dai"
+                        : "Strategy Compound Dai"}
+                </td>
                 <td>{drizzle.contracts.DrizzleStrategyCompoundDai.address}</td>
                 <td>
                     <ContractData

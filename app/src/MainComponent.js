@@ -10,6 +10,7 @@ import StanleyComponent from "./StanleyComponent";
 import MyPositions from "./MyPositions";
 import JosephConfigurationComponent from "./JosephConfigurationComponent";
 import MiltonConfigurationComponent from "./MiltonConfigurationComponent";
+import StanleyConfigurationComponent from "./StanleyConfigurationComponent";
 import MiltonSpreadConfigurationComponent from "./MiltonSpreadConfigurationComponent";
 import GlobalConfigurationComponent from "./GlobalConfigurationComponent";
 import FaucetComponent from "./FaucetComponent";
@@ -97,11 +98,14 @@ export default ({ drizzle, drizzleState }) => {
                         drizzleState={drizzleState}
                     />
                 </Tab>
+                <Tab eventKey="stanleyConfig" title="Stanley Config">
+                    <StanleyConfigurationComponent drizzle={drizzle} drizzleState={drizzleState} />
+                </Tab>
                 <Tab eventKey="myPositions" title="My positions">
                     <MyPositions drizzle={drizzle} drizzleState={drizzleState} />
                 </Tab>
 
-                {process.env.REACT_APP_ENV_PROFILE !== "mainnet" ? (
+                {process.env.REACT_APP_ENV_PROFILE !== "mainnet.ipor.io" ? (
                     <Tab eventKey="faucet" title="Faucet">
                         <FaucetComponent drizzle={drizzle} drizzleState={drizzleState} />
                     </Tab>

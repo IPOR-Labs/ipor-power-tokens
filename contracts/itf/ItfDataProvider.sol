@@ -1,5 +1,7 @@
-pragma solidity 0.8.15;
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.8.16;
 
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "../security/IporOwnableUpgradeable.sol";
 import "../interfaces/types/IporTypes.sol";
@@ -9,12 +11,17 @@ import "../amm/MiltonStorage.sol";
 import "./ItfIporOracle.sol";
 import "../interfaces/IMiltonSpreadInternal.sol";
 
-contract ItfDataProvider is UUPSUpgradeable, IporOwnableUpgradeable {
+contract ItfDataProvider is Initializable, UUPSUpgradeable, IporOwnableUpgradeable {
     // asset => milton addres for asset
     mapping(address => ItfMilton) private _miltons;
     mapping(address => MiltonStorage) private _miltonStorages;
+    mapping(address => IMiltonSpreadInternal) private _miltonSpreadModels;
     ItfIporOracle private _iporOracle;
-    IMiltonSpreadInternal private _miltonSpreadModel;
+
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
 
     // all arrary contains adresses for 1) usdt, 2) usdc, 3) dai
     function initialize(
@@ -22,15 +29,17 @@ contract ItfDataProvider is UUPSUpgradeable, IporOwnableUpgradeable {
         address[] memory miltons,
         address[] memory miltonStorages,
         address iporOracle,
-        address miltonSpreadModel
+        address[] memory miltonSpreadModels
     ) public initializer {
+        __Ownable_init();
+        __UUPSUpgradeable_init();
         uint256 i = 0;
         for (i; i < assets.length; i++) {
             _miltons[assets[i]] = ItfMilton(miltons[i]);
             _miltonStorages[assets[i]] = MiltonStorage(miltonStorages[i]);
+            _miltonSpreadModels[assets[i]] = IMiltonSpreadInternal(miltonSpreadModels[i]);
         }
         _iporOracle = ItfIporOracle(iporOracle);
-        _miltonSpreadModel = IMiltonSpreadInternal(miltonSpreadModel);
     }
 
     function getAmmData(uint256 timestamp, address asset)
@@ -45,7 +54,7 @@ contract ItfDataProvider is UUPSUpgradeable, IporOwnableUpgradeable {
             getMiltonData(timestamp, asset),
             getIporOracleData(timestamp, asset),
             getMiltonStorageData(asset),
-            getMiltonSpreadModelData()
+            getMiltonSpreadModelData(asset)
         );
     }
 
@@ -130,24 +139,25 @@ contract ItfDataProvider is UUPSUpgradeable, IporOwnableUpgradeable {
         );
     }
 
-    function getMiltonSpreadModelData()
+    function getMiltonSpreadModelData(address asset)
         public
         view
         returns (ItfDataProviderTypes.ItfMiltonSpreadModelData memory miltonSpreadModelData)
     {
+        IMiltonSpreadInternal miltonSpreadModel = _miltonSpreadModels[asset];
         miltonSpreadModelData = ItfDataProviderTypes.ItfMiltonSpreadModelData(
-            _miltonSpreadModel.getPayFixedRegionOneBase(),
-            _miltonSpreadModel.getPayFixedRegionOneSlopeForVolatility(),
-            _miltonSpreadModel.getPayFixedRegionOneSlopeForMeanReversion(),
-            _miltonSpreadModel.getPayFixedRegionTwoBase(),
-            _miltonSpreadModel.getPayFixedRegionTwoSlopeForVolatility(),
-            _miltonSpreadModel.getPayFixedRegionTwoSlopeForMeanReversion(),
-            _miltonSpreadModel.getReceiveFixedRegionOneBase(),
-            _miltonSpreadModel.getReceiveFixedRegionOneSlopeForVolatility(),
-            _miltonSpreadModel.getReceiveFixedRegionOneSlopeForMeanReversion(),
-            _miltonSpreadModel.getReceiveFixedRegionTwoBase(),
-            _miltonSpreadModel.getReceiveFixedRegionTwoSlopeForVolatility(),
-            _miltonSpreadModel.getReceiveFixedRegionTwoSlopeForMeanReversion()
+            miltonSpreadModel.getPayFixedRegionOneBase(),
+            miltonSpreadModel.getPayFixedRegionOneSlopeForVolatility(),
+            miltonSpreadModel.getPayFixedRegionOneSlopeForMeanReversion(),
+            miltonSpreadModel.getPayFixedRegionTwoBase(),
+            miltonSpreadModel.getPayFixedRegionTwoSlopeForVolatility(),
+            miltonSpreadModel.getPayFixedRegionTwoSlopeForMeanReversion(),
+            miltonSpreadModel.getReceiveFixedRegionOneBase(),
+            miltonSpreadModel.getReceiveFixedRegionOneSlopeForVolatility(),
+            miltonSpreadModel.getReceiveFixedRegionOneSlopeForMeanReversion(),
+            miltonSpreadModel.getReceiveFixedRegionTwoBase(),
+            miltonSpreadModel.getReceiveFixedRegionTwoSlopeForVolatility(),
+            miltonSpreadModel.getReceiveFixedRegionTwoSlopeForMeanReversion()
         );
     }
 

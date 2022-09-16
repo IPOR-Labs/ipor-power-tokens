@@ -14,13 +14,16 @@ module.exports = {
         docker: {
             provider: () => {
                 return new HDWalletProvider(
-                    [process.env.ADMIN_PRIV_KEY, process.env.IPOR_INDEX_ADMIN_PRIV_KEY],
+                    [process.env.SC_ADMIN_PRIV_KEY],
                     process.env.ETH_BC_URL
                 );
             },
             network_id: process.env.ETH_BC_NETWORK_ID,
             skipDryRun: true,
-            networkCheckTimeout: 300000, //5 min
+            networkCheckTimeout: 600000, //10 min
+            gas: 10000000,
+            gasPrice: 100000000000,
+            confirmations: process.env.SC_MIGRATION_CONFIRMATION,
         },
         develop: {
             host: "127.0.0.1",
@@ -39,16 +42,15 @@ module.exports = {
     },
     compilers: {
         solc: {
-            version: "0.8.15", // Fetch exact version from solc-bin (default: truffle's version)
-            // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
-
+            version: "0.8.16",
+            docker: true,
             settings: {
                 // See the solidity docs for advice about optimization and evmVersion
                 optimizer: {
                     enabled: true,
                     runs: 800,
                 },
-                //  evmVersion: "byzantium"
+                evmVersion: "london",
             },
         },
     },

@@ -1,14 +1,16 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.15;
+pragma solidity 0.8.16;
 
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
 import "../../libraries/errors/JosephErrors.sol";
 import "../../libraries/Constants.sol";
 import "../../libraries/math/IporMath.sol";
@@ -20,9 +22,10 @@ import "../../interfaces/IStanley.sol";
 import "../../security/IporOwnableUpgradeable.sol";
 
 abstract contract JosephInternal is
-    UUPSUpgradeable,
-    ReentrancyGuardUpgradeable,
+    Initializable,
     PausableUpgradeable,
+    ReentrancyGuardUpgradeable,
+    UUPSUpgradeable,
     IporOwnableUpgradeable,
     IJosephInternal
 {
@@ -60,8 +63,52 @@ abstract contract JosephInternal is
         _;
     }
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
+    function initialize(
+        bool paused,
+        address initAsset,
+        address ipToken,
+        address milton,
+        address miltonStorage,
+        address stanley
+    ) public initializer {
+        __Pausable_init();
+        __Ownable_init();
+        __UUPSUpgradeable_init();
+
+        require(initAsset != address(0), IporErrors.WRONG_ADDRESS);
+        require(ipToken != address(0), IporErrors.WRONG_ADDRESS);
+        require(milton != address(0), IporErrors.WRONG_ADDRESS);
+        require(miltonStorage != address(0), IporErrors.WRONG_ADDRESS);
+        require(stanley != address(0), IporErrors.WRONG_ADDRESS);
+        require(
+            _getDecimals() == IERC20MetadataUpgradeable(initAsset).decimals(),
+            IporErrors.WRONG_DECIMALS
+        );
+
+        if (paused) {
+            _pause();
+        }
+
+        IIpToken iipToken = IIpToken(ipToken);
+        require(initAsset == iipToken.getAsset(), IporErrors.ADDRESSES_MISMATCH);
+
+        _asset = initAsset;
+        _ipToken = iipToken;
+        _milton = IMiltonInternal(milton);
+        _miltonStorage = IMiltonStorage(miltonStorage);
+        _stanley = IStanley(stanley);
+        _miltonStanleyBalanceRatio = 85e16;
+        _maxLiquidityPoolBalance = 3_000_000;
+        _maxLpAccountContribution = 50_000;
+    }
+
     function getVersion() external pure virtual override returns (uint256) {
-        return 1;
+        return 2;
     }
 
     function getAsset() external view override returns (address) {
@@ -69,7 +116,7 @@ abstract contract JosephInternal is
     }
 
     function setMiltonStanleyBalanceRatio(uint256 newRatio) external onlyOwner {
-        require(newRatio != 0, JosephErrors.MILTON_STANLEY_RATIO);
+        require(newRatio > 0, JosephErrors.MILTON_STANLEY_RATIO);
         require(newRatio < 1e18, JosephErrors.MILTON_STANLEY_RATIO);
         _miltonStanleyBalanceRatio = newRatio;
     }
@@ -101,7 +148,7 @@ abstract contract JosephInternal is
     function rebalance() external override onlyOwner whenNotPaused {
         (uint256 totalBalance, uint256 wadMiltonAssetBalance) = _getIporTotalBalance();
 
-        require(totalBalance != 0, JosephErrors.STANLEY_BALANCE_IS_EMPTY);
+        require(totalBalance > 0, JosephErrors.STANLEY_BALANCE_IS_EMPTY);
 
         uint256 ratio = IporMath.division(wadMiltonAssetBalance * Constants.D18, totalBalance);
 
@@ -110,7 +157,7 @@ abstract contract JosephInternal is
         if (ratio > miltonStanleyBalanceRatio) {
             uint256 assetAmount = wadMiltonAssetBalance -
                 IporMath.division(miltonStanleyBalanceRatio * totalBalance, Constants.D18);
-            _milton.depositToStanley(assetAmount);
+            _getMilton().depositToStanley(assetAmount);
         } else {
             uint256 assetAmount = IporMath.division(
                 miltonStanleyBalanceRatio * totalBalance,

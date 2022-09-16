@@ -2,6 +2,7 @@ import { BigNumber } from "ethers";
 
 import {
     ERC20,
+	MockCUSDT,
     IpToken,
     IvToken,
     TestnetFaucet,
@@ -13,7 +14,9 @@ import {
     MiltonStorageDai,
     MiltonStorageUsdc,
     MiltonStorageUsdt,
-    MiltonSpreadModel,
+    MiltonSpreadModelUsdt,
+    MiltonSpreadModelUsdc,
+    MiltonSpreadModelDai,
     IporOracle,
     MiltonUsdc,
     MiltonUsdt,
@@ -30,7 +33,9 @@ import {
     miltonStorageUsdcFactory,
     miltonStorageUsdtFactory,
     miltonStorageSetup,
-    miltonSpreadModelFactory,
+    miltonSpreadModelUsdtFactory,
+    miltonSpreadModelUsdcFactory,
+    miltonSpreadModelDaiFactory,
     miltonDaiFactory,
     miltonUsdcFactory,
     miltonUsdtFactory,
@@ -82,9 +87,9 @@ export type DeployType = {
     aUsdt: ERC20;
     aaveToken: ERC20;
     compToken: ERC20;
-    cDai: ERC20;
-    cUsdc: ERC20;
-    cUsdt: ERC20;
+    cDai: MockCUSDT;
+    cUsdc: MockCUSDT;
+    cUsdt: MockCUSDT;
     testnetFaucet: TestnetFaucet;
     ipTokenDai: IpToken;
     ipTokenUsdc: IpToken;
@@ -93,6 +98,7 @@ export type DeployType = {
     ivTokenUsdc: IvToken;
     ivTokenUsdt: IvToken;
     strategyAaveDai: StrategyAave;
+    strategyAaveDaiV2: StrategyAave;
     strategyAaveUsdc: StrategyAave;
     strategyAaveUsdt: StrategyAave;
     strategyCompoundDai: StrategyCompound;
@@ -104,7 +110,9 @@ export type DeployType = {
     miltonStorageDai: MiltonStorageDai;
     miltonStorageUsdc: MiltonStorageUsdc;
     miltonStorageUsdt: MiltonStorageUsdt;
-    miltonSpreadModel: MiltonSpreadModel;
+    miltonSpreadModelUsdt: MiltonSpreadModelUsdt;
+    miltonSpreadModelUsdc: MiltonSpreadModelUsdc;
+    miltonSpreadModelDai: MiltonSpreadModelDai;
     miltonFacadeDataProvider: MiltonFacadeDataProvider;
     iporOracle: IporOracle;
     miltonDai: MiltonDai;
@@ -141,6 +149,7 @@ export const deploy = async (): Promise<DeployType> => {
     const ivTokenDai = await ivTokenDaiFactory();
 
     const strategyAaveDai = await aaveDaiStrategyFactory();
+    const strategyAaveDaiV2 = await aaveDaiStrategyFactory();
     const strategyAaveUsdc = await aaveUsdcStrategyFactory();
     const strategyAaveUsdt = await aaveUsdtStrategyFactory();
 
@@ -169,7 +178,9 @@ export const deploy = async (): Promise<DeployType> => {
     const miltonStorageDai = await miltonStorageDaiFactory();
     const miltonStorageUsdc = await miltonStorageUsdcFactory();
     const miltonStorageUsdt = await miltonStorageUsdtFactory();
-    const miltonSpreadModel = await miltonSpreadModelFactory();
+    const miltonSpreadModelUsdt = await miltonSpreadModelUsdtFactory();
+    const miltonSpreadModelUsdc = await miltonSpreadModelUsdcFactory();
+    const miltonSpreadModelDai = await miltonSpreadModelDaiFactory();
 
     const assets = [usdt.address, usdc.address, dai.address];
 
@@ -200,23 +211,23 @@ export const deploy = async (): Promise<DeployType> => {
 
     const iporOracle = await iporOracleFactory(initialParams);
 
-    const miltonDai = await miltonDaiFactory(
+    const miltonUsdt = await miltonUsdtFactory(
         iporOracle.address,
-        miltonStorageDai.address,
-        miltonSpreadModel.address,
-        stanleyDai.address
+        miltonStorageUsdt.address,
+        miltonSpreadModelUsdt.address,
+        stanleyUsdt.address
     );
     const miltonUsdc = await miltonUsdcFactory(
         iporOracle.address,
         miltonStorageUsdc.address,
-        miltonSpreadModel.address,
+        miltonSpreadModelUsdc.address,
         stanleyUsdc.address
     );
-    const miltonUsdt = await miltonUsdtFactory(
+    const miltonDai = await miltonDaiFactory(
         iporOracle.address,
-        miltonStorageUsdt.address,
-        miltonSpreadModel.address,
-        stanleyUsdt.address
+        miltonStorageDai.address,
+        miltonSpreadModelDai.address,
+        stanleyDai.address
     );
 
     const josephDai = await josephDaiFactory(
@@ -272,6 +283,7 @@ export const deploy = async (): Promise<DeployType> => {
         ivTokenUsdc,
         ivTokenUsdt,
         strategyAaveDai,
+        strategyAaveDaiV2,
         strategyAaveUsdc,
         strategyAaveUsdt,
         strategyCompoundDai,
@@ -283,7 +295,9 @@ export const deploy = async (): Promise<DeployType> => {
         miltonStorageDai,
         miltonStorageUsdc,
         miltonStorageUsdt,
-        miltonSpreadModel,
+        miltonSpreadModelUsdt,
+        miltonSpreadModelUsdc,
+        miltonSpreadModelDai,
         miltonFacadeDataProvider,
         iporOracle,
         miltonDai,
@@ -308,6 +322,7 @@ export const setup = async (deployed: DeployType) => {
         ivTokenUsdc,
         ivTokenDai,
         strategyAaveDai,
+		strategyAaveDaiV2,
         strategyAaveUsdc,
         strategyAaveUsdt,
         strategyCompoundDai,
@@ -349,6 +364,7 @@ export const setup = async (deployed: DeployType) => {
     await ivTokenSetup(ivTokenUsdt, stanleyUsdt.address);
 
     await strategyAaveSetup(strategyAaveDai, stanleyDai.address);
+	await strategyAaveSetup(strategyAaveDaiV2, stanleyDai.address);
     await strategyAaveSetup(strategyAaveUsdc, stanleyUsdc.address);
     await strategyAaveSetup(strategyAaveUsdt, stanleyUsdt.address);
 

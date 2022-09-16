@@ -12,8 +12,6 @@ import "solidity-coverage";
 import "@typechain/hardhat";
 import "hardhat-abi-exporter";
 import networks from "./hardhat.network";
-import "dotenv";
-
 import "@hardhat-docgen/core";
 import "@hardhat-docgen/markdown";
 
@@ -39,7 +37,7 @@ console.log("Hardhat Mocha Jobs =", jobs);
  */
 export default {
     solidity: {
-        version: "0.8.15",
+        version: "0.8.16",
         settings: {
             optimizer: {
                 enabled: true,

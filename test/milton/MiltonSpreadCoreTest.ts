@@ -1,15 +1,15 @@
 import hre from "hardhat";
 import chai from "chai";
 import { Signer, BigNumber } from "ethers";
-import { MockBaseMiltonSpreadModel } from "../../types";
-import { prepareMockMiltonSpreadModel, prepareMiltonSpreadBase } from "../utils/MiltonUtils";
+import { MockBaseMiltonSpreadModelDai } from "../../types";
+import { prepareMockMiltonSpreadModelDai, prepareMiltonSpreadBaseDai } from "../utils/MiltonUtils";
 
 import { assertError } from "../utils/AssertUtils";
 
 const { expect } = chai;
 
 describe("MiltonSpreadModel - Core", () => {
-    let miltonSpreadModel: MockBaseMiltonSpreadModel;
+    let miltonSpreadModel: MockBaseMiltonSpreadModelDai;
     let admin: Signer,
         userOne: Signer,
         userTwo: Signer,
@@ -18,12 +18,12 @@ describe("MiltonSpreadModel - Core", () => {
 
     before(async () => {
         [admin, userOne, userTwo, userThree, liquidityProvider] = await hre.ethers.getSigners();
-        miltonSpreadModel = await prepareMockMiltonSpreadModel();
+        miltonSpreadModel = await prepareMockMiltonSpreadModelDai();
     });
 
     it("should transfer ownership - simple case 1", async () => {
         //given
-        const miltonSpread = await prepareMiltonSpreadBase();
+        const miltonSpread = await prepareMiltonSpreadBaseDai();
         const expectedNewOwner = userTwo;
 
         //when
@@ -38,7 +38,7 @@ describe("MiltonSpreadModel - Core", () => {
 
     it("should NOT transfer ownership - sender not current owner", async () => {
         //given
-        const miltonSpread = await prepareMiltonSpreadBase();
+        const miltonSpread = await prepareMiltonSpreadBaseDai();
         const expectedNewOwner = userTwo;
 
         //when
@@ -51,7 +51,7 @@ describe("MiltonSpreadModel - Core", () => {
 
     it("should NOT confirm transfer ownership - sender not appointed owner", async () => {
         //given
-        const miltonSpread = await prepareMiltonSpreadBase();
+        const miltonSpread = await prepareMiltonSpreadBaseDai();
         const expectedNewOwner = userTwo;
 
         //when
@@ -66,7 +66,7 @@ describe("MiltonSpreadModel - Core", () => {
 
     it("should NOT confirm transfer ownership twice - sender not appointed owner", async () => {
         //given
-        const miltonSpread = await prepareMiltonSpreadBase();
+        const miltonSpread = await prepareMiltonSpreadBaseDai();
         const expectedNewOwner = userTwo;
 
         //when
@@ -82,7 +82,7 @@ describe("MiltonSpreadModel - Core", () => {
 
     it("should NOT transfer ownership - sender already lost ownership", async () => {
         //given
-        const miltonSpread = await prepareMiltonSpreadBase();
+        const miltonSpread = await prepareMiltonSpreadBaseDai();
         const expectedNewOwner = userTwo;
 
         await miltonSpread.connect(admin).transferOwnership(await expectedNewOwner.getAddress());
@@ -99,7 +99,7 @@ describe("MiltonSpreadModel - Core", () => {
 
     it("should have rights to transfer ownership - sender still have rights", async () => {
         //given
-        const miltonSpread = await prepareMiltonSpreadBase();
+        const miltonSpread = await prepareMiltonSpreadBaseDai();
 
         const expectedNewOwner = userTwo;
 
@@ -111,9 +111,9 @@ describe("MiltonSpreadModel - Core", () => {
         expect(await admin.getAddress()).to.be.equal(actualNewOwner);
     });
 
-    it("Should return proper constant", async () => {
+    it("Should return proper constant for DAI", async () => {
         // given
-        const miltonSpread = await prepareMiltonSpreadBase();
+        const miltonSpread = await prepareMiltonSpreadBaseDai();
 
         // when
         const payFixedRegionOneBase = await miltonSpread.getPayFixedRegionOneBase();
@@ -138,33 +138,33 @@ describe("MiltonSpreadModel - Core", () => {
             await miltonSpread.getReceiveFixedRegionTwoSlopeForMeanReversion();
 
         // then
-        expect(payFixedRegionOneBase).to.be.equal(BigNumber.from("1570169440701153"));
+        expect(payFixedRegionOneBase).to.be.equal(BigNumber.from("223452028860278"));
         expect(payFixedRegionOneSlopeForVolatility).to.be.equal(
-            BigNumber.from("198788881093494850")
+            BigNumber.from("66176612458519781376")
         );
         expect(payFixedRegionOneSlopeForMeanReversion).to.be.equal(
-            BigNumber.from("-38331366057144010")
+            BigNumber.from("-1186134254033851648")
         );
-        expect(payFixedRegionTwoBase).to.be.equal(BigNumber.from("5957385912947852"));
+        expect(payFixedRegionTwoBase).to.be.equal(BigNumber.from("145660962344800"));
         expect(payFixedRegionTwoSlopeForVolatility).to.be.equal(
-            BigNumber.from("422085481190794900")
+            BigNumber.from("213838820626510938112")
         );
         expect(payFixedRegionTwoSlopeForMeanReversion).to.be.equal(
-            BigNumber.from("-1044585377149331200")
+            BigNumber.from("-963243845920214784")
         );
-        expect(receiveFixedRegionOneBase).to.be.equal(BigNumber.from("237699618248428"));
+        expect(receiveFixedRegionOneBase).to.be.equal(BigNumber.from("-86557160865515"));
         expect(receiveFixedRegionOneSlopeForVolatility).to.be.equal(
-            BigNumber.from("35927957683456455")
+            BigNumber.from("-37390455427043344384")
         );
         expect(receiveFixedRegionOneSlopeForMeanReversion).to.be.equal(
-            BigNumber.from("10158530403206013")
+            BigNumber.from("-1129730689647621632")
         );
-        expect(receiveFixedRegionTwoBase).to.be.equal(BigNumber.from("-493406136001736"));
+        expect(receiveFixedRegionTwoBase).to.be.equal(BigNumber.from("-55994330424481"));
         expect(receiveFixedRegionTwoSlopeForVolatility).to.be.equal(
-            BigNumber.from("-2696690872084165600")
+            BigNumber.from("-89741154814986338304")
         );
         expect(receiveFixedRegionTwoSlopeForMeanReversion).to.be.equal(
-            BigNumber.from("-923865786926514900")
+            BigNumber.from("37480678662666200")
         );
     });
 });

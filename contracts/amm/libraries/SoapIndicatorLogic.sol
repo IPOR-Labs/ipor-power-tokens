@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.15;
+pragma solidity 0.8.16;
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import "../../libraries/errors/MiltonErrors.sol";
 import "../../libraries/Constants.sol";
@@ -77,7 +77,7 @@ library SoapIndicatorLogic {
             swapFixedInterestRate
         );
 
-        if (newAverageInterestRate != 0) {
+        if (newAverageInterestRate > 0) {
             uint256 currentQuasiHypoteticalInterestTotal = calculateQuasiHyphoteticalInterestTotal(
                 si,
                 rebalanceTimestamp

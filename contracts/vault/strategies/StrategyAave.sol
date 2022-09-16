@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.15;
+pragma solidity 0.8.16;
 
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
@@ -30,6 +30,11 @@ contract StrategyAave is StrategyCore, IStrategyAave {
     StakedAaveInterface private _stakedAaveInterface;
     AaveIncentivesInterface private _aaveIncentive;
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     /**
      * @param asset underlying token like DAI, USDT etc.
      * @param aToken share token like aDAI etc.
@@ -46,7 +51,9 @@ contract StrategyAave is StrategyCore, IStrategyAave {
         address aaveIncentive,
         address aaveToken
     ) public initializer nonReentrant {
+        __Pausable_init();
         __Ownable_init();
+        __UUPSUpgradeable_init();
 
         require(asset != address(0), IporErrors.WRONG_ADDRESS);
         require(aToken != address(0), IporErrors.WRONG_ADDRESS);
@@ -58,7 +65,11 @@ contract StrategyAave is StrategyCore, IStrategyAave {
         _asset = asset;
         _shareToken = aToken;
         _provider = AaveLendingPoolProviderV2(addressesProvider);
-        IERC20Upgradeable(_asset).safeApprove(_provider.getLendingPool(), type(uint256).max);
+
+        address lendingPoolAddress = _provider.getLendingPool();
+        require(lendingPoolAddress != address(0), IporErrors.WRONG_ADDRESS);
+        IERC20Upgradeable(_asset).safeApprove(lendingPoolAddress, type(uint256).max);
+
         _stakedAaveInterface = StakedAaveInterface(stkAave);
         _aaveIncentive = AaveIncentivesInterface(aaveIncentive);
         _stkAave = stkAave;
@@ -70,7 +81,10 @@ contract StrategyAave is StrategyCore, IStrategyAave {
      * @dev get current APY, represented in 18 decimals
      */
     function getApr() external view override returns (uint256 apr) {
-        AaveLendingPoolV2 lendingPool = AaveLendingPoolV2(_provider.getLendingPool());
+        address lendingPoolAddress = _provider.getLendingPool();
+        require(lendingPoolAddress != address(0), IporErrors.WRONG_ADDRESS);
+        AaveLendingPoolV2 lendingPool = AaveLendingPoolV2(lendingPoolAddress);
+
         DataTypesContract.ReserveData memory reserveData = lendingPool.getReserveData(_asset);
         apr = IporMath.division(reserveData.currentLiquidityRate, (10**9));
     }
@@ -90,32 +104,55 @@ contract StrategyAave is StrategyCore, IStrategyAave {
      * @notice deposit can only done by owner.
      * @param wadAmount amount to deposit in _aave lending.
      */
-    function deposit(uint256 wadAmount) external override whenNotPaused onlyStanley {
+    function deposit(uint256 wadAmount)
+        external
+        override
+        whenNotPaused
+        onlyStanley
+        returns (uint256 depositedAmount)
+    {
         address asset = _asset;
+        uint256 assetDecimals = IERC20Metadata(asset).decimals();
 
-        uint256 amount = IporMath.convertWadToAssetDecimals(
-            wadAmount,
-            IERC20Metadata(asset).decimals()
-        );
+        uint256 amount = IporMath.convertWadToAssetDecimals(wadAmount, assetDecimals);
         IERC20Upgradeable(asset).safeTransferFrom(_msgSender(), address(this), amount);
 
-        AaveLendingPoolV2 lendingPool = AaveLendingPoolV2(_provider.getLendingPool());
+        address lendingPoolAddress = _provider.getLendingPool();
+        require(lendingPoolAddress != address(0), IporErrors.WRONG_ADDRESS);
 
-        lendingPool.deposit(asset, amount, address(this), 0); // 29 -> referral
+        AaveLendingPoolV2 lendingPool = AaveLendingPoolV2(lendingPoolAddress);
+        lendingPool.deposit(asset, amount, address(this), 0);
+        depositedAmount = IporMath.convertToWad(amount, assetDecimals);
     }
 
     /**
      * @dev withdraw from _aave lending.
-     * @notice withdraw can only done by owner.
+     * @notice withdraw can only done by Stanley.
      * @param wadAmount amount to withdraw from _aave lending.
      */
-    function withdraw(uint256 wadAmount) external override whenNotPaused onlyStanley {
+    function withdraw(uint256 wadAmount)
+        external
+        override
+        whenNotPaused
+        onlyStanley
+        returns (uint256 withdrawnAmount)
+    {
         address asset = _asset;
-        uint256 amount = IporMath.convertWadToAssetDecimals(
-            wadAmount,
-            IERC20Metadata(asset).decimals()
+        uint256 assetDecimals = IERC20Metadata(asset).decimals();
+        uint256 amount = IporMath.convertWadToAssetDecimals(wadAmount, assetDecimals);
+
+        address lendingPoolAddress = _provider.getLendingPool();
+
+        require(lendingPoolAddress != address(0), IporErrors.WRONG_ADDRESS);
+
+        //Transfer assets from Aave directly to msgSender which is Stanley
+        uint256 withdrawnAmountAave = AaveLendingPoolV2(lendingPoolAddress).withdraw(
+            asset,
+            amount,
+            _msgSender()
         );
-        AaveLendingPoolV2(_provider.getLendingPool()).withdraw(asset, amount, _msgSender());
+
+        withdrawnAmount = IporMath.convertToWad(withdrawnAmountAave, assetDecimals);
     }
 
     /**
