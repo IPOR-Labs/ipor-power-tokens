@@ -1,4 +1,4 @@
-import hre from "hardhat";
+import hre, { upgrades } from "hardhat";
 import { expect } from "chai";
 import { Signer, BigNumber } from "ethers";
 
@@ -6,7 +6,6 @@ import {
     MiltonUsdcMockCase,
     MiltonUsdtMockCase,
     MiltonDaiMockCase,
-    MockMiltonSpreadModel,
     MiltonUsdcCase,
     MiltonUsdtCase,
     MiltonDaiCase,
@@ -28,6 +27,7 @@ import {
 import { MockStanley, MockStanleyCase, getMockStanleyCase } from "./StanleyUtils";
 import { prepareIporOracle } from "./IporOracleUtils";
 import {
+    MockBaseMiltonSpreadModelDai,
     DaiMockedToken,
     UsdtMockedToken,
     UsdcMockedToken,
@@ -37,9 +37,12 @@ import {
     MockMiltonStorage,
     MockSpreadModel,
     MiltonSpreadModel,
-    MockCase8MiltonDai,
+    IporToken,
 } from "../../types";
+
 import {
+    USD_10_000_000,
+    USD_1_000_000,
     TC_DEFAULT_EMA_18DEC,
     USD_10_000_6DEC,
     TOTAL_SUPPLY_6_DECIMALS,
@@ -53,6 +56,8 @@ import {
     N0__01_18DEC,
     N1__0_18DEC,
     YEAR_IN_SECONDS,
+    LEG_PAY_FIXED,
+    LEG_RECEIVE_FIXED,
 } from "./Constants";
 
 const { ethers } = hre;
@@ -86,12 +91,23 @@ export type TestData = {
     iporOracle: ItfIporOracle;
 };
 
+export type TestDataMining = {
+    executionTimestamp: BigNumber;
+    tokenDai?: DaiMockedToken;
+    tokenUsdt?: UsdtMockedToken;
+    tokenUsdc?: UsdcMockedToken;
+    ipTokenUsdt?: IpToken;
+    ipTokenUsdc?: IpToken;
+    ipTokenDai?: IpToken;
+    iporToken?: IporToken;
+};
+
 export const prepareTestData = async (
     executionTimestamp: BigNumber,
     accounts: Signer[],
     assets: AssetsType[],
     emas: BigNumber[],
-    miltonSpreadModel: MockMiltonSpreadModel | MiltonSpreadModel | MockSpreadModel, //data
+    miltonSpreadModel: MockBaseMiltonSpreadModelDai | MiltonSpreadModel | MockSpreadModel, //data
     miltonUsdcCase: MiltonUsdcCase,
     miltonUsdtCase: MiltonUsdtCase,
     miltonDaiCase: MiltonDaiCase,
@@ -184,26 +200,46 @@ export const prepareTestData = async (
     if (tokenUsdt) {
         stanleyUsdt = await getMockStanleyCase(stanleyCaseNumber, tokenUsdt.address);
         ipTokenUsdt = (await IpToken.deploy("IP USDT", "ipUSDT", tokenUsdt.address)) as IpToken;
-        miltonStorageUsdt = (await MiltonStorage.deploy()) as MiltonStorage;
-        miltonStorageUsdt.initialize();
 
-        miltonUsdt = await getMockMiltonUsdtCase(miltonUsdtCase);
-        miltonUsdt.initialize(
-            tokenUsdt.address,
-            iporOracle.address,
-            miltonStorageUsdt.address,
-            miltonSpreadModel.address,
-            stanleyUsdt.address
-        );
+        miltonStorageUsdt = (await upgrades.deployProxy(MiltonStorage, [], {
+            kind: "uups",
+        })) as MiltonStorage;
 
-        josephUsdt = await getMockJosephUsdtCase(josephCaseUsdt);
-        await josephUsdt.initialize(
-            tokenUsdt.address,
-            ipTokenUsdt.address,
-            miltonUsdt.address,
-            miltonStorageUsdt.address,
-            stanleyUsdt.address
-        );
+        const MiltonUSDT = await ethers.getContractFactory(miltonUsdtCase);
+        miltonUsdt = (await upgrades.deployProxy(
+            MiltonUSDT,
+            [
+                false,
+                tokenUsdt.address,
+                iporOracle.address,
+                miltonStorageUsdt.address,
+                miltonSpreadModel.address,
+                stanleyUsdt.address,
+            ],
+            {
+                kind: "uups",
+            }
+        )) as MiltonUsdtMockCase;
+
+        let JosephUsdt = await ethers.getContractFactory(josephCaseUsdt);
+        josephUsdt = (await upgrades.deployProxy(
+            JosephUsdt,
+            [
+                false,
+                tokenUsdt.address,
+                ipTokenUsdt.address,
+                miltonUsdt.address,
+                miltonStorageUsdt.address,
+                stanleyUsdt.address,
+            ],
+            {
+                kind: "uups",
+            }
+        )) as JosephUsdtMocks;
+
+        await josephUsdt.setMaxLiquidityPoolBalance(USD_10_000_000);
+        await josephUsdt.setMaxLpAccountContribution(USD_1_000_000);
+
         await miltonStorageUsdt.setJoseph(josephUsdt.address);
         await miltonStorageUsdt.setMilton(miltonUsdt.address);
 
@@ -219,27 +255,44 @@ export const prepareTestData = async (
 
         ipTokenUsdc = (await IpToken.deploy("IP USDC", "ipUSDC", tokenUsdc.address)) as IpToken;
 
-        miltonStorageUsdc = (await MiltonStorage.deploy()) as MiltonStorage;
-        miltonStorageUsdc.initialize();
+        miltonStorageUsdc = (await upgrades.deployProxy(MiltonStorage, [], {
+            kind: "uups",
+        })) as MiltonStorage;
 
-        miltonUsdc = await getMockMiltonUsdcCase(miltonUsdcCase);
-        await miltonUsdc.deployed();
-        miltonUsdc.initialize(
-            tokenUsdc.address,
-            iporOracle.address,
-            miltonStorageUsdc.address,
-            miltonSpreadModel.address,
-            stanleyUsdc.address
-        );
+        const MiltonUSDC = await ethers.getContractFactory(miltonUsdcCase);
+        miltonUsdc = (await upgrades.deployProxy(
+            MiltonUSDC,
+            [
+                false,
+                tokenUsdc.address,
+                iporOracle.address,
+                miltonStorageUsdc.address,
+                miltonSpreadModel.address,
+                stanleyUsdc.address,
+            ],
+            {
+                kind: "uups",
+            }
+        )) as MiltonUsdcMockCase;
 
-        josephUsdc = await getMockJosephUsdcCase(josephCaseUsdc);
-        await josephUsdc.initialize(
-            tokenUsdc.address,
-            ipTokenUsdc.address,
-            miltonUsdc.address,
-            miltonStorageUsdc.address,
-            stanleyUsdc.address
-        );
+        let JosephUsdc = await ethers.getContractFactory(josephCaseUsdc);
+        josephUsdc = (await upgrades.deployProxy(
+            JosephUsdc,
+            [
+                false,
+                tokenUsdc.address,
+                ipTokenUsdc.address,
+                miltonUsdc.address,
+                miltonStorageUsdc.address,
+                stanleyUsdc.address,
+            ],
+            {
+                kind: "uups",
+            }
+        )) as JosephUsdcMocks;
+
+        await josephUsdc.setMaxLiquidityPoolBalance(USD_10_000_000);
+        await josephUsdc.setMaxLpAccountContribution(USD_1_000_000);
 
         await miltonStorageUsdc.setJoseph(josephUsdc.address);
         await miltonStorageUsdc.setMilton(miltonUsdc.address);
@@ -256,26 +309,44 @@ export const prepareTestData = async (
 
         ipTokenDai = (await IpToken.deploy("IP DAI", "ipDAI", tokenDai.address)) as IpToken;
 
-        miltonStorageDai = (await MiltonStorage.deploy()) as MiltonStorage;
-        miltonStorageDai.initialize();
+        miltonStorageDai = (await upgrades.deployProxy(MiltonStorage, [], {
+            kind: "uups",
+        })) as MiltonStorage;
 
-        miltonDai = await getMockMiltonDaiCase(miltonDaiCase);
-        miltonDai.initialize(
-            tokenDai.address,
-            iporOracle.address,
-            miltonStorageDai.address,
-            miltonSpreadModel.address,
-            stanleyDai.address
-        );
+        const MiltonDAI = await ethers.getContractFactory(miltonDaiCase);
+        miltonDai = (await upgrades.deployProxy(
+            MiltonDAI,
+            [
+                false,
+                tokenDai.address,
+                iporOracle.address,
+                miltonStorageDai.address,
+                miltonSpreadModel.address,
+                stanleyDai.address,
+            ],
+            {
+                kind: "uups",
+            }
+        )) as MiltonDaiMockCase;
 
-        josephDai = await getMockJosephDaiCase(josephCaseDai);
-        await josephDai.initialize(
-            tokenDai.address,
-            ipTokenDai.address,
-            miltonDai.address,
-            miltonStorageDai.address,
-            stanleyDai.address
-        );
+        let JosephDai = await ethers.getContractFactory(josephCaseDai);
+        josephDai = (await upgrades.deployProxy(
+            JosephDai,
+            [
+                false,
+                tokenDai.address,
+                ipTokenDai.address,
+                miltonDai.address,
+                miltonStorageDai.address,
+                stanleyDai.address,
+            ],
+            {
+                kind: "uups",
+            }
+        )) as JosephDaiMocks;
+
+        await josephDai.setMaxLiquidityPoolBalance(USD_10_000_000);
+        await josephDai.setMaxLpAccountContribution(USD_1_000_000);
 
         await miltonStorageDai.setJoseph(josephDai.address);
         await miltonStorageDai.setMilton(miltonDai.address);
@@ -308,6 +379,93 @@ export const prepareTestData = async (
         stanleyUsdt,
         stanleyUsdc,
         stanleyDai,
+    };
+};
+
+export const prepareTestDataForMining = async (
+    executionTimestamp: BigNumber,
+    accounts: Signer[],
+    assets: AssetsType[]
+): Promise<TestDataMining> => {
+    let tokenDai: DaiMockedToken | undefined;
+    let tokenUsdt: UsdtMockedToken | undefined;
+    let tokenUsdc: UsdcMockedToken | undefined;
+    let ipTokenUsdt: IpToken | undefined;
+    let ipTokenUsdc: IpToken | undefined;
+    let ipTokenDai: IpToken | undefined;
+    let iporToken: IporToken | undefined;
+
+    const IpToken = await ethers.getContractFactory("IpToken");
+    const IporToken = await ethers.getContractFactory("IporToken");
+    const UsdtMockedToken = await ethers.getContractFactory("UsdtMockedToken");
+    const UsdcMockedToken = await ethers.getContractFactory("UsdcMockedToken");
+    const DaiMockedToken = await ethers.getContractFactory("DaiMockedToken");
+
+    const assetsAddr: string[] = [];
+    const lastUpdateTimestamps: BigNumber[] = [];
+
+    for (let k = 0; k < assets.length; k++) {
+        if (assets[k] === "USDT") {
+            tokenUsdt = (await UsdtMockedToken.deploy(
+                TOTAL_SUPPLY_6_DECIMALS,
+                6
+            )) as UsdtMockedToken;
+            await tokenUsdt.deployed();
+            assetsAddr.push(tokenUsdt.address);
+            lastUpdateTimestamps.push(executionTimestamp);
+        }
+        if (assets[k] === "USDC") {
+            tokenUsdc = (await UsdcMockedToken.deploy(
+                TOTAL_SUPPLY_6_DECIMALS,
+                6
+            )) as UsdcMockedToken;
+            await tokenUsdc.deployed();
+            assetsAddr.push(tokenUsdc.address);
+            lastUpdateTimestamps.push(executionTimestamp);
+        }
+
+        if (assets[k] === "DAI") {
+            tokenDai = (await DaiMockedToken.deploy(
+                TOTAL_SUPPLY_18_DECIMALS,
+                18
+            )) as DaiMockedToken;
+            await tokenDai.deployed();
+            assetsAddr.push(tokenDai.address);
+            lastUpdateTimestamps.push(executionTimestamp);
+        }
+    }
+
+    iporToken = (await IporToken.deploy(
+        "IPOR Token",
+        "IPOR",
+        await accounts[0].getAddress()
+    )) as IporToken;
+
+    if (tokenUsdt) {
+        ipTokenUsdt = (await IpToken.deploy("IP USDT", "ipUSDT", tokenUsdt.address)) as IpToken;
+        await ipTokenUsdt.setJoseph(await accounts[0].getAddress());
+    }
+
+    if (tokenUsdc) {
+        ipTokenUsdc = (await IpToken.deploy("IP USDC", "ipUSDC", tokenUsdc.address)) as IpToken;
+
+        await ipTokenUsdc.setJoseph(await accounts[0].getAddress());
+    }
+
+    if (tokenDai) {
+        ipTokenDai = (await IpToken.deploy("IP DAI", "ipDAI", tokenDai.address)) as IpToken;
+        await ipTokenDai.setJoseph(await accounts[0].getAddress());
+    }
+
+    return {
+        executionTimestamp,
+        tokenDai,
+        tokenUsdt,
+        tokenUsdc,
+        ipTokenUsdt,
+        ipTokenUsdc,
+        ipTokenDai,
+        iporToken,
     };
 };
 
@@ -358,7 +516,7 @@ export const setupTokenDaiInitialValuesForUsers = async (users: Signer[], testDa
 export const prepareTestDataDaiCase000 = async (
     executionTimestamp: BigNumber,
     accounts: Signer[],
-    miltonSpreadModel: MockSpreadModel | MockMiltonSpreadModel, //data
+    miltonSpreadModel: MockSpreadModel | MockBaseMiltonSpreadModelDai, //data
     ema: BigNumber,
     iporOracleOption?: ItfIporOracle
 ): Promise<TestData> => {
@@ -382,7 +540,7 @@ export const prepareTestDataDaiCase000 = async (
 export const prepareTestDataDaiCase700 = async (
     executionTimestamp: BigNumber,
     accounts: Signer[],
-    miltonSpreadModel: MockMiltonSpreadModel | MockSpreadModel //data
+    miltonSpreadModel: MockBaseMiltonSpreadModelDai | MockSpreadModel //data
 ): Promise<TestData> => {
     return await prepareTestData(
         executionTimestamp,
@@ -402,7 +560,7 @@ export const prepareTestDataDaiCase700 = async (
 export const prepareTestDataDaiCase800 = async (
     executionTimestamp: BigNumber,
     accounts: Signer[],
-    miltonSpreadModel: MockMiltonSpreadModel | MockSpreadModel //data
+    miltonSpreadModel: MockBaseMiltonSpreadModelDai | MockSpreadModel //data
 ): Promise<TestData> => {
     return await prepareTestData(
         executionTimestamp,
@@ -423,7 +581,7 @@ export const prepareTestDataDaiCase800 = async (
 export const prepareTestDataDaiCase001 = async (
     executionTimestamp: BigNumber,
     accounts: Signer[],
-    miltonSpreadModel: MockMiltonSpreadModel | MockSpreadModel //data
+    miltonSpreadModel: MockBaseMiltonSpreadModelDai | MockSpreadModel //data
 ): Promise<TestData> => {
     return await prepareTestData(
         executionTimestamp,
@@ -444,7 +602,7 @@ export const prepareTestDataDaiCase001 = async (
 export const prepareTestDataUsdtCase000 = async (
     executionTimestamp: BigNumber,
     accounts: Signer[],
-    miltonSpreadModel: MockMiltonSpreadModel | MockSpreadModel
+    miltonSpreadModel: MockBaseMiltonSpreadModelDai | MockSpreadModel
 ) => {
     return await prepareTestData(
         executionTimestamp,
@@ -465,7 +623,7 @@ export const prepareTestDataUsdtCase000 = async (
 export const prepareComplexTestDataDaiCase000 = async (
     executionTimestamp: BigNumber,
     accounts: Signer[],
-    miltonSpreadModel: MockSpreadModel | MockMiltonSpreadModel,
+    miltonSpreadModel: MockSpreadModel | MockBaseMiltonSpreadModelDai,
     ema: BigNumber,
     iporOracleOption?: ItfIporOracle
 ) => {
@@ -484,7 +642,7 @@ export const prepareComplexTestDataDaiCase000 = async (
 export const prepareComplexTestDataDaiCase700 = async (
     executionTimestamp: BigNumber,
     accounts: Signer[],
-    miltonSpreadModel: MockMiltonSpreadModel | MockSpreadModel
+    miltonSpreadModel: MockBaseMiltonSpreadModelDai | MockSpreadModel
 ) => {
     const testData = (await prepareTestDataDaiCase700(
         executionTimestamp,
@@ -499,7 +657,7 @@ export const prepareComplexTestDataDaiCase700 = async (
 export const prepareComplexTestDataDaiCase800 = async (
     executionTimestamp: BigNumber,
     accounts: Signer[],
-    miltonSpreadModel: MockMiltonSpreadModel | MockSpreadModel
+    miltonSpreadModel: MockBaseMiltonSpreadModelDai | MockSpreadModel
 ) => {
     const testData = (await prepareTestDataDaiCase800(
         executionTimestamp,
@@ -514,7 +672,7 @@ export const prepareComplexTestDataDaiCase800 = async (
 export const prepareComplexTestDataUsdtCase000 = async (
     executionTimestamp: BigNumber,
     accounts: Signer[],
-    miltonSpreadModel: MockMiltonSpreadModel | MockSpreadModel
+    miltonSpreadModel: MockBaseMiltonSpreadModelDai | MockSpreadModel
 ) => {
     const testData = (await prepareTestDataUsdtCase000(
         executionTimestamp,
@@ -533,7 +691,7 @@ export const prepareComplexTestDataUsdtCase000 = async (
 export const prepareComplexTestDataDaiCase400 = async (
     executionTimestamp: BigNumber,
     accounts: Signer[],
-    miltonSpreadModel: MockMiltonSpreadModel | MockSpreadModel
+    miltonSpreadModel: MockBaseMiltonSpreadModelDai | MockSpreadModel
 ) => {
     const testData = await prepareTestData(
         executionTimestamp,
@@ -626,7 +784,7 @@ export const getPayFixedDerivativeParamsDAICase1 = (user: Signer, tokenDai: DaiM
         totalAmount: USD_10_000_18DEC,
         acceptableFixedInterestRate: BigNumber.from("6").mul(N0__01_18DEC),
         leverage: LEVERAGE_18DEC,
-        direction: 0,
+        direction: LEG_PAY_FIXED,
         openTimestamp: BigNumber.from(Math.floor(Date.now() / 1000)),
         from: user,
     };
@@ -637,7 +795,7 @@ export const getReceiveFixedDerivativeParamsDAICase1 = (user: Signer, tokenDai: 
         totalAmount: USD_10_000_18DEC,
         acceptableFixedInterestRate: N0__01_18DEC,
         leverage: LEVERAGE_18DEC,
-        direction: 1,
+        direction: LEG_RECEIVE_FIXED,
         openTimestamp: BigNumber.from(Math.floor(Date.now() / 1000)),
         from: user,
     };

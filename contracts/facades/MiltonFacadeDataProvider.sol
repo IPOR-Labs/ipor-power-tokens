@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.9;
+pragma solidity 0.8.16;
 
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "../interfaces/types/MiltonStorageTypes.sol";
 import "../interfaces/types/MiltonFacadeTypes.sol";
 import "../interfaces/IIporOracle.sol";
 import "../interfaces/IMilton.sol";
 import "../interfaces/IMiltonInternal.sol";
+import "../interfaces/IJosephInternal.sol";
 import "../interfaces/IJoseph.sol";
 import "../interfaces/IMiltonStorage.sol";
 import "../interfaces/IMiltonSpreadModel.sol";
@@ -15,13 +17,19 @@ import "../security/IporOwnableUpgradeable.sol";
 import "../amm/MiltonStorage.sol";
 
 contract MiltonFacadeDataProvider is
-    IporOwnableUpgradeable,
+    Initializable,
     UUPSUpgradeable,
+    IporOwnableUpgradeable,
     IMiltonFacadeDataProvider
 {
     address internal _iporOracle;
     address[] internal _assets;
     mapping(address => MiltonFacadeTypes.AssetConfig) internal _assetConfig;
+
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
 
     function initialize(
         address iporOracle,
@@ -37,6 +45,7 @@ contract MiltonFacadeDataProvider is
         require(iporOracle != address(0), IporErrors.WRONG_ADDRESS);
 
         __Ownable_init();
+        __UUPSUpgradeable_init();
         _iporOracle = iporOracle;
 
         uint256 assetsLength = assets.length;
@@ -56,7 +65,7 @@ contract MiltonFacadeDataProvider is
     }
 
     function getVersion() external pure override returns (uint256) {
-        return 1;
+        return 2;
     }
 
     function getConfiguration()
@@ -113,25 +122,25 @@ contract MiltonFacadeDataProvider is
         override
         returns (uint256 totalCount, MiltonFacadeTypes.IporSwap[] memory swaps)
     {
-        require(chunkSize != 0, IporErrors.CHUNK_SIZE_EQUAL_ZERO);
+        require(chunkSize > 0, IporErrors.CHUNK_SIZE_EQUAL_ZERO);
         require(chunkSize <= Constants.MAX_CHUNK_SIZE, IporErrors.CHUNK_SIZE_TOO_BIG);
 
         MiltonFacadeTypes.AssetConfig memory config = _assetConfig[asset];
         IMiltonStorage miltonStorage = IMiltonStorage(config.miltonStorage);
 
-        (uint256 totalCount, MiltonStorageTypes.IporSwapId[] memory swapIds) = miltonStorage
-            .getSwapIds(_msgSender(), offset, chunkSize);
+        MiltonStorageTypes.IporSwapId[] memory swapIds;
+
+        (totalCount, swapIds) = miltonStorage.getSwapIds(_msgSender(), offset, chunkSize);
 
         IMiltonInternal milton = IMiltonInternal(config.milton);
 
-        MiltonFacadeTypes.IporSwap[] memory iporDerivatives = new MiltonFacadeTypes.IporSwap[](
-            swapIds.length
-        );
+        swaps = new MiltonFacadeTypes.IporSwap[](swapIds.length);
+
         for (uint256 i = 0; i != swapIds.length; i++) {
             MiltonStorageTypes.IporSwapId memory swapId = swapIds[i];
             if (swapId.direction == 0) {
                 IporTypes.IporSwapMemory memory iporSwap = miltonStorage.getSwapPayFixed(swapId.id);
-                iporDerivatives[i] = _mapToIporSwap(
+                swaps[i] = _mapToIporSwap(
                     asset,
                     iporSwap,
                     0,
@@ -141,7 +150,7 @@ contract MiltonFacadeDataProvider is
                 IporTypes.IporSwapMemory memory iporSwap = miltonStorage.getSwapReceiveFixed(
                     swapId.id
                 );
-                iporDerivatives[i] = _mapToIporSwap(
+                swaps[i] = _mapToIporSwap(
                     asset,
                     iporSwap,
                     1,
@@ -149,8 +158,6 @@ contract MiltonFacadeDataProvider is
                 );
             }
         }
-
-        return (totalCount, iporDerivatives);
     }
 
     function _getIporOracle() internal view virtual returns (address) {
@@ -186,10 +193,12 @@ contract MiltonFacadeDataProvider is
     {
         MiltonFacadeTypes.AssetConfig memory config = _assetConfig[asset];
 
-        IMiltonStorage miltonStorage = IMiltonStorage(config.miltonStorage);
         address miltonAddr = config.milton;
+        address josephAddr = config.joseph;
 
         IMiltonInternal milton = IMiltonInternal(miltonAddr);
+        IJosephInternal joseph = IJosephInternal(josephAddr);
+
         IMiltonSpreadModel spreadModel = IMiltonSpreadModel(milton.getMiltonSpreadModel());
         IporTypes.AccruedIpor memory accruedIpor = IIporOracle(_getIporOracle()).getAccruedIndex(
             timestamp,
@@ -199,17 +208,9 @@ contract MiltonFacadeDataProvider is
         IporTypes.MiltonBalancesMemory memory balance = IMiltonInternal(miltonAddr)
             .getAccruedBalance();
 
-        int256 spreadPayFixed = spreadModel.calculateSpreadPayFixed(
-            miltonStorage.calculateSoapPayFixed(accruedIpor.ibtPrice, timestamp),
-            accruedIpor,
-            balance
-        );
+        int256 spreadPayFixed = spreadModel.calculateSpreadPayFixed(accruedIpor, balance);
 
-        int256 spreadReceiveFixed = spreadModel.calculateSpreadReceiveFixed(
-            miltonStorage.calculateSoapReceiveFixed(accruedIpor.ibtPrice, timestamp),
-            accruedIpor,
-            balance
-        );
+        int256 spreadReceiveFixed = spreadModel.calculateSpreadReceiveFixed(accruedIpor, balance);
 
         assetConfiguration = MiltonFacadeTypes.AssetConfiguration(
             asset,
@@ -222,7 +223,9 @@ contract MiltonFacadeDataProvider is
             spreadPayFixed,
             spreadReceiveFixed,
             milton.getMaxLpUtilizationRate(),
-            milton.getMaxLpUtilizationPerLegRate()
+            milton.getMaxLpUtilizationPerLegRate(),
+            joseph.getMaxLiquidityPoolBalance() * Constants.D18,
+            joseph.getMaxLpAccountContribution() * Constants.D18
         );
     }
 

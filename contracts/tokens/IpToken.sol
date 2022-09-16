@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.9;
+pragma solidity 0.8.16;
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -49,13 +49,13 @@ contract IpToken is IporOwnable, IIpToken, ERC20 {
     }
 
     function mint(address account, uint256 amount) external override onlyJoseph {
-        require(amount != 0, JosephErrors.IP_TOKEN_MINT_AMOUNT_TOO_LOW);
+        require(amount > 0, JosephErrors.IP_TOKEN_MINT_AMOUNT_TOO_LOW);
         _mint(account, amount);
         emit Mint(account, amount);
     }
 
     function burn(address account, uint256 amount) external override onlyJoseph {
-        require(amount != 0, JosephErrors.IP_TOKEN_BURN_AMOUNT_TOO_LOW);
+        require(amount > 0, JosephErrors.IP_TOKEN_BURN_AMOUNT_TOO_LOW);
         _burn(account, amount);
         emit Burn(account, amount);
     }

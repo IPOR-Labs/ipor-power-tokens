@@ -1,20 +1,23 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.9;
+pragma solidity 0.8.16;
 
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "../security/IporOwnableUpgradeable.sol";
 import "../libraries/errors/MocksErrors.sol";
 import "../interfaces/ITestnetFaucet.sol";
 
 contract TestnetFaucet is
-UUPSUpgradeable,
-IporOwnableUpgradeable,
-ReentrancyGuardUpgradeable,
-ITestnetFaucet
+    Initializable,
+    ReentrancyGuardUpgradeable,
+    UUPSUpgradeable,
+    IporOwnableUpgradeable,
+    ITestnetFaucet
 {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
@@ -25,12 +28,18 @@ ITestnetFaucet
     address internal _usdc;
     address internal _usdt;
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(
         address dai,
         address usdc,
         address usdt
     ) public initializer {
         __Ownable_init();
+        __UUPSUpgradeable_init();
         require(dai != address(0), IporErrors.WRONG_ADDRESS);
         require(usdc != address(0), IporErrors.WRONG_ADDRESS);
         require(usdt != address(0), IporErrors.WRONG_ADDRESS);
@@ -46,7 +55,7 @@ ITestnetFaucet
     receive() external payable {}
 
     function getVersion() external pure virtual returns (uint256) {
-        return 1;
+        return 2;
     }
 
     function claim() external override nonReentrant {
@@ -69,9 +78,9 @@ ITestnetFaucet
 
     function transfer(address asset, uint256 amount) external onlyOwner {
         require(asset != address(0), IporErrors.WRONG_ADDRESS);
-        require(amount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(amount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
-        ERC20Upgradeable token = ERC20Upgradeable(asset);
+        IERC20Upgradeable token = IERC20Upgradeable(asset);
         uint256 maxValue = token.balanceOf(address(this));
         require(amount <= maxValue, IporErrors.NOT_ENOUGH_AMOUNT_TO_TRANSFER);
         IERC20Upgradeable(asset).safeTransfer(_msgSender(), amount);
@@ -99,7 +108,7 @@ ITestnetFaucet
     }
 
     function _transfer(address asset) internal {
-        ERC20Upgradeable token = ERC20Upgradeable(asset);
+        IERC20MetadataUpgradeable token = IERC20MetadataUpgradeable(asset);
         uint256 value;
         value = 10_000 * 10**token.decimals();
         IERC20Upgradeable(asset).safeTransfer(msg.sender, value);

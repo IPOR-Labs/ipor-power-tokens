@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.9;
+pragma solidity 0.8.16;
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import "../../libraries/errors/MiltonErrors.sol";
 import "../../libraries/Constants.sol";
@@ -21,7 +21,7 @@ library SoapIndicatorLogic {
                 calculateQuasiHyphoteticalInterestTotal(si, calculateTimestamp)).toInt256();
     }
 
-    //@notice For highest precision there is no division by D18 * D18 * Constants.YEAR_IN_SECONDS
+    /// @notice For highest precision there is no division by D18 * D18 * Constants.YEAR_IN_SECONDS
     function calculateQuasiSoapReceiveFixed(
         AmmMiltonStorageTypes.SoapIndicatorsMemory memory si,
         uint256 calculateTimestamp,
@@ -77,7 +77,7 @@ library SoapIndicatorLogic {
             swapFixedInterestRate
         );
 
-        if (newAverageInterestRate != 0) {
+        if (newAverageInterestRate > 0) {
             uint256 currentQuasiHypoteticalInterestTotal = calculateQuasiHyphoteticalInterestTotal(
                 si,
                 rebalanceTimestamp
@@ -99,7 +99,7 @@ library SoapIndicatorLogic {
             si.totalIbtQuantity = si.totalIbtQuantity - derivativeIbtQuantity;
             si.averageInterestRate = newAverageInterestRate;
         } else {
-            //@dev when newAverageInterestRate = 0 it means in IPOR Protocol is closing the LAST derivative on this leg.
+            /// @dev when newAverageInterestRate = 0 it means in IPOR Protocol is closing the LAST derivative on this leg.
             si.rebalanceTimestamp = rebalanceTimestamp;
             si.quasiHypotheticalInterestCumulative = 0;
             si.totalNotional = 0;
@@ -118,7 +118,7 @@ library SoapIndicatorLogic {
     ) internal pure returns (uint256) {
         require(
             calculateTimestamp >= derivativeOpenTimestamp,
-            MiltonErrors.CALC_TIMESTAMP_HIGHER_THAN_SWAP_OPEN_TIMESTAMP
+            MiltonErrors.CALC_TIMESTAMP_LOWER_THAN_SWAP_OPEN_TIMESTAMP
         );
         return
             derivativeNotional *
@@ -141,7 +141,7 @@ library SoapIndicatorLogic {
             );
     }
 
-    //division by Constants.YEAR_IN_SECONDS * 1e36 postponed at the end of calculation
+    /// @dev division by Constants.YEAR_IN_SECONDS * 1e36 postponed at the end of calculation
     function calculateQuasiHypotheticalInterestDelta(
         uint256 calculateTimestamp,
         uint256 lastRebalanceTimestamp,

@@ -1,6 +1,6 @@
 //solhint-disable no-empty-blocks
 // SPDX-License-Identifier: agpl-3.0
-pragma solidity 0.8.9;
+pragma solidity 0.8.16;
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
@@ -21,8 +21,15 @@ contract MockTestnetStrategy is StrategyCore {
     uint256 private _depositsBalance;
     uint256 private _lastUpdateBalance;
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address asset, address shareToken) public initializer nonReentrant {
+        __Pausable_init();
         __Ownable_init();
+        __UUPSUpgradeable_init();
 
         require(asset != address(0), IporErrors.WRONG_ADDRESS);
         require(shareToken != address(0), IporErrors.WRONG_ADDRESS);
@@ -40,21 +47,26 @@ contract MockTestnetStrategy is StrategyCore {
         return _calculateNewBalance();
     }
 
-    function deposit(uint256 wadAmount) external override onlyStanley {
+    function deposit(uint256 wadAmount)
+        external
+        override
+        onlyStanley
+        returns (uint256 depositedAmount)
+    {
         address asset = _asset;
+        uint256 assetDecimals = IERC20Metadata(asset).decimals();
 
-        uint256 amount = IporMath.convertWadToAssetDecimals(
-            wadAmount,
-            IERC20Metadata(asset).decimals()
-        );
+        uint256 amount = IporMath.convertWadToAssetDecimals(wadAmount, assetDecimals);
+
         uint256 newDepositsBalance = _calculateNewBalance() +
             IporMath.convertToWad(amount, IERC20Metadata(asset).decimals());
         _depositsBalance = newDepositsBalance;
         _lastUpdateBalance = block.timestamp;
         IERC20Upgradeable(asset).safeTransferFrom(_msgSender(), address(this), amount);
+        return IporMath.convertToWad(amount, assetDecimals);
     }
 
-    function withdraw(uint256 wadAmount) external override onlyStanley {
+    function withdraw(uint256 wadAmount) external override onlyStanley returns (uint256) {
         address asset = _asset;
         uint256 amount = IporMath.convertWadToAssetDecimals(
             wadAmount,
@@ -65,6 +77,8 @@ contract MockTestnetStrategy is StrategyCore {
         _depositsBalance = newDepositsBalance;
         _lastUpdateBalance = block.timestamp;
         IERC20Upgradeable(asset).safeTransfer(_msgSender(), amount);
+
+        return wadAmount;
     }
 
     function doClaim() external override onlyOwner {}

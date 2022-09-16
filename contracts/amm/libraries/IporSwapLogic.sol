@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.9;
+pragma solidity 0.8.16;
 
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import "../../libraries/errors/MiltonErrors.sol";
@@ -10,11 +10,11 @@ import "../../libraries/math/IporMath.sol";
 library IporSwapLogic {
     using SafeCast for uint256;
 
-	/// @param totalAmount total amount represented in 18 decimals
-	/// @param leverage swap leverage, represented in 18 decimals
-	/// @param liquidationDepositAmount liquidation deposit amount, represented in 18 decimals
-	/// @param iporPublicationFeeAmount IPOR publication fee amount, represented in 18 decimals
-	/// @param openingFeeRate opening fee rate, represented in 18 decimals
+    /// @param totalAmount total amount represented in 18 decimals
+    /// @param leverage swap leverage, represented in 18 decimals
+    /// @param liquidationDepositAmount liquidation deposit amount, represented in 18 decimals
+    /// @param iporPublicationFeeAmount IPOR publication fee amount, represented in 18 decimals
+    /// @param openingFeeRate opening fee rate, represented in 18 decimals
     function calculateSwapAmount(
         uint256 totalAmount,
         uint256 leverage,
@@ -78,12 +78,12 @@ library IporSwapLogic {
         );
     }
 
+    /// @notice Calculates interests fixed and floating without division by Constants.D18 * Constants.YEAR_IN_SECONDS
     function calculateQuasiInterest(
         IporTypes.IporSwapMemory memory swap,
         uint256 closingTimestamp,
         uint256 mdIbtPrice
     ) internal pure returns (uint256 quasiIFixed, uint256 quasiIFloating) {
-        //iFixed = fixed interest rate * notional amount * T / Ty
         require(
             closingTimestamp >= swap.openTimestamp,
             MiltonErrors.CLOSING_TIMESTAMP_LOWER_THAN_SWAP_OPEN_TIMESTAMP
@@ -98,7 +98,7 @@ library IporSwapLogic {
         quasiIFloating = calculateQuasiInterestFloating(swap.ibtQuantity, mdIbtPrice);
     }
 
-    //@notice for final value divide by Constants.D18* Constants.YEAR_IN_SECONDS
+    /// @notice Calculates interest fixed without division by Constants.D18 * Constants.YEAR_IN_SECONDS
     function calculateQuasiInterestFixed(
         uint256 notional,
         uint256 swapFixedInterestRate,
@@ -112,7 +112,7 @@ library IporSwapLogic {
             swapPeriodInSeconds;
     }
 
-    //@notice for final value divide by Constants.D18 * Constants.YEAR_IN_SECONDS
+    /// @notice Calculates interest floating without division by Constants.D18 * Constants.YEAR_IN_SECONDS
     function calculateQuasiInterestFloating(uint256 ibtQuantity, uint256 ibtCurrentPrice)
         internal
         pure

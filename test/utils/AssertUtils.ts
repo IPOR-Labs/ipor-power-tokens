@@ -1,5 +1,5 @@
 import chai from "chai";
-import hre from "hardhat";
+import hre, { upgrades } from "hardhat";
 import { BigNumber, Signer } from "ethers";
 import { MockSpreadModel } from "../../types";
 import {
@@ -8,12 +8,9 @@ import {
     setupTokenDaiInitialValuesForUsers,
     TestData,
 } from "./DataUtils";
-import {
-    MockMiltonSpreadModel,
-    MiltonUsdcCase,
-    MiltonUsdtCase,
-    MiltonDaiCase,
-} from "./MiltonUtils";
+import { MiltonUsdcCase, MiltonUsdtCase, MiltonDaiCase } from "./MiltonUtils";
+
+import { MockBaseMiltonSpreadModelDai } from "../../types";
 
 import { Derivatives, countOpenSwaps } from "./SwapUtils";
 
@@ -22,6 +19,8 @@ import { MockStanleyCase } from "./StanleyUtils";
 import { openSwapPayFixed, openSwapReceiveFixed } from "./SwapUtils";
 
 import {
+    LEG_PAY_FIXED,
+    LEG_RECEIVE_FIXED,
     N0__1_18DEC,
     N0__01_18DEC,
     TC_TOTAL_AMOUNT_100_18DEC,
@@ -81,7 +80,7 @@ export const testCasePagination = async (
     pageSize: BigNumber,
     expectedResponseSize: BigNumber,
     expectedError: string | null,
-    miltonSpreadModel: MockMiltonSpreadModel | MockSpreadModel
+    miltonSpreadModel: MockBaseMiltonSpreadModelDai | MockSpreadModel
 ) => {
     //given
     const testData = await prepareTestData(
@@ -160,13 +159,19 @@ export const testCasePagination = async (
     const MiltonFacadeDataProvider = await hre.ethers.getContractFactory(
         "MiltonFacadeDataProvider"
     );
-    const miltonFacadeDataProvider = await MiltonFacadeDataProvider.deploy();
-    await miltonFacadeDataProvider.initialize(
-        iporOracle.address,
-        [tokenDai.address, tokenUsdt.address, tokenUsdc.address],
-        [miltonDai.address, miltonUsdt.address, miltonUsdc.address],
-        [miltonStorageDai.address, miltonStorageUsdt.address, miltonStorageUsdc.address],
-        [josephDai.address, josephUsdt.address, josephUsdc.address]
+
+    const miltonFacadeDataProvider = await upgrades.deployProxy(
+        MiltonFacadeDataProvider,
+        [
+            iporOracle.address,
+            [tokenDai.address, tokenUsdt.address, tokenUsdc.address],
+            [miltonDai.address, miltonUsdt.address, miltonUsdc.address],
+            [miltonStorageDai.address, miltonStorageUsdt.address, miltonStorageUsdc.address],
+            [josephDai.address, josephUsdt.address, josephUsdc.address],
+        ],
+        {
+            kind: "uups",
+        }
     );
 
     for (let i = 0; BigNumber.from(i).lt(numberOfSwapsToCreate); i++) {
@@ -243,7 +248,7 @@ export const assertSoapIndicator = async (
 export const assertExpectedValues = async function (
     testData: TestData,
     asset: string,
-    direction: number,
+    direction: BigNumber,
     openerUser: Signer,
     closerUser: Signer,
     miltonBalanceBeforePayout: BigNumber,
@@ -257,14 +262,14 @@ export const assertExpectedValues = async function (
 ) {
     let actualDerivatives: Derivatives | undefined;
     if (testData.miltonStorageUsdt && testData.tokenUsdt && asset === testData.tokenUsdt.address) {
-        if (direction == 0) {
+        if (direction == LEG_PAY_FIXED) {
             actualDerivatives = await testData.miltonStorageUsdt.getSwapsPayFixed(
                 await openerUser.getAddress(),
                 0,
                 50
             );
         }
-        if (direction == 1) {
+        if (direction == LEG_RECEIVE_FIXED) {
             actualDerivatives = await testData.miltonStorageUsdt.getSwapsReceiveFixed(
                 await openerUser.getAddress(),
                 0,
@@ -274,14 +279,14 @@ export const assertExpectedValues = async function (
     }
 
     if (testData.miltonStorageUsdc && testData.tokenUsdc && asset === testData.tokenUsdc.address) {
-        if (direction == 0) {
+        if (direction == LEG_PAY_FIXED) {
             actualDerivatives = await testData.miltonStorageUsdc.getSwapsPayFixed(
                 await openerUser.getAddress(),
                 0,
                 50
             );
         }
-        if (direction == 1) {
+        if (direction == LEG_RECEIVE_FIXED) {
             actualDerivatives = await testData.miltonStorageUsdc.getSwapsReceiveFixed(
                 await openerUser.getAddress(),
                 0,
@@ -291,14 +296,14 @@ export const assertExpectedValues = async function (
     }
 
     if (testData.miltonStorageDai && testData.tokenDai && asset === testData.tokenDai.address) {
-        if (direction == 0) {
+        if (direction == LEG_PAY_FIXED) {
             actualDerivatives = await testData.miltonStorageDai.getSwapsPayFixed(
                 await openerUser.getAddress(),
                 0,
                 50
             );
         }
-        if (direction == 1) {
+        if (direction == LEG_RECEIVE_FIXED) {
             actualDerivatives = await testData.miltonStorageDai.getSwapsReceiveFixed(
                 await openerUser.getAddress(),
                 0,

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.9;
+pragma solidity 0.8.16;
 
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
@@ -15,8 +16,9 @@ import "./libraries/SoapIndicatorLogic.sol";
 
 //@dev all stored valuse related with money are in 18 decimals.
 contract MiltonStorage is
-    UUPSUpgradeable,
+    Initializable,
     PausableUpgradeable,
+    UUPSUpgradeable,
     IporOwnableUpgradeable,
     IMiltonStorage
 {
@@ -33,6 +35,8 @@ contract MiltonStorage is
     AmmMiltonStorageTypes.IporSwapContainer internal _swapsPayFixed;
     AmmMiltonStorageTypes.IporSwapContainer internal _swapsReceiveFixed;
 
+    mapping(address => uint128) private _liquidityPoolAccountContribution;
+
     modifier onlyMilton() {
         require(_msgSender() == _milton, IporErrors.CALLER_NOT_MILTON);
         _;
@@ -43,12 +47,19 @@ contract MiltonStorage is
         _;
     }
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize() public initializer {
+        __Pausable_init();
         __Ownable_init();
+        __UUPSUpgradeable_init();
     }
 
     function getVersion() external pure virtual override returns (uint256) {
-        return 1;
+        return 2;
     }
 
     function getLastSwapId() external view override returns (uint256) {
@@ -169,20 +180,19 @@ contract MiltonStorage is
         uint256 offset,
         uint256 chunkSize
     ) external view override returns (uint256 totalCount, uint256[] memory ids) {
-        require(chunkSize != 0, IporErrors.CHUNK_SIZE_EQUAL_ZERO);
+        require(chunkSize > 0, IporErrors.CHUNK_SIZE_EQUAL_ZERO);
         require(chunkSize <= Constants.MAX_CHUNK_SIZE, IporErrors.CHUNK_SIZE_TOO_BIG);
 
         uint32[] storage idsRef = _swapsPayFixed.ids[account];
-        uint256 resultSetSize = PaginationUtils.resolveResultSetSize(
-            idsRef.length,
-            offset,
-            chunkSize
-        );
-        uint256[] memory ids = new uint256[](resultSetSize);
+        totalCount = idsRef.length;
+
+        uint256 resultSetSize = PaginationUtils.resolveResultSetSize(totalCount, offset, chunkSize);
+
+        ids = new uint256[](resultSetSize);
+
         for (uint256 i = 0; i != resultSetSize; i++) {
             ids[i] = idsRef[offset + i];
         }
-        return (idsRef.length, ids);
     }
 
     function getSwapReceiveFixedIds(
@@ -190,20 +200,19 @@ contract MiltonStorage is
         uint256 offset,
         uint256 chunkSize
     ) external view override returns (uint256 totalCount, uint256[] memory ids) {
-        require(chunkSize != 0, IporErrors.CHUNK_SIZE_EQUAL_ZERO);
+        require(chunkSize > 0, IporErrors.CHUNK_SIZE_EQUAL_ZERO);
         require(chunkSize <= Constants.MAX_CHUNK_SIZE, IporErrors.CHUNK_SIZE_TOO_BIG);
 
         uint32[] storage idsRef = _swapsReceiveFixed.ids[account];
-        uint256 resultSetSize = PaginationUtils.resolveResultSetSize(
-            idsRef.length,
-            offset,
-            chunkSize
-        );
-        uint256[] memory ids = new uint256[](resultSetSize);
+        totalCount = idsRef.length;
+
+        uint256 resultSetSize = PaginationUtils.resolveResultSetSize(totalCount, offset, chunkSize);
+
+        ids = new uint256[](resultSetSize);
+
         for (uint256 i = 0; i != resultSetSize; i++) {
             ids[i] = idsRef[offset + i];
         }
-        return (idsRef.length, ids);
     }
 
     function getSwapIds(
@@ -216,7 +225,7 @@ contract MiltonStorage is
         override
         returns (uint256 totalCount, MiltonStorageTypes.IporSwapId[] memory ids)
     {
-        require(chunkSize != 0, IporErrors.CHUNK_SIZE_EQUAL_ZERO);
+        require(chunkSize > 0, IporErrors.CHUNK_SIZE_EQUAL_ZERO);
         require(chunkSize <= Constants.MAX_CHUNK_SIZE, IporErrors.CHUNK_SIZE_TOO_BIG);
 
         uint32[] storage payFixedIdsRef = _swapsPayFixed.ids[account];
@@ -225,15 +234,12 @@ contract MiltonStorage is
         uint32[] storage receiveFixedIdsRef = _swapsReceiveFixed.ids[account];
         uint256 receiveFixedLength = receiveFixedIdsRef.length;
 
-        uint256 resultSetSize = PaginationUtils.resolveResultSetSize(
-            payFixedLength + receiveFixedLength,
-            offset,
-            chunkSize
-        );
+        totalCount = payFixedLength + receiveFixedLength;
 
-        MiltonStorageTypes.IporSwapId[] memory ids = new MiltonStorageTypes.IporSwapId[](
-            resultSetSize
-        );
+        uint256 resultSetSize = PaginationUtils.resolveResultSetSize(totalCount, offset, chunkSize);
+
+        ids = new MiltonStorageTypes.IporSwapId[](resultSetSize);
+
         for (uint256 i = 0; i != resultSetSize; i++) {
             if (offset + i < payFixedLength) {
                 ids[i] = MiltonStorageTypes.IporSwapId(payFixedIdsRef[offset + i], 0);
@@ -244,7 +250,6 @@ contract MiltonStorage is
                 );
             }
         }
-        return (payFixedLength + receiveFixedLength, ids);
     }
 
     function calculateSoap(uint256 ibtPrice, uint256 calculateTimestamp)
@@ -291,9 +296,31 @@ contract MiltonStorage is
         soapReceiveFixed = IporMath.divisionInt(qSoapRf, Constants.WAD_P2_YEAR_IN_SECONDS_INT);
     }
 
-    function addLiquidity(uint256 assetAmount) external override onlyJoseph {
-        require(assetAmount != 0, MiltonErrors.DEPOSIT_AMOUNT_TOO_LOW);
-        _balances.liquidityPool = _balances.liquidityPool + assetAmount.toUint128();
+    function addLiquidity(
+        address account,
+        uint256 assetAmount,
+        uint256 cfgMaxLiquidityPoolBalance,
+        uint256 cfgMaxLpAccountContribution
+    ) external override onlyJoseph {
+        require(assetAmount > 0, MiltonErrors.DEPOSIT_AMOUNT_IS_TOO_LOW);
+
+        uint128 newLiquidityPoolBalance = _balances.liquidityPool + assetAmount.toUint128();
+
+        require(
+            newLiquidityPoolBalance <= cfgMaxLiquidityPoolBalance,
+            MiltonErrors.LIQUIDITY_POOL_BALANCE_IS_TOO_HIGH
+        );
+
+        uint128 newLiquidityPoolAccountContribution = _liquidityPoolAccountContribution[account] +
+            assetAmount.toUint128();
+
+        require(
+            newLiquidityPoolAccountContribution <= cfgMaxLpAccountContribution,
+            MiltonErrors.LP_ACCOUNT_CONTRIBUTION_IS_TOO_HIGH
+        );
+
+        _balances.liquidityPool = newLiquidityPoolBalance;
+        _liquidityPoolAccountContribution[account] = newLiquidityPoolAccountContribution;
     }
 
     function subtractLiquidity(uint256 assetAmount) external override onlyJoseph {
@@ -345,8 +372,8 @@ contract MiltonStorage is
         address liquidator,
         IporTypes.IporSwapMemory memory iporSwap,
         int256 payoff,
+        uint256 incomeFeeValue,
         uint256 closingTimestamp,
-        uint256 cfgIncomeFeeRate,
         uint256 cfgMinLiquidationThresholdToCloseBeforeMaturity,
         uint256 cfgSecondsBeforeMaturityWhenPositionCanBeClosed
     ) external override onlyMilton {
@@ -355,8 +382,8 @@ contract MiltonStorage is
             liquidator,
             iporSwap,
             payoff,
+            incomeFeeValue,
             closingTimestamp,
-            cfgIncomeFeeRate,
             cfgMinLiquidationThresholdToCloseBeforeMaturity,
             cfgSecondsBeforeMaturityWhenPositionCanBeClosed
         );
@@ -367,8 +394,8 @@ contract MiltonStorage is
         address liquidator,
         IporTypes.IporSwapMemory memory iporSwap,
         int256 payoff,
+        uint256 incomeFeeValue,
         uint256 closingTimestamp,
-        uint256 cfgIncomeFeeRate,
         uint256 cfgMinLiquidationThresholdToCloseBeforeMaturity,
         uint256 cfgSecondsBeforeMaturityWhenPositionCanBeClosed
     ) external override onlyMilton {
@@ -377,8 +404,8 @@ contract MiltonStorage is
             liquidator,
             iporSwap,
             payoff,
+            incomeFeeValue,
             closingTimestamp,
-            cfgIncomeFeeRate,
             cfgMinLiquidationThresholdToCloseBeforeMaturity,
             cfgSecondsBeforeMaturityWhenPositionCanBeClosed
         );
@@ -391,14 +418,16 @@ contract MiltonStorage is
         onlyMilton
     {
         uint256 currentVaultBalance = _balances.vault;
-        // We nedd this becouse for compound if we deposit and withdraw we could get negative intrest based on rounds
+        // We nedd this because for compound if we deposit and withdraw we could get negative intrest based on rounds
         require(
             vaultBalance + withdrawnAmount >= currentVaultBalance,
-            MiltonErrors.INTREST_FROM_STRATEGY_BELOW_ZERO
+            MiltonErrors.INTEREST_FROM_STRATEGY_BELOW_ZERO
         );
+
         uint256 interest = vaultBalance + withdrawnAmount - currentVaultBalance;
 
         uint256 liquidityPoolBalance = _balances.liquidityPool + interest;
+
         _balances.liquidityPool = liquidityPoolBalance.toUint128();
         _balances.vault = vaultBalance.toUint128();
     }
@@ -414,9 +443,10 @@ contract MiltonStorage is
 
         require(
             currentVaultBalance <= (vaultBalance - depositAmount),
-            MiltonErrors.INTREST_FROM_STRATEGY_BELOW_ZERO
+            MiltonErrors.INTEREST_FROM_STRATEGY_BELOW_ZERO
         );
-        uint256 interest = currentVaultBalance != 0
+		
+        uint256 interest = currentVaultBalance > 0
             ? (vaultBalance - currentVaultBalance - depositAmount)
             : 0;
         _balances.vault = vaultBalance.toUint128();
@@ -429,11 +459,11 @@ contract MiltonStorage is
         override
         onlyJoseph
     {
-        require(transferredAmount != 0, IporErrors.NOT_ENOUGH_AMOUNT_TO_TRANSFER);
+        require(transferredAmount > 0, IporErrors.NOT_ENOUGH_AMOUNT_TO_TRANSFER);
 
         uint256 balance = _balances.iporPublicationFee;
 
-        require(transferredAmount <= balance, MiltonErrors.PUBLICATION_FEE_BALANCE_TOO_LOW);
+        require(transferredAmount <= balance, MiltonErrors.PUBLICATION_FEE_BALANCE_IS_TOO_LOW);
 
         balance = balance - transferredAmount;
 
@@ -445,11 +475,11 @@ contract MiltonStorage is
         override
         onlyJoseph
     {
-        require(transferredAmount != 0, IporErrors.NOT_ENOUGH_AMOUNT_TO_TRANSFER);
+        require(transferredAmount > 0, IporErrors.NOT_ENOUGH_AMOUNT_TO_TRANSFER);
 
         uint256 balance = _balances.treasury;
 
-        require(transferredAmount <= balance, MiltonErrors.TREASURE_BALANCE_TOO_LOW);
+        require(transferredAmount <= balance, MiltonErrors.TREASURY_BALANCE_IS_TOO_LOW);
 
         balance = balance - transferredAmount;
 
@@ -478,13 +508,17 @@ contract MiltonStorage is
         _unpause();
     }
 
+    function getLiquidityPoolAccountContribution(address account) external view returns (uint256) {
+        return _liquidityPoolAccountContribution[account];
+    }
+
     function _getPositions(
         mapping(uint32 => AmmMiltonStorageTypes.IporSwap) storage swaps,
         uint32[] storage ids,
         uint256 offset,
         uint256 chunkSize
     ) internal view returns (IporTypes.IporSwapMemory[] memory) {
-        require(chunkSize != 0, IporErrors.CHUNK_SIZE_EQUAL_ZERO);
+        require(chunkSize > 0, IporErrors.CHUNK_SIZE_EQUAL_ZERO);
         require(chunkSize <= Constants.MAX_CHUNK_SIZE, IporErrors.CHUNK_SIZE_TOO_BIG);
 
         uint256 swapsIdsLength = PaginationUtils.resolveResultSetSize(
@@ -611,6 +645,7 @@ contract MiltonStorage is
         _balances.totalCollateralReceiveFixed =
             _balances.totalCollateralReceiveFixed +
             collateral.toUint128();
+
         _balances.iporPublicationFee =
             _balances.iporPublicationFee +
             cfgIporPublicationFee.toUint128();
@@ -647,8 +682,8 @@ contract MiltonStorage is
         address liquidator,
         IporTypes.IporSwapMemory memory swap,
         int256 payoff,
+        uint256 incomeFeeValue,
         uint256 closingTimestamp,
-        uint256 cfgIncomeFeeRate,
         uint256 cfgMinLiquidationThresholdToCloseBeforeMaturity,
         uint256 cfgSecondsBeforeMaturityWhenPositionCanBeClosed
     ) internal {
@@ -656,8 +691,8 @@ contract MiltonStorage is
             liquidator,
             swap,
             payoff,
+            incomeFeeValue,
             closingTimestamp,
-            cfgIncomeFeeRate,
             cfgMinLiquidationThresholdToCloseBeforeMaturity,
             cfgSecondsBeforeMaturityWhenPositionCanBeClosed
         );
@@ -671,8 +706,8 @@ contract MiltonStorage is
         address liquidator,
         IporTypes.IporSwapMemory memory swap,
         int256 payoff,
+        uint256 incomeFeeValue,
         uint256 closingTimestamp,
-        uint256 cfgIncomeFeeRate,
         uint256 cfgMinLiquidationThresholdToCloseBeforeMaturity,
         uint256 cfgSecondsBeforeMaturityWhenPositionCanBeClosed
     ) internal {
@@ -693,19 +728,23 @@ contract MiltonStorage is
             }
         }
 
-        uint256 incomeFee = IporMath.division(absPayoff * cfgIncomeFeeRate, Constants.D18);
-
-        _balances.treasury = _balances.treasury + incomeFee.toUint128();
+        _balances.treasury = _balances.treasury + incomeFeeValue.toUint128();
 
         if (payoff > 0) {
+            /// @dev Buyer earns, Milton (LP) looses
             require(
                 _balances.liquidityPool >= absPayoff,
                 MiltonErrors.CANNOT_CLOSE_SWAP_LP_IS_TOO_LOW
             );
 
+            /// @dev When Milton (LP) looses, then  always substract all payoff,
+            /// income fee is added in separate balance - treasury
             _balances.liquidityPool = _balances.liquidityPool - absPayoff.toUint128();
         } else {
-            _balances.liquidityPool = _balances.liquidityPool + (absPayoff - incomeFee).toUint128();
+            /// @dev Milton earns, Buyer looses,
+            _balances.liquidityPool =
+                _balances.liquidityPool +
+                (absPayoff - incomeFeeValue).toUint128();
         }
     }
 
@@ -762,7 +801,7 @@ contract MiltonStorage is
     }
 
     function _updateSwapsWhenClosePayFixed(IporTypes.IporSwapMemory memory iporSwap) internal {
-        require(iporSwap.id != 0, MiltonErrors.INCORRECT_SWAP_ID);
+        require(iporSwap.id > 0, MiltonErrors.INCORRECT_SWAP_ID);
         require(
             iporSwap.state != uint256(AmmTypes.SwapState.INACTIVE),
             MiltonErrors.INCORRECT_SWAP_STATUS
@@ -784,7 +823,7 @@ contract MiltonStorage is
     }
 
     function _updateSwapsWhenCloseReceiveFixed(IporTypes.IporSwapMemory memory iporSwap) internal {
-        require(iporSwap.id != 0, MiltonErrors.INCORRECT_SWAP_ID);
+        require(iporSwap.id > 0, MiltonErrors.INCORRECT_SWAP_ID);
         require(
             iporSwap.state != uint256(AmmTypes.SwapState.INACTIVE),
             MiltonErrors.INCORRECT_SWAP_STATUS
@@ -877,11 +916,11 @@ contract MiltonStorage is
         );
 
         _soapIndicatorsPayFixed = AmmMiltonStorageTypes.SoapIndicators(
-            pf.quasiHypotheticalInterestCumulative,			
-            pf.totalNotional.toUint128(),            
+            pf.quasiHypotheticalInterestCumulative,
+            pf.totalNotional.toUint128(),
             pf.totalIbtQuantity.toUint128(),
-			pf.averageInterestRate.toUint64(),
-			pf.rebalanceTimestamp.toUint32()            
+            pf.averageInterestRate.toUint64(),
+            pf.rebalanceTimestamp.toUint32()
         );
     }
 
@@ -908,7 +947,7 @@ contract MiltonStorage is
 
         _soapIndicatorsReceiveFixed = AmmMiltonStorageTypes.SoapIndicators(
             rf.quasiHypotheticalInterestCumulative,
-			rf.totalNotional.toUint128(),
+            rf.totalNotional.toUint128(),
             rf.totalIbtQuantity.toUint128(),
             rf.averageInterestRate.toUint64(),
             rf.rebalanceTimestamp.toUint32()

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.9;
+pragma solidity 0.8.16;
 
 import "../../libraries/errors/IporErrors.sol";
 import "../../libraries/errors/MiltonErrors.sol";
@@ -14,46 +14,14 @@ abstract contract Joseph is JosephInternal, IJoseph {
     using SafeCast for uint256;
     using SafeCast for int256;
 
-    function initialize(
-        address initAsset,
-        address ipToken,
-        address milton,
-        address miltonStorage,
-        address stanley
-    ) public initializer {
-        __Ownable_init();
-
-        require(initAsset != address(0), IporErrors.WRONG_ADDRESS);
-        require(ipToken != address(0), IporErrors.WRONG_ADDRESS);
-        require(milton != address(0), IporErrors.WRONG_ADDRESS);
-        require(miltonStorage != address(0), IporErrors.WRONG_ADDRESS);
-        require(stanley != address(0), IporErrors.WRONG_ADDRESS);
-        require(
-            _getDecimals() == ERC20Upgradeable(initAsset).decimals(),
-            IporErrors.WRONG_DECIMALS
-        );
-
-        IIpToken iipToken = IIpToken(ipToken);
-        require(initAsset == iipToken.getAsset(), IporErrors.ADDRESSES_MISMATCH);
-
-        _asset = initAsset;
-        _ipToken = iipToken;
-        _milton = IMiltonInternal(milton);
-        _miltonStorage = IMiltonStorage(miltonStorage);
-        _stanley = IStanley(stanley);
-        _miltonStanleyBalanceRatio = 85e16;
-    }
-
     function calculateExchangeRate() external view override returns (uint256) {
         return _calculateExchangeRate(block.timestamp);
     }
 
-    //@param assetAmount underlying token amount represented in decimals specific for underlying asset
     function provideLiquidity(uint256 assetAmount) external override whenNotPaused {
         _provideLiquidity(assetAmount, _getDecimals(), block.timestamp);
     }
 
-    //@param ipTokenAmount IpToken amount represented in 18 decimals
     function redeem(uint256 ipTokenAmount) external override whenNotPaused {
         _redeem(ipTokenAmount, block.timestamp);
     }
@@ -73,7 +41,7 @@ abstract contract Joseph is JosephInternal, IJoseph {
 
         uint256 ipTokenTotalSupply = _getIpToken().totalSupply();
 
-        if (ipTokenTotalSupply != 0) {
+        if (ipTokenTotalSupply > 0) {
             return IporMath.division(balance.toUint256() * Constants.D18, ipTokenTotalSupply);
         } else {
             return Constants.D18;
@@ -82,35 +50,40 @@ abstract contract Joseph is JosephInternal, IJoseph {
 
     function _checkVaultReservesRatio() internal view returns (uint256) {
         (uint256 totalBalance, uint256 wadMiltonAssetBalance) = _getIporTotalBalance();
-        require(totalBalance != 0, JosephErrors.STANLEY_BALANCE_IS_EMPTY);
+        require(totalBalance > 0, JosephErrors.STANLEY_BALANCE_IS_EMPTY);
         return IporMath.division(wadMiltonAssetBalance * Constants.D18, totalBalance);
     }
 
-    //@param assetAmount in decimals like asset
     function _provideLiquidity(
         uint256 assetAmount,
         uint256 assetDecimals,
         uint256 timestamp
     ) internal nonReentrant {
+        address msgSender = _msgSender();
         IMiltonInternal milton = _getMilton();
 
         uint256 exchangeRate = _calculateExchangeRate(timestamp);
 
-        require(exchangeRate != 0, MiltonErrors.LIQUIDITY_POOL_IS_EMPTY);
+        require(exchangeRate > 0, MiltonErrors.LIQUIDITY_POOL_IS_EMPTY);
 
         uint256 wadAssetAmount = IporMath.convertToWad(assetAmount, assetDecimals);
 
-        _getMiltonStorage().addLiquidity(wadAssetAmount);
+        _getMiltonStorage().addLiquidity(
+            msgSender,
+            wadAssetAmount,
+            _maxLiquidityPoolBalance * Constants.D18,
+            _maxLpAccountContribution * Constants.D18
+        );
 
-        IERC20Upgradeable(_asset).safeTransferFrom(_msgSender(), address(milton), assetAmount);
+        IERC20Upgradeable(_asset).safeTransferFrom(msgSender, address(milton), assetAmount);
 
         uint256 ipTokenAmount = IporMath.division(wadAssetAmount * Constants.D18, exchangeRate);
 
-        _getIpToken().mint(_msgSender(), ipTokenAmount);
+        _getIpToken().mint(msgSender, ipTokenAmount);
 
         emit ProvideLiquidity(
             timestamp,
-            _msgSender(),
+            msgSender,
             address(milton),
             exchangeRate,
             wadAssetAmount,
@@ -120,14 +93,14 @@ abstract contract Joseph is JosephInternal, IJoseph {
 
     function _redeem(uint256 ipTokenAmount, uint256 timestamp) internal nonReentrant {
         require(
-            ipTokenAmount != 0 && ipTokenAmount <= _getIpToken().balanceOf(_msgSender()),
+            ipTokenAmount > 0 && ipTokenAmount <= _getIpToken().balanceOf(_msgSender()),
             JosephErrors.CANNOT_REDEEM_IP_TOKEN_TOO_LOW
         );
         IMiltonInternal milton = _getMilton();
 
         uint256 exchangeRate = _calculateExchangeRate(timestamp);
 
-        require(exchangeRate != 0, MiltonErrors.LIQUIDITY_POOL_IS_EMPTY);
+        require(exchangeRate > 0, MiltonErrors.LIQUIDITY_POOL_IS_EMPTY);
 
         uint256 wadAssetAmount = IporMath.division(ipTokenAmount * exchangeRate, Constants.D18);
 
@@ -184,7 +157,7 @@ abstract contract Joseph is JosephInternal, IJoseph {
         uint256 redeemedAmount
     ) internal pure returns (uint256) {
         uint256 denominator = totalLiquidityPoolBalance - redeemedAmount;
-        if (denominator != 0) {
+        if (denominator > 0) {
             return
                 IporMath.division(
                     totalCollateralBalance * Constants.D18,

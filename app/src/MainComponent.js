@@ -10,10 +10,13 @@ import StanleyComponent from "./StanleyComponent";
 import MyPositions from "./MyPositions";
 import JosephConfigurationComponent from "./JosephConfigurationComponent";
 import MiltonConfigurationComponent from "./MiltonConfigurationComponent";
+import StanleyConfigurationComponent from "./StanleyConfigurationComponent";
 import MiltonSpreadConfigurationComponent from "./MiltonSpreadConfigurationComponent";
 import GlobalConfigurationComponent from "./GlobalConfigurationComponent";
 import FaucetComponent from "./FaucetComponent";
 import FrontendComponent from "./FrontendComponent";
+import JohnComponent from "./JohnComponent";
+import PwIporTokenComponent from "./PwIporTokenComponent";
 
 require("dotenv").config({ path: "../../.env" });
 const { AccountData, ContractData, ContractForm } = newContextComponents;
@@ -31,7 +34,8 @@ export default ({ drizzle, drizzleState }) => {
                             height="30"
                             className="d-inline-block align-top ipor-navbar"
                         />{" "}
-                        IPOR Protocol - MILTON Dev Tool
+                        IPOR Protocol - Cockpit{" "}
+                        {process.env.REACT_APP_ITF_ENABLED === "true" ? "- [ ITF ENABLED ]" : ""}
                     </Navbar.Brand>
                 </Navbar>
             </Container>
@@ -58,25 +62,27 @@ export default ({ drizzle, drizzleState }) => {
                         <td>
                             <strong>ERC20 Token Address</strong>
                         </td>
-                        <td>{drizzle.contracts.MockTestnetTokenUsdt.address}</td>
-                        <td>{drizzle.contracts.MockTestnetTokenUsdc.address}</td>
-                        <td>{drizzle.contracts.MockTestnetTokenDai.address}</td>
+                        <td>{drizzle.contracts.DrizzleUsdt.address}</td>
+                        <td>{drizzle.contracts.DrizzleUsdc.address}</td>
+                        <td>{drizzle.contracts.DrizzleDai.address}</td>
                     </tr>
                 </table>
             </div>
             <Tabs defaultActiveKey="profile" id="uncontrolled-tab-example">
-                 <Tab eventKey="iporIndex" title="IporOracle">
+                <Tab eventKey="iporIndex" title="IporOracle">
                     <IporOracleComponent drizzle={drizzle} drizzleState={drizzleState} />
                 </Tab>
+
                 <Tab eventKey="miltonOverview" title="Milton">
                     <MiltonComponent drizzle={drizzle} drizzleState={drizzleState} />
                 </Tab>
+
                 <Tab eventKey="joseph" title="Joseph">
                     <JosephComponent drizzle={drizzle} drizzleState={drizzleState} />
                 </Tab>
                 <Tab eventKey="stanley" title="Stanley">
                     <StanleyComponent drizzle={drizzle} drizzleState={drizzleState} />
-                </Tab> 
+                </Tab>
                 <Tab eventKey="globalConfig" title="Global Config">
                     <GlobalConfigurationComponent drizzle={drizzle} drizzleState={drizzleState} />
                 </Tab>
@@ -92,14 +98,31 @@ export default ({ drizzle, drizzleState }) => {
                         drizzleState={drizzleState}
                     />
                 </Tab>
+                <Tab eventKey="stanleyConfig" title="Stanley Config">
+                    <StanleyConfigurationComponent drizzle={drizzle} drizzleState={drizzleState} />
+                </Tab>
                 <Tab eventKey="myPositions" title="My positions">
                     <MyPositions drizzle={drizzle} drizzleState={drizzleState} />
                 </Tab>
-                <Tab eventKey="faucet" title="Faucet">
-                    <FaucetComponent drizzle={drizzle} drizzleState={drizzleState} />
-                </Tab>
+
+                {process.env.REACT_APP_ENV_PROFILE !== "mainnet.ipor.io" ? (
+                    <Tab eventKey="faucet" title="Faucet">
+                        <FaucetComponent drizzle={drizzle} drizzleState={drizzleState} />
+                    </Tab>
+                ) : (
+                    ""
+                )}
+
                 <Tab eventKey="frontend" title="Frontend Data Provider">
                     <FrontendComponent drizzle={drizzle} drizzleState={drizzleState} />
+                </Tab>
+
+                <Tab eventKey="John" title="Liquidity Rewards">
+                    <JohnComponent drizzle={drizzle} drizzleState={drizzleState} />
+                </Tab>
+
+                <Tab eventKey="PwIporToken" title="Power Ipor">
+                    <PwIporTokenComponent drizzle={drizzle} drizzleState={drizzleState} />
                 </Tab>
             </Tabs>
         </div>

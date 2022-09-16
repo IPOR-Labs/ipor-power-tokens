@@ -1,6 +1,6 @@
 //solhint-disable no-empty-blocks
 // SPDX-License-Identifier: agpl-3.0
-pragma solidity 0.8.9;
+pragma solidity 0.8.16;
 import "../../interfaces/IStrategy.sol";
 
 // simple mock for total _balance tests
@@ -18,12 +18,14 @@ contract MockStrategy is IStrategy {
         return 1;
     }
 
-    function deposit(uint256 amount) external {
+    function deposit(uint256 amount) external override returns (uint256 depositedAmount) {
         _balance = _balance + amount;
+        depositedAmount = amount;
     }
 
-    function withdraw(uint256 amount) external {
+    function withdraw(uint256 amount) external override returns (uint256 withdrawnAmount) {
         _balance = _balance - amount;
+        withdrawnAmount = amount;
     }
 
     function getAsset() external view returns (address) {
@@ -62,8 +64,16 @@ contract MockStrategy is IStrategy {
         _shareTokens = shareToken;
     }
 
+    function getTreasuryManager() external view override returns (address) {
+        return _treasuryManager;
+    }
+
     function setTreasuryManager(address manager) external {
         _treasuryManager = manager;
+    }
+
+    function getTreasury() external view override returns (address) {
+        return _treasury;
     }
 
     function setTreasury(address treasury) external {
