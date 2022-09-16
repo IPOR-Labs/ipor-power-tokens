@@ -6,6 +6,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "../security/IporOwnableUpgradeable.sol";
 import "../libraries/errors/IporErrors.sol";
 import "../libraries/errors/MiningErrors.sol";
@@ -25,6 +26,7 @@ contract John is
     PausableUpgradeable,
     UUPSUpgradeable,
     IporOwnableUpgradeable,
+    ReentrancyGuardUpgradeable,
     IJohnInternal,
     IJohn
 {
@@ -155,7 +157,12 @@ contract John is
         return _accountsParams[_msgSender()][ipToken].ipTokensBalance;
     }
 
-    function stake(address ipToken, uint256 ipTokenAmount) external override whenNotPaused {
+    function stake(address ipToken, uint256 ipTokenAmount)
+        external
+        override
+        nonReentrant
+        whenNotPaused
+    {
         require(ipTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
         require(_ipTokens[ipToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
 
@@ -188,7 +195,12 @@ contract John is
         emit StakeIpTokens(block.timestamp, _msgSender(), ipToken, ipTokenAmount);
     }
 
-    function unstake(address ipToken, uint256 ipTokenAmount) external override whenNotPaused {
+    function unstake(address ipToken, uint256 ipTokenAmount)
+        external
+        override
+        nonReentrant
+        whenNotPaused
+    {
         require(_ipTokens[ipToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
         JohnTypes.GlobalRewardsParams memory globalParams = _globalParameters[ipToken];
         JohnTypes.AccountRewardsParams memory accountParams = _accountsParams[_msgSender()][
@@ -260,7 +272,7 @@ contract John is
         emit WithdrawFromDelegation(block.timestamp, account, ipToken, pwTokenAmount);
     }
 
-    function claim(address ipToken) external override whenNotPaused {
+    function claim(address ipToken) external override whenNotPaused nonReentrant {
         JohnTypes.AccountRewardsParams memory accountParams = _accountsParams[_msgSender()][
             ipToken
         ];
