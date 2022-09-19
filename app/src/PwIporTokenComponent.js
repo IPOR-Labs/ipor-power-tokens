@@ -227,7 +227,7 @@ export default ({ drizzle, drizzleState }) => {
                                 drizzle={drizzle}
                                 drizzleState={drizzleState}
                                 contract="PwIporToken"
-                                method="exchangeRate"
+                                method="calculateExchangeRate"
                                 render={(value) => (
                                     <div>
                                         {value / 1000000000000000000}
@@ -248,7 +248,7 @@ export default ({ drizzle, drizzleState }) => {
                                 drizzle={drizzle}
                                 drizzleState={drizzleState}
                                 contract="PwIporToken"
-                                method="withdrawalFee"
+                                method="getWithdrawFee"
                                 render={(value) => (
                                     <div>
                                         {value / 10000000000000000} %
@@ -354,7 +354,7 @@ export default ({ drizzle, drizzleState }) => {
                             <ContractForm
                                 drizzle={drizzle}
                                 contract="PwIporToken"
-                                method="delegateToRewards"
+                                method="delegateToJohn"
                                 render={({ handleSubmit, inputs, state, handleInputChange }) => {
                                     state["assets"] = assets;
                                     state["amounts"] = amounts;

@@ -196,7 +196,7 @@ describe("PwIporToken unstake", () => {
         // when
 
         await expect(
-            pwIporToken.delegateToRewards([tokens.ipTokenDai.address], [N0__5_18DEC])
+            pwIporToken.delegateToJohn([tokens.ipTokenDai.address], [N0__5_18DEC])
         ).to.be.revertedWith("IPOR_705");
 
         // then

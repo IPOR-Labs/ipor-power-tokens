@@ -30,16 +30,16 @@ contract LiquidityRewardsAgent {
         _john.unstake(ipToken, ipTokenAmount);
     }
 
-    function accountRewards(address ipToken) external view returns (uint256) {
-        return _john.accountRewards(ipToken);
+    function calculateAccountRewards(address ipToken) external view returns (uint256) {
+        return _john.calculateAccountRewards(ipToken);
     }
 
-    function accountParams(address ipToken)
+    function getAccountParams(address ipToken)
         external
         view
         returns (JohnTypes.AccountRewardsParams memory)
     {
-        return _john.accountParams(ipToken);
+        return _john.getAccountParams(ipToken);
     }
 
     function balanceOfDelegatedPwIpor(address account, address[] memory requestIpTokens)
@@ -72,11 +72,11 @@ contract LiquidityRewardsAgent {
         _pwToken.unstake(pwTokenAmount);
     }
 
-    function delegateToRewards(address[] memory ipTokens, uint256[] memory pwIporAmounts) external {
-        _pwToken.delegateToRewards(ipTokens, pwIporAmounts);
+    function delegatePwIpor(address[] memory ipTokens, uint256[] memory pwIporAmounts) external {
+        _pwToken.delegateToJohn(ipTokens, pwIporAmounts);
     }
 
-    function withdrawFromDelegation(address ipToken, uint256 pwIporAmount) external {
-        _pwToken.withdrawFromDelegation(ipToken, pwIporAmount);
+    function undelegatePwIpor(address ipToken, uint256 pwIporAmount) external {
+        _pwToken.undelegateFromJohn(ipToken, pwIporAmount);
     }
 }
