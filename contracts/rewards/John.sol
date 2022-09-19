@@ -247,13 +247,36 @@ contract John is
         require(rewards > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
 
         _claim(_msgSender(), ipToken, rewards, accountParams, globalParams);
-        _rebalanceParams(
-            accountParams,
-            globalParams,
-            accountParams.ipTokensBalance,
+        //        _rebalanceParams(
+        //            accountParams,
+        //            globalParams,
+        //            accountParams.ipTokensBalance,
+        //            accountParams.delegatedPwTokenBalance,
+        //            ipToken,
+        //            _msgSender()
+        //        );
+
+        uint256 accountPowerUp = MiningCalculation.calculateAccountPowerUp(
             accountParams.delegatedPwTokenBalance,
+            accountParams.ipTokensBalance,
+            _verticalShift(),
+            _horizontalShift()
+        );
+
+        uint256 compositeMultiplierCumulativeBeforeBlock = globalParams
+            .compositeMultiplierCumulativeBeforeBlock +
+            (block.number - globalParams.blockNumber) *
+            globalParams.compositeMultiplierInTheBlock;
+
+        _saveAccountParams(
+            _msgSender(),
             ipToken,
-            _msgSender()
+            JohnTypes.AccountRewardsParams(
+                accountPowerUp,
+                compositeMultiplierCumulativeBeforeBlock,
+                accountParams.ipTokensBalance,
+                accountParams.delegatedPwTokenBalance
+            )
         );
 
         emit Claim(block.timestamp, _msgSender(), ipToken, rewards);
