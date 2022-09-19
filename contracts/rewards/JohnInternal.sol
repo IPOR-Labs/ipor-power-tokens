@@ -73,7 +73,7 @@ abstract contract JohnInternal is
 
             _ipTokens[ipTokens[i]] = true;
 
-            _savegetGlobalParams(
+            _saveGlobalParams(
                 ipTokens[i],
                 JohnTypes.GlobalRewardsParams(0, 0, 0, 0, 0, uint32(Constants.D8))
             );
@@ -174,7 +174,7 @@ abstract contract JohnInternal is
             globalParams.aggregatePowerUp
         );
 
-        _savegetGlobalParams(
+        _saveGlobalParams(
             ipToken,
             JohnTypes.GlobalRewardsParams(
                 globalParams.aggregatePowerUp,
@@ -191,7 +191,7 @@ abstract contract JohnInternal is
     function addIpToken(address ipToken) external onlyOwner whenNotPaused {
         require(ipToken != address(0), IporErrors.WRONG_ADDRESS);
         _ipTokens[ipToken] = true;
-        _savegetGlobalParams(
+        _saveGlobalParams(
             ipToken,
             JohnTypes.GlobalRewardsParams(0, 0, 0, 0, 0, uint32(Constants.D8))
         );
@@ -232,7 +232,7 @@ abstract contract JohnInternal is
             (block.number - globalParams.blockNumber) *
             globalParams.compositeMultiplierInTheBlock;
 
-        _savegetAccountParams(
+        _saveAccountParams(
             account,
             ipToken,
             JohnTypes.AccountRewardsParams(
@@ -269,7 +269,7 @@ abstract contract JohnInternal is
             aggregatePowerUp
         );
 
-        _savegetGlobalParams(
+        _saveGlobalParams(
             ipToken,
             JohnTypes.GlobalRewardsParams(
                 aggregatePowerUp,
@@ -349,7 +349,7 @@ abstract contract JohnInternal is
         return _pwIporToken;
     }
 
-    function _savegetAccountParams(
+    function _saveAccountParams(
         address account,
         address ipToken,
         JohnTypes.AccountRewardsParams memory params
@@ -357,7 +357,7 @@ abstract contract JohnInternal is
         _accountParams[account][ipToken] = params;
     }
 
-    function _savegetGlobalParams(address ipToken, JohnTypes.GlobalRewardsParams memory params)
+    function _saveGlobalParams(address ipToken, JohnTypes.GlobalRewardsParams memory params)
         internal
         virtual
     {

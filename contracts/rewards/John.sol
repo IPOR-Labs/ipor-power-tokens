@@ -151,7 +151,7 @@ contract John is JohnInternal, IJohn {
             (block.number - globalParams.blockNumber) *
             globalParams.compositeMultiplierInTheBlock;
 
-        _savegetAccountParams(
+        _saveAccountParams(
             _msgSender(),
             ipToken,
             JohnTypes.AccountRewardsParams(
