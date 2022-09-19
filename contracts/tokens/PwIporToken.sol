@@ -10,12 +10,13 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "../security/IporOwnableUpgradeable.sol";
 import "../interfaces/IPwIporTokenInternal.sol";
 import "../interfaces/IPwIporToken.sol";
-import "../interfaces/IJohn.sol";
+import "../interfaces/IJohnInternal.sol";
 import "../interfaces/types/PwIporTokenTypes.sol";
 import "../libraries/errors/IporErrors.sol";
 import "../libraries/errors/MiningErrors.sol";
 import "../libraries/Constants.sol";
 import "../libraries/math/IporMath.sol";
+import "./PwIporTokenInternal.sol";
 //TODO: remove at the end
 import "hardhat/console.sol";
 
@@ -26,29 +27,10 @@ contract PwIporToken is
     UUPSUpgradeable,
     ReentrancyGuardUpgradeable,
     IporOwnableUpgradeable,
-    IPwIporTokenInternal,
+    PwIporTokenInternal,
     IPwIporToken
 {
     using SafeERC20Upgradeable for IERC20Upgradeable;
-
-    // 2 weeks
-    uint256 public constant COOL_DOWN_IN_SECONDS = 2 * 7 * 24 * 60 * 60;
-
-    address private _john;
-    address private _iporToken;
-    // account address -> amount 18 decimals
-    mapping(address => uint256) private _baseBalance;
-    // account address -> amount 18 decimals
-    mapping(address => uint256) private _delegatedBalance;
-    // account address -> {coolDownFinish, amount}
-    mapping(address => PwIporTokenTypes.PwCoolDown) private _coolDowns;
-    uint256 private _baseTotalSupply;
-    uint256 private _withdrawalFee;
-
-    modifier onlyJohn() {
-        require(_msgSender() == _john, MiningErrors.CALLER_NOT_JOHN);
-        _;
-    }
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -62,10 +44,6 @@ contract PwIporToken is
         require(iporToken != address(0), IporErrors.WRONG_ADDRESS);
         _iporToken = iporToken;
         _withdrawalFee = Constants.D17 * 5;
-    }
-
-    function getVersion() external pure override returns (uint256) {
-        return 1;
     }
 
     function name() external pure override returns (string memory) {
@@ -84,10 +62,6 @@ contract PwIporToken is
         return IporMath.division(_baseTotalSupply * _exchangeRate(), Constants.D18);
     }
 
-    function totalSupplyBase() external view override returns (uint256) {
-        return _baseTotalSupply;
-    }
-
     function balanceOf(address account) external view override returns (uint256) {
         return _balanceOf(account);
     }
@@ -100,28 +74,8 @@ contract PwIporToken is
         return _coolDowns[_msgSender()];
     }
 
-    function exchangeRate() external view override returns (uint256) {
-        return _exchangeRate();
-    }
-
     function delegatedBalanceOf(address account) external view override returns (uint256) {
         return _delegatedBalance[account];
-    }
-
-    function getJohn() external view override returns (address) {
-        return _john;
-    }
-
-    function setWithdrawalFee(uint256 withdrawalFee) external override onlyOwner {
-        _withdrawalFee = withdrawalFee;
-        emit WithdrawalFee(block.timestamp, _msgSender(), withdrawalFee);
-    }
-
-    function setJohn(address newJohnAddr) external override onlyOwner whenNotPaused {
-        require(newJohnAddr != address(0), IporErrors.WRONG_ADDRESS);
-        address oldJohnAddr = _john;
-        _john = newJohnAddr;
-        emit JohnChanged(_msgSender(), oldJohnAddr, newJohnAddr);
     }
 
     function stake(uint256 iporTokenAmount) external override whenNotPaused nonReentrant {
@@ -233,29 +187,6 @@ contract PwIporToken is
         emit Redeem(block.timestamp, _msgSender(), coolDown.amount);
     }
 
-    function receiveRewards(address account, uint256 iporTokenAmount)
-        external
-        override
-        whenNotPaused
-        onlyJohn
-    {
-        // We need this value before transfer tokens
-        uint256 exchangeRate = _exchangeRate();
-        require(iporTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
-
-        IERC20Upgradeable(_iporToken).safeTransferFrom(
-            _msgSender(),
-            address(this),
-            iporTokenAmount
-        );
-
-        uint256 newBaseTokens = IporMath.division(iporTokenAmount * Constants.D18, exchangeRate);
-        _baseBalance[account] += newBaseTokens;
-        _baseTotalSupply += newBaseTokens;
-
-        emit ReceiveRewards(block.timestamp, account, iporTokenAmount);
-    }
-
     function delegateToRewards(address[] memory ipTokens, uint256[] memory pwIporAmounts)
         external
         override
@@ -274,7 +205,7 @@ contract PwIporToken is
         );
 
         _delegatedBalance[_msgSender()] += pwIporToDelegate;
-        IJohn(_john).delegatePwIpor(_msgSender(), ipTokens, pwIporAmounts);
+        IJohnInternal(_john).delegatePwIpor(_msgSender(), ipTokens, pwIporAmounts);
 
         emit DelegateToReward(block.timestamp, _msgSender(), ipTokens, pwIporAmounts);
     }
@@ -290,57 +221,14 @@ contract PwIporToken is
             MiningErrors.DELEGATED_BALANCE_TOO_LOW
         );
 
-        IJohn(_john).withdrawFromDelegation(_msgSender(), ipToken, pwIporAmount);
+        IJohnInternal(_john).withdrawFromDelegation(_msgSender(), ipToken, pwIporAmount);
         _delegatedBalance[_msgSender()] -= pwIporAmount;
 
         emit WithdrawFromDelegation(block.timestamp, _msgSender(), ipToken, pwIporAmount);
     }
 
-    function pause() external override onlyOwner {
-        _pause();
-    }
-
-    function unpause() external override onlyOwner {
-        _unpause();
-    }
-
-    function _exchangeRate() internal view returns (uint256) {
-        uint256 baseTotalSupply = _baseTotalSupply;
-        if (baseTotalSupply == 0) {
-            return Constants.D18;
-        }
-        uint256 balanceOfIporToken = IERC20Upgradeable(_iporToken).balanceOf(address(this));
-        if (balanceOfIporToken == 0) {
-            return Constants.D18;
-        }
-        return IporMath.division(balanceOfIporToken * Constants.D18, baseTotalSupply);
-    }
-
     function _balanceOf(address account) internal view returns (uint256) {
         return _baseAmountToPwToken(_baseBalance[account], _exchangeRate());
-    }
-
-    function _amountWithoutFee(uint256 baseAmount) internal view returns (uint256) {
-        return IporMath.division((Constants.D18 - _withdrawalFee) * baseAmount, Constants.D18);
-    }
-
-    function _baseAmountToPwToken(uint256 baseAmount, uint256 exchangeRate)
-        internal
-        pure
-        returns (uint256)
-    {
-        return IporMath.division(baseAmount * exchangeRate, Constants.D18);
-    }
-
-    function _availablePwTokens(address account, uint256 exchangeRate)
-        internal
-        view
-        returns (uint256)
-    {
-        return
-            _baseAmountToPwToken(_baseBalance[account], exchangeRate) -
-            _delegatedBalance[account] -
-            _coolDowns[account].amount;
     }
 
     //solhint-disable no-empty-blocks

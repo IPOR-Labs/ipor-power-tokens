@@ -39,6 +39,12 @@ interface IPwIporTokenInternal {
     /// @dev Emits {Unpaused}.
     function unpause() external;
 
+    /// @notice Emitted when user received rewards from john contract
+    /// @param timestamp moment when method was execute
+    /// @param account address
+    /// @param iporTokenAmount of power token received from john
+    event ReceiveRewards(uint256 timestamp, address account, uint256 iporTokenAmount);
+
     /// @notice Emitted when new Fee is setup.
     /// @param timestamp moment when set new fee
     /// @param sender account address
