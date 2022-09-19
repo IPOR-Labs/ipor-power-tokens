@@ -309,7 +309,7 @@ export default ({ drizzle, drizzleState }) => (
                             drizzle={drizzle}
                             drizzleState={drizzleState}
                             contract="John"
-                            method="rewardsPerBlock"
+                            method="getRewardsPerBlock"
                             methodArgs={[drizzle.contracts.IpTokenUsdt.address]}
                             render={(value) => {
                                 console.error(value);
@@ -328,7 +328,7 @@ export default ({ drizzle, drizzleState }) => (
                             drizzle={drizzle}
                             drizzleState={drizzleState}
                             contract="John"
-                            method="rewardsPerBlock"
+                            method="getRewardsPerBlock"
                             methodArgs={[drizzle.contracts.IpTokenUsdc.address]}
                             render={(value) => {
                                 console.error(value);
@@ -347,7 +347,7 @@ export default ({ drizzle, drizzleState }) => (
                             drizzle={drizzle}
                             drizzleState={drizzleState}
                             contract="John"
-                            method="rewardsPerBlock"
+                            method="getRewardsPerBlock"
                             methodArgs={[drizzle.contracts.IpTokenDai.address]}
                             render={(value) => {
                                 console.error(value);

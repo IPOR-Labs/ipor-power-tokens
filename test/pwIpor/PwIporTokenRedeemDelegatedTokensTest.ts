@@ -57,7 +57,7 @@ describe("PwIporToken configuration, deploy tests", () => {
         await pwIporToken.stake(N1__0_18DEC);
         //    when
         await expect(
-            pwIporToken.withdrawFromDelegation(tokens.ipTokenDai.address, ZERO)
+            pwIporToken.undelegateFromJohn(tokens.ipTokenDai.address, ZERO)
         ).to.be.revertedWith("IPOR_004");
     });
 
@@ -66,17 +66,17 @@ describe("PwIporToken configuration, deploy tests", () => {
         await pwIporToken.stake(N1__0_18DEC);
         //    when
         await expect(
-            pwIporToken.withdrawFromDelegation(tokens.ipTokenDai.address, N0__1_18DEC)
+            pwIporToken.undelegateFromJohn(tokens.ipTokenDai.address, N0__1_18DEC)
         ).to.be.revertedWith("IPOR_706");
     });
 
     it("Should revert transaction when delegate amount is less then withdraw amont", async () => {
         //    given
         await pwIporToken.stake(N1__0_18DEC);
-        await pwIporToken.delegateToRewards([tokens.ipTokenDai.address], [N0__1_18DEC]);
+        await pwIporToken.delegateToJohn([tokens.ipTokenDai.address], [N0__1_18DEC]);
         //    when
         await expect(
-            pwIporToken.withdrawFromDelegation(tokens.ipTokenDai.address, N0__5_18DEC)
+            pwIporToken.undelegateFromJohn(tokens.ipTokenDai.address, N0__5_18DEC)
         ).to.be.revertedWith("IPOR_706");
     });
 
@@ -84,23 +84,23 @@ describe("PwIporToken configuration, deploy tests", () => {
         //    given
         const [admin] = accounts;
         await pwIporToken.stake(N2__0_18DEC);
-        await pwIporToken.delegateToRewards([tokens.ipTokenDai.address], [N1__0_18DEC]);
+        await pwIporToken.delegateToJohn([tokens.ipTokenDai.address], [N1__0_18DEC]);
         const delegatedBalanceBefore = await pwIporToken.delegatedBalanceOf(
             await admin.getAddress()
         );
-        const exchangeRateBefore = await pwIporToken.exchangeRate();
+        const exchangeRateBefore = await pwIporToken.calculateExchangeRate();
         const pwTokenBalanceBefore = await pwIporToken.balanceOf(await admin.getAddress());
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
         //    when
-        await pwIporToken.withdrawFromDelegation(tokens.ipTokenDai.address, N1__0_18DEC);
+        await pwIporToken.undelegateFromJohn(tokens.ipTokenDai.address, N1__0_18DEC);
 
         //    then
 
         const delegatedBalanceAfter = await pwIporToken.delegatedBalanceOf(
             await admin.getAddress()
         );
-        const exchangeRateAfter = await pwIporToken.exchangeRate();
+        const exchangeRateAfter = await pwIporToken.calculateExchangeRate();
         const pwTokenBalanceAfter = await pwIporToken.balanceOf(await admin.getAddress());
 
         expect(delegatedBalanceBefore).to.be.equal(N1__0_18DEC);

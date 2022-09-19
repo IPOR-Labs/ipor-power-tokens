@@ -89,7 +89,7 @@ describe("John claim", () => {
 
         await pwIporToken
             .connect(userOne)
-            .delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
 
         const pwIporTokenBalanceBefore = await pwIporToken
             .connect(userOne)
@@ -116,7 +116,7 @@ describe("John claim", () => {
         await pwIporToken.connect(userOne).stake(delegatedIporToken);
         await pwIporToken
             .connect(userOne)
-            .delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
 
         const pwIporTokenBalanceBefore = await pwIporToken
             .connect(userOne)
@@ -132,7 +132,7 @@ describe("John claim", () => {
 
         const rewardsAfterFirstStake = await john
             .connect(userOne)
-            .accountRewards(tokens.ipTokenDai.address);
+            .calculateAccountRewards(tokens.ipTokenDai.address);
 
         await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokens);
 
@@ -143,7 +143,7 @@ describe("John claim", () => {
 
         const rewardsAfterSecondStake = await john
             .connect(userOne)
-            .accountRewards(tokens.ipTokenDai.address);
+            .calculateAccountRewards(tokens.ipTokenDai.address);
 
         expect(rewardsAfterFirstStake).to.be.equal(BigNumber.from("100000000000000000000"));
         expect(rewardsAfterSecondStake).to.be.equal(ZERO);
@@ -168,7 +168,7 @@ describe("John claim", () => {
         await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokens);
         await pwIporToken
             .connect(userOne)
-            .delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
         const pwIporTokenBalanceAfter1Stake = await pwIporToken
@@ -176,15 +176,15 @@ describe("John claim", () => {
             .balanceOf(await userOne.getAddress());
         const rewardsAfterFirstStake = await john
             .connect(userOne)
-            .accountRewards(tokens.ipTokenDai.address);
+            .calculateAccountRewards(tokens.ipTokenDai.address);
 
         await pwIporToken
             .connect(userOne)
-            .delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
 
         const rewardsAfterSecondStake = await john
             .connect(userOne)
-            .accountRewards(tokens.ipTokenDai.address);
+            .calculateAccountRewards(tokens.ipTokenDai.address);
         //    then
 
         const pwIporTokenBalanceAfter2Stake = await pwIporToken
@@ -195,9 +195,9 @@ describe("John claim", () => {
         expect(rewardsAfterSecondStake).to.be.equal(ZERO);
 
         expect(pwIporTokenBalanceBefore).to.be.equal(BigNumber.from("200000000000000000000"));
-        // 1 transfer when first delegateToRewards
+        // 1 transfer when first delegateToJohn
         expect(pwIporTokenBalanceAfter1Stake).to.be.equal(BigNumber.from("201000000000000000000"));
-        // 100 transfer after second delegateToRewards
+        // 100 transfer after second delegateToJohn
         expect(pwIporTokenBalanceAfter2Stake).to.be.equal(BigNumber.from("302000000000000000000"));
     });
 });

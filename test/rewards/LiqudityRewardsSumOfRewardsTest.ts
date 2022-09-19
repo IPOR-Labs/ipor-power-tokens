@@ -96,7 +96,7 @@ describe("John claim", () => {
 
         await pwIporToken
             .connect(userOne)
-            .delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
 
         const pwIporTokenBalanceBefore = await pwIporToken
             .connect(userOne)
@@ -104,18 +104,18 @@ describe("John claim", () => {
 
         await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokens);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
-        const globalParamsBefore = await john.globalParams(tokens.ipTokenDai.address);
+        const globalParamsBefore = await john.getGlobalParams(tokens.ipTokenDai.address);
         const userParamsBefore = await john
             .connect(userOne)
-            .accountParams(tokens.ipTokenDai.address);
+            .getAccountParams(tokens.ipTokenDai.address);
         const ipTokenBalanceBefore = await tokens.ipTokenDai.balanceOf(await userOne.getAddress());
         //    when
         await john.connect(userOne).unstake(tokens.ipTokenDai.address, stakedIpTokens);
         //    then
-        const globalParamsAfter = await john.globalParams(tokens.ipTokenDai.address);
+        const globalParamsAfter = await john.getGlobalParams(tokens.ipTokenDai.address);
         const userParamsAfter = await john
             .connect(userOne)
-            .accountParams(tokens.ipTokenDai.address);
+            .getAccountParams(tokens.ipTokenDai.address);
         const ipTokenBalanceAfter = await tokens.ipTokenDai.balanceOf(await userOne.getAddress());
 
         const pwIporTokenBalanceAfter = await pwIporToken
@@ -169,7 +169,7 @@ describe("John claim", () => {
 
         // Admin
         await pwIporToken.stake(delegatedIporToken);
-        await pwIporToken.delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
+        await pwIporToken.delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
         await john.stake(tokens.ipTokenDai.address, stakedIpTokens);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
@@ -177,7 +177,7 @@ describe("John claim", () => {
         await pwIporToken.connect(userOne).stake(delegatedIporToken);
         await pwIporToken
             .connect(userOne)
-            .delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
         await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokens);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
@@ -185,7 +185,7 @@ describe("John claim", () => {
         await pwIporToken.connect(userTwo).stake(delegatedIporToken);
         await pwIporToken
             .connect(userTwo)
-            .delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
         await john.connect(userTwo).stake(tokens.ipTokenDai.address, stakedIpTokens);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
@@ -194,7 +194,7 @@ describe("John claim", () => {
         await john.connect(userOne).unstake(tokens.ipTokenDai.address, stakedIpTokens);
         await john.connect(userTwo).unstake(tokens.ipTokenDai.address, stakedIpTokens);
         //    then
-        const globalParamsAfter = await john.globalParams(tokens.ipTokenDai.address);
+        const globalParamsAfter = await john.getGlobalParams(tokens.ipTokenDai.address);
         expectGlobalParam(
             extractGlobalParam(globalParamsAfter),
             ZERO,
@@ -205,13 +205,13 @@ describe("John claim", () => {
             100000000
         );
 
-        const rewardsAdmin = await john.accountRewards(tokens.ipTokenDai.address);
+        const rewardsAdmin = await john.calculateAccountRewards(tokens.ipTokenDai.address);
         const rewardsUserOne = await john
             .connect(userOne)
-            .accountRewards(tokens.ipTokenDai.address);
+            .calculateAccountRewards(tokens.ipTokenDai.address);
         const rewardsUserTwo = await john
             .connect(userTwo)
-            .accountRewards(tokens.ipTokenDai.address);
+            .calculateAccountRewards(tokens.ipTokenDai.address);
         expect(rewardsAdmin.add(rewardsUserOne).add(rewardsUserTwo)).to.be.equal(ZERO);
     });
 
@@ -222,7 +222,7 @@ describe("John claim", () => {
 
         // Admin
         await pwIporToken.stake(delegatedIporToken);
-        await pwIporToken.delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
+        await pwIporToken.delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
         await john.stake(tokens.ipTokenDai.address, N1__0_18DEC.mul(BigNumber.from("100")));
         await hre.network.provider.send("hardhat_mine", ["0x20"]);
         await john.stake(tokens.ipTokenDai.address, N1__0_18DEC.mul(BigNumber.from("20")));
@@ -234,7 +234,7 @@ describe("John claim", () => {
         await pwIporToken.connect(userOne).stake(delegatedIporToken);
         await pwIporToken
             .connect(userOne)
-            .delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
         await john
             .connect(userOne)
             .stake(tokens.ipTokenDai.address, N1__0_18DEC.mul(BigNumber.from("100")));
@@ -253,7 +253,7 @@ describe("John claim", () => {
         await pwIporToken.connect(userTwo).stake(delegatedIporToken);
         await pwIporToken
             .connect(userTwo)
-            .delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
         await john
             .connect(userTwo)
             .stake(tokens.ipTokenDai.address, N1__0_18DEC.mul(BigNumber.from("60")));
@@ -286,7 +286,7 @@ describe("John claim", () => {
             .connect(userTwo)
             .unstake(tokens.ipTokenDai.address, N1__0_18DEC.mul(BigNumber.from("20")));
         //    then
-        const globalParamsAfter = await john.globalParams(tokens.ipTokenDai.address);
+        const globalParamsAfter = await john.getGlobalParams(tokens.ipTokenDai.address);
         expect(extractGlobalParam(globalParamsAfter).aggregatePowerUp).to.be.equal(ZERO);
     });
 
@@ -295,11 +295,11 @@ describe("John claim", () => {
         const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
 
-        const accruedRewardsBefore = await john.accruedRewards(tokens.ipTokenDai.address);
+        const accruedRewardsBefore = await john.calculateAccruedRewards(tokens.ipTokenDai.address);
         await pwIporToken.connect(userOne).stake(delegatedIporToken);
         await pwIporToken
             .connect(userOne)
-            .delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
 
         const pwIporTokenBalanceBefore = await pwIporToken
             .connect(userOne)
@@ -309,29 +309,33 @@ describe("John claim", () => {
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
         await john.connect(userOne).unstake(tokens.ipTokenDai.address, stakedIpTokens);
 
-        const accruedRewardsAfter1Unstake = await john.accruedRewards(tokens.ipTokenDai.address);
+        const accruedRewardsAfter1Unstake = await john.calculateAccruedRewards(
+            tokens.ipTokenDai.address
+        );
         const pwIporTokenBalanceAfter1Unstake = await pwIporToken
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
-        const accruedRewardsAfter1UnstakePlus100Mine = await john.accruedRewards(
+        const accruedRewardsAfter1UnstakePlus100Mine = await john.calculateAccruedRewards(
             tokens.ipTokenDai.address
         );
         await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokens);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
         await john.connect(userOne).unstake(tokens.ipTokenDai.address, stakedIpTokens);
-        const accruedRewardsAfter2Unstake = await john.accruedRewards(tokens.ipTokenDai.address);
+        const accruedRewardsAfter2Unstake = await john.calculateAccruedRewards(
+            tokens.ipTokenDai.address
+        );
 
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
-        const accruedRewardsAfter2UnstakePlus100Mine = await john.accruedRewards(
+        const accruedRewardsAfter2UnstakePlus100Mine = await john.calculateAccruedRewards(
             tokens.ipTokenDai.address
         );
 
         //    then
 
-        const accountRewardsAfter = await john.accountRewards(tokens.ipTokenDai.address);
+        const accountRewardsAfter = await john.calculateAccountRewards(tokens.ipTokenDai.address);
         const pwIporTokenBalanceAfter = await pwIporToken
             .connect(userOne)
             .balanceOf(await userOne.getAddress());

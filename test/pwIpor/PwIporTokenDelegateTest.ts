@@ -51,7 +51,7 @@ describe("PwIporToken configuration, deploy tests", () => {
         const [admin, userOne] = accounts;
         //    when
         await expect(
-            pwIporToken.delegateToRewards([await userOne.getAddress()], [N0__1_18DEC, N1__0_18DEC])
+            pwIporToken.delegateToJohn([await userOne.getAddress()], [N0__1_18DEC, N1__0_18DEC])
         ).to.be.revertedWith("IPOR_005");
     });
 
@@ -61,7 +61,7 @@ describe("PwIporToken configuration, deploy tests", () => {
         const [admin, userOne] = accounts;
         //    when
         await expect(
-            pwIporToken.delegateToRewards([await admin.getAddress()], [N1__0_18DEC])
+            pwIporToken.delegateToJohn([await admin.getAddress()], [N1__0_18DEC])
         ).to.be.revertedWith("IPOR_705");
     });
 
@@ -71,7 +71,7 @@ describe("PwIporToken configuration, deploy tests", () => {
         const [admin, userOne] = accounts;
         //    when
         await expect(
-            pwIporToken.delegateToRewards(
+            pwIporToken.delegateToJohn(
                 [tokens.tokenDai.address, tokens.tokenUsdc.address],
                 [N1__0_18DEC, N0__1_18DEC]
             )
@@ -87,7 +87,7 @@ describe("PwIporToken configuration, deploy tests", () => {
         );
 
         //    when
-        await pwIporToken.delegateToRewards([tokens.ipTokenDai.address], [N0__1_18DEC]);
+        await pwIporToken.delegateToJohn([tokens.ipTokenDai.address], [N0__1_18DEC]);
 
         //    then
         const delegatedBalanceAfter = await pwIporToken.delegatedBalanceOf(
@@ -109,7 +109,7 @@ describe("PwIporToken configuration, deploy tests", () => {
             await admin.getAddress()
         );
         //    when
-        await pwIporToken.delegateToRewards(
+        await pwIporToken.delegateToJohn(
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
             [N0__1_18DEC, N0__1_18DEC]
         );
