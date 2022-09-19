@@ -111,12 +111,6 @@ interface IPwIporToken {
     /// @param iporTokenAmount of ipor token was transferred to user
     event Redeem(uint256 timestamp, address account, uint256 iporTokenAmount);
 
-    /// @notice Emitted when user received rewards from john contract
-    /// @param timestamp moment when method was execute
-    /// @param account address
-    /// @param iporTokenAmount of power token received from john
-    event ReceiveRewards(uint256 timestamp, address account, uint256 iporTokenAmount);
-
     /// @notice Emitted when user delegated tokens to john contract
     /// @param timestamp moment when method was execute
     /// @param account address

@@ -247,14 +247,6 @@ contract John is
         require(rewards > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
 
         _claim(_msgSender(), ipToken, rewards, accountParams, globalParams);
-        //        _rebalanceParams(
-        //            accountParams,
-        //            globalParams,
-        //            accountParams.ipTokensBalance,
-        //            accountParams.delegatedPwTokenBalance,
-        //            ipToken,
-        //            _msgSender()
-        //        );
 
         uint256 accountPowerUp = MiningCalculation.calculateAccountPowerUp(
             accountParams.delegatedPwTokenBalance,
