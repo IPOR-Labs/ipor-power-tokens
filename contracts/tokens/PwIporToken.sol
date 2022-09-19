@@ -10,7 +10,7 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "../security/IporOwnableUpgradeable.sol";
 import "../interfaces/IPwIporTokenInternal.sol";
 import "../interfaces/IPwIporToken.sol";
-import "../interfaces/IJohn.sol";
+import "../interfaces/IJohnInternal.sol";
 import "../interfaces/types/PwIporTokenTypes.sol";
 import "../libraries/errors/IporErrors.sol";
 import "../libraries/errors/MiningErrors.sol";
@@ -205,7 +205,7 @@ contract PwIporToken is
         );
 
         _delegatedBalance[_msgSender()] += pwIporToDelegate;
-        IJohn(_john).delegatePwIpor(_msgSender(), ipTokens, pwIporAmounts);
+        IJohnInternal(_john).delegatePwIpor(_msgSender(), ipTokens, pwIporAmounts);
 
         emit DelegateToReward(block.timestamp, _msgSender(), ipTokens, pwIporAmounts);
     }
@@ -221,7 +221,7 @@ contract PwIporToken is
             MiningErrors.DELEGATED_BALANCE_TOO_LOW
         );
 
-        IJohn(_john).withdrawFromDelegation(_msgSender(), ipToken, pwIporAmount);
+        IJohnInternal(_john).withdrawFromDelegation(_msgSender(), ipToken, pwIporAmount);
         _delegatedBalance[_msgSender()] -= pwIporAmount;
 
         emit WithdrawFromDelegation(block.timestamp, _msgSender(), ipToken, pwIporAmount);

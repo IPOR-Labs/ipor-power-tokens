@@ -38,6 +38,26 @@ interface IJohnInternal {
     /// @param ipToken address of ipToken
     function removeIpToken(address ipToken) external;
 
+    /// @notice method allowed to delegate power token to rewards contract
+    /// @param account address which one delegate power tokens
+    /// @param ipTokens to which power tokens should be delegated
+    /// @param pwTokenAmounts which should be assigns to assets , represented in 18 decimals
+    function delegatePwIpor(
+        address account,
+        address[] memory ipTokens,
+        uint256[] memory pwTokenAmounts
+    ) external;
+
+    /// @notice method allowed to withdraw power token from rewards contract
+    /// @param account address which one delegate power tokens
+    /// @param ipToken from which you want to withdraw tokens
+    /// @param pwTokenAmount to withdraw, represented in 18 decimals
+    function withdrawFromDelegation(
+        address account,
+        address ipToken,
+        uint256 pwTokenAmount
+    ) external;
+
     /// @notice Pauses current smart contract, it can be executed only by the Owner
     /// @dev Emits {Paused} event.
     function pause() external;
@@ -66,4 +86,23 @@ interface IJohnInternal {
     /// @param account address
     /// @param ipToken address of ipToken
     event IpTokenRemoved(uint256 timestamp, address account, address ipToken);
+
+    /// @notice Emitted when user delegate power token to rewards contract
+    /// @param timestamp moment when method was execute
+    /// @param account account address
+    /// @param ipToken address of ipToken which should be unstake
+    /// @param amount of ipTokens to unstake, represented in 18 decimals
+    event AddPwIporToBalance(uint256 timestamp, address account, address ipToken, uint256 amount);
+
+    /// @notice Emitted when user withdraw power token from rewards contract
+    /// @param timestamp moment when method was execute
+    /// @param account account address
+    /// @param ipToken address of ipToken
+    /// @param amount of power token to withdraw, represented in 18 decimals
+    event WithdrawFromDelegation(
+        uint256 timestamp,
+        address account,
+        address ipToken,
+        uint256 amount
+    );
 }
