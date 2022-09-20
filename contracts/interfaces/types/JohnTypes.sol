@@ -14,21 +14,23 @@ library JohnTypes {
 
     struct GlobalRewardsParams {
         uint256 aggregatePowerUp;
-        uint256 accruedRewards;
         // represented in 27 decimals
-        uint256 compositeMultiplierInTheBlock;
+        uint128 compositeMultiplierInTheBlock;
         // represented in 27 decimals
-        uint256 compositeMultiplierCumulativeBeforeBlock;
+        uint128 compositeMultiplierCumulativeBeforeBlock;
         uint32 blockNumber;
         // represented in 8 decimals
         uint32 blockRewards;
+        uint88 accruedRewards;
     }
 
     struct AccountRewardsParams {
-        uint256 powerUp;
         // represented in 27 decimals
-        uint256 compositeMultiplierCumulative;
-        uint256 ipTokensBalance;
-        uint256 delegatedPwTokenBalance;
+        uint128 compositeMultiplierCumulative;
+        uint128 ipTokensBalance;
+        //  powerUp < 100 *10^18
+        uint72 powerUp;
+        //delegatedPwTokenBalance < 10^26 < 2^87
+        uint96 delegatedPwTokenBalance;
     }
 }

@@ -150,14 +150,14 @@ contract John is JohnInternal, IJohn {
             .compositeMultiplierCumulativeBeforeBlock +
             (block.number - globalParams.blockNumber) *
             globalParams.compositeMultiplierInTheBlock;
-
+        require(accountPowerUp < type(uint72).max, IporErrors.VALUE_DOESNT_FIT_IN_72_BITS);
         _saveAccountParams(
             _msgSender(),
             ipToken,
             JohnTypes.AccountRewardsParams(
-                accountPowerUp,
-                compositeMultiplierCumulativeBeforeBlock,
+                compositeMultiplierCumulativeBeforeBlock.toUint128(),
                 accountParams.ipTokensBalance,
+                uint72(accountPowerUp),
                 accountParams.delegatedPwTokenBalance
             )
         );

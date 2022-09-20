@@ -75,7 +75,7 @@ abstract contract JohnInternal is
 
             _saveGlobalParams(
                 ipTokens[i],
-                JohnTypes.GlobalRewardsParams(0, 0, 0, 0, 0, uint32(Constants.D8))
+                JohnTypes.GlobalRewardsParams(0, 0, 0, 0, uint32(Constants.D8), 0)
             );
         }
     }
@@ -173,16 +173,17 @@ abstract contract JohnInternal is
             rewardsValue,
             globalParams.aggregatePowerUp
         );
+        require(accruedRewards < type(uint88).max, IporErrors.VALUE_DOESNT_FIT_IN_88_BITS);
 
         _saveGlobalParams(
             ipToken,
             JohnTypes.GlobalRewardsParams(
                 globalParams.aggregatePowerUp,
-                accruedRewards,
-                compositeMultiplier,
-                compositeMultiplierCumulativeBeforeBlock,
+                compositeMultiplier.toUint128(),
+                compositeMultiplierCumulativeBeforeBlock.toUint128(),
                 blockNumber.toUint32(),
-                rewardsValue
+                rewardsValue,
+                uint88(accruedRewards)
             )
         );
         emit RewardsPerBlockChanged(_msgSender(), rewardsValue);
@@ -193,7 +194,7 @@ abstract contract JohnInternal is
         _ipTokens[ipToken] = true;
         _saveGlobalParams(
             ipToken,
-            JohnTypes.GlobalRewardsParams(0, 0, 0, 0, 0, uint32(Constants.D8))
+            JohnTypes.GlobalRewardsParams(0, 0, 0, 0, uint32(Constants.D8), 0)
         );
         emit IpTokenAdded(_msgSender(), ipToken);
     }
@@ -231,15 +232,16 @@ abstract contract JohnInternal is
             .compositeMultiplierCumulativeBeforeBlock +
             (block.number - globalParams.blockNumber) *
             globalParams.compositeMultiplierInTheBlock;
-
+        require(accountPowerUp < type(uint72).max, IporErrors.VALUE_DOESNT_FIT_IN_72_BITS);
+        require(delegatedPwTokens < type(uint96).max, IporErrors.VALUE_DOESNT_FIT_IN_96_BITS);
         _saveAccountParams(
             account,
             ipToken,
             JohnTypes.AccountRewardsParams(
-                accountPowerUp,
-                compositeMultiplierCumulativeBeforeBlock,
-                ipTokensBalance,
-                delegatedPwTokens
+                compositeMultiplierCumulativeBeforeBlock.toUint128(),
+                ipTokensBalance.toUint128(),
+                uint72(accountPowerUp),
+                uint96(delegatedPwTokens)
             )
         );
 
@@ -269,15 +271,16 @@ abstract contract JohnInternal is
             aggregatePowerUp
         );
 
+        require(accountPowerUp < type(uint72).max, IporErrors.VALUE_DOESNT_FIT_IN_72_BITS);
         _saveGlobalParams(
             ipToken,
             JohnTypes.GlobalRewardsParams(
                 aggregatePowerUp,
-                accruedRewards,
-                compositeMultiplier,
-                compositeMultiplierCumulativeBeforeBlock,
+                compositeMultiplier.toUint128(),
+                compositeMultiplierCumulativeBeforeBlock.toUint128(),
                 block.number.toUint32(),
-                globalParams.blockRewards
+                globalParams.blockRewards,
+                uint88(accruedRewards)
             )
         );
     }
@@ -291,9 +294,9 @@ abstract contract JohnInternal is
         JohnTypes.GlobalRewardsParams memory globalParams = _globalParameters[ipToken];
 
         if (accountParams.ipTokensBalance == 0) {
-            _accountParams[account][ipToken].delegatedPwTokenBalance =
-                accountParams.delegatedPwTokenBalance +
-                pwTokenAmount;
+            uint256 newBalance = accountParams.delegatedPwTokenBalance + pwTokenAmount;
+            require(newBalance < type(uint96).max, IporErrors.VALUE_DOESNT_FIT_IN_96_BITS);
+            _accountParams[account][ipToken].delegatedPwTokenBalance = uint96(newBalance);
             emit AddPwIporToBalance(account, ipToken, pwTokenAmount);
             return;
         }

@@ -31,4 +31,10 @@ library IporErrors {
     string public constant CHUNK_SIZE_EQUAL_ZERO = "IPOR_009";
 
     string public constant CHUNK_SIZE_TOO_BIG = "IPOR_010";
+
+    string public constant VALUE_DOESNT_FIT_IN_72_BITS = "IPOR_011";
+
+    string public constant VALUE_DOESNT_FIT_IN_88_BITS = "IPOR_012";
+
+    string public constant VALUE_DOESNT_FIT_IN_96_BITS = "IPOR_013";
 }

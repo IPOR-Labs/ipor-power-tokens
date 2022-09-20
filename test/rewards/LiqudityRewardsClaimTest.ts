@@ -5,7 +5,7 @@ import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
 import { John, IporToken, PwIporToken } from "../../types";
-import { Tokens, getDeployedTokens } from "../utils/JohnUtils";
+import { Tokens, getDeployedTokens, extractGlobalParam } from "../utils/JohnUtils";
 import {
     N1__0_18DEC,
     ZERO,
