@@ -9,6 +9,7 @@
     "bootstrap": "^5.0.2",
     "dotenv": "^10.0.0",
     "env-cmd": "^10.1.0",
+    "ethers": "^5.7.1",
     "react": "^16.11.0",
     "react-bootstrap": "^1.6.1",
     "react-dom": "^16.11.0",

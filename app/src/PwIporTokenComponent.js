@@ -1,20 +1,21 @@
 import React, { useState } from "react";
 import { newContextComponents } from "@drizzle/react-components";
-import { Button } from "react-bootstrap";
+import { BigNumber } from "ethers";
 
 const { ContractData, ContractForm } = newContextComponents;
 
 export default ({ drizzle, drizzleState }) => {
-    const [assets, setAssets] = useState([""]);
-    const [amounts, setAmounts] = useState(["0"]);
+    const [ipTokens, setIpTokens] = useState([""]);
+    const [pwIporAmounts, setPwIporAmounts] = useState(["0"]);
 
     return (
         <div>
             <br />
+
             <h3>
                 Ipor Token <small>{drizzle.contracts.IporToken.address}</small>
             </h3>
-            {assets}
+            {ipTokens}
             <br />
             <div className="row">
                 <table className="table" align="center">
@@ -114,7 +115,7 @@ export default ({ drizzle, drizzleState }) => {
                                 drizzle={drizzle}
                                 drizzleState={drizzleState}
                                 contract="PwIporToken"
-                                method="john"
+                                method="getJohn"
                                 render={(value) =>
                                     value !== "0x0000000000000000000000000000000000000000" ? (
                                         value
@@ -339,13 +340,14 @@ export default ({ drizzle, drizzleState }) => {
                                 <td style={{ border: "none", padding: "1em" }}>
                                     <input
                                         id="amounts"
-                                        value={amounts.map((e) => e.toString()).join(",")}
-                                        onChange={(e) =>
-                                            setAmounts(
-                                                e.target.value.split(",")
-                                                // .map((a) => (a != "" ? BigNumber.from(a) : ""))
-                                            )
-                                        }
+                                        value={pwIporAmounts.map((e) => e.toString()).join(",")}
+                                        onChange={(e) => {
+                                            setPwIporAmounts(
+                                                e.target.value
+                                                    .split(",")
+                                                    .map((a) => (a != "" ? BigNumber.from(a) : ""))
+                                            );
+                                        }}
                                     />
                                 </td>
                             </tr>
@@ -356,8 +358,8 @@ export default ({ drizzle, drizzleState }) => {
                                 contract="PwIporToken"
                                 method="delegateToJohn"
                                 render={({ handleSubmit, inputs, state, handleInputChange }) => {
-                                    state["assets"] = assets;
-                                    state["amounts"] = amounts;
+                                    state["ipTokens"] = ipTokens;
+                                    state["pwIporAmounts"] = pwIporAmounts;
                                     return (
                                         <div>
                                             <form
@@ -390,7 +392,7 @@ export default ({ drizzle, drizzleState }) => {
                                     drizzle={drizzle}
                                     drizzleState={drizzleState}
                                     contract="John"
-                                    method="userParams"
+                                    method="getAccountParams"
                                     methodArgs={[drizzle.contracts.IpTokenUsdt.address]}
                                     render={(value) => {
                                         return (
@@ -407,7 +409,7 @@ export default ({ drizzle, drizzleState }) => {
                                     drizzle={drizzle}
                                     drizzleState={drizzleState}
                                     contract="John"
-                                    method="userParams"
+                                    method="getAccountParams"
                                     methodArgs={[drizzle.contracts.IpTokenUsdc.address]}
                                     render={(value) => {
                                         return (
@@ -424,7 +426,7 @@ export default ({ drizzle, drizzleState }) => {
                                     drizzle={drizzle}
                                     drizzleState={drizzleState}
                                     contract="John"
-                                    method="userParams"
+                                    method="getAccountParams"
                                     methodArgs={[drizzle.contracts.IpTokenDai.address]}
                                     render={(value) => {
                                         return (
