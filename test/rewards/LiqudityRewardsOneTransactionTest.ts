@@ -94,7 +94,7 @@ describe("One block/Transaction tests", () => {
             [agent1.address, agent2.address],
             [N1__0_18DEC, N1__0_18DEC]
         );
-        await liquidityRewardsTestAction.delegateToRewards(
+        await liquidityRewardsTestAction.delegatePwIpor(
             [agent1.address, agent2.address],
             [[tokens.ipTokenDai.address], [tokens.ipTokenDai.address]],
             [[N1__0_18DEC], [N1__0_18DEC]]
@@ -106,8 +106,8 @@ describe("One block/Transaction tests", () => {
         );
 
         //    then
-        const agent1AccountParamsAfter = await agent1.accountParams(tokens.ipTokenDai.address);
-        const agent2AccountParamsAfter = await agent2.accountParams(tokens.ipTokenDai.address);
+        const agent1AccountParamsAfter = await agent1.getAccountParams(tokens.ipTokenDai.address);
+        const agent2AccountParamsAfter = await agent2.getAccountParams(tokens.ipTokenDai.address);
         const agent1After = extractMyParam(agent1AccountParamsAfter);
         const agent2After = extractMyParam(agent2AccountParamsAfter);
 
@@ -127,7 +127,7 @@ describe("One block/Transaction tests", () => {
             [agent1.address, agent2.address],
             [N1__0_18DEC, N1__0_18DEC]
         );
-        await liquidityRewardsTestAction.delegateToRewards(
+        await liquidityRewardsTestAction.delegatePwIpor(
             [agent1.address, agent2.address],
             [[tokens.ipTokenDai.address], [tokens.ipTokenDai.address]],
             [[N1__0_18DEC], [N1__0_18DEC]]
@@ -147,8 +147,8 @@ describe("One block/Transaction tests", () => {
         );
         //    then
 
-        const agent1AccountParamsAfter = await agent1.accountParams(tokens.ipTokenDai.address);
-        const agent2AccountParamsAfter = await agent2.accountParams(tokens.ipTokenDai.address);
+        const agent1AccountParamsAfter = await agent1.getAccountParams(tokens.ipTokenDai.address);
+        const agent2AccountParamsAfter = await agent2.getAccountParams(tokens.ipTokenDai.address);
         const agent1PwTokenBalanceAfter = await pwIporToken.balanceOf(agent1.address);
         const agent2PwTokenBalanceAfter = await pwIporToken.balanceOf(agent2.address);
         const agent1After = extractMyParam(agent1AccountParamsAfter);
@@ -180,7 +180,7 @@ describe("One block/Transaction tests", () => {
             N1__0_18DEC.mul(BigNumber.from("10000"))
         );
         await pwIporToken.connect(userOne).stake(N100__0_18DEC);
-        await pwIporToken.connect(userOne).delegateToRewards([ipDai], [N100__0_18DEC]);
+        await pwIporToken.connect(userOne).delegateToJohn([ipDai], [N100__0_18DEC]);
         await john.connect(userOne).stake(ipDai, N1000__0_18DEC);
 
         const agent1IpTokenBalanceBefore = await tokens.ipTokenDai.balanceOf(agent1.address);
@@ -190,7 +190,7 @@ describe("One block/Transaction tests", () => {
         );
         const userOneIporTokenBalanceBefore = await iporToken.balanceOf(await userOne.getAddress());
 
-        const accruedRewardsBefore = await john.accruedRewards(ipDai);
+        const accruedRewardsBefore = await john.calculateAccruedRewards(ipDai);
         const userOnePwTokenBalanceBefore = await pwIporToken.balanceOf(await userOne.getAddress());
         const agent1PwTokenBalanceBefore = await pwIporToken.balanceOf(agent1.address);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
@@ -229,7 +229,7 @@ describe("One block/Transaction tests", () => {
         );
         const userOneIporTokenBalanceAfter = await iporToken.balanceOf(await userOne.getAddress());
 
-        const accruedRewardsAfter = await john.accruedRewards(ipDai);
+        const accruedRewardsAfter = await john.calculateAccruedRewards(ipDai);
         const userOnePwTokenBalanceAfter = await pwIporToken.balanceOf(await userOne.getAddress());
 
         expect(accruedRewardsBefore).to.be.equal(ZERO);
@@ -290,8 +290,8 @@ describe("One block/Transaction tests", () => {
 
         //    then
         const blockNumberAfterTransaction = (await hre.ethers.provider.getBlock("latest")).number;
-        const agent1Rewards = await agent1.accountRewards(ipDai);
-        const agent2Rewards = await agent2.accountRewards(ipDai);
+        const agent1Rewards = await agent1.calculateAccountRewards(ipDai);
+        const agent2Rewards = await agent2.calculateAccountRewards(ipDai);
 
         expect(pendingBlockBeforeMine.transactions.length).to.be.equal(2);
         expect(pendingBlockAfterMine.transactions.length).to.be.equal(0);
@@ -309,7 +309,7 @@ describe("One block/Transaction tests", () => {
 
         const agent1PwTokenBalanceBefore = await pwIporToken.balanceOf(agent1.address);
         const agent2PwTokenBalanceBefore = await pwIporToken.balanceOf(agent2.address);
-        const blockRewardsInitial = await john.rewardsPerBlock(ipDai);
+        const blockRewardsInitial = await john.getRewardsPerBlock(ipDai);
 
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
         await network.provider.send("evm_setAutomine", [false]);
@@ -324,20 +324,20 @@ describe("One block/Transaction tests", () => {
         await agent2.stakeIpToken(ipDai, N1000__0_18DEC);
         await hre.network.provider.send("evm_mine");
 
-        const blockRewardsAfterBlock11 = await john.rewardsPerBlock(ipDai);
+        const blockRewardsAfterBlock11 = await john.getRewardsPerBlock(ipDai);
         const agent2StakeIpTokensInBlock = (await hre.ethers.provider.getBlock("latest")).number;
-        const agent1RewardsInBlock11 = await agent1.accountRewards(ipDai);
+        const agent1RewardsInBlock11 = await agent1.calculateAccountRewards(ipDai);
         await hre.network.provider.send("hardhat_mine", ["0x9"]);
         const blockNumberBeforeUnstake = (await hre.ethers.provider.getBlock("latest")).number;
-        const agent1RewardsInBlock20 = await agent1.accountRewards(ipDai);
-        const agent2RewardsInBlock20 = await agent2.accountRewards(ipDai);
+        const agent1RewardsInBlock20 = await agent1.calculateAccountRewards(ipDai);
+        const agent2RewardsInBlock20 = await agent2.calculateAccountRewards(ipDai);
 
         await john.setRewardsPerBlock(ipDai, BigNumber.from("1000000000"));
         await agent1.unstakeIpToken(ipDai, N1000__0_18DEC);
         await agent2.unstakeIpToken(ipDai, N1000__0_18DEC);
         await hre.network.provider.send("evm_mine");
         const unstakeBlockNumber = (await hre.ethers.provider.getBlock("latest")).number;
-        const blockRewardsAfterBlock21 = await john.rewardsPerBlock(ipDai);
+        const blockRewardsAfterBlock21 = await john.getRewardsPerBlock(ipDai);
 
         //    then
 
@@ -372,7 +372,7 @@ describe("One block/Transaction tests", () => {
                 [agent1.address, agent2.address],
                 [N1__0_18DEC, N1__0_18DEC]
             );
-            await liquidityRewardsTestAction.delegateToRewards(
+            await liquidityRewardsTestAction.delegatePwIpor(
                 [agent1.address, agent2.address],
                 [[tokens.ipTokenDai.address], [tokens.ipTokenDai.address]],
                 [[N1__0_18DEC], [N1__0_18DEC]]
@@ -393,13 +393,17 @@ describe("One block/Transaction tests", () => {
             );
 
             //    then
-            const agent1AccountParamsAfter = await agent1.accountParams(tokens.ipTokenDai.address);
-            const agent2AccountParamsAfter = await agent2.accountParams(tokens.ipTokenDai.address);
+            const agent1AccountParamsAfter = await agent1.getAccountParams(
+                tokens.ipTokenDai.address
+            );
+            const agent2AccountParamsAfter = await agent2.getAccountParams(
+                tokens.ipTokenDai.address
+            );
             agent1PwTokenBalanceAfter = await pwIporToken.balanceOf(agent1.address);
             agent2PwTokenBalanceAfter = await pwIporToken.balanceOf(agent2.address);
             const agent1After = extractMyParam(agent1AccountParamsAfter);
             const agent2After = extractMyParam(agent2AccountParamsAfter);
-            const accruedRewards = await john.accruedRewards(tokens.ipTokenDai.address);
+            const accruedRewards = await john.calculateAccruedRewards(tokens.ipTokenDai.address);
             const differencesBetweenRewords = accruedRewards
                 .sub(agent2PwTokenBalanceAfter)
                 .sub(agent1PwTokenBalanceAfter)
@@ -430,7 +434,7 @@ describe("One block/Transaction tests", () => {
                 [agent1.address, agent2.address],
                 [N1__0_18DEC, N1__0_18DEC]
             );
-            await liquidityRewardsTestAction.delegateToRewards(
+            await liquidityRewardsTestAction.delegatePwIpor(
                 [agent1.address, agent2.address],
                 [[tokens.ipTokenDai.address], [tokens.ipTokenDai.address]],
                 [[N1__0_18DEC], [N1__0_18DEC]]

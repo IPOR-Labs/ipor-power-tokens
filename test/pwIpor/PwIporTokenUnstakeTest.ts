@@ -96,7 +96,7 @@ describe("PwIporToken unstake", () => {
         //    given
         await pwIporToken.stake(N1__0_18DEC);
 
-        await pwIporToken.delegateToRewards(
+        await pwIporToken.delegateToJohn(
             [tokens.ipTokenDai.address],
             [N0__1_18DEC.mul(BigNumber.from("6"))]
         );
@@ -114,9 +114,9 @@ describe("PwIporToken unstake", () => {
         const balanceBefore = await pwIporToken.balanceOf(await admin.getAddress());
         const totalSupplyBefore = await pwIporToken.totalSupplyBase();
         const iporBalanceBefore = await iporToken.balanceOf(await admin.getAddress());
-        const exchangeRateBefore = await pwIporToken.exchangeRate();
+        const exchangeRateBefore = await pwIporToken.calculateExchangeRate();
 
-        await pwIporToken.delegateToRewards([tokens.ipTokenDai.address], [N0__6_18DEC]);
+        await pwIporToken.delegateToJohn([tokens.ipTokenDai.address], [N0__6_18DEC]);
         //    when
         await pwIporToken.unstake(N0__4_18DEC);
 
@@ -124,7 +124,7 @@ describe("PwIporToken unstake", () => {
         const balanceAfter = await pwIporToken.balanceOf(await admin.getAddress());
         const totalSupplyAfter = await pwIporToken.totalSupplyBase();
         const iporBalanceAfter = await iporToken.balanceOf(await admin.getAddress());
-        const exchangeRateAfter = await pwIporToken.exchangeRate();
+        const exchangeRateAfter = await pwIporToken.calculateExchangeRate();
 
         expect(balanceBefore).to.be.equal(N1__0_18DEC);
         expect(totalSupplyBefore).to.be.equal(N1__0_18DEC);
@@ -145,10 +145,10 @@ describe("PwIporToken unstake", () => {
         const balanceBefore = await pwIporToken.balanceOf(await admin.getAddress());
         const totalSupplyBefore = await pwIporToken.totalSupplyBase();
         const iporBalanceBefore = await iporToken.balanceOf(await admin.getAddress());
-        const exchangeRateBefore = await pwIporToken.exchangeRate();
-        const withdrawalFeeBefore = await pwIporToken.withdrawalFee();
+        const exchangeRateBefore = await pwIporToken.calculateExchangeRate();
+        const withdrawalFeeBefore = await pwIporToken.getWithdrawFee();
 
-        await pwIporToken.delegateToRewards([tokens.ipTokenDai.address], [N0__6_18DEC]);
+        await pwIporToken.delegateToJohn([tokens.ipTokenDai.address], [N0__6_18DEC]);
         //    when
         await pwIporToken.setWithdrawalFee(N0__1_18DEC);
         await pwIporToken.unstake(N0__4_18DEC);
@@ -157,8 +157,8 @@ describe("PwIporToken unstake", () => {
         const balanceAfter = await pwIporToken.balanceOf(await admin.getAddress());
         const totalSupplyAfter = await pwIporToken.totalSupplyBase();
         const iporBalanceAfter = await iporToken.balanceOf(await admin.getAddress());
-        const exchangeRateAfter = await pwIporToken.exchangeRate();
-        const withdrawalFeeAfter = await pwIporToken.withdrawalFee();
+        const exchangeRateAfter = await pwIporToken.calculateExchangeRate();
+        const withdrawalFeeAfter = await pwIporToken.getWithdrawFee();
 
         expect(balanceBefore).to.be.equal(N1__0_18DEC);
         expect(totalSupplyBefore).to.be.equal(N1__0_18DEC);

@@ -36,13 +36,13 @@ describe("John Stake and balance", () => {
 
     it("Should set up one asset", async () => {
         //    given
-        const rewardsBefore = await john.rewardsPerBlock(tokens.ipTokenUsdc.address);
+        const rewardsBefore = await john.getRewardsPerBlock(tokens.ipTokenUsdc.address);
 
         //    when
         await john.setRewardsPerBlock(tokens.ipTokenUsdc.address, N2_0_8D);
 
         //    then
-        const rewardsAfter = await john.rewardsPerBlock(tokens.ipTokenUsdc.address);
+        const rewardsAfter = await john.getRewardsPerBlock(tokens.ipTokenUsdc.address);
 
         expect(rewardsBefore).to.be.equal(N1_0_8D);
         expect(rewardsAfter).to.be.equal(N2_0_8D);
@@ -50,15 +50,15 @@ describe("John Stake and balance", () => {
 
     it("Should not update Accrued rewards when update block rewords", async () => {
         //    given
-        const rewardsBefore = await john.rewardsPerBlock(tokens.ipTokenUsdc.address);
-        const globalParamsBefore = await john.globalParams(tokens.ipTokenUsdc.address);
+        const rewardsBefore = await john.getRewardsPerBlock(tokens.ipTokenUsdc.address);
+        const globalParamsBefore = await john.getGlobalParams(tokens.ipTokenUsdc.address);
 
         //    when
         await john.setRewardsPerBlock(tokens.ipTokenUsdc.address, N2_0_8D);
 
         //    then
-        const rewardsAfter = await john.rewardsPerBlock(tokens.ipTokenUsdc.address);
-        const globalParamsAfter = await john.globalParams(tokens.ipTokenUsdc.address);
+        const rewardsAfter = await john.getRewardsPerBlock(tokens.ipTokenUsdc.address);
+        const globalParamsAfter = await john.getGlobalParams(tokens.ipTokenUsdc.address);
 
         expect(rewardsBefore).to.be.equal(N1_0_8D);
         expect(rewardsAfter).to.be.equal(N2_0_8D);
@@ -68,9 +68,9 @@ describe("John Stake and balance", () => {
 
     it("Should setup 3 asset", async () => {
         //    given
-        const rewardsDaiBefore = await john.rewardsPerBlock(tokens.ipTokenDai.address);
-        const rewardsUsdcBefore = await john.rewardsPerBlock(tokens.ipTokenUsdc.address);
-        const rewardsUsdtBefore = await john.rewardsPerBlock(tokens.ipTokenUsdt.address);
+        const rewardsDaiBefore = await john.getRewardsPerBlock(tokens.ipTokenDai.address);
+        const rewardsUsdcBefore = await john.getRewardsPerBlock(tokens.ipTokenUsdc.address);
+        const rewardsUsdtBefore = await john.getRewardsPerBlock(tokens.ipTokenUsdt.address);
 
         //    when
         await john.setRewardsPerBlock(tokens.ipTokenDai.address, N1_0_8D);
@@ -78,9 +78,9 @@ describe("John Stake and balance", () => {
         await john.setRewardsPerBlock(tokens.ipTokenUsdt.address, N0_1_8D);
 
         //    then
-        const rewardsDaiAfter = await john.rewardsPerBlock(tokens.ipTokenDai.address);
-        const rewardsUsdcAfter = await john.rewardsPerBlock(tokens.ipTokenUsdc.address);
-        const rewardsUsdtAfter = await john.rewardsPerBlock(tokens.ipTokenUsdt.address);
+        const rewardsDaiAfter = await john.getRewardsPerBlock(tokens.ipTokenDai.address);
+        const rewardsUsdcAfter = await john.getRewardsPerBlock(tokens.ipTokenUsdc.address);
+        const rewardsUsdtAfter = await john.getRewardsPerBlock(tokens.ipTokenUsdt.address);
 
         expect(rewardsDaiBefore).to.be.equal(N1_0_8D);
         expect(rewardsUsdcBefore).to.be.equal(N1_0_8D);
@@ -93,7 +93,7 @@ describe("John Stake and balance", () => {
 
     it("Should not be able to update value when not owner", async () => {
         //    given
-        const rewardsDaiBefore = await john.rewardsPerBlock(tokens.ipTokenDai.address);
+        const rewardsDaiBefore = await john.getRewardsPerBlock(tokens.ipTokenDai.address);
 
         //    when
         await expect(
@@ -101,7 +101,7 @@ describe("John Stake and balance", () => {
         ).to.be.revertedWith("Ownable: caller is not the owner");
 
         //    then
-        const rewardsDaiAfter = await john.rewardsPerBlock(tokens.ipTokenDai.address);
+        const rewardsDaiAfter = await john.getRewardsPerBlock(tokens.ipTokenDai.address);
 
         expect(rewardsDaiBefore).to.be.equal(N1_0_8D);
         expect(rewardsDaiAfter).to.be.equal(N1_0_8D);

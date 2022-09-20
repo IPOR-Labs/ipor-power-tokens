@@ -65,7 +65,7 @@ describe("PwIporToken configuration, deploy tests", () => {
 
     it("Should the exchange rate be one when the power token was deployed", async () => {
         // then
-        const exchangeRate = await pwIporToken.exchangeRate();
+        const exchangeRate = await pwIporToken.calculateExchangeRate();
 
         expect(exchangeRate).to.be.equal(N1__0_18DEC);
     });
@@ -76,7 +76,7 @@ describe("PwIporToken configuration, deploy tests", () => {
         await iporToken.increaseAllowance(pwIporToken.address, TOTAL_SUPPLY_18_DECIMALS);
 
         const adminAddress = await accounts[0].getAddress();
-        const exchangeRateBefore = await pwIporToken.exchangeRate();
+        const exchangeRateBefore = await pwIporToken.calculateExchangeRate();
         const balanceBefore = await pwIporToken.balanceOf(adminAddress);
 
         // when
@@ -85,7 +85,7 @@ describe("PwIporToken configuration, deploy tests", () => {
 
         // then
 
-        const exchangeRateAfter = await pwIporToken.exchangeRate();
+        const exchangeRateAfter = await pwIporToken.calculateExchangeRate();
         const balanceAfter = await pwIporToken.balanceOf(adminAddress);
 
         expect(balanceBefore).to.be.equal(ZERO);
@@ -111,7 +111,7 @@ describe("PwIporToken configuration, deploy tests", () => {
 
         const userOneBalanceBefore = await pwIporToken.balanceOf(await userOne.getAddress());
         const userTwoBalanceBefore = await pwIporToken.balanceOf(await userTwo.getAddress());
-        const exchangeRateBefore = await pwIporToken.exchangeRate();
+        const exchangeRateBefore = await pwIporToken.calculateExchangeRate();
 
         //    when
         await iporToken.transfer(pwIporToken.address, N1__0_18DEC);
@@ -119,7 +119,7 @@ describe("PwIporToken configuration, deploy tests", () => {
         //    then
         const userOneBalanceAfter = await pwIporToken.balanceOf(await userOne.getAddress());
         const userTwoBalanceAfter = await pwIporToken.balanceOf(await userTwo.getAddress());
-        const exchangeRateAfter = await pwIporToken.exchangeRate();
+        const exchangeRateAfter = await pwIporToken.calculateExchangeRate();
         const N1__5_18DEC = N0__1_18DEC.mul(BigNumber.from("15"));
 
         expect(userOneBalanceBefore).to.be.equal(N1__0_18DEC);
@@ -146,7 +146,7 @@ describe("PwIporToken configuration, deploy tests", () => {
 
         const userOneBalanceBefore = await pwIporToken.balanceOf(await userOne.getAddress());
         const userTwoBalanceBefore = await pwIporToken.balanceOf(await userTwo.getAddress());
-        const exchangeRateBefore = await pwIporToken.exchangeRate();
+        const exchangeRateBefore = await pwIporToken.calculateExchangeRate();
 
         //    when
         await iporToken.transfer(pwIporToken.address, N1__0_18DEC);
@@ -155,7 +155,7 @@ describe("PwIporToken configuration, deploy tests", () => {
         //    then
         const userOneBalanceAfter = await pwIporToken.balanceOf(await userOne.getAddress());
         const userTwoBalanceAfter = await pwIporToken.balanceOf(await userTwo.getAddress());
-        const exchangeRateAfter = await pwIporToken.exchangeRate();
+        const exchangeRateAfter = await pwIporToken.calculateExchangeRate();
         const N2__0_18DEC = N1__0_18DEC.mul(BigNumber.from("2"));
 
         expect(userOneBalanceBefore).to.be.equal(N1__0_18DEC);

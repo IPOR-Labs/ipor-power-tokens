@@ -46,7 +46,7 @@ const randomDelegateIporToken = async (
 
     if (allowToDelegate <= 0) return;
     const delegateAmount = randomBigNumberFromInterval(1, allowToDelegate, N1__0_18DEC);
-    await pwIporToken.connect(account).delegateToRewards([ipToken], [delegateAmount]);
+    await pwIporToken.connect(account).delegateToJohn([ipToken], [delegateAmount]);
 };
 
 const randomWithdrawPwToken = async (
@@ -66,7 +66,7 @@ const randomWithdrawPwToken = async (
 
     if (balance.lte(ZERO)) return;
 
-    await pwIporToken.connect(account).withdrawFromDelegation(ipToken, withdrawAmount);
+    await pwIporToken.connect(account).undelegateFromJohn(ipToken, withdrawAmount);
 };
 
 const randomStakeIpToken = async (account: Signer, ipToken: string, john: John) => {
@@ -163,13 +163,13 @@ describe("John claim", () => {
         await pwIporToken.connect(userOne).stake(N100__0_18DEC);
         await pwIporToken
             .connect(userOne)
-            .delegateToRewards([tokens.ipTokenDai.address], [N100__0_18DEC]);
+            .delegateToJohn([tokens.ipTokenDai.address], [N100__0_18DEC]);
 
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
-        const accruedRewardsBefore = await john.accruedRewards(tokens.ipTokenDai.address);
+        const accruedRewardsBefore = await john.calculateAccruedRewards(tokens.ipTokenDai.address);
         const userOneIporTokenBalance = await pwIporToken.balanceOf(await userOne.getAddress());
-        const pwTokenExchangeRateBefore = await pwIporToken.exchangeRate();
+        const pwTokenExchangeRateBefore = await pwIporToken.calculateExchangeRate();
 
         // when
         for (let i = 0; i < 50; i++) {
@@ -181,8 +181,8 @@ describe("John claim", () => {
 
         // then
         const userOneIporTokenAfter = await pwIporToken.balanceOf(await userOne.getAddress());
-        const accruedRewardsAfter = await john.accruedRewards(tokens.ipTokenDai.address);
-        const pwTokenExchangeRateAfter = await pwIporToken.exchangeRate();
+        const accruedRewardsAfter = await john.calculateAccruedRewards(tokens.ipTokenDai.address);
+        const pwTokenExchangeRateAfter = await pwIporToken.calculateExchangeRate();
 
         expect(accruedRewardsBefore).to.be.equal(ZERO);
         expect(userOneIporTokenBalance).to.be.equal(N100__0_18DEC);
@@ -198,19 +198,19 @@ describe("John claim", () => {
         await pwIporToken.connect(userOne).stake(N100__0_18DEC);
         await pwIporToken
             .connect(userOne)
-            .delegateToRewards([tokens.ipTokenDai.address], [N100__0_18DEC]);
+            .delegateToJohn([tokens.ipTokenDai.address], [N100__0_18DEC]);
 
         // UserTwo
         await pwIporToken.connect(userTwo).stake(N100__0_18DEC);
         await pwIporToken
             .connect(userTwo)
-            .delegateToRewards([tokens.ipTokenDai.address], [N100__0_18DEC]);
+            .delegateToJohn([tokens.ipTokenDai.address], [N100__0_18DEC]);
 
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
-        const accruedRewardsBefore = await john.accruedRewards(tokens.ipTokenDai.address);
+        const accruedRewardsBefore = await john.calculateAccruedRewards(tokens.ipTokenDai.address);
         const userOneIporTokenBalance = await pwIporToken.balanceOf(await userOne.getAddress());
         const userTwoIporTokenBalance = await pwIporToken.balanceOf(await userTwo.getAddress());
-        const pwTokenExchangeRateBefore = await pwIporToken.exchangeRate();
+        const pwTokenExchangeRateBefore = await pwIporToken.calculateExchangeRate();
 
         // when
         for (let i = 0; i < 50; i++) {
@@ -227,12 +227,12 @@ describe("John claim", () => {
 
         const userOneIporTokenAfter = await pwIporToken.balanceOf(await userOne.getAddress());
         const userTwoIporTokenAfter = await pwIporToken.balanceOf(await userTwo.getAddress());
-        const accruedRewardsAfter = await john.accruedRewards(tokens.ipTokenDai.address);
+        const accruedRewardsAfter = await john.calculateAccruedRewards(tokens.ipTokenDai.address);
         const sumOfRewards = userOneIporTokenAfter
             .add(userTwoIporTokenAfter)
             .sub(userTwoIporTokenBalance)
             .sub(userOneIporTokenBalance);
-        const pwTokenExchangeRateAfter = await pwIporToken.exchangeRate();
+        const pwTokenExchangeRateAfter = await pwIporToken.calculateExchangeRate();
         const allRewardsMinusUsersRewards = accruedRewardsAfter.sub(sumOfRewards).abs();
 
         expect(accruedRewardsBefore).to.be.equal(ZERO);
@@ -249,26 +249,26 @@ describe("John claim", () => {
 
         // Admin
         await pwIporToken.stake(N100__0_18DEC);
-        await pwIporToken.delegateToRewards([tokens.ipTokenDai.address], [N100__0_18DEC]);
+        await pwIporToken.delegateToJohn([tokens.ipTokenDai.address], [N100__0_18DEC]);
 
         // UserOne
         await pwIporToken.connect(userOne).stake(N100__0_18DEC);
         await pwIporToken
             .connect(userOne)
-            .delegateToRewards([tokens.ipTokenDai.address], [N100__0_18DEC]);
+            .delegateToJohn([tokens.ipTokenDai.address], [N100__0_18DEC]);
 
         // UserTwo
         await pwIporToken.connect(userTwo).stake(N100__0_18DEC);
         await pwIporToken
             .connect(userTwo)
-            .delegateToRewards([tokens.ipTokenDai.address], [N100__0_18DEC]);
+            .delegateToJohn([tokens.ipTokenDai.address], [N100__0_18DEC]);
 
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
-        const accruedRewardsBefore = await john.accruedRewards(tokens.ipTokenDai.address);
+        const accruedRewardsBefore = await john.calculateAccruedRewards(tokens.ipTokenDai.address);
         const adminIporTokenBalance = await pwIporToken.balanceOf(await admin.getAddress());
         const userOneIporTokenBalance = await pwIporToken.balanceOf(await userOne.getAddress());
         const userTwoIporTokenBalance = await pwIporToken.balanceOf(await userTwo.getAddress());
-        const pwTokenExchangeRateBefore = await pwIporToken.exchangeRate();
+        const pwTokenExchangeRateBefore = await pwIporToken.calculateExchangeRate();
 
         // when
         for (let i = 0; i < 50; i++) {
@@ -294,12 +294,12 @@ describe("John claim", () => {
         const adminIporTokenAfter = await pwIporToken.balanceOf(await admin.getAddress());
         const userOneIporTokenAfter = await pwIporToken.balanceOf(await userOne.getAddress());
         const userTwoIporTokenAfter = await pwIporToken.balanceOf(await userTwo.getAddress());
-        const accruedRewardsAfter = await john.accruedRewards(tokens.ipTokenDai.address);
+        const accruedRewardsAfter = await john.calculateAccruedRewards(tokens.ipTokenDai.address);
         const sumOfRewards = adminIporTokenAfter
             .add(userOneIporTokenAfter)
             .add(userTwoIporTokenAfter)
             .sub(N300__0_18DEC);
-        const pwTokenExchangeRateAfter = await pwIporToken.exchangeRate();
+        const pwTokenExchangeRateAfter = await pwIporToken.calculateExchangeRate();
         const allRewardsMinusUsersRewards = accruedRewardsAfter.sub(sumOfRewards).abs();
 
         expect(accruedRewardsBefore).to.be.equal(ZERO);
@@ -318,26 +318,26 @@ describe("John claim", () => {
 
         // Admin
         await pwIporToken.stake(N100__0_18DEC);
-        await pwIporToken.delegateToRewards([tokens.ipTokenDai.address], [N100__0_18DEC]);
+        await pwIporToken.delegateToJohn([tokens.ipTokenDai.address], [N100__0_18DEC]);
 
         // UserOne
         await pwIporToken.connect(userOne).stake(N100__0_18DEC);
         await pwIporToken
             .connect(userOne)
-            .delegateToRewards([tokens.ipTokenDai.address], [N100__0_18DEC]);
+            .delegateToJohn([tokens.ipTokenDai.address], [N100__0_18DEC]);
 
         // UserTwo
         await pwIporToken.connect(userTwo).stake(N100__0_18DEC);
         await pwIporToken
             .connect(userTwo)
-            .delegateToRewards([tokens.ipTokenDai.address], [N100__0_18DEC]);
+            .delegateToJohn([tokens.ipTokenDai.address], [N100__0_18DEC]);
 
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
-        const accruedRewardsBefore = await john.accruedRewards(tokens.ipTokenDai.address);
+        const accruedRewardsBefore = await john.calculateAccruedRewards(tokens.ipTokenDai.address);
         const adminIporTokenBalance = await pwIporToken.balanceOf(await admin.getAddress());
         const userOneIporTokenBalance = await pwIporToken.balanceOf(await userOne.getAddress());
         const userTwoIporTokenBalance = await pwIporToken.balanceOf(await userTwo.getAddress());
-        const pwTokenExchangeRateBefore = await pwIporToken.exchangeRate();
+        const pwTokenExchangeRateBefore = await pwIporToken.calculateExchangeRate();
 
         // when
         for (let i = 0; i < 50; i++) {
@@ -364,12 +364,12 @@ describe("John claim", () => {
         const adminIporTokenAfter = await pwIporToken.balanceOf(await admin.getAddress());
         const userOneIporTokenAfter = await pwIporToken.balanceOf(await userOne.getAddress());
         const userTwoIporTokenAfter = await pwIporToken.balanceOf(await userTwo.getAddress());
-        const accruedRewardsAfter = await john.accruedRewards(tokens.ipTokenDai.address);
+        const accruedRewardsAfter = await john.calculateAccruedRewards(tokens.ipTokenDai.address);
         const sumOfRewards = adminIporTokenAfter
             .add(userOneIporTokenAfter)
             .add(userTwoIporTokenAfter)
             .sub(N300__0_18DEC);
-        const pwTokenExchangeRateAfter = await pwIporToken.exchangeRate();
+        const pwTokenExchangeRateAfter = await pwIporToken.calculateExchangeRate();
         const allRewardsMinusUsersRewards = accruedRewardsAfter.sub(sumOfRewards).abs();
 
         expect(accruedRewardsBefore).to.be.equal(ZERO);
@@ -403,9 +403,9 @@ describe("John claim", () => {
         const userThreeIporTokenBalanceBefore = await pwIporToken.balanceOf(
             await userThree.getAddress()
         );
-        const pwTokenExchangeRateBefore = await pwIporToken.exchangeRate();
+        const pwTokenExchangeRateBefore = await pwIporToken.calculateExchangeRate();
 
-        const accruedRewardsBefore = await john.accruedRewards(tokens.ipTokenDai.address);
+        const accruedRewardsBefore = await john.calculateAccruedRewards(tokens.ipTokenDai.address);
 
         // when
         //result for 1000
@@ -451,7 +451,7 @@ describe("John claim", () => {
             await userThree.getAddress()
         );
 
-        const accruedRewardsAfter = await john.accruedRewards(tokens.ipTokenDai.address);
+        const accruedRewardsAfter = await john.calculateAccruedRewards(tokens.ipTokenDai.address);
 
         const sumOfRewards = adminIporTokenBalanceAfter
             .add(userOneIporTokenBalanceAfter)
@@ -461,7 +461,7 @@ describe("John claim", () => {
             .sub(userOneIporTokenBalanceBefore)
             .sub(userTwoIporTokenBalanceBefore)
             .sub(userThreeIporTokenBalanceBefore);
-        const pwTokenExchangeRateAfter = await pwIporToken.exchangeRate();
+        const pwTokenExchangeRateAfter = await pwIporToken.calculateExchangeRate();
         const allRewardsMinusUsersRewards = accruedRewardsAfter.sub(sumOfRewards).abs();
 
         expect(accruedRewardsBefore).to.be.equal(ZERO);
