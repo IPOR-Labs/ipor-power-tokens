@@ -320,13 +320,13 @@ export default ({ drizzle, drizzleState }) => (
                 </td>
             </tr>
             <tr>
-                <td>PwIporToken</td>
-                <td>{drizzle.contracts.PwIporToken.address}</td>
+                <td>PowerIpor</td>
+                <td>{drizzle.contracts.PowerIpor.address}</td>
                 <td>
                     <ContractData
                         drizzle={drizzle}
                         drizzleState={drizzleState}
-                        contract="PwIporToken"
+                        contract="PowerIpor"
                         method="getVersion"
                     />
                 </td>
@@ -1284,27 +1284,27 @@ export default ({ drizzle, drizzleState }) => (
                 </td>
             </tr>
             <tr>
-                <td>PwIporToken</td>
-                <td>{drizzle.contracts.PwIporToken.address}</td>
+                <td>PowerIpor</td>
+                <td>{drizzle.contracts.PowerIpor.address}</td>
                 <td>
                     <ContractData
                         drizzle={drizzle}
                         drizzleState={drizzleState}
-                        contract="PwIporToken"
+                        contract="PowerIpor"
                         method="owner"
                     />
                 </td>
                 <td>
                     <ContractForm
                         drizzle={drizzle}
-                        contract="PwIporToken"
+                        contract="PowerIpor"
                         method="transferOwnership"
                     />
                 </td>
                 <td>
                     <ContractForm
                         drizzle={drizzle}
-                        contract="PwIporToken"
+                        contract="PowerIpor"
                         method="confirmTransferOwnership"
                     />
                 </td>
@@ -1770,21 +1770,21 @@ export default ({ drizzle, drizzleState }) => (
                 </td>
             </tr>
             <tr>
-                <td>PwIporToken</td>
-                <td>{drizzle.contracts.PwIporToken.address}</td>
+                <td>PowerIpor</td>
+                <td>{drizzle.contracts.PowerIpor.address}</td>
                 <td>
                     <ContractData
                         drizzle={drizzle}
                         drizzleState={drizzleState}
-                        contract="PwIporToken"
+                        contract="PowerIpor"
                         method="paused"
                     />
                 </td>
                 <td>
-                    <ContractForm drizzle={drizzle} contract="PwIporToken" method="pause" />
+                    <ContractForm drizzle={drizzle} contract="PowerIpor" method="pause" />
                 </td>
                 <td>
-                    <ContractForm drizzle={drizzle} contract="PwIporToken" method="unpause" />
+                    <ContractForm drizzle={drizzle} contract="PowerIpor" method="unpause" />
                 </td>
             </tr>
         </table>

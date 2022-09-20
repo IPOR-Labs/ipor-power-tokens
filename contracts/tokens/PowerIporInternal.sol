@@ -10,21 +10,21 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "../libraries/errors/IporErrors.sol";
 import "../libraries/errors/MiningErrors.sol";
 import "../libraries/Constants.sol";
-import "../interfaces/types/PwIporTokenTypes.sol";
+import "../interfaces/types/PowerIporTypes.sol";
 import "../libraries/math/IporMath.sol";
-import "../interfaces/IPwIporTokenInternal.sol";
+import "../interfaces/IPowerIporInternal.sol";
 import "../interfaces/IJohn.sol";
 import "../security/IporOwnableUpgradeable.sol";
 //TODO: remove at the end
 import "hardhat/console.sol";
 
 // TODO: Add tests for events
-abstract contract PwIporTokenInternal is
+abstract contract PowerIporInternal is
     PausableUpgradeable,
     UUPSUpgradeable,
     ReentrancyGuardUpgradeable,
     IporOwnableUpgradeable,
-    IPwIporTokenInternal
+    IPowerIporInternal
 {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
@@ -37,8 +37,8 @@ abstract contract PwIporTokenInternal is
     mapping(address => uint256) internal _baseBalance;
     // account address -> amount 18 decimals
     mapping(address => uint256) internal _delegatedBalance;
-    // account address -> {coolDownFinish, amount}
-    mapping(address => PwIporTokenTypes.PwCoolDown) internal _coolDowns;
+    // account address -> {endTimestamp, amount}
+    mapping(address => PowerIporTypes.PwIporCoolDown) internal _coolDowns;
     uint256 internal _baseTotalSupply;
     uint256 internal _withdrawFee;
 
@@ -77,9 +77,9 @@ abstract contract PwIporTokenInternal is
         return _john;
     }
 
-    function setWithdrawalFee(uint256 withdrawalFee) external override onlyOwner {
+    function setWithdrawFee(uint256 withdrawalFee) external override onlyOwner {
         _withdrawFee = withdrawalFee;
-        emit WithdrawalFee(_msgSender(), withdrawalFee);
+        emit WithdrawFee(_msgSender(), withdrawalFee);
     }
 
     function setJohn(address newJohnAddr) external override onlyOwner whenNotPaused {
@@ -133,11 +133,11 @@ abstract contract PwIporTokenInternal is
         return IporMath.division(balanceOfIporToken * Constants.D18, baseTotalSupply);
     }
 
-    function _amountWithoutFee(uint256 baseAmount) internal view returns (uint256) {
+    function _calculateAmountWithoutFee(uint256 baseAmount) internal view returns (uint256) {
         return IporMath.division((Constants.D18 - _withdrawFee) * baseAmount, Constants.D18);
     }
 
-    function _baseAmountToPwToken(uint256 baseAmount, uint256 exchangeRate)
+    function _calculateBaseAmountToPwIpor(uint256 baseAmount, uint256 exchangeRate)
         internal
         pure
         returns (uint256)
@@ -145,19 +145,20 @@ abstract contract PwIporTokenInternal is
         return IporMath.division(baseAmount * exchangeRate, Constants.D18);
     }
 
-    function _availablePwTokens(address account, uint256 exchangeRate)
+    function _getAvailablePwIporAmount(address account, uint256 exchangeRate)
         internal
         view
         returns (uint256)
     {
         return
-            _baseAmountToPwToken(_baseBalance[account], exchangeRate) -
+            _calculateBaseAmountToPwIpor(_baseBalance[account], exchangeRate) -
             _delegatedBalance[account] -
             _coolDowns[account].amount;
     }
 
     function _balanceOf(address account) internal view returns (uint256) {
-        return _baseAmountToPwToken(_baseBalance[account], _calculateExchangeRate(_iporToken));
+        return
+            _calculateBaseAmountToPwIpor(_baseBalance[account], _calculateExchangeRate(_iporToken));
     }
 
     //solhint-disable no-empty-blocks

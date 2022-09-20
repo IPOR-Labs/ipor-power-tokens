@@ -35,7 +35,7 @@ export type GlobalParams = {
 export type UserParams = {
     powerUp: BigNumber;
     compositeMultiplierCumulative: BigNumber;
-    ipTokensBalance: BigNumber;
+    ipTokenBalance: BigNumber;
     delegatedPowerTokenBalance: BigNumber;
 };
 
@@ -131,25 +131,25 @@ export const expectUserParam = (
     params: UserParams,
     powerUp: BigNumber,
     compositeMultiplierCumulative: BigNumber,
-    ipTokensBalance: BigNumber,
+    ipTokenBalance: BigNumber,
     delegatedPowerTokenBalance: BigNumber
 ): void => {
     expect(params.powerUp).to.be.equal(powerUp);
     expect(params.compositeMultiplierCumulative).to.be.equal(compositeMultiplierCumulative);
-    expect(params.ipTokensBalance).to.be.equal(ipTokensBalance);
+    expect(params.ipTokenBalance).to.be.equal(ipTokenBalance);
     expect(params.delegatedPowerTokenBalance).to.be.equal(delegatedPowerTokenBalance);
 };
 
 export const extractMyParam = (value: any): UserParams => {
     const powerUp = value[0];
     const compositeMultiplierCumulative = value[1];
-    const ipTokensBalance = value[2];
+    const ipTokenBalance = value[2];
     const delegatedPowerTokenBalance = value[3];
 
     return {
         powerUp,
         compositeMultiplierCumulative,
-        ipTokensBalance,
+        ipTokenBalance,
         delegatedPowerTokenBalance,
     };
 };
