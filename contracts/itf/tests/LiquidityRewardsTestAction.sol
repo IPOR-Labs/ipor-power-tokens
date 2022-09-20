@@ -52,8 +52,6 @@ contract LiquidityRewardsTestAction {
         }
     }
 
-    //    interact with pwToken
-
     function delegatedBalanceOf(address account) external view returns (uint256) {
         return LiquidityRewardsAgent(account).delegatedBalanceOf(account);
     }
@@ -64,9 +62,9 @@ contract LiquidityRewardsTestAction {
         }
     }
 
-    function unstakePwToken(address[] memory accounts, uint256[] memory iporTokenAmounts) external {
+    function unstakePwIpor(address[] memory accounts, uint256[] memory iporTokenAmounts) external {
         for (uint256 i = 0; i != accounts.length; i++) {
-            LiquidityRewardsAgent(accounts[i]).unstakePwToken(iporTokenAmounts[i]);
+            LiquidityRewardsAgent(accounts[i]).unstakePwIpor(iporTokenAmounts[i]);
         }
     }
 
@@ -95,22 +93,22 @@ contract LiquidityRewardsTestAction {
     function depositAndWithdrawIporTokensAndIpToken(
         address account,
         address[] memory ipTokens,
-        uint256[] memory iporAmounts,
+        uint256[] memory iporTokenAmounts,
         uint256[] memory ipTokenAmounts
     ) external {
-        LiquidityRewardsAgent(account).delegatePwIpor(ipTokens, iporAmounts);
+        LiquidityRewardsAgent(account).delegatePwIpor(ipTokens, iporTokenAmounts);
         LiquidityRewardsAgent(account).stakeIpToken(ipTokens[0], ipTokenAmounts[0]);
-        LiquidityRewardsAgent(account).undelegatePwIpor(ipTokens[0], iporAmounts[0]);
+        LiquidityRewardsAgent(account).undelegatePwIpor(ipTokens[0], iporTokenAmounts[0]);
         LiquidityRewardsAgent(account).unstakeIpToken(ipTokens[0], ipTokenAmounts[0]);
     }
 
     function depositIporTokensAndIpToken(
         address account,
         address[] memory ipTokens,
-        uint256[] memory iporAmounts,
+        uint256[] memory iporTokenAmounts,
         uint256[] memory ipTokenAmounts
     ) external {
-        LiquidityRewardsAgent(account).delegatePwIpor(ipTokens, iporAmounts);
+        LiquidityRewardsAgent(account).delegatePwIpor(ipTokens, iporTokenAmounts);
         LiquidityRewardsAgent(account).stakeIpToken(ipTokens[0], ipTokenAmounts[0]);
     }
 }

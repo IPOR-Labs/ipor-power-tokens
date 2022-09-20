@@ -33,21 +33,21 @@ interface IJohnInternal {
     /// @notice method allowed to delegate power token to rewards contract
     /// @param account address which one delegate power tokens
     /// @param ipTokens to which power tokens should be delegated
-    /// @param pwTokenAmounts which should be assigns to assets , represented in 18 decimals
+    /// @param pwIporAmount which should be assigns to assets , represented in 18 decimals
     function delegatePwIpor(
         address account,
         address[] memory ipTokens,
-        uint256[] memory pwTokenAmounts
+        uint256[] memory pwIporAmount
     ) external;
 
     /// @notice method allowed to withdraw power token from rewards contract
     /// @param account address which one delegate power tokens
     /// @param ipToken from which you want to withdraw tokens
-    /// @param pwTokenAmount to withdraw, represented in 18 decimals
+    /// @param pwIporAmount to withdraw, represented in 18 decimals
     function undelegatePwIpor(
         address account,
         address ipToken,
-        uint256 pwTokenAmount
+        uint256 pwIporAmount
     ) external;
 
     /// @notice method setup rewards per block
@@ -89,12 +89,12 @@ interface IJohnInternal {
     /// @notice Emitted when user delegate power token to rewards contract
     /// @param account account address
     /// @param ipToken address of ipToken which should be unstake
-    /// @param amount of ipTokens to unstake, represented in 18 decimals
-    event AddPwIporToBalance(address account, address ipToken, uint256 amount);
+    /// @param ipTokenAmount of ipTokens to unstake, represented in 18 decimals
+    event DelegatePwIpor(address account, address ipToken, uint256 ipTokenAmount);
 
     /// @notice Emitted when user undelegate power token from John contract
     /// @param account account address
     /// @param ipToken address of ipToken
-    /// @param amount of power token to withdraw, represented in 18 decimals
-    event UndelegatePwIpor(address account, address ipToken, uint256 amount);
+    /// @param ipTokenAmount of power token to withdraw, represented in 18 decimals
+    event UndelegatePwIpor(address account, address ipToken, uint256 ipTokenAmount);
 }

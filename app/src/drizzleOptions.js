@@ -76,7 +76,7 @@ import MockTestnetStrategyCompoundDai from "./contracts/MockTestnetStrategyCompo
 
 import John from "./contracts/John.json";
 import IporToken from "./contracts/IporToken.json";
-import PwIporToken from "./contracts/PwIporToken.json";
+import PowerIpor from "./contracts/PowerIpor.json";
 
 require("dotenv").config({ path: "../../.env" });
 
@@ -122,15 +122,15 @@ let DrizzleStrategyCompoundDai;
 if (process.env.REACT_APP_ENV_PROFILE === "mainnet.ipor.io") {
     //Mainnet
 
-    DrizzleUsdt.networks[networkId] = {address: addresses.USDT};
-    DrizzleUsdc.networks[networkId] = {address: addresses.USDC};
-    DrizzleDai.networks[networkId] = {address: addresses.DAI};
-    DrizzleShareTokenAaveUsdt.networks[networkId] = {address: addresses.aUSDT};
-    DrizzleShareTokenAaveUsdc.networks[networkId] = {address: addresses.aUSDC};
-    DrizzleShareTokenAaveDai.networks[networkId] = {address: addresses.aDAI};
-    DrizzleShareTokenCompoundUsdt.networks[networkId] = {address: addresses.cUSDT};
-    DrizzleShareTokenCompoundUsdc.networks[networkId] = {address: addresses.cUSDC};
-    DrizzleShareTokenCompoundDai.networks[networkId] = {address: addresses.cDAI};
+    DrizzleUsdt.networks[networkId] = { address: addresses.USDT };
+    DrizzleUsdc.networks[networkId] = { address: addresses.USDC };
+    DrizzleDai.networks[networkId] = { address: addresses.DAI };
+    DrizzleShareTokenAaveUsdt.networks[networkId] = { address: addresses.aUSDT };
+    DrizzleShareTokenAaveUsdc.networks[networkId] = { address: addresses.aUSDC };
+    DrizzleShareTokenAaveDai.networks[networkId] = { address: addresses.aDAI };
+    DrizzleShareTokenCompoundUsdt.networks[networkId] = { address: addresses.cUSDT };
+    DrizzleShareTokenCompoundUsdc.networks[networkId] = { address: addresses.cUSDC };
+    DrizzleShareTokenCompoundDai.networks[networkId] = { address: addresses.cDAI };
 
     DrizzleStrategyAaveUsdt = StrategyAaveUsdt;
     DrizzleStrategyAaveUsdc = StrategyAaveUsdc;
@@ -261,7 +261,7 @@ let options = {
 
         John,
         IporToken,
-        PwIporToken,
+        PowerIpor,
     ],
 };
 

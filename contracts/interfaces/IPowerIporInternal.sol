@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.16;
 
-import "./types/PwIporTokenTypes.sol";
+import "./types/PowerIporTypes.sol";
 
 /// @title
-interface IPwIporTokenInternal {
+interface IPowerIporInternal {
     /// @notice Returns current version of Power Ipor Token
     /// @return Current Power Ipor Token version
     function getVersion() external pure returns (uint256);
@@ -17,7 +17,7 @@ interface IPwIporTokenInternal {
 
     /// @notice Method setup unstake fee
     /// @param withdrawalFee percent of fee, represented in 18 decimals.
-    function setWithdrawalFee(uint256 withdrawalFee) external;
+    function setWithdrawFee(uint256 withdrawalFee) external;
 
     /// @notice method allowed to transfer rewards from John contracts to balance of specific account
     /// @param account - address of user who received rewards
@@ -47,7 +47,7 @@ interface IPwIporTokenInternal {
     /// @notice Emitted when new Fee is setup.
     /// @param sender account address
     /// @param fee new value of fee, represented in 18 decimals
-    event WithdrawalFee(address sender, uint256 fee);
+    event WithdrawFee(address sender, uint256 fee);
 
     /// @notice Emmited when John's address is changed by its owner.
     /// @param changedBy account address that has changed John's address

@@ -2,22 +2,22 @@
 pragma solidity 0.8.16;
 
 import "../../rewards/John.sol";
-import "../../tokens/PwIporToken.sol";
+import "../../tokens/PowerIpor.sol";
 
 contract LiquidityRewardsAgent {
     John private _john;
-    PwIporToken private _pwToken;
+    PowerIpor private _powerIpor;
 
     constructor(
-        address pwToken,
+        address powerIpor,
         address john,
         address ipToken,
         address iporToken
     ) {
         _john = John(john);
-        _pwToken = PwIporToken(pwToken);
+        _powerIpor = PowerIpor(powerIpor);
         IERC20(ipToken).approve(john, Constants.MAX_VALUE);
-        IERC20(iporToken).approve(pwToken, Constants.MAX_VALUE);
+        IERC20(iporToken).approve(powerIpor, Constants.MAX_VALUE);
     }
 
     //    interact with John
@@ -58,25 +58,23 @@ contract LiquidityRewardsAgent {
         _john.claim(ipToken);
     }
 
-    //    interact with pwToken
-
     function delegatedBalanceOf(address account) external view returns (uint256) {
-        return _pwToken.delegatedBalanceOf(account);
+        return _powerIpor.delegatedBalanceOf(account);
     }
 
     function stakeIporToken(uint256 iporTokenAmount) external {
-        _pwToken.stake(iporTokenAmount);
+        _powerIpor.stake(iporTokenAmount);
     }
 
-    function unstakePwToken(uint256 pwTokenAmount) external {
-        _pwToken.unstake(pwTokenAmount);
+    function unstakePwIpor(uint256 pwIporAmount) external {
+        _powerIpor.unstake(pwIporAmount);
     }
 
     function delegatePwIpor(address[] memory ipTokens, uint256[] memory pwIporAmounts) external {
-        _pwToken.delegateToJohn(ipTokens, pwIporAmounts);
+        _powerIpor.delegateToJohn(ipTokens, pwIporAmounts);
     }
 
     function undelegatePwIpor(address ipToken, uint256 pwIporAmount) external {
-        _pwToken.undelegateFromJohn(ipToken, pwIporAmount);
+        _powerIpor.undelegateFromJohn(ipToken, pwIporAmount);
     }
 }

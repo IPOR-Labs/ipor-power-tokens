@@ -7,13 +7,13 @@ module.exports = async function (deployer, _network, addresses) {
     const ipUsdt = await func.getValue(keys.ipUSDT);
     const ipUsdc = await func.getValue(keys.ipUSDC);
     const ipDai = await func.getValue(keys.ipDAI);
-    const pwIporToken = await func.getValue(keys.PwIporTokenProxy);
+    const powerIpor = await func.getValue(keys.PowerIporProxy);
     const iporToken = await func.getValue(keys.IPOR);
     const assets = [ipUsdt, ipUsdc, ipDai];
 
     const initialParams = {
         assets,
-        pwIporToken,
+        powerIpor,
         iporToken,
     };
 

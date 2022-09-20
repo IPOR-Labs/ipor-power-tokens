@@ -4,13 +4,13 @@ import chai from "chai";
 import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { IporToken, PwIporToken } from "../../types";
+import { IporToken, PowerIpor } from "../../types";
 
 chai.use(solidity);
 const { expect } = chai;
 const { ethers } = hre;
 
-describe("PwIporToken comnfiguration, deploy tests", () => {
+describe("PowerIpor configuration, deploy tests", () => {
     let accounts: Signer[];
     let iporToken: IporToken;
     before(async () => {
@@ -26,41 +26,37 @@ describe("PwIporToken comnfiguration, deploy tests", () => {
 
     it("Should deploy contract", async () => {
         // given
-        const PwIporToken = await ethers.getContractFactory("PwIporToken");
+        const PowerIpor = await ethers.getContractFactory("PowerIpor");
         // when
-        const pwIporToken = (await upgrades.deployProxy(PwIporToken, [
-            iporToken.address,
-        ])) as PwIporToken;
+        const powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
         // then
-        expect(await pwIporToken.name()).to.be.equal("Power IPOR");
-        expect(await pwIporToken.symbol()).to.be.equal("pwIPOR");
-        expect(await pwIporToken.decimals()).to.be.equal(BigNumber.from("18"));
+        expect(await powerIpor.name()).to.be.equal("Power IPOR");
+        expect(await powerIpor.symbol()).to.be.equal("pwIPOR");
+        expect(await powerIpor.decimals()).to.be.equal(BigNumber.from("18"));
     });
 
     it("Should not be able to deploy contract when no iporToken address", async () => {
         // given
-        const PwIporToken = await ethers.getContractFactory("PwIporToken");
+        const PowerIpor = await ethers.getContractFactory("PowerIpor");
         // when
         await expect(
-            upgrades.deployProxy(PwIporToken, ["0x0000000000000000000000000000000000000000"])
+            upgrades.deployProxy(PowerIpor, ["0x0000000000000000000000000000000000000000"])
         ).to.be.revertedWith("IPOR_000");
         // then
     });
 
     it("Should be able to transfer ownership", async () => {
         // given
-        const PwIporToken = await ethers.getContractFactory("PwIporToken");
-        const pwIporToken = (await upgrades.deployProxy(PwIporToken, [
-            iporToken.address,
-        ])) as PwIporToken;
+        const PowerIpor = await ethers.getContractFactory("PowerIpor");
+        const powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
 
         const [admin, userOne] = accounts;
-        const ownerAddressBefore = await pwIporToken.owner();
+        const ownerAddressBefore = await powerIpor.owner();
         // when
-        await pwIporToken.transferOwnership(await userOne.getAddress());
-        await pwIporToken.connect(userOne).confirmTransferOwnership();
+        await powerIpor.transferOwnership(await userOne.getAddress());
+        await powerIpor.connect(userOne).confirmTransferOwnership();
         // then
-        const ownerAddressAfter = await pwIporToken.owner();
+        const ownerAddressAfter = await powerIpor.owner();
 
         expect(ownerAddressBefore).to.be.equal(await admin.getAddress());
         expect(ownerAddressAfter).to.be.equal(await userOne.getAddress());
@@ -68,35 +64,31 @@ describe("PwIporToken comnfiguration, deploy tests", () => {
 
     it("Should not be able to transfer ownership when not owner", async () => {
         // given
-        const PwIporToken = await ethers.getContractFactory("PwIporToken");
-        const pwIporToken = (await upgrades.deployProxy(PwIporToken, [
-            iporToken.address,
-        ])) as PwIporToken;
+        const PowerIpor = await ethers.getContractFactory("PowerIpor");
+        const powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
 
         const [admin, userOne] = accounts;
-        const ownerAddressBefore = await pwIporToken.owner();
+        const ownerAddressBefore = await powerIpor.owner();
         // when
         await expect(
             //when
-            pwIporToken.connect(userOne).transferOwnership(await userOne.getAddress())
+            powerIpor.connect(userOne).transferOwnership(await userOne.getAddress())
             //then
         ).to.be.revertedWith("Ownable: caller is not the owner");
     });
 
     it("Should be able to pause contract when owner", async () => {
         // given
-        const PwIporToken = await ethers.getContractFactory("PwIporToken");
-        const pwIporToken = (await upgrades.deployProxy(PwIporToken, [
-            iporToken.address,
-        ])) as PwIporToken;
+        const PowerIpor = await ethers.getContractFactory("PowerIpor");
+        const powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
 
         const [admin, userOne] = accounts;
 
-        const isPausedBefore = await pwIporToken.paused();
+        const isPausedBefore = await powerIpor.paused();
         // when
-        await pwIporToken.pause();
+        await powerIpor.pause();
         // then
-        const isPausedAfter = await pwIporToken.paused();
+        const isPausedAfter = await powerIpor.paused();
 
         expect(isPausedBefore).to.be.false;
         expect(isPausedAfter).to.be.true;
@@ -104,19 +96,17 @@ describe("PwIporToken comnfiguration, deploy tests", () => {
 
     it("Should not be able to pause contract when no owner", async () => {
         // given
-        const PwIporToken = await ethers.getContractFactory("PwIporToken");
-        const pwIporToken = (await upgrades.deployProxy(PwIporToken, [
-            iporToken.address,
-        ])) as PwIporToken;
+        const PowerIpor = await ethers.getContractFactory("PowerIpor");
+        const powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
 
         const [admin, userOne] = accounts;
-        const isPausedBefore = await pwIporToken.paused();
+        const isPausedBefore = await powerIpor.paused();
         // when
-        await expect(pwIporToken.connect(userOne).pause()).to.be.revertedWith(
+        await expect(powerIpor.connect(userOne).pause()).to.be.revertedWith(
             "Ownable: caller is not the owner"
         );
         // then
-        const isPausedAfter = await pwIporToken.paused();
+        const isPausedAfter = await powerIpor.paused();
 
         expect(isPausedBefore).to.be.false;
         expect(isPausedAfter).to.be.false;
@@ -124,16 +114,14 @@ describe("PwIporToken comnfiguration, deploy tests", () => {
 
     it("Should be able to unpause contract when owner", async () => {
         // given
-        const PwIporToken = await ethers.getContractFactory("PwIporToken");
-        const pwIporToken = (await upgrades.deployProxy(PwIporToken, [
-            iporToken.address,
-        ])) as PwIporToken;
-        await pwIporToken.pause();
-        const isPausedBefore = await pwIporToken.paused();
+        const PowerIpor = await ethers.getContractFactory("PowerIpor");
+        const powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
+        await powerIpor.pause();
+        const isPausedBefore = await powerIpor.paused();
         // when
-        await pwIporToken.unpause();
+        await powerIpor.unpause();
         // then
-        const isPausedAfter = await pwIporToken.paused();
+        const isPausedAfter = await powerIpor.paused();
 
         expect(isPausedBefore).to.be.true;
         expect(isPausedAfter).to.be.false;
@@ -141,20 +129,18 @@ describe("PwIporToken comnfiguration, deploy tests", () => {
 
     it("Should not be able to unpause contract when no owner", async () => {
         // given
-        const PwIporToken = await ethers.getContractFactory("PwIporToken");
-        const pwIporToken = (await upgrades.deployProxy(PwIporToken, [
-            iporToken.address,
-        ])) as PwIporToken;
+        const PowerIpor = await ethers.getContractFactory("PowerIpor");
+        const powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
 
         const [admin, userOne] = accounts;
-        await pwIporToken.pause();
-        const isPausedBefore = await pwIporToken.paused();
+        await powerIpor.pause();
+        const isPausedBefore = await powerIpor.paused();
         // when
-        await expect(pwIporToken.connect(userOne).unpause()).to.be.revertedWith(
+        await expect(powerIpor.connect(userOne).unpause()).to.be.revertedWith(
             "Ownable: caller is not the owner"
         );
         // then
-        const isPausedAfter = await pwIporToken.paused();
+        const isPausedAfter = await powerIpor.paused();
 
         expect(isPausedBefore).to.be.true;
         expect(isPausedAfter).to.be.true;

@@ -50,14 +50,14 @@ interface IJohn {
     /// @notice Emitted when user stake ipToken
     /// @param account account address
     /// @param ipToken address of ipToken which should be stake
-    /// @param account of ipTokens to stake, represented in 18 decimals
-    event StakeIpTokens(address account, address ipToken, uint256 amount);
+    /// @param ipTokenAmount of ipTokens to stake, represented in 18 decimals
+    event StakeIpTokens(address account, address ipToken, uint256 ipTokenAmount);
 
     /// @notice Emitted when user unstake ipTokens
     /// @param account account address
     /// @param ipToken address of ipToken which should be stake
-    /// @param amount of ipTokens to stake, represented in 18 decimals
-    event UnstakeIpTokens(address account, address ipToken, uint256 amount);
+    /// @param ipTokenAmount of ipTokens to stake, represented in 18 decimals
+    event UnstakeIpTokens(address account, address ipToken, uint256 ipTokenAmount);
 
     /// @notice Emitted when user claim rewards
     /// @param account account address
