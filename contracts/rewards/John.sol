@@ -12,7 +12,7 @@ contract John is JohnInternal, IJohn {
     using SafeCast for int256;
 
     function balanceOf(address ipToken) external view override returns (uint256) {
-        return _accountParams[_msgSender()][ipToken].ipTokensBalance;
+        return _accountParams[_msgSender()][ipToken].ipTokenBalance;
     }
 
     function balanceOfDelegatedPwIpor(address account, address[] memory requestIpTokens)
@@ -29,18 +29,18 @@ contract John is JohnInternal, IJohn {
             require(_ipTokens[ipToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
             balances[i] = JohnTypes.DelegatedPwIpor(
                 ipToken,
-                _accountParams[account][ipToken].delegatedPwTokenBalance
+                _accountParams[account][ipToken].delegatedPwIporBalance
             );
         }
         return JohnTypes.BalanceOfDelegatedPwIpor(balances);
     }
 
     function getRewardsPerBlock(address ipToken) external view override returns (uint32) {
-        return _globalParameters[ipToken].blockRewards;
+        return _globalParams[ipToken].blockRewards;
     }
 
     function calculateAccruedRewards(address ipToken) external view override returns (uint256) {
-        JohnTypes.GlobalRewardsParams memory globalParams = _globalParameters[ipToken];
+        JohnTypes.GlobalRewardsParams memory globalParams = _globalParams[ipToken];
         if (globalParams.aggregatePowerUp == 0) {
             return globalParams.accruedRewards;
         }
@@ -54,7 +54,7 @@ contract John is JohnInternal, IJohn {
     }
 
     function calculateAccountRewards(address ipToken) external view override returns (uint256) {
-        JohnTypes.GlobalRewardsParams memory globalParams = _globalParameters[ipToken];
+        JohnTypes.GlobalRewardsParams memory globalParams = _globalParams[ipToken];
         JohnTypes.AccountRewardsParams memory accountParams = _accountParams[_msgSender()][ipToken];
         return _calculateAccountRewards(accountParams, globalParams);
     }
@@ -71,7 +71,7 @@ contract John is JohnInternal, IJohn {
         IERC20Upgradeable(ipToken).safeTransferFrom(_msgSender(), address(this), ipTokenAmount);
 
         JohnTypes.AccountRewardsParams memory accountParams = _accountParams[_msgSender()][ipToken];
-        JohnTypes.GlobalRewardsParams memory globalParams = _globalParameters[ipToken];
+        JohnTypes.GlobalRewardsParams memory globalParams = _globalParams[ipToken];
 
         // assumption we start counting from first person who can get rewards
         if (globalParams.blockNumber == 0) {
@@ -87,8 +87,8 @@ contract John is JohnInternal, IJohn {
         _rebalanceParams(
             accountParams,
             globalParams,
-            accountParams.ipTokensBalance + ipTokenAmount,
-            accountParams.delegatedPwTokenBalance,
+            accountParams.ipTokenBalance + ipTokenAmount,
+            accountParams.delegatedPwIporBalance,
             ipToken,
             _msgSender()
         );
@@ -102,7 +102,7 @@ contract John is JohnInternal, IJohn {
         whenNotPaused
     {
         require(_ipTokens[ipToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
-        JohnTypes.GlobalRewardsParams memory globalParams = _globalParameters[ipToken];
+        JohnTypes.GlobalRewardsParams memory globalParams = _globalParams[ipToken];
         JohnTypes.AccountRewardsParams memory accountParams = _accountParams[_msgSender()][ipToken];
 
         uint256 rewards = _calculateAccountRewards(accountParams, globalParams);
@@ -111,16 +111,13 @@ contract John is JohnInternal, IJohn {
             _claim(_msgSender(), rewards);
         }
 
-        require(
-            ipTokenAmount <= accountParams.ipTokensBalance,
-            MiningErrors.STAKED_BALANCE_TOO_LOW
-        );
+        require(ipTokenAmount <= accountParams.ipTokenBalance, MiningErrors.STAKED_BALANCE_TOO_LOW);
 
         _rebalanceParams(
             accountParams,
             globalParams,
-            accountParams.ipTokensBalance - ipTokenAmount,
-            accountParams.delegatedPwTokenBalance,
+            accountParams.ipTokenBalance - ipTokenAmount,
+            accountParams.delegatedPwIporBalance,
             ipToken,
             _msgSender()
         );
@@ -132,7 +129,7 @@ contract John is JohnInternal, IJohn {
 
     function claim(address ipToken) external override whenNotPaused nonReentrant {
         JohnTypes.AccountRewardsParams memory accountParams = _accountParams[_msgSender()][ipToken];
-        JohnTypes.GlobalRewardsParams memory globalParams = _globalParameters[ipToken];
+        JohnTypes.GlobalRewardsParams memory globalParams = _globalParams[ipToken];
 
         uint256 rewards = _calculateAccountRewards(accountParams, globalParams);
         require(rewards > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
@@ -140,8 +137,8 @@ contract John is JohnInternal, IJohn {
         _claim(_msgSender(), rewards);
 
         uint256 accountPowerUp = MiningCalculation.calculateAccountPowerUp(
-            accountParams.delegatedPwTokenBalance,
-            accountParams.ipTokensBalance,
+            accountParams.delegatedPwIporBalance,
+            accountParams.ipTokenBalance,
             _verticalShift(),
             _horizontalShift()
         );
@@ -156,9 +153,9 @@ contract John is JohnInternal, IJohn {
             ipToken,
             JohnTypes.AccountRewardsParams(
                 compositeMultiplierCumulativeBeforeBlock.toUint128(),
-                accountParams.ipTokensBalance,
+                accountParams.ipTokenBalance,
                 uint72(accountPowerUp),
-                accountParams.delegatedPwTokenBalance
+                accountParams.delegatedPwIporBalance
             )
         );
 

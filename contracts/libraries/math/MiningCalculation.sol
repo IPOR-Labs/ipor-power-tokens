@@ -14,21 +14,21 @@ library MiningCalculation {
     using SafeCast for int256;
 
     function calculateAccountPowerUp(
-        uint256 pwToken,
-        uint256 ipToken,
+        uint256 pwIporAmount,
+        uint256 ipTokenAmount,
         uint256 verticalShift,
         uint256 horizontalShift
     ) internal view returns (uint256) {
-        if (ipToken == 0) {
+        if (ipTokenAmount == 0) {
             return 0;
         }
-        bytes16 pwTokenFP = _toFixedPoint(pwToken, Constants.D18);
-        bytes16 ipTokenFP = _toFixedPoint(ipToken, Constants.D18);
+        bytes16 pwIporAmountFP = _toFixedPoint(pwIporAmount, Constants.D18);
+        bytes16 ipTokenAmountFP = _toFixedPoint(ipTokenAmount, Constants.D18);
         bytes16 verticalSwitchFP = _toFixedPoint(verticalShift, Constants.D18);
         bytes16 horizontalSwitchFP = _toFixedPoint(horizontalShift, Constants.D18);
 
         bytes16 underLog = ABDKMathQuad.add(
-            ABDKMathQuad.div(pwTokenFP, ipTokenFP),
+            ABDKMathQuad.div(pwIporAmountFP, ipTokenAmountFP),
             horizontalSwitchFP
         );
 
@@ -39,15 +39,15 @@ library MiningCalculation {
 
     function calculateAggregatePowerUp(
         uint256 accountPowerUp,
-        uint256 accountIpToken,
+        uint256 accountIpTokenAmount,
         uint256 previousAccountPowerUp,
-        uint256 previousAccountIpToken,
+        uint256 previousAccountIpTokenAmount,
         uint256 previousAggregatePowerUp
     ) internal view returns (uint256) {
         int256 apu = accountPowerUp.toInt256() *
-            accountIpToken.toInt256() -
+            accountIpTokenAmount.toInt256() -
             previousAccountPowerUp.toInt256() *
-            previousAccountIpToken.toInt256();
+            previousAccountIpTokenAmount.toInt256();
 
         if (apu < 0) {
             uint256 absApu = IporMath.division((-apu).toUint256(), Constants.D18);
@@ -109,7 +109,7 @@ library MiningCalculation {
     }
 
     function calculateAccountRewards(
-        uint256 accountIpTokens,
+        uint256 accountIpTokenAmount,
         uint256 accountPowerUp,
         uint256 compositeMultiplierCumulative,
         uint256 accountCompositeMultiplierCumulative
@@ -118,7 +118,7 @@ library MiningCalculation {
             compositeMultiplierCumulative >= accountCompositeMultiplierCumulative,
             MiningErrors.COMPOSITE_MULTIPLIER_GREATER_OR_EQUAL_THAN_ACCOUNT_COMPOSITE_MULTIPLIER
         );
-        uint256 accountRewards = accountIpTokens *
+        uint256 accountRewards = accountIpTokenAmount *
             accountPowerUp *
             (compositeMultiplierCumulative - accountCompositeMultiplierCumulative);
         return IporMath.division(accountRewards, Constants.D45);

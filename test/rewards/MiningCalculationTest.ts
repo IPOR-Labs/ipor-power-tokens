@@ -18,13 +18,18 @@ describe("John Stake and balance", () => {
         miningCalculation = (await MiningCalculation.deploy()) as MockMiningCalculation;
     });
 
-    it("Should return zero when ipToken  = 0 ", async () => {
+    it("Should return zero when ipTokenAmount  = 0 ", async () => {
         //    given
-        const { pwToken, ipToken, verticalShift, horizontalShift } = getValues("2", "0", "2", "2");
+        const { pwIporAmount, ipTokenAmount, verticalShift, horizontalShift } = getValues(
+            "2",
+            "0",
+            "2",
+            "2"
+        );
         //    when
         const result = await miningCalculation.calculateUserPowerUp(
-            pwToken,
-            ipToken,
+            pwIporAmount,
+            ipTokenAmount,
             verticalShift,
             horizontalShift
         );
@@ -32,9 +37,9 @@ describe("John Stake and balance", () => {
         expect(result).to.be.equal(ZERO);
     });
 
-    it("Should return verticalShift when pwToken  = 0 ", async () => {
+    it("Should return verticalShift when pwIporAmount  = 0 ", async () => {
         //    given
-        const { pwToken, ipToken, verticalShift, horizontalShift } = getValues(
+        const { pwIporAmount, ipTokenAmount, verticalShift, horizontalShift } = getValues(
             "0",
             N0__1_18DEC.toString(),
             "4000000000000000000",
@@ -42,8 +47,8 @@ describe("John Stake and balance", () => {
         );
         //    when
         const result = await miningCalculation.calculateUserPowerUp(
-            pwToken,
-            ipToken,
+            pwIporAmount,
+            ipTokenAmount,
             verticalShift,
             horizontalShift
         );
@@ -51,9 +56,9 @@ describe("John Stake and balance", () => {
         expect(result).to.be.equal(verticalShift);
     });
 
-    it("Should return verticalShift when pwToken  = 0, lost precision  pass fraction ", async () => {
+    it("Should return verticalShift when pwIporAmount  = 0, lost precision  pass fraction ", async () => {
         //    given
-        const { pwToken, ipToken, verticalShift, horizontalShift } = getValues(
+        const { pwIporAmount, ipTokenAmount, verticalShift, horizontalShift } = getValues(
             "0",
             N0__1_18DEC.toString(),
             "400000000000000000",
@@ -61,8 +66,8 @@ describe("John Stake and balance", () => {
         );
         //    when
         const result = await miningCalculation.calculateUserPowerUp(
-            pwToken,
-            ipToken,
+            pwIporAmount,
+            ipTokenAmount,
             verticalShift,
             horizontalShift
         );
@@ -72,7 +77,7 @@ describe("John Stake and balance", () => {
 
     it("Should calculate simple case 1 ", async () => {
         //    given
-        const { pwToken, ipToken, verticalShift, horizontalShift } = getValues(
+        const { pwIporAmount, ipTokenAmount, verticalShift, horizontalShift } = getValues(
             N0__1_18DEC.toString(),
             N0__1_18DEC.toString(),
             N1__0_18DEC.toString(),
@@ -80,8 +85,8 @@ describe("John Stake and balance", () => {
         );
         //    when
         const result = await miningCalculation.calculateUserPowerUp(
-            pwToken,
-            ipToken,
+            pwIporAmount,
+            ipTokenAmount,
             verticalShift,
             horizontalShift
         );
@@ -91,19 +96,19 @@ describe("John Stake and balance", () => {
 });
 
 const getValues = (
-    pwToken: string,
-    ipToken: string,
+    pwIporAmount: string,
+    ipTokenAmount: string,
     verticalShift: string,
     horizontalShift: string
 ): {
-    pwToken: BigNumber;
-    ipToken: BigNumber;
+    pwIporAmount: BigNumber;
+    ipTokenAmount: BigNumber;
     verticalShift: BigNumber;
     horizontalShift: BigNumber;
 } => {
     return {
-        pwToken: BigNumber.from(pwToken),
-        ipToken: BigNumber.from(ipToken),
+        pwIporAmount: BigNumber.from(pwIporAmount),
+        ipTokenAmount: BigNumber.from(ipTokenAmount),
         verticalShift: BigNumber.from(verticalShift),
         horizontalShift: BigNumber.from(horizontalShift),
     };

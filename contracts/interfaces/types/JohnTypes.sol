@@ -27,10 +27,10 @@ library JohnTypes {
     struct AccountRewardsParams {
         // represented in 27 decimals
         uint128 compositeMultiplierCumulative;
-        uint128 ipTokensBalance;
+        uint128 ipTokenBalance;
         //  powerUp < 100 *10^18
         uint72 powerUp;
         //delegatedPwTokenBalance < 10^26 < 2^87
-        uint96 delegatedPwTokenBalance;
+        uint96 delegatedPwIporBalance;
     }
 }

@@ -2,14 +2,14 @@
 pragma solidity 0.8.16;
 
 import "../interfaces/IJohnInternal.sol";
-import "../interfaces/IPwIporToken.sol";
-import "./PwIporTokenInternal.sol";
+import "../interfaces/IPowerIpor.sol";
+import "./PowerIporInternal.sol";
 
 //TODO: remove at the end
 import "hardhat/console.sol";
 
 // TODO: Add tests for events
-contract PwIporToken is PwIporTokenInternal, IPwIporToken {
+contract PowerIpor is PowerIporInternal, IPowerIpor {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     function name() external pure override returns (string memory) {
@@ -41,7 +41,7 @@ contract PwIporToken is PwIporTokenInternal, IPwIporToken {
         return _withdrawFee;
     }
 
-    function activeCoolDown() external view returns (PwIporTokenTypes.PwCoolDown memory) {
+    function activeCoolDown() external view returns (PowerIporTypes.PwIporCoolDown memory) {
         return _coolDowns[_msgSender()];
     }
 
@@ -66,35 +66,32 @@ contract PwIporToken is PwIporTokenInternal, IPwIporToken {
         emit Stake(msgSender, iporTokenAmount, exchangeRate, newBaseTokens);
     }
 
-    function unstake(uint256 pwTokenAmount) external override whenNotPaused nonReentrant {
-        require(pwTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+    function unstake(uint256 pwIporAmount) external override whenNotPaused nonReentrant {
+        require(pwIporAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
         address iporTokenAddress = _iporToken;
         address msgSender = _msgSender();
 
         uint256 exchangeRate = _calculateExchangeRate(iporTokenAddress);
-        uint256 undelegatedPwTokens = _availablePwTokens(msgSender, exchangeRate);
+        uint256 undelegatedPwIporAmount = _getAvailablePwIporAmount(msgSender, exchangeRate);
 
         require(
-            undelegatedPwTokens >= pwTokenAmount,
+            undelegatedPwIporAmount >= pwIporAmount,
             MiningErrors.STAKE_AND_UNDELEGATED_BALANCE_TOO_LOW
         );
 
-        uint256 baseAmountToUnstake = IporMath.division(
-            pwTokenAmount * Constants.D18,
-            exchangeRate
-        );
+        uint256 baseAmountToUnstake = IporMath.division(pwIporAmount * Constants.D18, exchangeRate);
 
         require(_baseBalance[msgSender] >= baseAmountToUnstake, MiningErrors.BASE_BALANCE_TOO_LOW);
 
         _baseBalance[msgSender] -= baseAmountToUnstake;
         _baseTotalSupply -= baseAmountToUnstake;
 
-        uint256 amountToTransfer = _baseAmountToPwToken(
-            _amountWithoutFee(baseAmountToUnstake),
+        uint256 amountToTransfer = _calculateBaseAmountToPwIpor(
+            _calculateAmountWithoutFee(baseAmountToUnstake),
             exchangeRate
         );
         IERC20Upgradeable(iporTokenAddress).transfer(msgSender, amountToTransfer);
-        emit Unstake(msgSender, pwTokenAmount, exchangeRate, pwTokenAmount - amountToTransfer);
+        emit Unstake(msgSender, pwIporAmount, exchangeRate, pwIporAmount - amountToTransfer);
     }
 
     function delegateToJohn(address[] memory ipTokens, uint256[] memory pwIporAmounts)
@@ -110,7 +107,7 @@ contract PwIporToken is PwIporTokenInternal, IPwIporToken {
         }
 
         require(
-            _availablePwTokens(_msgSender(), _calculateExchangeRate(_iporToken)) >=
+            _getAvailablePwIporAmount(_msgSender(), _calculateExchangeRate(_iporToken)) >=
                 pwIporToDelegate,
             MiningErrors.STAKED_BALANCE_TOO_LOW
         );
@@ -135,24 +132,24 @@ contract PwIporToken is PwIporTokenInternal, IPwIporToken {
         IJohnInternal(_john).undelegatePwIpor(_msgSender(), ipToken, pwIporAmount);
         _delegatedBalance[_msgSender()] -= pwIporAmount;
 
-        emit UndelegatePwIpor(_msgSender(), ipToken, pwIporAmount);
+        emit UndelegateFromJohn(_msgSender(), ipToken, pwIporAmount);
     }
 
     function coolDown(uint256 pwIporAmount) external override whenNotPaused {
         require(pwIporAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
         address msgSender = _msgSender();
 
-        uint256 availablePwTokens = _baseAmountToPwToken(
+        uint256 availablePwIporAmount = _calculateBaseAmountToPwIpor(
             _baseBalance[msgSender],
             _calculateExchangeRate(_iporToken)
         ) - _delegatedBalance[msgSender];
 
         require(
-            availablePwTokens >= pwIporAmount,
+            availablePwIporAmount >= pwIporAmount,
             MiningErrors.STAKE_AND_UNDELEGATED_BALANCE_TOO_LOW
         );
 
-        _coolDowns[msgSender] = PwIporTokenTypes.PwCoolDown(
+        _coolDowns[msgSender] = PowerIporTypes.PwIporCoolDown(
             block.timestamp + COOL_DOWN_IN_SECONDS,
             pwIporAmount
         );
@@ -160,14 +157,14 @@ contract PwIporToken is PwIporTokenInternal, IPwIporToken {
     }
 
     function cancelCoolDown() external override whenNotPaused {
-        _coolDowns[_msgSender()] = PwIporTokenTypes.PwCoolDown(0, 0);
+        _coolDowns[_msgSender()] = PowerIporTypes.PwIporCoolDown(0, 0);
         emit CoolDown(_msgSender(), 0, 0);
     }
 
     function redeem() external override whenNotPaused nonReentrant {
         address msgSender = _msgSender();
-        PwIporTokenTypes.PwCoolDown memory coolDown = _coolDowns[msgSender];
-        require(block.timestamp >= coolDown.coolDownFinish, MiningErrors.COOL_DOWN_NOT_FINISH);
+        PowerIporTypes.PwIporCoolDown memory coolDown = _coolDowns[msgSender];
+        require(block.timestamp >= coolDown.endTimestamp, MiningErrors.COOL_DOWN_NOT_FINISH);
         require(coolDown.amount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
         address iporTokenAddress = _iporToken;
 
@@ -181,7 +178,7 @@ contract PwIporToken is PwIporTokenInternal, IPwIporToken {
 
         _baseBalance[msgSender] -= baseAmountToUnstake;
         _baseTotalSupply -= baseAmountToUnstake;
-        _coolDowns[msgSender] = PwIporTokenTypes.PwCoolDown(0, 0);
+        _coolDowns[msgSender] = PowerIporTypes.PwIporCoolDown(0, 0);
 
         IERC20Upgradeable(iporTokenAddress).transfer(msgSender, coolDown.amount);
 

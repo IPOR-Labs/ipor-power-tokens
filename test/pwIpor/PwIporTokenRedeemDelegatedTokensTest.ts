@@ -4,7 +4,7 @@ import chai from "chai";
 import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { IporToken, PwIporToken, John } from "../../types";
+import { IporToken, PowerIpor, John } from "../../types";
 import {
     N1__0_18DEC,
     ZERO,
@@ -20,10 +20,10 @@ chai.use(solidity);
 const { expect } = chai;
 const { ethers } = hre;
 
-describe("PwIporToken configuration, deploy tests", () => {
+describe("PowerIpor configuration, deploy tests", () => {
     let accounts: Signer[];
     let iporToken: IporToken;
-    let pwIporToken: PwIporToken;
+    let powerIpor: PowerIpor;
     let tokens: Tokens;
     let john: John;
 
@@ -39,76 +39,72 @@ describe("PwIporToken configuration, deploy tests", () => {
             "IPOR",
             await accounts[0].getAddress()
         )) as IporToken;
-        const PwIporToken = await ethers.getContractFactory("PwIporToken");
-        pwIporToken = (await upgrades.deployProxy(PwIporToken, [iporToken.address])) as PwIporToken;
-        await iporToken.increaseAllowance(pwIporToken.address, TOTAL_SUPPLY_18_DECIMALS);
+        const PowerIpor = await ethers.getContractFactory("PowerIpor");
+        powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
+        await iporToken.increaseAllowance(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
         const John = await hre.ethers.getContractFactory("John");
         john = (await upgrades.deployProxy(John, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
-            pwIporToken.address,
+            powerIpor.address,
             iporToken.address,
         ])) as John;
 
-        await pwIporToken.setJohn(john.address);
+        await powerIpor.setJohn(john.address);
     });
 
     it("Should revert transaction when withdraw zero", async () => {
         //    given
-        await pwIporToken.stake(N1__0_18DEC);
+        await powerIpor.stake(N1__0_18DEC);
         //    when
         await expect(
-            pwIporToken.undelegateFromJohn(tokens.ipTokenDai.address, ZERO)
+            powerIpor.undelegateFromJohn(tokens.ipTokenDai.address, ZERO)
         ).to.be.revertedWith("IPOR_004");
     });
 
     it("Should revert transaction when no delegate tokens", async () => {
         //    given
-        await pwIporToken.stake(N1__0_18DEC);
+        await powerIpor.stake(N1__0_18DEC);
         //    when
         await expect(
-            pwIporToken.undelegateFromJohn(tokens.ipTokenDai.address, N0__1_18DEC)
+            powerIpor.undelegateFromJohn(tokens.ipTokenDai.address, N0__1_18DEC)
         ).to.be.revertedWith("IPOR_706");
     });
 
     it("Should revert transaction when delegate amount is less then withdraw amont", async () => {
         //    given
-        await pwIporToken.stake(N1__0_18DEC);
-        await pwIporToken.delegateToJohn([tokens.ipTokenDai.address], [N0__1_18DEC]);
+        await powerIpor.stake(N1__0_18DEC);
+        await powerIpor.delegateToJohn([tokens.ipTokenDai.address], [N0__1_18DEC]);
         //    when
         await expect(
-            pwIporToken.undelegateFromJohn(tokens.ipTokenDai.address, N0__5_18DEC)
+            powerIpor.undelegateFromJohn(tokens.ipTokenDai.address, N0__5_18DEC)
         ).to.be.revertedWith("IPOR_706");
     });
 
     it("Should withdraw tokens when delegate more tokens", async () => {
         //    given
         const [admin] = accounts;
-        await pwIporToken.stake(N2__0_18DEC);
-        await pwIporToken.delegateToJohn([tokens.ipTokenDai.address], [N1__0_18DEC]);
-        const delegatedBalanceBefore = await pwIporToken.delegatedBalanceOf(
-            await admin.getAddress()
-        );
-        const exchangeRateBefore = await pwIporToken.calculateExchangeRate();
-        const pwTokenBalanceBefore = await pwIporToken.balanceOf(await admin.getAddress());
+        await powerIpor.stake(N2__0_18DEC);
+        await powerIpor.delegateToJohn([tokens.ipTokenDai.address], [N1__0_18DEC]);
+        const delegatedBalanceBefore = await powerIpor.delegatedBalanceOf(await admin.getAddress());
+        const exchangeRateBefore = await powerIpor.calculateExchangeRate();
+        const pwIporBalanceBefore = await powerIpor.balanceOf(await admin.getAddress());
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
         //    when
-        await pwIporToken.undelegateFromJohn(tokens.ipTokenDai.address, N1__0_18DEC);
+        await powerIpor.undelegateFromJohn(tokens.ipTokenDai.address, N1__0_18DEC);
 
         //    then
 
-        const delegatedBalanceAfter = await pwIporToken.delegatedBalanceOf(
-            await admin.getAddress()
-        );
-        const exchangeRateAfter = await pwIporToken.calculateExchangeRate();
-        const pwTokenBalanceAfter = await pwIporToken.balanceOf(await admin.getAddress());
+        const delegatedBalanceAfter = await powerIpor.delegatedBalanceOf(await admin.getAddress());
+        const exchangeRateAfter = await powerIpor.calculateExchangeRate();
+        const pwIporBalanceAfter = await powerIpor.balanceOf(await admin.getAddress());
 
         expect(delegatedBalanceBefore).to.be.equal(N1__0_18DEC);
         expect(exchangeRateBefore).to.be.equal(N1__0_18DEC);
-        expect(pwTokenBalanceBefore).to.be.equal(N2__0_18DEC);
+        expect(pwIporBalanceBefore).to.be.equal(N2__0_18DEC);
 
         expect(delegatedBalanceAfter).to.be.equal(ZERO);
         expect(exchangeRateAfter).to.be.equal(N1__0_18DEC);
-        expect(pwTokenBalanceAfter).to.be.equal(N2__0_18DEC);
+        expect(pwIporBalanceAfter).to.be.equal(N2__0_18DEC);
     });
 });

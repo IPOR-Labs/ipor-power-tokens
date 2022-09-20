@@ -751,7 +751,7 @@ export default ({ drizzle, drizzleState }) => (
                         <strong>My Delegated power token balance</strong>
                         <br />
                         <small>
-                            Balance of pwTokens delegated from power token contract, <br />
+                            Balance of pwIpor tokens delegated from PowerIpor contract, <br />
                             represented in 18 decimals
                         </small>
                     </td>
