@@ -28,7 +28,7 @@ library JohnTypes {
         uint256 powerUp;
         // represented in 27 decimals
         uint256 compositeMultiplierCumulative;
-        uint256 ipTokensBalance;
-        uint256 delegatedPwTokenBalance;
+        uint256 ipTokenBalance;
+        uint256 delegatedPwIporBalance;
     }
 }

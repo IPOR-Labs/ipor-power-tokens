@@ -28,11 +28,11 @@ describe("John Stake and balance", () => {
         const blockRewards = BigNumber.from("300000000");
         const N3_0_D18 = BigNumber.from("3000000000000000000");
         const userOneIpToken = BigNumber.from("100").mul(D18);
-        const userOnePwToken = BigNumber.from("100").mul(D18);
+        const userOnePwIpor = BigNumber.from("100").mul(D18);
         const userTwoIpToken = BigNumber.from("100").mul(D18);
-        const userTwoPwToken = BigNumber.from("100").mul(D18);
+        const userTwoPwIpor = BigNumber.from("100").mul(D18);
         const userThreeIpToken = BigNumber.from("300").mul(D18);
-        const userThreePwToken = BigNumber.from("100").mul(D18);
+        const userThreePwIpor = BigNumber.from("100").mul(D18);
         //Block 1 calculation
         const user1compositeMultiplierCumulativeBefore = 0;
         const accruedRewards = await miningCalculation.calculateAccruedRewards(
@@ -44,7 +44,7 @@ describe("John Stake and balance", () => {
         expect(accruedRewards).to.be.equal(N3_0_D18);
 
         const userPowerUp = await miningCalculation.calculateUserPowerUp(
-            userOnePwToken,
+            userOnePwIpor,
             userOneIpToken,
             verticalShift,
             horizontalShift
@@ -112,7 +112,7 @@ describe("John Stake and balance", () => {
         //User one rewards
         const block3 = BigNumber.from("3");
 
-        //    userTwo 100 ipToken pwToken 100
+        //    userTwo 100 ipToken pwIpor 100
 
         const accruedRewardsBlok3 = await miningCalculation.calculateAccruedRewards(
             block3,
@@ -123,7 +123,7 @@ describe("John Stake and balance", () => {
         expect(accruedRewardsBlok3).to.be.equal(BigNumber.from("9").mul(D18));
 
         const userPowerUpUserTwo = await miningCalculation.calculateUserPowerUp(
-            userTwoPwToken,
+            userTwoPwIpor,
             userTwoIpToken,
             verticalShift,
             horizontalShift
@@ -224,7 +224,7 @@ describe("John Stake and balance", () => {
         expect(accruedRewardsBlok5).to.be.equal(BigNumber.from("15").mul(D18));
 
         const userPowerUpUserThree = await miningCalculation.calculateUserPowerUp(
-            userThreePwToken,
+            userThreePwIpor,
             userThreeIpToken,
             verticalShift,
             horizontalShift

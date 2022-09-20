@@ -2,10 +2,10 @@
 pragma solidity 0.8.16;
 
 /// @title Struct used across liquidity rewards.
-library PwIporTokenTypes {
-    struct PwCoolDown {
+library PowerIporTypes {
+    struct PwIporCoolDown {
         // @dev timestamp when one can redeem tokens
-        uint256 coolDownFinish;
+        uint256 endTimestamp;
         // @dev amount of tokens which can be redeem without fee
         uint256 amount;
     }

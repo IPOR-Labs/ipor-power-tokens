@@ -104,6 +104,6 @@ module.exports = {
     JohnProxy: "JohnProxy",
     JohnImpl: "JohnImpl",
     IPOR: "IPOR",
-    PwIporTokenProxy: "PwIporTokenProxy",
-    PwIporTokenImpl: "PwIporTokenImpl",
+    PowerIporProxy: "PowerIporProxy",
+    PowerIporImpl: "PowerIporImpl",
 };
