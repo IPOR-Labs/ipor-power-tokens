@@ -117,7 +117,7 @@ export default ({ drizzle, drizzleState }) => {
                     <FrontendComponent drizzle={drizzle} drizzleState={drizzleState} />
                 </Tab>
 
-                <Tab eventKey="John" title="Liquidity Rewards">
+                <Tab eventKey="John" title="John">
                     <JohnComponent drizzle={drizzle} drizzleState={drizzleState} />
                 </Tab>
 
