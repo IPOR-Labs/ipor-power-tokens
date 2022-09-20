@@ -6,7 +6,7 @@ const { ContractData, ContractForm } = newContextComponents;
 export default ({ drizzle, drizzleState }) => (
     <div>
         <br />
-        <h3>Liquidity Rewards {drizzle.contracts.John.address} </h3>
+        <h3>John {drizzle.contracts.John.address} </h3>
         <br />
         <div className="row">
             <table className="table" align="center">
@@ -124,7 +124,7 @@ export default ({ drizzle, drizzleState }) => (
                             drizzle={drizzle}
                             drizzleState={drizzleState}
                             contract="John"
-                            method="globalParams"
+                            method="getGlobalParams"
                             methodArgs={[drizzle.contracts.IpTokenUsdt.address]}
                             render={(value) => {
                                 return (
@@ -183,7 +183,7 @@ export default ({ drizzle, drizzleState }) => (
                             drizzle={drizzle}
                             drizzleState={drizzleState}
                             contract="John"
-                            method="globalParams"
+                            method="getGlobalParams"
                             methodArgs={[drizzle.contracts.IpTokenUsdc.address]}
                             render={(value) => {
                                 return (
@@ -242,7 +242,7 @@ export default ({ drizzle, drizzleState }) => (
                             drizzle={drizzle}
                             drizzleState={drizzleState}
                             contract="John"
-                            method="globalParams"
+                            method="getGlobalParams"
                             methodArgs={[drizzle.contracts.IpTokenDai.address]}
                             render={(value) => {
                                 return (
@@ -495,7 +495,7 @@ export default ({ drizzle, drizzleState }) => (
                             drizzle={drizzle}
                             drizzleState={drizzleState}
                             contract="John"
-                            method="userParams"
+                            method="getAccountParams"
                             methodArgs={[drizzle.contracts.IpTokenUsdt.address]}
                             render={(value) => {
                                 return (
@@ -542,7 +542,7 @@ export default ({ drizzle, drizzleState }) => (
                             drizzle={drizzle}
                             drizzleState={drizzleState}
                             contract="John"
-                            method="userParams"
+                            method="getAccountParams"
                             methodArgs={[drizzle.contracts.IpTokenUsdc.address]}
                             render={(value) => {
                                 return (
@@ -589,7 +589,7 @@ export default ({ drizzle, drizzleState }) => (
                             drizzle={drizzle}
                             drizzleState={drizzleState}
                             contract="John"
-                            method="userParams"
+                            method="getAccountParams"
                             methodArgs={[drizzle.contracts.IpTokenDai.address]}
                             render={(value) => {
                                 return (
@@ -837,7 +837,7 @@ export default ({ drizzle, drizzleState }) => (
                             drizzle={drizzle}
                             drizzleState={drizzleState}
                             contract="John"
-                            method="accountRewards"
+                            method="calculateAccountRewards"
                             methodArgs={[drizzle.contracts.IpTokenUsdt.address]}
                             render={(value) => {
                                 console.error(value);
@@ -856,7 +856,7 @@ export default ({ drizzle, drizzleState }) => (
                             drizzle={drizzle}
                             drizzleState={drizzleState}
                             contract="John"
-                            method="accountRewards"
+                            method="calculateAccountRewards"
                             methodArgs={[drizzle.contracts.IpTokenUsdc.address]}
                             render={(value) => {
                                 console.error(value);
@@ -875,7 +875,7 @@ export default ({ drizzle, drizzleState }) => (
                             drizzle={drizzle}
                             drizzleState={drizzleState}
                             contract="John"
-                            method="accountRewards"
+                            method="calculateAccountRewards"
                             methodArgs={[drizzle.contracts.IpTokenDai.address]}
                             render={(value) => {
                                 console.error(value);
