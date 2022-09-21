@@ -90,11 +90,11 @@ export const getDeployedTokens = async (accounts: Signer[]): Promise<Tokens> => 
 
 export const extractGlobalParam = (value: any): GlobalParams => {
     const aggregatePowerUp = value[0];
-    const accruedRewards = value[1];
-    const compositeMultiplierInTheBlock = value[2];
-    const compositeMultiplierCumulativePrevBlock = value[3];
-    const blockNumber = value[4];
-    const blockRewards = value[5];
+    const accruedRewards = value[5];
+    const compositeMultiplierInTheBlock = value[1];
+    const compositeMultiplierCumulativePrevBlock = value[2];
+    const blockNumber = value[3];
+    const blockRewards = value[4];
 
     return {
         aggregatePowerUp,
@@ -141,9 +141,9 @@ export const expectUserParam = (
 };
 
 export const extractMyParam = (value: any): UserParams => {
-    const powerUp = value[0];
-    const compositeMultiplierCumulative = value[1];
-    const ipTokenBalance = value[2];
+    const powerUp = value[2];
+    const compositeMultiplierCumulative = value[0];
+    const ipTokenBalance = value[1];
     const delegatedPowerTokenBalance = value[3];
 
     return {

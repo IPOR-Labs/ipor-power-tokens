@@ -75,7 +75,7 @@ abstract contract JohnInternal is
 
             _saveGlobalParams(
                 ipTokens[i],
-                JohnTypes.GlobalRewardsParams(0, 0, 0, 0, 0, uint32(Constants.D8))
+                JohnTypes.GlobalRewardsParams(0, 0, 0, 0, uint32(Constants.D8), 0)
             );
         }
     }
@@ -178,11 +178,11 @@ abstract contract JohnInternal is
             ipToken,
             JohnTypes.GlobalRewardsParams(
                 globalParams.aggregatePowerUp,
-                accruedRewards,
-                compositeMultiplier,
-                compositeMultiplierCumulativePrevBlock,
+                compositeMultiplier.toUint128(),
+                compositeMultiplierCumulativePrevBlock.toUint128(),
                 blockNumber.toUint32(),
-                rewardsValue
+                rewardsValue,
+                accruedRewards.toUint88()
             )
         );
         emit RewardsPerBlockChanged(_msgSender(), rewardsValue);
@@ -193,7 +193,7 @@ abstract contract JohnInternal is
         _ipTokens[ipToken] = true;
         _saveGlobalParams(
             ipToken,
-            JohnTypes.GlobalRewardsParams(0, 0, 0, 0, 0, uint32(Constants.D8))
+            JohnTypes.GlobalRewardsParams(0, 0, 0, 0, uint32(Constants.D8), 0)
         );
         emit IpTokenAdded(_msgSender(), ipToken);
     }
@@ -231,15 +231,14 @@ abstract contract JohnInternal is
             .compositeMultiplierCumulativePrevBlock +
             (block.number - globalParams.blockNumber) *
             globalParams.compositeMultiplierInTheBlock;
-
         _saveAccountParams(
             account,
             ipToken,
             JohnTypes.AccountRewardsParams(
-                accountPowerUp,
-                compositeMultiplierCumulativePrevBlock,
-                ipTokenBalance,
-                delegatedPwIporAmount
+                compositeMultiplierCumulativePrevBlock.toUint128(),
+                ipTokenBalance.toUint128(),
+                accountPowerUp.toUint72(),
+                delegatedPwIporAmount.toUint96()
             )
         );
 
@@ -263,7 +262,6 @@ abstract contract JohnInternal is
                 globalParams.accruedRewards
             );
         }
-
         uint256 compositeMultiplier = MiningCalculation.compositeMultiplier(
             globalParams.blockRewards,
             aggregatePowerUp
@@ -273,11 +271,11 @@ abstract contract JohnInternal is
             ipToken,
             JohnTypes.GlobalRewardsParams(
                 aggregatePowerUp,
-                accruedRewards,
-                compositeMultiplier,
-                compositeMultiplierCumulativePrevBlock,
+                compositeMultiplier.toUint128(),
+                compositeMultiplierCumulativePrevBlock.toUint128(),
                 block.number.toUint32(),
-                globalParams.blockRewards
+                globalParams.blockRewards,
+                accruedRewards.toUint88()
             )
         );
     }
@@ -291,9 +289,8 @@ abstract contract JohnInternal is
         JohnTypes.GlobalRewardsParams memory globalParams = _globalParams[ipToken];
 
         if (accountParams.ipTokenBalance == 0) {
-            _accountParams[account][ipToken].delegatedPwIporBalance =
-                accountParams.delegatedPwIporBalance +
-                pwIporAmount;
+            uint256 newBalance = accountParams.delegatedPwIporBalance + pwIporAmount;
+            _accountParams[account][ipToken].delegatedPwIporBalance = newBalance.toUint96();
             emit DelegatePwIpor(account, ipToken, pwIporAmount);
             return;
         }
