@@ -173,7 +173,6 @@ abstract contract JohnInternal is
             rewardsValue,
             globalParams.aggregatePowerUp
         );
-        require(accruedRewards < type(uint88).max, IporErrors.VALUE_DOESNT_FIT_IN_88_BITS);
 
         _saveGlobalParams(
             ipToken,
@@ -183,7 +182,7 @@ abstract contract JohnInternal is
                 compositeMultiplierCumulativeBeforeBlock.toUint128(),
                 blockNumber.toUint32(),
                 rewardsValue,
-                uint88(accruedRewards)
+                accruedRewards.toUint88()
             )
         );
         emit RewardsPerBlockChanged(_msgSender(), rewardsValue);
@@ -232,16 +231,14 @@ abstract contract JohnInternal is
             .compositeMultiplierCumulativeBeforeBlock +
             (block.number - globalParams.blockNumber) *
             globalParams.compositeMultiplierInTheBlock;
-        require(accountPowerUp < type(uint72).max, IporErrors.VALUE_DOESNT_FIT_IN_72_BITS);
-        require(delegatedPwIporAmount < type(uint96).max, IporErrors.VALUE_DOESNT_FIT_IN_96_BITS);
         _saveAccountParams(
             account,
             ipToken,
             JohnTypes.AccountRewardsParams(
                 compositeMultiplierCumulativeBeforeBlock.toUint128(),
                 ipTokenBalance.toUint128(),
-                uint72(accountPowerUp),
-                uint96(delegatedPwIporAmount)
+                accountPowerUp.toUint72(),
+                delegatedPwIporAmount.toUint96()
             )
         );
 
@@ -270,7 +267,6 @@ abstract contract JohnInternal is
             aggregatePowerUp
         );
 
-        require(accountPowerUp < type(uint72).max, IporErrors.VALUE_DOESNT_FIT_IN_72_BITS);
         _saveGlobalParams(
             ipToken,
             JohnTypes.GlobalRewardsParams(
@@ -279,7 +275,7 @@ abstract contract JohnInternal is
                 compositeMultiplierCumulativeBeforeBlock.toUint128(),
                 block.number.toUint32(),
                 globalParams.blockRewards,
-                uint88(accruedRewards)
+                accruedRewards.toUint88()
             )
         );
     }
@@ -294,8 +290,7 @@ abstract contract JohnInternal is
 
         if (accountParams.ipTokenBalance == 0) {
             uint256 newBalance = accountParams.delegatedPwIporBalance + pwIporAmount;
-            require(newBalance < type(uint96).max, IporErrors.VALUE_DOESNT_FIT_IN_96_BITS);
-            _accountParams[account][ipToken].delegatedPwIporBalance = uint96(newBalance);
+            _accountParams[account][ipToken].delegatedPwIporBalance = newBalance.toUint96();
             emit DelegatePwIpor(account, ipToken, pwIporAmount);
             return;
         }
