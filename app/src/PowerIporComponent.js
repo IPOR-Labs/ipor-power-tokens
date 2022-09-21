@@ -81,7 +81,7 @@ export default ({ drizzle, drizzleState }) => {
                             <br />
                             <small>
                                 for setup need to transfer 1000000000000000000000 ipor tokens to{" "}
-                                <br /> Liquidity Rewards {drizzle.contracts.John.address}
+                                <br /> John {drizzle.contracts.John.address}
                             </small>
                         </td>
                         <td>
@@ -315,13 +315,13 @@ export default ({ drizzle, drizzleState }) => {
                         <td>
                             <tr style={{ border: "none" }}>
                                 <td>
-                                    <label htmlFor="Assets"> Assets: </label>
+                                    <label htmlFor="IpTokens"> IpTokens: </label>
                                 </td>
                                 <td style={{ border: "none", padding: "1em" }}>
                                     <input
-                                        id="assets"
-                                        value={assets.join(",")}
-                                        onChange={(e) => setAssets(e.target.value.split(","))}
+                                        id="IpTokens"
+                                        value={ipTokens.join(",")}
+                                        onChange={(e) => setIpTokens(e.target.value.split(","))}
                                     />
                                 </td>
                             </tr>

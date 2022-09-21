@@ -48,20 +48,27 @@ library MiningCalculation {
             accountIpTokenAmount.toInt256() -
             previousAccountPowerUp.toInt256() *
             previousAccountIpTokenAmount.toInt256();
-
+        uint256 newApu;
         if (apu < 0) {
             uint256 absApu = IporMath.division((-apu).toUint256(), Constants.D18);
             //   last unstake ipTokens we can have rounding error
-            if (previousAggregatePowerUp < absApu && previousAggregatePowerUp + 100 >= absApu) {
+
+            if (previousAggregatePowerUp < absApu && previousAggregatePowerUp + 10000 >= absApu) {
                 return 0;
             }
             require(
                 previousAggregatePowerUp >= absApu,
                 MiningErrors.AGGREGATE_POWER_UP_COULD_NOT_BE_NEGATIVE
             );
-            return previousAggregatePowerUp - absApu;
+            newApu = previousAggregatePowerUp - absApu;
+        } else {
+            newApu = previousAggregatePowerUp + IporMath.division(apu.toUint256(), Constants.D18);
         }
-        return previousAggregatePowerUp + IporMath.division(apu.toUint256(), Constants.D18);
+
+        if (newApu < 10000) {
+            return 0;
+        }
+        return newApu;
     }
 
     function calculateAccruedRewards(
