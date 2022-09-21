@@ -265,15 +265,12 @@ abstract contract JohnInternal is
                 globalParams.accruedRewards
             );
         }
-        console.log("aggregatePowerUp ", aggregatePowerUp);
-        console.log("globalParams.blockRewards ", globalParams.blockRewards);
         uint256 compositeMultiplier = MiningCalculation.compositeMultiplier(
             globalParams.blockRewards,
             aggregatePowerUp
         );
 
         require(accountPowerUp < type(uint72).max, IporErrors.VALUE_DOESNT_FIT_IN_72_BITS);
-        console.log("compositeMultiplier ", compositeMultiplier);
         _saveGlobalParams(
             ipToken,
             JohnTypes.GlobalRewardsParams(
