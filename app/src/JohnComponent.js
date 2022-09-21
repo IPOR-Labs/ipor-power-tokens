@@ -140,13 +140,21 @@ export default ({ drizzle, drizzleState }) => (
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
                                             <td>Accrued rewards</td>
                                             <td style={{ "padding-left": "1rem" }}>
-                                                {value[1] / 1000000000000000000}
+                                                {value[5] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[5]}</small>
+                                            </td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Composite multiplier in the Block</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[1] / 1000000000000000000000000000}
                                                 <br />
                                                 <small>{value[1]}</small>
                                             </td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
-                                            <td>Composite multiplier in the Block</td>
+                                            <td>Composite multiplier cumulative before block</td>
                                             <td style={{ "padding-left": "1rem" }}>
                                                 {value[2] / 1000000000000000000000000000}
                                                 <br />
@@ -154,23 +162,15 @@ export default ({ drizzle, drizzleState }) => (
                                             </td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
-                                            <td>Composite multiplier cumulative before block</td>
-                                            <td style={{ "padding-left": "1rem" }}>
-                                                {value[3] / 1000000000000000000000000000}
-                                                <br />
-                                                <small>{value[3]}</small>
-                                            </td>
-                                        </tr>
-                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
                                             <td>Block number</td>
-                                            <td style={{ "padding-left": "1rem" }}>{value[4]}</td>
+                                            <td style={{ "padding-left": "1rem" }}>{value[3]}</td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
                                             <td>Block rewards</td>
                                             <td style={{ "padding-left": "1rem" }}>
-                                                {value[5] / 100000000}
+                                                {value[4] / 100000000}
                                                 <br />
-                                                <small>{value[5]}</small>
+                                                <small>{value[4]}</small>
                                             </td>
                                         </tr>
                                     </table>
@@ -199,13 +199,21 @@ export default ({ drizzle, drizzleState }) => (
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
                                             <td>Accrued rewards</td>
                                             <td style={{ "padding-left": "1rem" }}>
-                                                {value[1] / 1000000000000000000}
+                                                {value[5] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[5]}</small>
+                                            </td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Composite multiplier in the Block</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[1] / 1000000000000000000000000000}
                                                 <br />
                                                 <small>{value[1]}</small>
                                             </td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
-                                            <td>Composite multiplier in the Block</td>
+                                            <td>Composite multiplier cumulative before block</td>
                                             <td style={{ "padding-left": "1rem" }}>
                                                 {value[2] / 1000000000000000000000000000}
                                                 <br />
@@ -213,23 +221,15 @@ export default ({ drizzle, drizzleState }) => (
                                             </td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
-                                            <td>Composite multiplier cumulative before block</td>
-                                            <td style={{ "padding-left": "1rem" }}>
-                                                {value[3] / 1000000000000000000000000000}
-                                                <br />
-                                                <small>{value[3]}</small>
-                                            </td>
-                                        </tr>
-                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
                                             <td>Block number</td>
-                                            <td style={{ "padding-left": "1rem" }}>{value[4]}</td>
+                                            <td style={{ "padding-left": "1rem" }}>{value[3]}</td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
                                             <td>Block rewards</td>
                                             <td style={{ "padding-left": "1rem" }}>
-                                                {value[5] / 100000000}
+                                                {value[4] / 100000000}
                                                 <br />
-                                                <small>{value[5]}</small>
+                                                <small>{value[4]}</small>
                                             </td>
                                         </tr>
                                     </table>
@@ -258,13 +258,21 @@ export default ({ drizzle, drizzleState }) => (
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
                                             <td>Accrued rewards</td>
                                             <td style={{ "padding-left": "1rem" }}>
-                                                {value[1] / 1000000000000000000}
+                                                {value[5] / 1000000000000000000}
+                                                <br />
+                                                <small>{value[5]}</small>
+                                            </td>
+                                        </tr>
+                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
+                                            <td>Composite multiplier in the Block</td>
+                                            <td style={{ "padding-left": "1rem" }}>
+                                                {value[1] / 1000000000000000000000000000}
                                                 <br />
                                                 <small>{value[1]}</small>
                                             </td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
-                                            <td>Composite multiplier in the Block</td>
+                                            <td>Composite multiplier cumulative before block</td>
                                             <td style={{ "padding-left": "1rem" }}>
                                                 {value[2] / 1000000000000000000000000000}
                                                 <br />
@@ -272,23 +280,15 @@ export default ({ drizzle, drizzleState }) => (
                                             </td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
-                                            <td>Composite multiplier cumulative before block</td>
-                                            <td style={{ "padding-left": "1rem" }}>
-                                                {value[3] / 1000000000000000000000000000}
-                                                <br />
-                                                <small>{value[3]}</small>
-                                            </td>
-                                        </tr>
-                                        <tr style={{ border: "none", "padding-left": "1rem" }}>
                                             <td>Block number</td>
-                                            <td style={{ "padding-left": "1rem" }}>{value[4]}</td>
+                                            <td style={{ "padding-left": "1rem" }}>{value[3]}</td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
                                             <td>Block rewards</td>
                                             <td style={{ "padding-left": "1rem" }}>
-                                                {value[5] / 100000000}
+                                                {value[4] / 100000000}
                                                 <br />
-                                                <small>{value[5]}</small>
+                                                <small>{value[4]}</small>
                                             </td>
                                         </tr>
                                     </table>
@@ -503,25 +503,25 @@ export default ({ drizzle, drizzleState }) => (
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
                                             <td>Power up</td>
                                             <td style={{ "padding-left": "1rem" }}>
-                                                {value[0] / 1000000000000000000}
+                                                {value[2] / 1000000000000000000}
                                                 <br />
-                                                <small>{value[0]}</small>
+                                                <small>{value[2]}</small>
                                             </td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
                                             <td>Composite multiplier cumulative</td>
                                             <td style={{ "padding-left": "1rem" }}>
-                                                {value[1] / 1000000000000000000000000000}
+                                                {value[0] / 1000000000000000000000000000}
                                                 <br />
-                                                <small>{value[1]}</small>
+                                                <small>{value[0]}</small>
                                             </td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
                                             <td>Staked ipTokens</td>
                                             <td style={{ "padding-left": "1rem" }}>
-                                                {value[2] / 1000000000000000000}
+                                                {value[1] / 1000000000000000000}
                                                 <br />
-                                                <small>{value[2]}</small>
+                                                <small>{value[1]}</small>
                                             </td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
@@ -550,25 +550,25 @@ export default ({ drizzle, drizzleState }) => (
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
                                             <td>Power up</td>
                                             <td style={{ "padding-left": "1rem" }}>
-                                                {value[0] / 1000000000000000000}
+                                                {value[2] / 1000000000000000000}
                                                 <br />
-                                                <small>{value[0]}</small>
+                                                <small>{value[2]}</small>
                                             </td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
                                             <td>Composite multiplier cumulative</td>
                                             <td style={{ "padding-left": "1rem" }}>
-                                                {value[1] / 1000000000000000000000000000}
+                                                {value[0] / 1000000000000000000000000000}
                                                 <br />
-                                                <small>{value[1]}</small>
+                                                <small>{value[0]}</small>
                                             </td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
                                             <td>Staked ipTokens</td>
                                             <td style={{ "padding-left": "1rem" }}>
-                                                {value[2] / 1000000000000000000}
+                                                {value[1] / 1000000000000000000}
                                                 <br />
-                                                <small>{value[2]}</small>
+                                                <small>{value[1]}</small>
                                             </td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
@@ -597,25 +597,25 @@ export default ({ drizzle, drizzleState }) => (
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
                                             <td>Power up</td>
                                             <td style={{ "padding-left": "1rem" }}>
-                                                {value[0] / 1000000000000000000}
+                                                {value[2] / 1000000000000000000}
                                                 <br />
-                                                <small>{value[0]}</small>
+                                                <small>{value[2]}</small>
                                             </td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
                                             <td>Composite multiplier cumulative</td>
                                             <td style={{ "padding-left": "1rem" }}>
-                                                {value[1] / 1000000000000000000000000000}
+                                                {value[0] / 1000000000000000000000000000}
                                                 <br />
-                                                <small>{value[1]}</small>
+                                                <small>{value[0]}</small>
                                             </td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
                                             <td>Staked ipTokens</td>
                                             <td style={{ "padding-left": "1rem" }}>
-                                                {value[2] / 1000000000000000000}
+                                                {value[1] / 1000000000000000000}
                                                 <br />
-                                                <small>{value[2]}</small>
+                                                <small>{value[1]}</small>
                                             </td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>

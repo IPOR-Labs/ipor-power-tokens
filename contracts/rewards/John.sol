@@ -147,14 +147,13 @@ contract John is JohnInternal, IJohn {
             .compositeMultiplierCumulativeBeforeBlock +
             (block.number - globalParams.blockNumber) *
             globalParams.compositeMultiplierInTheBlock;
-
         _saveAccountParams(
             _msgSender(),
             ipToken,
             JohnTypes.AccountRewardsParams(
-                accountPowerUp,
-                compositeMultiplierCumulativeBeforeBlock,
+                compositeMultiplierCumulativeBeforeBlock.toUint128(),
                 accountParams.ipTokenBalance,
+                accountPowerUp.toUint72(),
                 accountParams.delegatedPwIporBalance
             )
         );
