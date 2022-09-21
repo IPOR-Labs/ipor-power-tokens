@@ -381,7 +381,7 @@ describe("John claim", () => {
         expect(pwIporExchangeRateBefore).to.be.equal(pwIporExchangeRateAfter);
     });
 
-    it("Should random stake and delegate to rewards contracts", async () => {
+    it.only("Should random stake and delegate to rewards contracts", async () => {
         //    given
         const ipDai = tokens.ipTokenDai.address;
         await hre.network.provider.send("hardhat_mine", ["0x9999999"]);
@@ -410,7 +410,7 @@ describe("John claim", () => {
         // accruedRewardsAfter:            10_695_898 * 10^18
         // sum of rewards(4 users):        10_695_897.999999999999942012
         // accruedRewards - sumOfRewards = 57988
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 100; i++) {
             randomChangeBlockReward(ipDai, john);
             for (let userIndex = 0; userIndex < users.length; userIndex++) {
                 await hre.network.provider.send("hardhat_mine", ["0x64"]);
@@ -462,3 +462,8 @@ describe("John claim", () => {
         expect(pwIporExchangeRateBefore).to.be.equal(pwIporExchangeRateAfter);
     });
 });
+
+// compositeMultiplier  10070936111433463124822422
+// aggregatePowerUp  7
+// globalParams.blockRewards  600000000
+// compositeMultiplier  857142857142857142857142857142857142857142857

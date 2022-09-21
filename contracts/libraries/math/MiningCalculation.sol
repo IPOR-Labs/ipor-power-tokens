@@ -52,6 +52,9 @@ library MiningCalculation {
         if (apu < 0) {
             uint256 absApu = IporMath.division((-apu).toUint256(), Constants.D18);
             //   last unstake ipTokens we can have rounding error
+            console.log("previousAggregatePowerUp ", previousAggregatePowerUp);
+            console.log("absApu                   ", absApu);
+
             if (previousAggregatePowerUp < absApu && previousAggregatePowerUp + 100 >= absApu) {
                 return 0;
             }
@@ -60,6 +63,9 @@ library MiningCalculation {
                 MiningErrors.AGGREGATE_POWER_UP_COULD_NOT_BE_NEGATIVE
             );
             return previousAggregatePowerUp - absApu;
+        }
+        if (apu < 100) {
+            return 0;
         }
         return previousAggregatePowerUp + IporMath.division(apu.toUint256(), Constants.D18);
     }
