@@ -152,8 +152,8 @@ abstract contract JohnInternal is
         JohnTypes.GlobalRewardsParams memory globalParams = _globalParams[ipToken];
         uint256 blockNumber = block.number;
 
-        uint256 compositeMultiplierCumulativeBeforeBlock = globalParams
-            .compositeMultiplierCumulativeBeforeBlock +
+        uint256 compositeMultiplierCumulativePrevBlock = globalParams
+            .compositeMultiplierCumulativePrevBlock +
             (blockNumber - globalParams.blockNumber) *
             globalParams.compositeMultiplierInTheBlock;
 
@@ -180,7 +180,7 @@ abstract contract JohnInternal is
                 globalParams.aggregatePowerUp,
                 accruedRewards,
                 compositeMultiplier,
-                compositeMultiplierCumulativeBeforeBlock,
+                compositeMultiplierCumulativePrevBlock,
                 blockNumber.toUint32(),
                 rewardsValue
             )
@@ -188,7 +188,7 @@ abstract contract JohnInternal is
         emit RewardsPerBlockChanged(_msgSender(), rewardsValue);
     }
 
-    function addIpToken(address ipToken) external onlyOwner whenNotPaused {
+    function addIpTokenAsset(address ipToken) external onlyOwner whenNotPaused {
         require(ipToken != address(0), IporErrors.WRONG_ADDRESS);
         _ipTokens[ipToken] = true;
         _saveGlobalParams(
@@ -198,7 +198,7 @@ abstract contract JohnInternal is
         emit IpTokenAdded(_msgSender(), ipToken);
     }
 
-    function removeIpToken(address ipToken) external override onlyOwner {
+    function removeIpTokenAsset(address ipToken) external override onlyOwner {
         require(ipToken != address(0), IporErrors.WRONG_ADDRESS);
         _ipTokens[ipToken] = false;
         emit IpTokenRemoved(_msgSender(), ipToken);
@@ -227,8 +227,8 @@ abstract contract JohnInternal is
             _horizontalShift()
         );
 
-        uint256 compositeMultiplierCumulativeBeforeBlock = globalParams
-            .compositeMultiplierCumulativeBeforeBlock +
+        uint256 compositeMultiplierCumulativePrevBlock = globalParams
+            .compositeMultiplierCumulativePrevBlock +
             (block.number - globalParams.blockNumber) *
             globalParams.compositeMultiplierInTheBlock;
 
@@ -237,7 +237,7 @@ abstract contract JohnInternal is
             ipToken,
             JohnTypes.AccountRewardsParams(
                 accountPowerUp,
-                compositeMultiplierCumulativeBeforeBlock,
+                compositeMultiplierCumulativePrevBlock,
                 ipTokenBalance,
                 delegatedPwIporAmount
             )
@@ -275,7 +275,7 @@ abstract contract JohnInternal is
                 aggregatePowerUp,
                 accruedRewards,
                 compositeMultiplier,
-                compositeMultiplierCumulativeBeforeBlock,
+                compositeMultiplierCumulativePrevBlock,
                 block.number.toUint32(),
                 globalParams.blockRewards
             )
@@ -319,8 +319,8 @@ abstract contract JohnInternal is
         JohnTypes.AccountRewardsParams memory accountParams,
         JohnTypes.GlobalRewardsParams memory globalParams
     ) internal view returns (uint256) {
-        uint256 compositeMultiplierCumulativeBeforeBlock = globalParams
-            .compositeMultiplierCumulativeBeforeBlock +
+        uint256 compositeMultiplierCumulativePrevBlock = globalParams
+            .compositeMultiplierCumulativePrevBlock +
             (block.number - globalParams.blockNumber) *
             globalParams.compositeMultiplierInTheBlock;
 
@@ -328,7 +328,7 @@ abstract contract JohnInternal is
             MiningCalculation.calculateAccountRewards(
                 accountParams.ipTokenBalance,
                 accountParams.powerUp,
-                compositeMultiplierCumulativeBeforeBlock,
+                compositeMultiplierCumulativePrevBlock,
                 accountParams.compositeMultiplierCumulative
             );
     }

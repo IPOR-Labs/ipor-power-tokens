@@ -26,7 +26,10 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
     function totalSupply() external view override returns (uint256) {
         return
-            IporMath.division(_baseTotalSupply * _calculateExchangeRate(_iporToken), Constants.D18);
+            IporMath.division(
+                _baseTotalSupply * _calculateInternalExchangeRate(_iporToken),
+                Constants.D18
+            );
     }
 
     function balanceOf(address account) external view override returns (uint256) {
@@ -50,7 +53,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         address iporTokenAddress = _iporToken;
         address msgSender = _msgSender();
 
-        uint256 exchangeRate = _calculateExchangeRate(iporTokenAddress);
+        uint256 exchangeRate = _calculateInternalExchangeRate(iporTokenAddress);
 
         IERC20Upgradeable(iporTokenAddress).safeTransferFrom(
             msgSender,
@@ -71,11 +74,11 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         address iporTokenAddress = _iporToken;
         address msgSender = _msgSender();
 
-        uint256 exchangeRate = _calculateExchangeRate(iporTokenAddress);
-        uint256 undelegatedPwIporAmount = _getAvailablePwIporAmount(msgSender, exchangeRate);
+        uint256 exchangeRate = _calculateInternalExchangeRate(iporTokenAddress);
+        uint256 availablePwIporAmount = _getAvailablePwIporAmount(msgSender, exchangeRate);
 
         require(
-            undelegatedPwIporAmount >= pwIporAmount,
+            availablePwIporAmount >= pwIporAmount,
             MiningErrors.STAKE_AND_UNDELEGATED_BALANCE_TOO_LOW
         );
 
@@ -107,7 +110,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         }
 
         require(
-            _getAvailablePwIporAmount(_msgSender(), _calculateExchangeRate(_iporToken)) >=
+            _getAvailablePwIporAmount(_msgSender(), _calculateInternalExchangeRate(_iporToken)) >=
                 pwIporToDelegate,
             MiningErrors.STAKED_BALANCE_TOO_LOW
         );
@@ -141,7 +144,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
         uint256 availablePwIporAmount = _calculateBaseAmountToPwIpor(
             _baseBalance[msgSender],
-            _calculateExchangeRate(_iporToken)
+            _calculateInternalExchangeRate(_iporToken)
         ) - _delegatedBalance[msgSender];
 
         require(
@@ -168,7 +171,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         require(coolDown.amount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
         address iporTokenAddress = _iporToken;
 
-        uint256 exchangeRate = _calculateExchangeRate(iporTokenAddress);
+        uint256 exchangeRate = _calculateInternalExchangeRate(iporTokenAddress);
         uint256 baseAmountToUnstake = IporMath.division(
             coolDown.amount * Constants.D18,
             exchangeRate

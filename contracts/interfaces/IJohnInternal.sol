@@ -57,11 +57,11 @@ interface IJohnInternal {
 
     /// @notice method allowed to add new token(ipToken)
     /// @param ipToken address of ipToken
-    function addIpToken(address ipToken) external;
+    function addIpTokenAsset(address ipToken) external;
 
     /// @notice method allowed to remove token
     /// @param ipToken address of ipToken
-    function removeIpToken(address ipToken) external;
+    function removeIpTokenAsset(address ipToken) external;
 
     /// @notice Pauses current smart contract, it can be executed only by the Owner
     /// @dev Emits {Paused} event.

@@ -28,14 +28,16 @@ abstract contract PowerIporInternal is
 {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
-    // 2 weeks
+    /// @dev 2 weeks
     uint256 public constant COOL_DOWN_IN_SECONDS = 2 * 7 * 24 * 60 * 60;
 
     address internal _john;
     address internal _iporToken;
     // account address -> amount 18 decimals
+    /// @dev
     mapping(address => uint256) internal _baseBalance;
-    // account address -> amount 18 decimals
+
+    /// @dev balance of pwIpor which are delegated to John, information per account, balance represented in 18 decimals
     mapping(address => uint256) internal _delegatedBalance;
     // account address -> {endTimestamp, amount}
     mapping(address => PowerIporTypes.PwIporCoolDown) internal _coolDowns;
@@ -70,7 +72,7 @@ abstract contract PowerIporInternal is
     }
 
     function calculateExchangeRate() external view override returns (uint256) {
-        return _calculateExchangeRate(_iporToken);
+        return _calculateInternalExchangeRate(_iporToken);
     }
 
     function getJohn() external view override returns (address) {
@@ -97,7 +99,7 @@ abstract contract PowerIporInternal is
     {
         address iporTokenAddress = _iporToken;
         // We need this value before transfer tokens
-        uint256 exchangeRate = _calculateExchangeRate(iporTokenAddress);
+        uint256 exchangeRate = _calculateInternalExchangeRate(iporTokenAddress);
         require(iporTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         IERC20Upgradeable(iporTokenAddress).safeTransferFrom(
@@ -121,7 +123,11 @@ abstract contract PowerIporInternal is
         _unpause();
     }
 
-    function _calculateExchangeRate(address iporTokenAddress) internal view returns (uint256) {
+    function _calculateInternalExchangeRate(address iporTokenAddress)
+        internal
+        view
+        returns (uint256)
+    {
         uint256 baseTotalSupply = _baseTotalSupply;
         if (baseTotalSupply == 0) {
             return Constants.D18;
@@ -158,7 +164,10 @@ abstract contract PowerIporInternal is
 
     function _balanceOf(address account) internal view returns (uint256) {
         return
-            _calculateBaseAmountToPwIpor(_baseBalance[account], _calculateExchangeRate(_iporToken));
+            _calculateBaseAmountToPwIpor(
+                _baseBalance[account],
+                _calculateInternalExchangeRate(_iporToken)
+            );
     }
 
     //solhint-disable no-empty-blocks

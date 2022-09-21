@@ -4,7 +4,7 @@ pragma solidity 0.8.16;
 import "../libraries/math/MiningCalculation.sol";
 
 contract MockMiningCalculation {
-    function calculateUserPowerUp(
+    function calculateAccountPowerUp(
         uint256 pwIporAmount,
         uint256 ipTokenAmount,
         uint256 verticalShift,

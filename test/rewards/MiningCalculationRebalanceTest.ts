@@ -43,7 +43,7 @@ describe("John Stake and balance", () => {
         );
         expect(accruedRewards).to.be.equal(N3_0_D18);
 
-        const userPowerUp = await miningCalculation.calculateUserPowerUp(
+        const userPowerUp = await miningCalculation.calculateAccountPowerUp(
             userOnePwIpor,
             userOneIpToken,
             verticalShift,
@@ -122,7 +122,7 @@ describe("John Stake and balance", () => {
         );
         expect(accruedRewardsBlok3).to.be.equal(BigNumber.from("9").mul(D18));
 
-        const userPowerUpUserTwo = await miningCalculation.calculateUserPowerUp(
+        const userPowerUpUserTwo = await miningCalculation.calculateAccountPowerUp(
             userTwoPwIpor,
             userTwoIpToken,
             verticalShift,
@@ -223,7 +223,7 @@ describe("John Stake and balance", () => {
         );
         expect(accruedRewardsBlok5).to.be.equal(BigNumber.from("15").mul(D18));
 
-        const userPowerUpUserThree = await miningCalculation.calculateUserPowerUp(
+        const userPowerUpUserThree = await miningCalculation.calculateAccountPowerUp(
             userThreePwIpor,
             userThreeIpToken,
             verticalShift,

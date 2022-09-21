@@ -124,9 +124,9 @@ library MiningCalculation {
         return IporMath.division(accountRewards, Constants.D45);
     }
 
-    function _toFixedPoint(uint256 number, uint256 decimals) internal view returns (bytes16) {
+    function _toFixedPoint(uint256 number, uint256 decimals) private view returns (bytes16) {
         if (number % decimals > 0) {
-            //            when we calculate we lost this value in conversion
+            // when we calculate we lost this value in conversion
             number += 1;
         }
         bytes16 nominator = ABDKMathQuad.fromUInt(number);

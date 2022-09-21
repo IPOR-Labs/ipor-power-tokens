@@ -18,7 +18,7 @@ library JohnTypes {
         // represented in 27 decimals
         uint256 compositeMultiplierInTheBlock;
         // represented in 27 decimals
-        uint256 compositeMultiplierCumulativeBeforeBlock;
+        uint256 compositeMultiplierCumulativePrevBlock;
         uint32 blockNumber;
         // represented in 8 decimals
         uint32 blockRewards;

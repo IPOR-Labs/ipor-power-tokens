@@ -143,8 +143,8 @@ contract John is JohnInternal, IJohn {
             _horizontalShift()
         );
 
-        uint256 compositeMultiplierCumulativeBeforeBlock = globalParams
-            .compositeMultiplierCumulativeBeforeBlock +
+        uint256 compositeMultiplierCumulativePrevBlock = globalParams
+            .compositeMultiplierCumulativePrevBlock +
             (block.number - globalParams.blockNumber) *
             globalParams.compositeMultiplierInTheBlock;
 
@@ -153,7 +153,7 @@ contract John is JohnInternal, IJohn {
             ipToken,
             JohnTypes.AccountRewardsParams(
                 accountPowerUp,
-                compositeMultiplierCumulativeBeforeBlock,
+                compositeMultiplierCumulativePrevBlock,
                 accountParams.ipTokenBalance,
                 accountParams.delegatedPwIporBalance
             )

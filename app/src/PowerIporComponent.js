@@ -44,7 +44,7 @@ export default ({ drizzle, drizzleState }) => {
                         <td>
                             <strong>My allowances</strong>
                             <br />
-                            <small>To PowerIpor</small>
+                            <small>Allowance to pwIpor</small>
                         </td>
                         <td>
                             <ContractData
@@ -77,7 +77,7 @@ export default ({ drizzle, drizzleState }) => {
                     </tr>
                     <tr>
                         <td>
-                            <strong>Transfer TOKENS to</strong>
+                            <strong>Transfer Ipor Tokens to</strong>
                             <br />
                             <small>
                                 for setup need to transfer 1000000000000000000000 ipor tokens to{" "}
@@ -297,7 +297,7 @@ export default ({ drizzle, drizzleState }) => {
                     </tr>
                     <tr style={{ padding: "1em" }}>
                         <td>
-                            <strong>Delegate power ipor to John</strong> <br />
+                            <strong>Delegate pwIpor to John</strong> <br />
                             Assets: <br />
                             <small>
                                 ipUsdt: {drizzle.contracts.IpTokenUsdt.address}, <br />
@@ -320,8 +320,8 @@ export default ({ drizzle, drizzleState }) => {
                                 <td style={{ border: "none", padding: "1em" }}>
                                     <input
                                         id="assets"
-                                        value={assets.join(",")}
-                                        onChange={(e) => setAssets(e.target.value.split(","))}
+                                        value={ipTokens.join(",")}
+                                        onChange={(e) => setIpTokens(e.target.value.split(","))}
                                     />
                                 </td>
                             </tr>
@@ -375,7 +375,7 @@ export default ({ drizzle, drizzleState }) => {
                     </tr>
                     <tr>
                         <td>
-                            <strong>Withdraw power ipor from John</strong> <br />
+                            <strong>Withdraw pwIpor from John</strong> <br />
                             Assets: <br />
                             <small>
                                 ipUsdt: {drizzle.contracts.IpTokenUsdt.address}, delegated balance{" "}
@@ -436,7 +436,7 @@ export default ({ drizzle, drizzleState }) => {
                             <ContractForm
                                 drizzle={drizzle}
                                 contract="PowerIpor"
-                                method="withdrawFromDelegation"
+                                method="undelegateFromJohn"
                             />
                         </td>
                     </tr>
