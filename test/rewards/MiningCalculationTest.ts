@@ -10,7 +10,7 @@ import { N1__0_18DEC, ZERO, N0__1_18DEC } from "../utils/Constants";
 chai.use(solidity);
 const { expect } = chai;
 
-describe("John Stake and balance", () => {
+describe.only("John Stake and balance", () => {
     let miningCalculation: MockMiningCalculation;
 
     before(async () => {
@@ -41,7 +41,7 @@ describe("John Stake and balance", () => {
         //    given
         const { pwIporAmount, ipTokenAmount, verticalShift, horizontalShift } = getValues(
             "0",
-            N0__1_18DEC.toString(),
+            N1__0_18DEC.toString(),
             "4000000000000000000",
             N1__0_18DEC.toString()
         );
@@ -56,11 +56,11 @@ describe("John Stake and balance", () => {
         expect(result).to.be.equal(verticalShift);
     });
 
-    it("Should return verticalShift when pwIporAmount  = 0, lost precision  pass fraction ", async () => {
+    it("Should return 0 when ipToken < 1", async () => {
         //    given
         const { pwIporAmount, ipTokenAmount, verticalShift, horizontalShift } = getValues(
             "0",
-            N0__1_18DEC.toString(),
+            "999999999999999999",
             "400000000000000000",
             N1__0_18DEC.toString()
         );
@@ -72,14 +72,14 @@ describe("John Stake and balance", () => {
             horizontalShift
         );
         //    then
-        expect(result).to.be.equal(BigNumber.from("400000000000000000"));
+        expect(result).to.be.equal(ZERO);
     });
 
     it("Should calculate simple case 1 ", async () => {
         //    given
         const { pwIporAmount, ipTokenAmount, verticalShift, horizontalShift } = getValues(
-            N0__1_18DEC.toString(),
-            N0__1_18DEC.toString(),
+            N1__0_18DEC.toString(),
+            N1__0_18DEC.toString(),
             N1__0_18DEC.toString(),
             N1__0_18DEC.toString()
         );
