@@ -5,12 +5,15 @@ import { BigNumber } from "ethers";
 
 import { solidity } from "ethereum-waffle";
 import { MockMiningCalculation } from "../../types";
-import { N1__0_18DEC, ZERO, N0__1_18DEC } from "../utils/Constants";
+import { N1__0_18DEC, ZERO, N0__1_18DEC, N2__0_18DEC } from "../utils/Constants";
+import linearFunctionTestData from "../asset/testDataForLinearFunction.json";
 
 chai.use(solidity);
 const { expect } = chai;
 
-describe.only("John Stake and balance", () => {
+const itParam = require("mocha-param");
+
+describe("John Stake and balance", () => {
     let miningCalculation: MockMiningCalculation;
 
     before(async () => {
@@ -92,6 +95,59 @@ describe.only("John Stake and balance", () => {
         );
         //    then
         expect(result).to.be.equal(N1__0_18DEC.mul(BigNumber.from("2")));
+    });
+
+    type TestData = { ipTokenAmount: string; pwIporAmount: string; result: string };
+    const powerUpTestData: TestData[] = [
+        {
+            ipTokenAmount: N1__0_18DEC.toString(),
+            pwIporAmount: N1__0_18DEC.toString(),
+            result: "1400000000000000000",
+        },
+        {
+            ipTokenAmount: N1__0_18DEC.toString(),
+            pwIporAmount: N2__0_18DEC.toString(),
+            result: "1984962500721156182",
+        },
+        {
+            ipTokenAmount: N2__0_18DEC.toString(),
+            pwIporAmount: N1__0_18DEC.toString(),
+            result: "984962500721156182",
+        },
+        {
+            ipTokenAmount: N1__0_18DEC.mul(BigNumber.from("10")).toString(),
+            pwIporAmount: N1__0_18DEC.toString(),
+            result: "537503523749934909",
+        },
+        {
+            ipTokenAmount: N1__0_18DEC.mul(BigNumber.from("10")).toString(),
+            pwIporAmount: N1__0_18DEC.mul(BigNumber.from("123")).toString(),
+            result: "4133354340613827254",
+        },
+        {
+            ipTokenAmount: N1__0_18DEC.mul(BigNumber.from("33")).toString(),
+            pwIporAmount: N1__0_18DEC.mul(BigNumber.from("44")).toString(),
+            result: "1622392421336447926",
+        },
+    ];
+
+    itParam("Should calculate proper accountPowerUp", powerUpTestData, async (item: TestData) => {
+        //    given
+        const { pwIporAmount, ipTokenAmount, verticalShift, horizontalShift } = getValues(
+            item.pwIporAmount,
+            item.ipTokenAmount,
+            "400000000000000000",
+            N1__0_18DEC.toString()
+        );
+        //    when
+        const result = await miningCalculation.calculateUserPowerUp(
+            pwIporAmount,
+            ipTokenAmount,
+            verticalShift,
+            horizontalShift
+        );
+        //    then
+        expect(result).to.be.equal(BigNumber.from(item.result));
     });
 });
 
