@@ -74,6 +74,7 @@ contract John is JohnInternal, IJohn {
         JohnTypes.GlobalRewardsParams memory globalParams = _globalParams[ipToken];
 
         // assumption we start counting from first person who can get rewards
+        //        TODO remove
         if (globalParams.blockNumber == 0) {
             globalParams.blockNumber = block.number.toUint32();
         }
@@ -85,12 +86,12 @@ contract John is JohnInternal, IJohn {
         }
 
         _rebalanceParams(
-            accountParams,
-            globalParams,
-            accountParams.ipTokenBalance + ipTokenAmount,
-            accountParams.delegatedPwIporBalance,
+            _msgSender(),
             ipToken,
-            _msgSender()
+            globalParams,
+            accountParams,
+            accountParams.ipTokenBalance + ipTokenAmount,
+            accountParams.delegatedPwIporBalance
         );
         emit StakeIpTokens(_msgSender(), ipToken, ipTokenAmount);
     }
@@ -114,12 +115,12 @@ contract John is JohnInternal, IJohn {
         require(ipTokenAmount <= accountParams.ipTokenBalance, MiningErrors.STAKED_BALANCE_TOO_LOW);
 
         _rebalanceParams(
-            accountParams,
-            globalParams,
-            accountParams.ipTokenBalance - ipTokenAmount,
-            accountParams.delegatedPwIporBalance,
+            _msgSender(),
             ipToken,
-            _msgSender()
+            globalParams,
+            accountParams,
+            accountParams.ipTokenBalance - ipTokenAmount,
+            accountParams.delegatedPwIporBalance
         );
 
         IERC20Upgradeable(ipToken).transfer(_msgSender(), ipTokenAmount);

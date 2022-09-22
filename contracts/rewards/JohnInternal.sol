@@ -117,6 +117,60 @@ abstract contract JohnInternal is
         }
     }
 
+    function delegatePwIporAndStakeIpToken(
+        address account,
+        address[] memory ipTokens,
+        uint256[] memory pwIporAmount,
+        uint256[] memory ipTokenAmount
+    ) external override onlyPowerIpor whenNotPaused {
+        for (uint256 i = 0; i != ipTokens.length; i++) {
+            require(_ipTokens[ipTokens[i]], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
+
+            JohnTypes.AccountRewardsParams memory accountParams = _accountParams[account][
+                ipTokens[i]
+            ];
+            JohnTypes.GlobalRewardsParams memory globalParams = _globalParams[ipTokens[i]];
+
+            //stake
+            IERC20Upgradeable(ipTokens[i]).safeTransferFrom(
+                account,
+                address(this),
+                ipTokenAmount[i]
+            );
+
+            // assumption we start counting from first person who can get rewards
+            //            TODO: to remove
+            if (globalParams.blockNumber == 0) {
+                globalParams.blockNumber = block.number.toUint32();
+            }
+
+            // delegate
+            if (accountParams.ipTokenBalance == 0 && ipTokenAmount[i] == 0) {
+                uint256 newBalance = accountParams.delegatedPwIporBalance + pwIporAmount[i];
+                _accountParams[account][ipTokens[i]].delegatedPwIporBalance = newBalance.toUint96();
+                emit DelegatePwIpor(account, ipTokens[i], pwIporAmount[i]);
+                continue;
+            }
+            // _claimWhenRewardsExists(accountParams, globalParams){}
+            // _claimAndRebalance(){} ----
+            uint256 rewards = _calculateAccountRewards(accountParams, globalParams);
+
+            if (rewards > 0) {
+                _claim(account, rewards);
+            }
+
+            _rebalanceParams(
+                account,
+                ipTokens[i],
+                globalParams,
+                accountParams,
+                accountParams.ipTokenBalance + ipTokenAmount[i],
+                accountParams.delegatedPwIporBalance + pwIporAmount[i]
+            );
+            //           todo: event
+        }
+    }
+
     function undelegatePwIpor(
         address account,
         address ipToken,
@@ -135,12 +189,12 @@ abstract contract JohnInternal is
             IPowerIporInternal(_getPowerIpor()).receiveRewards(account, rewards);
         }
         _rebalanceParams(
-            accountParams,
-            globalParams,
-            accountParams.ipTokenBalance,
-            accountParams.delegatedPwIporBalance - pwIporAmount,
+            account,
             ipToken,
-            account
+            globalParams,
+            accountParams,
+            accountParams.ipTokenBalance,
+            accountParams.delegatedPwIporBalance - pwIporAmount
         );
 
         emit UndelegatePwIpor(account, ipToken, pwIporAmount);
@@ -213,15 +267,15 @@ abstract contract JohnInternal is
     }
 
     function _rebalanceParams(
-        JohnTypes.AccountRewardsParams memory accountParams,
-        JohnTypes.GlobalRewardsParams memory globalParams,
-        uint256 ipTokenBalance,
-        uint256 delegatedPwIporAmount,
+        address account,
         address ipToken,
-        address account
+        JohnTypes.GlobalRewardsParams memory globalParams,
+        JohnTypes.AccountRewardsParams memory accountParams,
+        uint256 ipTokenBalance,
+        uint256 delegatedPwIporBalance
     ) internal {
         uint256 accountPowerUp = MiningCalculation.calculateAccountPowerUp(
-            delegatedPwIporAmount,
+            delegatedPwIporBalance,
             ipTokenBalance,
             _verticalShift(),
             _horizontalShift()
@@ -238,7 +292,7 @@ abstract contract JohnInternal is
                 compositeMultiplierCumulativeBeforeBlock.toUint128(),
                 ipTokenBalance.toUint128(),
                 accountPowerUp.toUint72(),
-                delegatedPwIporAmount.toUint96()
+                delegatedPwIporBalance.toUint96()
             )
         );
 
@@ -302,12 +356,12 @@ abstract contract JohnInternal is
         }
 
         _rebalanceParams(
-            accountParams,
-            globalParams,
-            accountParams.ipTokenBalance,
-            accountParams.delegatedPwIporBalance + pwIporAmount,
+            account,
             ipToken,
-            account
+            globalParams,
+            accountParams,
+            accountParams.ipTokenBalance,
+            accountParams.delegatedPwIporBalance + pwIporAmount
         );
         emit DelegatePwIpor(account, ipToken, pwIporAmount);
     }
