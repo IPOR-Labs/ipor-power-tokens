@@ -104,6 +104,18 @@ interface IJohnInternal {
     /// @param ipTokenAmount of ipTokens to unstake, represented in 18 decimals
     event DelegatePwIpor(address account, address ipToken, uint256 ipTokenAmount);
 
+    /// @notice Emitted when user delegate power token to rewards contract
+    /// @param account account address
+    /// @param ipToken address of ipToken which should be unstake
+    /// @param pwIporAmount of pwIpor to delegate, represented in 18 decimals
+    /// @param ipTokenAmount of ipTokens to stake, represented in 18 decimals
+    event DelegatePwIporAndStakeIpToken(
+        address account,
+        address ipToken,
+        uint256 pwIporAmount,
+        uint256 ipTokenAmount
+    );
+
     /// @notice Emitted when user undelegate power token from John contract
     /// @param account account address
     /// @param ipToken address of ipToken

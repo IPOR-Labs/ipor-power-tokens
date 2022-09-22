@@ -120,8 +120,8 @@ abstract contract JohnInternal is
     function delegatePwIporAndStakeIpToken(
         address account,
         address[] memory ipTokens,
-        uint256[] memory pwIporAmount,
-        uint256[] memory ipTokenAmount
+        uint256[] memory pwIporAmounts,
+        uint256[] memory ipTokenAmounts
     ) external override onlyPowerIpor whenNotPaused {
         for (uint256 i = 0; i != ipTokens.length; i++) {
             require(_ipTokens[ipTokens[i]], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
@@ -132,11 +132,20 @@ abstract contract JohnInternal is
             JohnTypes.GlobalRewardsParams memory globalParams = _globalParams[ipTokens[i]];
 
             //stake
-            IERC20Upgradeable(ipTokens[i]).safeTransferFrom(
-                account,
-                address(this),
-                ipTokenAmount[i]
-            );
+            if (ipTokenAmounts[i] != 0) {
+                IERC20Upgradeable(ipTokens[i]).safeTransferFrom(
+                    account,
+                    address(this),
+                    ipTokenAmounts[i]
+                );
+            }
+            // delegate
+            if (accountParams.ipTokenBalance == 0 && ipTokenAmounts[i] == 0) {
+                uint256 newBalance = accountParams.delegatedPwIporBalance + pwIporAmounts[i];
+                _accountParams[account][ipTokens[i]].delegatedPwIporBalance = newBalance.toUint96();
+                emit DelegatePwIpor(account, ipTokens[i], pwIporAmounts[i]);
+                continue;
+            }
 
             // assumption we start counting from first person who can get rewards
             //            TODO: to remove
@@ -144,30 +153,22 @@ abstract contract JohnInternal is
                 globalParams.blockNumber = block.number.toUint32();
             }
 
-            // delegate
-            if (accountParams.ipTokenBalance == 0 && ipTokenAmount[i] == 0) {
-                uint256 newBalance = accountParams.delegatedPwIporBalance + pwIporAmount[i];
-                _accountParams[account][ipTokens[i]].delegatedPwIporBalance = newBalance.toUint96();
-                emit DelegatePwIpor(account, ipTokens[i], pwIporAmount[i]);
-                continue;
-            }
-            // _claimWhenRewardsExists(accountParams, globalParams){}
-            // _claimAndRebalance(){} ----
-            uint256 rewards = _calculateAccountRewards(accountParams, globalParams);
-
-            if (rewards > 0) {
-                _claim(account, rewards);
-            }
+            _claimWhenRewardsExists(account, globalParams, accountParams);
 
             _rebalanceParams(
                 account,
                 ipTokens[i],
                 globalParams,
                 accountParams,
-                accountParams.ipTokenBalance + ipTokenAmount[i],
-                accountParams.delegatedPwIporBalance + pwIporAmount[i]
+                accountParams.ipTokenBalance + ipTokenAmounts[i],
+                accountParams.delegatedPwIporBalance + pwIporAmounts[i]
             );
-            //           todo: event
+            emit DelegatePwIporAndStakeIpToken(
+                account,
+                ipTokens[i],
+                pwIporAmounts[i],
+                ipTokenAmounts[i]
+            );
         }
     }
 
@@ -183,11 +184,8 @@ abstract contract JohnInternal is
             MiningErrors.DELEGATED_BALANCE_TOO_LOW
         );
         JohnTypes.GlobalRewardsParams memory globalParams = _globalParams[ipToken];
-        uint256 rewards = _calculateAccountRewards(accountParams, globalParams);
 
-        if (rewards > 0) {
-            IPowerIporInternal(_getPowerIpor()).receiveRewards(account, rewards);
-        }
+        _claimWhenRewardsExists(account, globalParams, accountParams);
         _rebalanceParams(
             account,
             ipToken,
@@ -349,11 +347,7 @@ abstract contract JohnInternal is
             return;
         }
 
-        uint256 rewards = _calculateAccountRewards(accountParams, globalParams);
-
-        if (rewards > 0) {
-            _claim(account, rewards);
-        }
+        _claimWhenRewardsExists(account, globalParams, accountParams);
 
         _rebalanceParams(
             account,
@@ -364,6 +358,18 @@ abstract contract JohnInternal is
             accountParams.delegatedPwIporBalance + pwIporAmount
         );
         emit DelegatePwIpor(account, ipToken, pwIporAmount);
+    }
+
+    function _claimWhenRewardsExists(
+        address account,
+        JohnTypes.GlobalRewardsParams memory globalParams,
+        JohnTypes.AccountRewardsParams memory accountParams
+    ) internal {
+        uint256 rewards = _calculateAccountRewards(accountParams, globalParams);
+
+        if (rewards > 0) {
+            _claim(account, rewards);
+        }
     }
 
     function _calculateAccountRewards(

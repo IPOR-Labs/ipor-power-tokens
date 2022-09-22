@@ -79,12 +79,7 @@ contract John is JohnInternal, IJohn {
             globalParams.blockNumber = block.number.toUint32();
         }
 
-        uint256 rewards = _calculateAccountRewards(accountParams, globalParams);
-
-        if (rewards > 0) {
-            _claim(_msgSender(), rewards);
-        }
-
+        _claimWhenRewardsExists(_msgSender(), globalParams, accountParams);
         _rebalanceParams(
             _msgSender(),
             ipToken,
@@ -106,11 +101,7 @@ contract John is JohnInternal, IJohn {
         JohnTypes.GlobalRewardsParams memory globalParams = _globalParams[ipToken];
         JohnTypes.AccountRewardsParams memory accountParams = _accountParams[_msgSender()][ipToken];
 
-        uint256 rewards = _calculateAccountRewards(accountParams, globalParams);
-
-        if (rewards > 0) {
-            _claim(_msgSender(), rewards);
-        }
+        _claimWhenRewardsExists(_msgSender(), globalParams, accountParams);
 
         require(ipTokenAmount <= accountParams.ipTokenBalance, MiningErrors.STAKED_BALANCE_TOO_LOW);
 
