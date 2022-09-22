@@ -158,7 +158,7 @@ abstract contract JohnInternal is
             globalParams.compositeMultiplierInTheBlock;
 
         uint256 accruedRewards;
-        if (globalParams.aggregatePowerUp != 0) {
+        if (globalParams.aggregatedPowerUp != 0) {
             accruedRewards = MiningCalculation.calculateAccruedRewards(
                 blockNumber.toUint32(),
                 globalParams.blockNumber,
@@ -171,13 +171,13 @@ abstract contract JohnInternal is
 
         uint256 compositeMultiplier = MiningCalculation.compositeMultiplier(
             rewardsValue,
-            globalParams.aggregatePowerUp
+            globalParams.aggregatedPowerUp
         );
 
         _saveGlobalParams(
             ipToken,
             JohnTypes.GlobalRewardsParams(
-                globalParams.aggregatePowerUp,
+                globalParams.aggregatedPowerUp,
                 compositeMultiplier.toUint128(),
                 compositeMultiplierCumulativePrevBlock.toUint128(),
                 blockNumber.toUint32(),
@@ -242,17 +242,17 @@ abstract contract JohnInternal is
             )
         );
 
-        uint256 aggregatePowerUp = MiningCalculation.calculateAggregatePowerUp(
+        uint256 aggregatedPowerUp = MiningCalculation.calculateAggregatePowerUp(
             accountPowerUp,
             ipTokenBalance,
             accountParams.powerUp,
             accountParams.ipTokenBalance,
-            globalParams.aggregatePowerUp
+            globalParams.aggregatedPowerUp
         );
 
         uint256 accruedRewards;
         //        check if we should update rewards, it should happened when at least one accounts stake ipTokens
-        if (globalParams.aggregatePowerUp == 0) {
+        if (globalParams.aggregatedPowerUp == 0) {
             accruedRewards = globalParams.accruedRewards;
         } else {
             accruedRewards = MiningCalculation.calculateAccruedRewards(
@@ -264,13 +264,13 @@ abstract contract JohnInternal is
         }
         uint256 compositeMultiplier = MiningCalculation.compositeMultiplier(
             globalParams.blockRewards,
-            aggregatePowerUp
+            aggregatedPowerUp
         );
 
         _saveGlobalParams(
             ipToken,
             JohnTypes.GlobalRewardsParams(
-                aggregatePowerUp,
+                aggregatedPowerUp,
                 compositeMultiplier.toUint128(),
                 compositeMultiplierCumulativePrevBlock.toUint128(),
                 block.number.toUint32(),

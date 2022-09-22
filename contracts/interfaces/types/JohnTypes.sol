@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 pragma solidity 0.8.16;
 
-/// @title Struct used across liquidity rewards.
+/// @title Structures used in John smart contract.
 library JohnTypes {
+    /// @title Struct pair represented delegated pwIpor
     struct DelegatedPwIpor {
         address ipToken;
         uint256 amount;
@@ -12,8 +13,10 @@ library JohnTypes {
         DelegatedPwIpor[] balances;
     }
 
+    /// @title Global indicators used in rewards calculation.
     struct GlobalRewardsParams {
-        uint256 aggregatePowerUp;
+		/// @notice powerUp indicator aggregated
+        uint256 aggregatedPowerUp;
         // represented in 27 decimals
         uint128 compositeMultiplierInTheBlock;
         // represented in 27 decimals

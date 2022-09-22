@@ -51,12 +51,12 @@ contract MockMiningCalculation {
             );
     }
 
-    function compositeMultiplier(uint256 blockRewards, uint256 aggregatePowerUp)
+    function compositeMultiplier(uint256 blockRewards, uint256 aggregatedPowerUp)
         public
         view
         returns (uint256)
     {
-        return MiningCalculation.compositeMultiplier(blockRewards, aggregatePowerUp);
+        return MiningCalculation.compositeMultiplier(blockRewards, aggregatedPowerUp);
     }
 
     function compositeMultiplierCumulative(

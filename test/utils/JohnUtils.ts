@@ -24,7 +24,7 @@ export type Tokens = {
 };
 
 export type GlobalParams = {
-    aggregatePowerUp: BigNumber;
+    aggregatedPowerUp: BigNumber;
     accruedRewards: BigNumber;
     compositeMultiplierInTheBlock: BigNumber;
     compositeMultiplierCumulativePrevBlock: BigNumber;
@@ -89,7 +89,7 @@ export const getDeployedTokens = async (accounts: Signer[]): Promise<Tokens> => 
 };
 
 export const extractGlobalParam = (value: any): GlobalParams => {
-    const aggregatePowerUp = value[0];
+    const aggregatedPowerUp = value[0];
     const accruedRewards = value[5];
     const compositeMultiplierInTheBlock = value[1];
     const compositeMultiplierCumulativePrevBlock = value[2];
@@ -97,7 +97,7 @@ export const extractGlobalParam = (value: any): GlobalParams => {
     const blockRewards = value[4];
 
     return {
-        aggregatePowerUp,
+        aggregatedPowerUp,
         accruedRewards,
         compositeMultiplierInTheBlock,
         compositeMultiplierCumulativePrevBlock,
@@ -108,14 +108,14 @@ export const extractGlobalParam = (value: any): GlobalParams => {
 
 export const expectGlobalParam = (
     params: GlobalParams,
-    aggregatePowerUp: BigNumber,
+    aggregatedPowerUp: BigNumber,
     accruedRewards: BigNumber,
     compositeMultiplierInTheBlock: BigNumber,
     compositeMultiplierCumulativePrevBlock: BigNumber,
     blockNumber: number,
     blockRewards: number
 ): void => {
-    expect(params.aggregatePowerUp).to.be.equal(aggregatePowerUp);
+    expect(params.aggregatedPowerUp).to.be.equal(aggregatedPowerUp);
     expect(params.accruedRewards).to.be.equal(accruedRewards);
     expect(params.compositeMultiplierInTheBlock).to.be.equal(compositeMultiplierInTheBlock);
     expect(params.compositeMultiplierCumulativePrevBlock).to.be.equal(

@@ -30,7 +30,7 @@ export default ({ drizzle, drizzleState }) => (
                 </tr>
                 <tr>
                     <td>
-                        <strong>Liquidity Rewards Balance of ipTokens</strong>
+                        <strong>John's balance of ipTokens</strong>
                         <br />
                         <small>represented in 18 decimals</small>
                     </td>
@@ -85,7 +85,7 @@ export default ({ drizzle, drizzleState }) => (
                 </tr>
                 <tr>
                     <td>
-                        <strong>Liquidity Rewards Balance of IPOR Tokens</strong>
+                        <strong>John's balance of IPOR Tokens</strong>
                         <br />
                         <small>represented in 18 decimals</small>
                     </td>
@@ -99,9 +99,13 @@ export default ({ drizzle, drizzleState }) => (
                             render={(value) => {
                                 if (value == 0) {
                                     return (
-                                        <strong>
-                                            This should be > 0, go to power ipor and transfer tokens
-                                        </strong>
+                                        <div>
+                                            {value} <br />
+                                            <small>
+                                                This should be > 0, go to Power Ipor tab and
+                                                transfer tokens
+                                            </small>
+                                        </div>
                                     );
                                 }
                                 return (
@@ -250,9 +254,9 @@ export default ({ drizzle, drizzleState }) => (
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
                                             <td>Aggregated power up</td>
                                             <td style={{ "padding-left": "1rem" }}>
-                                                {value.aggregatePowerUp / 1000000000000000000}
+                                                {value.aggregatedPowerUp / 1000000000000000000}
                                                 <br />
-                                                <small>{value.aggregatePowerUp}</small>
+                                                <small>{value.aggregatedPowerUp}</small>
                                             </td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>

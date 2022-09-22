@@ -3,14 +3,15 @@ pragma solidity 0.8.16;
 
 import "./types/JohnTypes.sol";
 
-/// @title
+/// @title Interface for interaction with John.
+/// John is reposnsible to mint and redistribute reward across accounts contributed in IPOR Protocol.
 interface IJohn {
-    /// @notice check balance of staked ipTokens
-    /// @param ipToken address of ipToken
-    /// @return balance of ipToken stake
+    /// @notice Returns balance of staked ipTokens
+    /// @param ipToken address of ipToken (ipUSDT, ipUSDC, ipDAI etc.)
+    /// @return balance of ipToken staked by account
     function balanceOf(address ipToken) external view returns (uint256);
 
-    /// @notice fetch balance of power tokens related to token(ipToken)
+    /// @notice Returns balance of delegated pwIpor tokens
     /// @param account address for which we want get balance
     /// @param ipTokens list of ipTokens addresses(ipTokens) for which we want fetch balances
     /// @return {JohnTypes.BalanceOfDelegatedPwIpor}

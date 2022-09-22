@@ -41,7 +41,7 @@ contract John is JohnInternal, IJohn {
 
     function calculateAccruedRewards(address ipToken) external view override returns (uint256) {
         JohnTypes.GlobalRewardsParams memory globalParams = _globalParams[ipToken];
-        if (globalParams.aggregatePowerUp == 0) {
+        if (globalParams.aggregatedPowerUp == 0) {
             return globalParams.accruedRewards;
         }
         return

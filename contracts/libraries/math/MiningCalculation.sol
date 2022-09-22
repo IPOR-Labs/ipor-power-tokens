@@ -104,15 +104,15 @@ library MiningCalculation {
     }
 
     // returns value with 27 decimals
-    function compositeMultiplier(uint256 blockRewards, uint256 aggregatePowerUp)
+    function compositeMultiplier(uint256 blockRewards, uint256 aggregatedPowerUp)
         internal
         view
         returns (uint256)
     {
-        if (aggregatePowerUp == 0) {
+        if (aggregatedPowerUp == 0) {
             return 0;
         }
-        return IporMath.division(blockRewards * Constants.D18 * Constants.D19, aggregatePowerUp);
+        return IporMath.division(blockRewards * Constants.D18 * Constants.D19, aggregatedPowerUp);
     }
 
     function calculateAccountRewards(

@@ -287,7 +287,7 @@ describe("John claim", () => {
             .unstake(tokens.ipTokenDai.address, N1__0_18DEC.mul(BigNumber.from("20")));
         //    then
         const globalParamsAfter = await john.getGlobalParams(tokens.ipTokenDai.address);
-        expect(extractGlobalParam(globalParamsAfter).aggregatePowerUp).to.be.equal(ZERO);
+        expect(extractGlobalParam(globalParamsAfter).aggregatedPowerUp).to.be.equal(ZERO);
     });
 
     it("Should not add rewards when no ipToken was stake", async () => {
