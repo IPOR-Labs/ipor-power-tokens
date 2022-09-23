@@ -4,65 +4,64 @@ pragma solidity 0.8.16;
 import "./types/JohnTypes.sol";
 
 /// @title Interface for interaction with John.
-/// John is reposnsible to mint and redistribute reward across accounts contributed in IPOR Protocol.
+/// John is responsible for distribution IPOR token rewards across accounts contributed in IPOR Protocol
+/// by staking ipTokens and / or delegating pwIpor tokens to John. IpTokens can be staked directly to John,
+/// PwIpor tokens account can get stake IPOR Tokens in PowerIpor smart contract.
 interface IJohn {
     /// @notice Returns balance of staked ipTokens
     /// @param ipToken address of ipToken (ipUSDT, ipUSDC, ipDAI etc.)
-    /// @return balance of ipToken staked by account
+    /// @return balance of ipTokens staked by account
     function balanceOf(address ipToken) external view returns (uint256);
 
-    /// @notice Returns balance of delegated pwIpor tokens
-    /// @param account address for which we want get balance
+    /// @notice Returns balance of delegated pwIpor tokens for a given account and list of ipToken addresses.
+    /// @param account address for which we want get information about balance of delegated pwIpor tokens
     /// @param ipTokens list of ipTokens addresses(ipTokens) for which we want fetch balances
-    /// @return {JohnTypes.BalanceOfDelegatedPwIpor}
+    /// @return balances list of {JohnTypes.DelegatedPwIporBalance} structure, with information how much pwIpor token is delegated per ipToken address.
     function balanceOfDelegatedPwIpor(address account, address[] memory ipTokens)
         external
         view
-        returns (JohnTypes.BalanceOfDelegatedPwIpor memory);
+        returns (JohnTypes.DelegatedPwIporBalance[] memory balances);
 
-    /// @notice fetch rewards per block for asset
-    /// @param ipToken address for which asset should fetch constant
-    function getRewardsPerBlock(address ipToken) external view returns (uint32);
-
-    /// @notice Calculate accrued rewards
-    /// @param ipToken address for which asset should calculate rewards
-    /// @return accrued rewards, represented in 18 decimals.
+    /// @notice Calculate accrued rewards from last rebalance saved in storage
+    /// @param ipToken ipToken address
+    /// @return accrued rewards from last rebalance saved in storage, represented in 18 decimals.
     function calculateAccruedRewards(address ipToken) external view returns (uint256);
 
-    /// @notice Calculate account rewards
+    /// @notice Calculates account rewards based on current state of account and global parameters.
+	/// @dev Calculation not consider accrued values at current block
     /// @param ipToken address for which asset should calculate rewards
     /// @return Current account rewards, represented in 18 decimals.
     function calculateAccountRewards(address ipToken) external view returns (uint256);
 
-    /// @notice method allowed to stake ipTokens into rewards contract
-    /// @param ipToken address of ipToken which should be stake
-    /// @param ipTokenAmount of ipTokens to stake, represented in 18 decimals
+    /// @notice Stakes ipToken amount into John.
+    /// @param ipToken address for a specific asset (ipUSDT, ipUSDC, ipDAI, etc.)
+    /// @param ipTokenAmount ipToken amount being staked, represented in 18 decimals
     function stake(address ipToken, uint256 ipTokenAmount) external;
 
-    /// @notice method allowed to unstake ipTokens from rewards contract
-    /// @param ipToken address of ipToken which should be stake
-    /// @param ipTokenAmount of ipTokens to stake, represented in 18 decimals
+    /// @notice Unstakes ipToken amount from John.
+    /// @param ipToken address for a specific underlying asset (ipUSDT, ipUSDC, ipDAI, etc.)
+    /// @param ipTokenAmount ipToken amount being unstaked, represented in 18 decimals
     function unstake(address ipToken, uint256 ipTokenAmount) external;
 
     /// @notice method allowed to claim rewards per asset
     /// @param ipToken from which you want claim rewards
     function claim(address ipToken) external;
 
-    /// @notice Emitted when user stake ipToken
+    /// @notice Emitted when account stake ipToken
     /// @param account account address
     /// @param ipToken address of ipToken which should be stake
     /// @param ipTokenAmount of ipTokens to stake, represented in 18 decimals
     event StakeIpTokens(address account, address ipToken, uint256 ipTokenAmount);
 
-    /// @notice Emitted when user unstake ipTokens
+    /// @notice Emitted when account unstake ipTokens
     /// @param account account address
     /// @param ipToken address of ipToken which should be stake
     /// @param ipTokenAmount of ipTokens to stake, represented in 18 decimals
     event UnstakeIpTokens(address account, address ipToken, uint256 ipTokenAmount);
 
-    /// @notice Emitted when user claim rewards
+    /// @notice Emitted when account claim rewards
     /// @param account account address
     /// @param ipToken address of ipToken
-    /// @param rewards amount, represented in 18 decimals
-    event Claim(address account, address ipToken, uint256 rewards);
+    /// @param iporTokenAmount reward amount in Ipor Token, represented in 18 decimals
+    event Claim(address account, address ipToken, uint256 iporTokenAmount);
 }

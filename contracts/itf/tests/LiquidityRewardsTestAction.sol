@@ -37,9 +37,12 @@ contract LiquidityRewardsTestAction {
     function balanceOfDelegatedPwIpor(address account, address[] memory requestIpTokens)
         external
         view
-        returns (JohnTypes.BalanceOfDelegatedPwIpor memory)
+        returns (JohnTypes.DelegatedPwIporBalance[] memory balances)
     {
-        return LiquidityRewardsAgent(account).balanceOfDelegatedPwIpor(account, requestIpTokens);
+        balances = LiquidityRewardsAgent(account).balanceOfDelegatedPwIpor(
+            account,
+            requestIpTokens
+        );
     }
 
     function balanceOf(address account, address ipToken) external view returns (uint256) {

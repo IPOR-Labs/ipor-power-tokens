@@ -309,7 +309,8 @@ describe("One block/Transaction tests", () => {
 
         const agent1PwIporBalanceBefore = await powerIpor.balanceOf(agent1.address);
         const agent2PwIporBalanceBefore = await powerIpor.balanceOf(agent2.address);
-        const blockRewardsInitial = await john.getRewardsPerBlock(ipDai);
+        const globalParamsBefore = await john.getGlobalParams(ipDai);
+        const rewardsPerBlockInitial = globalParamsBefore.rewardsPerBlock;
 
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
         await network.provider.send("evm_setAutomine", [false]);
@@ -324,7 +325,8 @@ describe("One block/Transaction tests", () => {
         await agent2.stakeIpToken(ipDai, N1000__0_18DEC);
         await hre.network.provider.send("evm_mine");
 
-        const blockRewardsAfterBlock11 = await john.getRewardsPerBlock(ipDai);
+        const globalParamsAfter = await john.getGlobalParams(ipDai);
+        const rewardsPerBlockAfterBlock11 = globalParamsAfter.rewardsPerBlock;
         const agent2StakeIpTokensInBlock = (await hre.ethers.provider.getBlock("latest")).number;
         const agent1RewardsInBlock11 = await agent1.calculateAccountRewards(ipDai);
         await hre.network.provider.send("hardhat_mine", ["0x9"]);
@@ -337,7 +339,8 @@ describe("One block/Transaction tests", () => {
         await agent2.unstakeIpToken(ipDai, N1000__0_18DEC);
         await hre.network.provider.send("evm_mine");
         const unstakeBlockNumber = (await hre.ethers.provider.getBlock("latest")).number;
-        const blockRewardsAfterBlock21 = await john.getRewardsPerBlock(ipDai);
+        const globalParamsAfter2 = await john.getGlobalParams(ipDai);
+        const rewardsPerBlockAfterBlock21 = globalParamsAfter2.rewardsPerBlock;
 
         //    then
 
@@ -347,17 +350,17 @@ describe("One block/Transaction tests", () => {
         const agent1Rewards = agent1PwIporBalanceAfter.sub(agent1PwIporBalanceBefore);
         const agent2Rewards = agent2PwIporBalanceAfter.sub(agent2PwIporBalanceBefore);
 
-        expect(blockRewardsInitial).to.be.equal(BigNumber.from("100000000"));
+        expect(rewardsPerBlockInitial).to.be.equal(BigNumber.from("100000000"));
         expect(agent2StakeIpTokensInBlock).to.be.equal(agent1StakeIpTokensInBlock + 11);
         expect(agent1RewardsInBlock11).to.be.equal(N1__0_18DEC.mul(BigNumber.from("11")));
-        expect(blockRewardsAfterBlock11).to.be.equal(BigNumber.from("50000000"));
+        expect(rewardsPerBlockAfterBlock11).to.be.equal(BigNumber.from("50000000"));
         expect(blockNumberBeforeUnstake).to.be.equal(agent1StakeIpTokensInBlock + 20);
         expect(agent1RewardsInBlock20).to.be.equal(BigNumber.from("13250000000000000000"));
         expect(agent2RewardsInBlock20).to.be.equal(BigNumber.from("2250000000000000000"));
         expect(unstakeBlockNumber).to.be.equal(agent1StakeIpTokensInBlock + 21);
         expect(agent1Rewards).to.be.equal(BigNumber.from("13500000000000000000"));
         expect(agent2Rewards).to.be.equal(BigNumber.from("2500000000000000000"));
-        expect(blockRewardsAfterBlock21).to.be.equal(BigNumber.from("1000000000"));
+        expect(rewardsPerBlockAfterBlock21).to.be.equal(BigNumber.from("1000000000"));
 
         await network.provider.send("evm_setAutomine", [true]);
     });

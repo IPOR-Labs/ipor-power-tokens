@@ -25,7 +25,7 @@ describe("John Stake and balance", () => {
     //flow based on Łukasz's excel file
     it("Should calculate rewards", async () => {
         const block1 = BigNumber.from("1");
-        const blockRewards = BigNumber.from("300000000");
+        const rewardsPerBlock = BigNumber.from("300000000");
         const N3_0_D18 = BigNumber.from("3000000000000000000");
         const userOneIpToken = BigNumber.from("100").mul(D18);
         const userOnePwIpor = BigNumber.from("100").mul(D18);
@@ -38,7 +38,7 @@ describe("John Stake and balance", () => {
         const accruedRewards = await miningCalculation.calculateAccruedRewards(
             block1,
             zero,
-            blockRewards,
+            rewardsPerBlock,
             zero
         );
         expect(accruedRewards).to.be.equal(N3_0_D18);
@@ -62,7 +62,7 @@ describe("John Stake and balance", () => {
         expect(aggregateBoost).to.be.equal(BigNumber.from("140000000000000000000"));
 
         const compositeMultiplier = await miningCalculation.compositeMultiplier(
-            blockRewards,
+            rewardsPerBlock,
             aggregateBoost
         );
 
@@ -117,7 +117,7 @@ describe("John Stake and balance", () => {
         const accruedRewardsBlok3 = await miningCalculation.calculateAccruedRewards(
             block3,
             block1,
-            blockRewards,
+            rewardsPerBlock,
             accruedRewards
         );
         expect(accruedRewardsBlok3).to.be.equal(BigNumber.from("9").mul(D18));
@@ -141,7 +141,7 @@ describe("John Stake and balance", () => {
         expect(aggregateBoostBlock3).to.be.equal(BigNumber.from("280000000000000000000"));
 
         const compositeMultiplierBlock3 = await miningCalculation.compositeMultiplier(
-            blockRewards,
+            rewardsPerBlock,
             aggregateBoostBlock3
         );
 
@@ -218,7 +218,7 @@ describe("John Stake and balance", () => {
         const accruedRewardsBlok5 = await miningCalculation.calculateAccruedRewards(
             block5,
             block3,
-            blockRewards,
+            rewardsPerBlock,
             accruedRewardsBlok3
         );
         expect(accruedRewardsBlok5).to.be.equal(BigNumber.from("15").mul(D18));
@@ -242,7 +242,7 @@ describe("John Stake and balance", () => {
         expect(aggregateBoostBlock5).to.be.equal(BigNumber.from("524511249783653145700"));
 
         const compositeMultiplierBlock5 = await miningCalculation.compositeMultiplier(
-            blockRewards,
+            rewardsPerBlock,
             aggregateBoostBlock5
         );
 

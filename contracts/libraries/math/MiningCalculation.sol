@@ -72,16 +72,18 @@ library MiningCalculation {
     }
 
     function calculateAccruedRewards(
-        uint256 blocNumber,
+        uint256 blockNumber,
         uint256 lastRebalanceBlockNumber,
-        uint256 blockRewards,
+        uint256 rewardsPerBlock,
         uint256 previousAccruedRewards
     ) internal view returns (uint256) {
         require(
-            blocNumber >= lastRebalanceBlockNumber,
+            blockNumber >= lastRebalanceBlockNumber,
             MiningErrors.BLOCK_NUMBER_GREATER_OR_EQUAL_THAN_PREVIOUS_BLOCK_NUMBER
         );
-        uint256 newRewards = (blocNumber - lastRebalanceBlockNumber) * blockRewards * Constants.D10;
+        uint256 newRewards = (blockNumber - lastRebalanceBlockNumber) *
+            rewardsPerBlock *
+            Constants.D10;
         return previousAccruedRewards + newRewards;
     }
 
@@ -104,7 +106,7 @@ library MiningCalculation {
     }
 
     // returns value with 27 decimals
-    function compositeMultiplier(uint256 blockRewards, uint256 aggregatedPowerUp)
+    function compositeMultiplier(uint256 rewardsPerBlock, uint256 aggregatedPowerUp)
         internal
         view
         returns (uint256)
@@ -112,9 +114,16 @@ library MiningCalculation {
         if (aggregatedPowerUp == 0) {
             return 0;
         }
-        return IporMath.division(blockRewards * Constants.D18 * Constants.D19, aggregatedPowerUp);
+        return
+            IporMath.division(rewardsPerBlock * Constants.D18 * Constants.D19, aggregatedPowerUp);
     }
 
+    /// @notice calculates account rewards represented in Ipor Tokens
+    /// @param accountIpTokenAmount amount of ipToken for a given account
+    /// @param accountPowerUp value of powerUp param for a given account
+    /// @param compositeMultiplierCumulative value of param Composite Multiplier Cumulative global
+    /// @param accountCompositeMultiplierCumulative value of param Composite Multiplier Cumulative for a given account
+    /// @return rewards, amount of Ipor Tokens
     function calculateAccountRewards(
         uint256 accountIpTokenAmount,
         uint256 accountPowerUp,

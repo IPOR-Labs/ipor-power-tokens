@@ -162,7 +162,7 @@ abstract contract JohnInternal is
             accruedRewards = MiningCalculation.calculateAccruedRewards(
                 blockNumber.toUint32(),
                 globalParams.blockNumber,
-                globalParams.blockRewards,
+                globalParams.rewardsPerBlock,
                 globalParams.accruedRewards
             );
         } else {
@@ -251,19 +251,20 @@ abstract contract JohnInternal is
         );
 
         uint256 accruedRewards;
-        //        check if we should update rewards, it should happened when at least one accounts stake ipTokens
+
+        /// @dev check if we should update rewards, it should happened when at least one account stake ipTokens
         if (globalParams.aggregatedPowerUp == 0) {
             accruedRewards = globalParams.accruedRewards;
         } else {
             accruedRewards = MiningCalculation.calculateAccruedRewards(
                 block.number,
                 globalParams.blockNumber,
-                globalParams.blockRewards,
+                globalParams.rewardsPerBlock,
                 globalParams.accruedRewards
             );
         }
         uint256 compositeMultiplier = MiningCalculation.compositeMultiplier(
-            globalParams.blockRewards,
+            globalParams.rewardsPerBlock,
             aggregatedPowerUp
         );
 
@@ -274,7 +275,7 @@ abstract contract JohnInternal is
                 compositeMultiplier.toUint128(),
                 compositeMultiplierCumulativePrevBlock.toUint128(),
                 block.number.toUint32(),
-                globalParams.blockRewards,
+                globalParams.rewardsPerBlock,
                 accruedRewards.toUint88()
             )
         );

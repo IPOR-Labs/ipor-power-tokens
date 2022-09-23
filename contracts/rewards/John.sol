@@ -6,6 +6,9 @@ import "./JohnInternal.sol";
 //TODO: remove at the end
 import "hardhat/console.sol";
 
+/// @title Smart contract responsible for distribution IPOR token rewards across accounts contributed in IPOR Protocol
+/// by staking ipTokens and / or delegating pwIpor tokens to John. IpTokens can be staked directly to John,
+/// PwIpor tokens account can get stake IPOR Tokens in PowerIpor smart contract.
 contract John is JohnInternal, IJohn {
     using SafeERC20Upgradeable for IERC20Upgradeable;
     using SafeCast for uint256;
@@ -19,24 +22,18 @@ contract John is JohnInternal, IJohn {
         external
         view
         override
-        returns (JohnTypes.BalanceOfDelegatedPwIpor memory)
+        returns (JohnTypes.DelegatedPwIporBalance[] memory balances)
     {
-        JohnTypes.DelegatedPwIpor[] memory balances = new JohnTypes.DelegatedPwIpor[](
-            requestIpTokens.length
-        );
+        balances = new JohnTypes.DelegatedPwIporBalance[](requestIpTokens.length);
+
         for (uint256 i = 0; i != requestIpTokens.length; i++) {
             address ipToken = requestIpTokens[i];
             require(_ipTokens[ipToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
-            balances[i] = JohnTypes.DelegatedPwIpor(
+            balances[i] = JohnTypes.DelegatedPwIporBalance(
                 ipToken,
                 _accountParams[account][ipToken].delegatedPwIporBalance
             );
         }
-        return JohnTypes.BalanceOfDelegatedPwIpor(balances);
-    }
-
-    function getRewardsPerBlock(address ipToken) external view override returns (uint32) {
-        return _globalParams[ipToken].blockRewards;
     }
 
     function calculateAccruedRewards(address ipToken) external view override returns (uint256) {
@@ -48,7 +45,7 @@ contract John is JohnInternal, IJohn {
             MiningCalculation.calculateAccruedRewards(
                 block.number,
                 globalParams.blockNumber,
-                globalParams.blockRewards,
+                globalParams.rewardsPerBlock,
                 globalParams.accruedRewards
             );
     }
@@ -131,10 +128,10 @@ contract John is JohnInternal, IJohn {
         JohnTypes.AccountRewardsParams memory accountParams = _accountParams[_msgSender()][ipToken];
         JohnTypes.GlobalRewardsParams memory globalParams = _globalParams[ipToken];
 
-        uint256 rewards = _calculateAccountRewards(accountParams, globalParams);
-        require(rewards > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
+        uint256 iporTokenAmount = _calculateAccountRewards(accountParams, globalParams);
+        require(iporTokenAmount > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
 
-        _claim(_msgSender(), rewards);
+        _claim(_msgSender(), iporTokenAmount);
 
         uint256 accountPowerUp = MiningCalculation.calculateAccountPowerUp(
             accountParams.delegatedPwIporBalance,
@@ -158,6 +155,6 @@ contract John is JohnInternal, IJohn {
             )
         );
 
-        emit Claim(_msgSender(), ipToken, rewards);
+        emit Claim(_msgSender(), ipToken, iporTokenAmount);
     }
 }

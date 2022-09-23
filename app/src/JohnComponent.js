@@ -294,9 +294,9 @@ export default ({ drizzle, drizzleState }) => (
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
                                             <td>Rewards per block</td>
                                             <td style={{ "padding-left": "1rem" }}>
-                                                {value.blockRewards / 100000000}
+                                                {value.rewardsPerBlock / 100000000}
                                                 <br />
-                                                <small>{value.blockRewards}</small>
+                                                <small>{value.rewardsPerBlock}</small>
                                             </td>
                                         </tr>
                                     </table>
@@ -317,15 +317,14 @@ export default ({ drizzle, drizzleState }) => (
                             drizzle={drizzle}
                             drizzleState={drizzleState}
                             contract="John"
-                            method="getRewardsPerBlock"
+                            method="getGlobalParams"
                             methodArgs={[drizzle.contracts.IpTokenUsdt.address]}
                             render={(value) => {
-                                console.error(value);
                                 return (
                                     <div>
-                                        {value / 100000000}
+                                        {value.rewardsPerBlock / 100000000}
                                         <br />
-                                        <small>{value}</small>
+                                        <small>{value.rewardsPerBlock}</small>
                                     </div>
                                 );
                             }}
@@ -336,15 +335,14 @@ export default ({ drizzle, drizzleState }) => (
                             drizzle={drizzle}
                             drizzleState={drizzleState}
                             contract="John"
-                            method="getRewardsPerBlock"
+                            method="getGlobalParams"
                             methodArgs={[drizzle.contracts.IpTokenUsdc.address]}
                             render={(value) => {
-                                console.error(value);
                                 return (
                                     <div>
-                                        {value / 100000000}
+                                        {value.rewardsPerBlock / 100000000}
                                         <br />
-                                        <small>{value}</small>
+                                        <small>{value.rewardsPerBlock}</small>
                                     </div>
                                 );
                             }}
@@ -355,15 +353,14 @@ export default ({ drizzle, drizzleState }) => (
                             drizzle={drizzle}
                             drizzleState={drizzleState}
                             contract="John"
-                            method="getRewardsPerBlock"
+                            method="getGlobalParams"
                             methodArgs={[drizzle.contracts.IpTokenDai.address]}
                             render={(value) => {
-                                console.error(value);
                                 return (
                                     <div>
-                                        {value / 100000000}
+                                        {value.rewardsPerBlock / 100000000}
                                         <br />
-                                        <small>{value}</small>
+                                        <small>{value.rewardsPerBlock}</small>
                                     </div>
                                 );
                             }}
