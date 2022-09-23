@@ -11,7 +11,7 @@ import {
     extractGlobalParam,
     expectGlobalParam,
     expectUserParam,
-    extractMyParam,
+    extractAccountParam,
 } from "../utils/JohnUtils";
 import {
     N1__0_18DEC,
@@ -99,7 +99,7 @@ describe("John Stake and balance", () => {
                 0,
                 100000000
             );
-            expectUserParam(extractMyParam(initUserParamResponse), ZERO, ZERO, ZERO, ZERO);
+            expectUserParam(extractAccountParam(initUserParamResponse), ZERO, ZERO, ZERO, ZERO);
 
             await powerIpor.stake(delegatedIporToken);
             await john.stake(tokens.ipTokenDai.address, stakedIpTokens);
@@ -117,7 +117,7 @@ describe("John Stake and balance", () => {
                 100000000
             );
             expectUserParam(
-                extractMyParam(afterDelegatePwIporUPR),
+                extractAccountParam(afterDelegatePwIporUPR),
                 BigNumber.from("400000000000000000"),
                 ZERO,
                 stakedIpTokens,
@@ -143,7 +143,7 @@ describe("John Stake and balance", () => {
             );
 
             expectUserParam(
-                extractMyParam(afterStakeIpTokensUPR),
+                extractAccountParam(afterStakeIpTokensUPR),
                 BigNumber.from("1400000000000000000"),
                 BigNumber.from("25000000000000000000000000"),
                 stakedIpTokens,
