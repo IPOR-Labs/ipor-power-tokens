@@ -11,7 +11,7 @@ import {
     LiquidityRewardsTestAction,
     LiquidityRewardsAgent,
 } from "../../types";
-import { Tokens, getDeployedTokens, extractMyParam } from "../utils/JohnUtils";
+import { Tokens, getDeployedTokens, extractAccountParam } from "../utils/JohnUtils";
 import {
     N1__0_18DEC,
     ZERO,
@@ -108,8 +108,8 @@ describe("One block/Transaction tests", () => {
         //    then
         const agent1AccountParamsAfter = await agent1.getAccountParams(tokens.ipTokenDai.address);
         const agent2AccountParamsAfter = await agent2.getAccountParams(tokens.ipTokenDai.address);
-        const agent1After = extractMyParam(agent1AccountParamsAfter);
-        const agent2After = extractMyParam(agent2AccountParamsAfter);
+        const agent1After = extractAccountParam(agent1AccountParamsAfter);
+        const agent2After = extractAccountParam(agent2AccountParamsAfter);
 
         expect(agent1After.powerUp).to.be.equal(agent2After.powerUp);
         expect(agent1After.compositeMultiplierCumulative).to.be.equal(
@@ -151,8 +151,8 @@ describe("One block/Transaction tests", () => {
         const agent2AccountParamsAfter = await agent2.getAccountParams(tokens.ipTokenDai.address);
         const agent1PwIporBalanceAfter = await powerIpor.balanceOf(agent1.address);
         const agent2PwIporBalanceAfter = await powerIpor.balanceOf(agent2.address);
-        const agent1After = extractMyParam(agent1AccountParamsAfter);
-        const agent2After = extractMyParam(agent2AccountParamsAfter);
+        const agent1After = extractAccountParam(agent1AccountParamsAfter);
+        const agent2After = extractAccountParam(agent2AccountParamsAfter);
 
         expect(agent1After.powerUp).to.be.equal(agent2After.powerUp);
         expect(agent1After.compositeMultiplierCumulative).to.be.equal(
@@ -401,8 +401,8 @@ describe("One block/Transaction tests", () => {
             );
             agent1PwIporBalanceAfter = await powerIpor.balanceOf(agent1.address);
             agent2PwIporBalanceAfter = await powerIpor.balanceOf(agent2.address);
-            const agent1After = extractMyParam(agent1AccountParamsAfter);
-            const agent2After = extractMyParam(agent2AccountParamsAfter);
+            const agent1After = extractAccountParam(agent1AccountParamsAfter);
+            const agent2After = extractAccountParam(agent2AccountParamsAfter);
             const accruedRewards = await john.calculateAccruedRewards(tokens.ipTokenDai.address);
             const differencesBetweenRewords = accruedRewards
                 .sub(agent2PwIporBalanceAfter)

@@ -74,23 +74,19 @@ contract John is JohnInternal, IJohn {
         JohnTypes.GlobalRewardsParams memory globalParams = _globalParams[ipToken];
 
         // assumption we start counting from first person who can get rewards
+        //        TODO remove
         if (globalParams.blockNumber == 0) {
             globalParams.blockNumber = block.number.toUint32();
         }
 
-        uint256 rewards = _calculateAccountRewards(accountParams, globalParams);
-
-        if (rewards > 0) {
-            _claim(_msgSender(), rewards);
-        }
-
+        _claimWhenRewardsExists(_msgSender(), globalParams, accountParams);
         _rebalanceParams(
-            accountParams,
-            globalParams,
-            accountParams.ipTokenBalance + ipTokenAmount,
-            accountParams.delegatedPwIporBalance,
+            _msgSender(),
             ipToken,
-            _msgSender()
+            globalParams,
+            accountParams,
+            accountParams.ipTokenBalance + ipTokenAmount,
+            accountParams.delegatedPwIporBalance
         );
         emit StakeIpTokens(_msgSender(), ipToken, ipTokenAmount);
     }
@@ -105,21 +101,17 @@ contract John is JohnInternal, IJohn {
         JohnTypes.GlobalRewardsParams memory globalParams = _globalParams[ipToken];
         JohnTypes.AccountRewardsParams memory accountParams = _accountParams[_msgSender()][ipToken];
 
-        uint256 rewards = _calculateAccountRewards(accountParams, globalParams);
-
-        if (rewards > 0) {
-            _claim(_msgSender(), rewards);
-        }
+        _claimWhenRewardsExists(_msgSender(), globalParams, accountParams);
 
         require(ipTokenAmount <= accountParams.ipTokenBalance, MiningErrors.STAKED_BALANCE_TOO_LOW);
 
         _rebalanceParams(
-            accountParams,
-            globalParams,
-            accountParams.ipTokenBalance - ipTokenAmount,
-            accountParams.delegatedPwIporBalance,
+            _msgSender(),
             ipToken,
-            _msgSender()
+            globalParams,
+            accountParams,
+            accountParams.ipTokenBalance - ipTokenAmount,
+            accountParams.delegatedPwIporBalance
         );
 
         IERC20Upgradeable(ipToken).transfer(_msgSender(), ipTokenAmount);
