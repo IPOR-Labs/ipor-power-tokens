@@ -60,8 +60,8 @@ interface IPowerIpor {
     ) external;
 
     /// @notice The method allowed to withdraw power tokens from delegation
-    /// @param ipTokens - ipToken from which one want withdraw tokens
-    /// @param pwIporAmounts - amount which one want withdraw
+    /// @param ipTokens - list of ipTokens from which one want withdraw tokens
+    /// @param pwIporAmounts - list of amounts which one want withdraw
     function undelegateFromJohn(address[] memory ipTokens, uint256[] memory pwIporAmounts) external;
 
     /// @notice The method allowed to freeze power tokens before withdraw Ipor tokens to avoid fees

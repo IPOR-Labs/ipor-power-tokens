@@ -54,8 +54,8 @@ interface IJohnInternal {
 
     /// @notice method allowed to withdraw power token from rewards contract
     /// @param account address which one delegate power tokens
-    /// @param ipTokens from which you want to withdraw tokens
-    /// @param pwIporAmounts to withdraw, represented in 18 decimals
+    /// @param ipTokens list of ipTokens from which you want to withdraw tokens
+    /// @param pwIporAmounts list of amounts to withdraw, represented in 18 decimals
     function undelegatePwIpor(
         address account,
         address[] memory ipTokens,
