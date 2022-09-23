@@ -36,15 +36,19 @@ describe("John Stake and balance", () => {
 
     it("Should set up one asset", async () => {
         // given
-        const globalParamsUsdcBefore = await john.getGlobalParams(tokens.ipTokenUsdc.address);
-        const rewardsBefore = globalParamsUsdcBefore.rewardsPerBlock;
+        const globalIndicatorsUsdcBefore = await john.getGlobalIndicators(
+            tokens.ipTokenUsdc.address
+        );
+        const rewardsBefore = globalIndicatorsUsdcBefore.rewardsPerBlock;
 
         // when
         await john.setRewardsPerBlock(tokens.ipTokenUsdc.address, N2_0_8D);
 
         // then
-        const globalParamsUsdcAfter = await john.getGlobalParams(tokens.ipTokenUsdc.address);
-        const rewardsAfter = globalParamsUsdcAfter.rewardsPerBlock;
+        const globalIndicatorsUsdcAfter = await john.getGlobalIndicators(
+            tokens.ipTokenUsdc.address
+        );
+        const rewardsAfter = globalIndicatorsUsdcAfter.rewardsPerBlock;
 
         expect(rewardsBefore).to.be.equal(N1_0_8D);
         expect(rewardsAfter).to.be.equal(N2_0_8D);
@@ -52,33 +56,41 @@ describe("John Stake and balance", () => {
 
     it("Should not update Accrued rewards when update block rewords", async () => {
         //    given
-        const globalParamsUsdcBefore = await john.getGlobalParams(tokens.ipTokenUsdc.address);
-        const rewardsBefore = globalParamsUsdcBefore.rewardsPerBlock;
-        const globalParamsBefore = await john.getGlobalParams(tokens.ipTokenUsdc.address);
+        const globalIndicatorsUsdcBefore = await john.getGlobalIndicators(
+            tokens.ipTokenUsdc.address
+        );
+        const rewardsBefore = globalIndicatorsUsdcBefore.rewardsPerBlock;
+        const globalIndicatorsBefore = await john.getGlobalIndicators(tokens.ipTokenUsdc.address);
 
         //    when
         await john.setRewardsPerBlock(tokens.ipTokenUsdc.address, N2_0_8D);
 
         //    then
-        const globalParamsUsdcAfter = await john.getGlobalParams(tokens.ipTokenUsdc.address);
-        const rewardsAfter = globalParamsUsdcAfter.rewardsPerBlock;
+        const globalIndicatorsUsdcAfter = await john.getGlobalIndicators(
+            tokens.ipTokenUsdc.address
+        );
+        const rewardsAfter = globalIndicatorsUsdcAfter.rewardsPerBlock;
 
         expect(rewardsBefore).to.be.equal(N1_0_8D);
         expect(rewardsAfter).to.be.equal(N2_0_8D);
-        expect(extractGlobalParam(globalParamsBefore).accruedRewards).to.be.equal(ZERO);
-        expect(extractGlobalParam(globalParamsUsdcAfter).accruedRewards).to.be.equal(ZERO);
+        expect(extractGlobalParam(globalIndicatorsBefore).accruedRewards).to.be.equal(ZERO);
+        expect(extractGlobalParam(globalIndicatorsUsdcAfter).accruedRewards).to.be.equal(ZERO);
     });
 
     it("Should setup 3 asset", async () => {
         //    given
-        const globalParamsDaiBefore = await john.getGlobalParams(tokens.ipTokenDai.address);
-        const rewardsDaiBefore = globalParamsDaiBefore.rewardsPerBlock;
+        const globalIndicatorsDaiBefore = await john.getGlobalIndicators(tokens.ipTokenDai.address);
+        const rewardsDaiBefore = globalIndicatorsDaiBefore.rewardsPerBlock;
 
-        const globalParamsUsdcBefore = await john.getGlobalParams(tokens.ipTokenUsdc.address);
-        const rewardsUsdcBefore = globalParamsUsdcBefore.rewardsPerBlock;
+        const globalIndicatorsUsdcBefore = await john.getGlobalIndicators(
+            tokens.ipTokenUsdc.address
+        );
+        const rewardsUsdcBefore = globalIndicatorsUsdcBefore.rewardsPerBlock;
 
-        const globalParamsUsdtBefore = await john.getGlobalParams(tokens.ipTokenUsdt.address);
-        const rewardsUsdtBefore = globalParamsUsdtBefore.rewardsPerBlock;
+        const globalIndicatorsUsdtBefore = await john.getGlobalIndicators(
+            tokens.ipTokenUsdt.address
+        );
+        const rewardsUsdtBefore = globalIndicatorsUsdtBefore.rewardsPerBlock;
 
         //    when
         await john.setRewardsPerBlock(tokens.ipTokenDai.address, N1_0_8D);
@@ -86,14 +98,18 @@ describe("John Stake and balance", () => {
         await john.setRewardsPerBlock(tokens.ipTokenUsdt.address, N0_1_8D);
 
         //    then
-        const globalParamsDaiAfter = await john.getGlobalParams(tokens.ipTokenDai.address);
-        const rewardsDaiAfter = await globalParamsDaiAfter.rewardsPerBlock;
+        const globalIndicatorsDaiAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
+        const rewardsDaiAfter = await globalIndicatorsDaiAfter.rewardsPerBlock;
 
-        const globalParamsUsdcAfter = await john.getGlobalParams(tokens.ipTokenUsdc.address);
-        const rewardsUsdcAfter = globalParamsUsdcAfter.rewardsPerBlock;
+        const globalIndicatorsUsdcAfter = await john.getGlobalIndicators(
+            tokens.ipTokenUsdc.address
+        );
+        const rewardsUsdcAfter = globalIndicatorsUsdcAfter.rewardsPerBlock;
 
-        const globalParamsUsdtAfter = await john.getGlobalParams(tokens.ipTokenUsdt.address);
-        const rewardsUsdtAfter = globalParamsUsdtAfter.rewardsPerBlock;
+        const globalIndicatorsUsdtAfter = await john.getGlobalIndicators(
+            tokens.ipTokenUsdt.address
+        );
+        const rewardsUsdtAfter = globalIndicatorsUsdtAfter.rewardsPerBlock;
 
         expect(rewardsDaiBefore).to.be.equal(N1_0_8D);
         expect(rewardsUsdcBefore).to.be.equal(N1_0_8D);
@@ -106,8 +122,8 @@ describe("John Stake and balance", () => {
 
     it("Should not be able to update value when not owner", async () => {
         //    given
-        const globalParamsBefore = await john.getGlobalParams(tokens.ipTokenDai.address);
-        const rewardsDaiBefore = globalParamsBefore.rewardsPerBlock;
+        const globalIndicatorsBefore = await john.getGlobalIndicators(tokens.ipTokenDai.address);
+        const rewardsDaiBefore = globalIndicatorsBefore.rewardsPerBlock;
 
         //    when
         await expect(
@@ -115,8 +131,8 @@ describe("John Stake and balance", () => {
         ).to.be.revertedWith("Ownable: caller is not the owner");
 
         //    then
-        const globalParamsAfter = await john.getGlobalParams(tokens.ipTokenDai.address);
-        const rewardsDaiAfter = globalParamsAfter.rewardsPerBlock;
+        const globalIndicatorsAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
+        const rewardsDaiAfter = globalIndicatorsAfter.rewardsPerBlock;
 
         expect(rewardsDaiBefore).to.be.equal(N1_0_8D);
         expect(rewardsDaiAfter).to.be.equal(N1_0_8D);

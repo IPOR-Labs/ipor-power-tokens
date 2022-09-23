@@ -28,7 +28,7 @@ interface IJohn {
     function calculateAccruedRewards(address ipToken) external view returns (uint256);
 
     /// @notice Calculates account rewards based on current state of account and global parameters.
-	/// @dev Calculation not consider accrued values at current block
+    /// @dev Calculation not consider accrued values at current block
     /// @param ipToken address for which asset should calculate rewards
     /// @return Current account rewards, represented in 18 decimals.
     function calculateAccountRewards(address ipToken) external view returns (uint256);
@@ -48,19 +48,19 @@ interface IJohn {
     function claim(address ipToken) external;
 
     /// @notice Emitted when account stake ipToken
-    /// @param account account address
+    /// @param account account address in the context of which activities of staking ipTokens are performed
     /// @param ipToken address of ipToken which should be stake
     /// @param ipTokenAmount of ipTokens to stake, represented in 18 decimals
     event StakeIpTokens(address account, address ipToken, uint256 ipTokenAmount);
 
     /// @notice Emitted when account unstake ipTokens
-    /// @param account account address
+    /// @param account account address in the context of which activities of unstaking ipTokens are performed
     /// @param ipToken address of ipToken which should be stake
     /// @param ipTokenAmount of ipTokens to stake, represented in 18 decimals
     event UnstakeIpTokens(address account, address ipToken, uint256 ipTokenAmount);
 
     /// @notice Emitted when account claim rewards
-    /// @param account account address
+    /// @param account account address in the context of which activities of claiming are performed
     /// @param ipToken address of ipToken
     /// @param iporTokenAmount reward amount in Ipor Token, represented in 18 decimals
     event Claim(address account, address ipToken, uint256 iporTokenAmount);

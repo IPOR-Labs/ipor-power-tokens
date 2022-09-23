@@ -106,10 +106,14 @@ describe("One block/Transaction tests", () => {
         );
 
         //    then
-        const agent1AccountParamsAfter = await agent1.getAccountParams(tokens.ipTokenDai.address);
-        const agent2AccountParamsAfter = await agent2.getAccountParams(tokens.ipTokenDai.address);
-        const agent1After = extractAccountParam(agent1AccountParamsAfter);
-        const agent2After = extractAccountParam(agent2AccountParamsAfter);
+        const agent1AccountIndicatorsAfter = await agent1.getAccountIndicators(
+            tokens.ipTokenDai.address
+        );
+        const agent2AccountIndicatorsAfter = await agent2.getAccountIndicators(
+            tokens.ipTokenDai.address
+        );
+        const agent1After = extractAccountParam(agent1AccountIndicatorsAfter);
+        const agent2After = extractAccountParam(agent2AccountIndicatorsAfter);
 
         expect(agent1After.powerUp).to.be.equal(agent2After.powerUp);
         expect(agent1After.compositeMultiplierCumulative).to.be.equal(
@@ -147,12 +151,16 @@ describe("One block/Transaction tests", () => {
         );
         //    then
 
-        const agent1AccountParamsAfter = await agent1.getAccountParams(tokens.ipTokenDai.address);
-        const agent2AccountParamsAfter = await agent2.getAccountParams(tokens.ipTokenDai.address);
+        const agent1AccountIndicatorsAfter = await agent1.getAccountIndicators(
+            tokens.ipTokenDai.address
+        );
+        const agent2AccountIndicatorsAfter = await agent2.getAccountIndicators(
+            tokens.ipTokenDai.address
+        );
         const agent1PwIporBalanceAfter = await powerIpor.balanceOf(agent1.address);
         const agent2PwIporBalanceAfter = await powerIpor.balanceOf(agent2.address);
-        const agent1After = extractAccountParam(agent1AccountParamsAfter);
-        const agent2After = extractAccountParam(agent2AccountParamsAfter);
+        const agent1After = extractAccountParam(agent1AccountIndicatorsAfter);
+        const agent2After = extractAccountParam(agent2AccountIndicatorsAfter);
 
         expect(agent1After.powerUp).to.be.equal(agent2After.powerUp);
         expect(agent1After.compositeMultiplierCumulative).to.be.equal(
@@ -309,8 +317,8 @@ describe("One block/Transaction tests", () => {
 
         const agent1PwIporBalanceBefore = await powerIpor.balanceOf(agent1.address);
         const agent2PwIporBalanceBefore = await powerIpor.balanceOf(agent2.address);
-        const globalParamsBefore = await john.getGlobalParams(ipDai);
-        const rewardsPerBlockInitial = globalParamsBefore.rewardsPerBlock;
+        const globalIndicatorsBefore = await john.getGlobalIndicators(ipDai);
+        const rewardsPerBlockInitial = globalIndicatorsBefore.rewardsPerBlock;
 
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
         await network.provider.send("evm_setAutomine", [false]);
@@ -325,8 +333,8 @@ describe("One block/Transaction tests", () => {
         await agent2.stakeIpToken(ipDai, N1000__0_18DEC);
         await hre.network.provider.send("evm_mine");
 
-        const globalParamsAfter = await john.getGlobalParams(ipDai);
-        const rewardsPerBlockAfterBlock11 = globalParamsAfter.rewardsPerBlock;
+        const globalIndicatorsAfter = await john.getGlobalIndicators(ipDai);
+        const rewardsPerBlockAfterBlock11 = globalIndicatorsAfter.rewardsPerBlock;
         const agent2StakeIpTokensInBlock = (await hre.ethers.provider.getBlock("latest")).number;
         const agent1RewardsInBlock11 = await agent1.calculateAccountRewards(ipDai);
         await hre.network.provider.send("hardhat_mine", ["0x9"]);
@@ -339,8 +347,8 @@ describe("One block/Transaction tests", () => {
         await agent2.unstakeIpToken(ipDai, N1000__0_18DEC);
         await hre.network.provider.send("evm_mine");
         const unstakeBlockNumber = (await hre.ethers.provider.getBlock("latest")).number;
-        const globalParamsAfter2 = await john.getGlobalParams(ipDai);
-        const rewardsPerBlockAfterBlock21 = globalParamsAfter2.rewardsPerBlock;
+        const globalIndicatorsAfter2 = await john.getGlobalIndicators(ipDai);
+        const rewardsPerBlockAfterBlock21 = globalIndicatorsAfter2.rewardsPerBlock;
 
         //    then
 
@@ -396,16 +404,16 @@ describe("One block/Transaction tests", () => {
             );
 
             //    then
-            const agent1AccountParamsAfter = await agent1.getAccountParams(
+            const agent1AccountIndicatorsAfter = await agent1.getAccountIndicators(
                 tokens.ipTokenDai.address
             );
-            const agent2AccountParamsAfter = await agent2.getAccountParams(
+            const agent2AccountIndicatorsAfter = await agent2.getAccountIndicators(
                 tokens.ipTokenDai.address
             );
             agent1PwIporBalanceAfter = await powerIpor.balanceOf(agent1.address);
             agent2PwIporBalanceAfter = await powerIpor.balanceOf(agent2.address);
-            const agent1After = extractAccountParam(agent1AccountParamsAfter);
-            const agent2After = extractAccountParam(agent2AccountParamsAfter);
+            const agent1After = extractAccountParam(agent1AccountIndicatorsAfter);
+            const agent2After = extractAccountParam(agent2AccountIndicatorsAfter);
             const accruedRewards = await john.calculateAccruedRewards(tokens.ipTokenDai.address);
             const differencesBetweenRewords = accruedRewards
                 .sub(agent2PwIporBalanceAfter)

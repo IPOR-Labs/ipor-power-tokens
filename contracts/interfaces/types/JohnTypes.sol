@@ -13,7 +13,7 @@ library JohnTypes {
     }
 
     /// @title Global indicators used in rewards calculation.
-    struct GlobalRewardsParams {
+    struct GlobalRewardsIndicators {
         /// @notice powerUp indicator aggregated
         /// @dev represended in 18 decimals
         uint256 aggregatedPowerUp;
@@ -32,7 +32,7 @@ library JohnTypes {
     }
 
     /// @title Rewards params specified for one account. Params used in algorithm responsible for rewards distribution.
-    struct AccountRewardsParams {
+    struct AccountRewardsIndicators {
         /// @notice composite multiplier cumulative
         /// @dev represented in 27 decimals
         uint128 compositeMultiplierCumulative;

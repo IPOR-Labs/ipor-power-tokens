@@ -92,7 +92,7 @@ describe("PowerIpor unstake", () => {
         expect(iporBalanceAfter).to.be.equal(iporBalanceBefore.add(N0__5_18DEC));
     });
 
-    it("Should not be able to unstake when user delegated tokens to liquidity rewards contract", async () => {
+    it("Should not be able to unstake when user delegated tokens to John", async () => {
         //    given
         await powerIpor.stake(N1__0_18DEC);
 
@@ -106,7 +106,7 @@ describe("PowerIpor unstake", () => {
         );
     });
 
-    it("Should be able to unstake tokens which is not delegate when he delegated tokens to liquidity rewards contract", async () => {
+    it("Should be able to unstake tokens which is not delegate when he delegated tokens to John", async () => {
         //    given
         const [admin] = accounts;
 

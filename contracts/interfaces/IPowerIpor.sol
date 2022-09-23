@@ -4,7 +4,8 @@ pragma solidity 0.8.16;
 import "./types/PowerIporTypes.sol";
 
 /// @title Interface for interaction with PowerIpor - smart contract responsible
-/// for managing Power Ipor token and Ipor Token and delegation to John contracts.
+/// for managing Power Ipor Token (pwIpor), swap Ipor Token to Power Ipor tokens and
+/// delegating Power Ipor tokens to John contracts.
 interface IPowerIpor {
     /// @notice Name of the pwIpor token
     /// @return Returns the name of the pwIpor token.
@@ -18,20 +19,20 @@ interface IPowerIpor {
     /// @return Returns the number of decimals 18 used to get its user representation.
     function decimals() external pure returns (uint8);
 
-    /// @notice Total supply of pwIpor token.
+    /// @notice Gets total supply of pwIpor token.
     /// @dev Value is calculated in runtime using baseTotalSupply and internal exchange rate.
-    /// @return Total supply of power tokens in 18 decimals
+    /// @return Total supply of pwIpor tokens, represented in 18 decimals
     function totalSupply() external view returns (uint256);
 
-    /// @param account address for which we want to know the balance of power tokens
-    /// @return Returns the amount of power tokens owned by `account`.
+    /// @param Gets balance of pwIpor token for a given account address
+    /// @return Returns the amount of pwIpor tokens owned by `account`.
     function balanceOf(address account) external view returns (uint256);
 
-    /// @param account address for which we want to know the balance of delegated power tokens to rewards contract
-    /// @return  Returns the amount of power tokens owned by `account` and delegated to John contracts.
+    /// @param Gets delegated balance of pwIpor token for a given account address. Token are delegated from PowerIpor to John smart contract (reponsible for rewards distribution).
+    /// @return  Returns the amount of pwIpor tokens owned by `account` and delegated to John contracts.
     function delegatedBalanceOf(address account) external view returns (uint256);
 
-    /// @notice Returns withdrawal fee which it gets while unstake without cooling down
+    /// @notice Gets configuration param withdrawal fee which it gets while unstake without cooling down
     /// @return Percent of fee in 18 decimal
     function getWithdrawFee() external view returns (uint256);
 
@@ -97,11 +98,11 @@ interface IPowerIpor {
     /// @param fee value which was subtract from amount
     event Unstake(address account, uint256 iporTokenAmount, uint256 exchangeRate, uint256 fee);
 
-    /// @notice Emitted when user delegated tokens to john contract
+    /// @notice Emitted when user delegated tokens to John contract
     /// @param account address
     /// @param ipTokens list of token to delegate power tokens
-    /// @param amounts list of value how tokens should be delegated by asset
-    event DelegateToJohn(address account, address[] ipTokens, uint256[] amounts);
+    /// @param pwIporAmounts list of value how tokens should be delegated by asset
+    event DelegateToJohn(address account, address[] ipTokens, uint256[] pwIporAmounts);
 
     /// @notice Emitted when user withdraw tokens from delegated
     /// @param account address

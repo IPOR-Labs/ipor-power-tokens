@@ -23,7 +23,7 @@ export type Tokens = {
     ipTokenUsdt: IpToken;
 };
 
-export type GlobalParams = {
+export type GlobalIndicators = {
     aggregatedPowerUp: BigNumber;
     accruedRewards: BigNumber;
     compositeMultiplierInTheBlock: BigNumber;
@@ -88,7 +88,7 @@ export const getDeployedTokens = async (accounts: Signer[]): Promise<Tokens> => 
     };
 };
 
-export const extractGlobalParam = (value: any): GlobalParams => {
+export const extractGlobalParam = (value: any): GlobalIndicators => {
     const aggregatedPowerUp = value[0];
     const accruedRewards = value[5];
     const compositeMultiplierInTheBlock = value[1];
@@ -107,7 +107,7 @@ export const extractGlobalParam = (value: any): GlobalParams => {
 };
 
 export const expectGlobalParam = (
-    params: GlobalParams,
+    params: GlobalIndicators,
     aggregatedPowerUp: BigNumber,
     accruedRewards: BigNumber,
     compositeMultiplierInTheBlock: BigNumber,

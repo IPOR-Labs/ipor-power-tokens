@@ -76,18 +76,18 @@ contract MockMiningCalculation {
             );
     }
 
-    function calculateUserRewards(
+    function calculateAccountRewards(
         uint256 accountIpTokenAmount,
         uint256 accountPowerUp,
-        uint256 compositeMultiplier,
-        uint256 accountCompositeMultiplier
+        uint256 accountCompositeMultiplier,
+        uint256 compositeMultiplier
     ) public view returns (uint256) {
         return
             MiningCalculation.calculateAccountRewards(
                 accountIpTokenAmount,
                 accountPowerUp,
-                compositeMultiplier,
-                accountCompositeMultiplier
+                accountCompositeMultiplier,
+                compositeMultiplier
             );
     }
 }

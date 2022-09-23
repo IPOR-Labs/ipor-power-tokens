@@ -384,7 +384,7 @@ export default ({ drizzle, drizzleState }) => {
                                     drizzle={drizzle}
                                     drizzleState={drizzleState}
                                     contract="John"
-                                    method="getAccountParams"
+                                    method="getAccountIndicators"
                                     methodArgs={[drizzle.contracts.IpTokenUsdt.address]}
                                     render={(value) => {
                                         return (
@@ -401,7 +401,7 @@ export default ({ drizzle, drizzleState }) => {
                                     drizzle={drizzle}
                                     drizzleState={drizzleState}
                                     contract="John"
-                                    method="getAccountParams"
+                                    method="getAccountIndicators"
                                     methodArgs={[drizzle.contracts.IpTokenUsdc.address]}
                                     render={(value) => {
                                         return (
@@ -418,7 +418,7 @@ export default ({ drizzle, drizzleState }) => {
                                     drizzle={drizzle}
                                     drizzleState={drizzleState}
                                     contract="John"
-                                    method="getAccountParams"
+                                    method="getAccountIndicators"
                                     methodArgs={[drizzle.contracts.IpTokenDai.address]}
                                     render={(value) => {
                                         return (

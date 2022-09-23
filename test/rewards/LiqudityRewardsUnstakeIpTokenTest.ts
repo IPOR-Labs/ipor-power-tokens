@@ -381,7 +381,7 @@ describe("John claim", () => {
         expect(pwIporExchangeRateBefore).to.be.equal(pwIporExchangeRateAfter);
     });
 
-    it("Should random stake and delegate to rewards contracts", async () => {
+    it("Should random stake and delegate to John", async () => {
         //    given
         const ipDai = tokens.ipTokenDai.address;
         await hre.network.provider.send("hardhat_mine", ["0x9999999"]);

@@ -127,17 +127,17 @@ library MiningCalculation {
     function calculateAccountRewards(
         uint256 accountIpTokenAmount,
         uint256 accountPowerUp,
-        uint256 compositeMultiplierCumulative,
-        uint256 accountCompositeMultiplierCumulative
+        uint256 accountCompositeMultiplierCumulative,
+        uint256 compositeMultiplierCumulative
     ) internal view returns (uint256) {
         require(
             compositeMultiplierCumulative >= accountCompositeMultiplierCumulative,
             MiningErrors.COMPOSITE_MULTIPLIER_GREATER_OR_EQUAL_THAN_ACCOUNT_COMPOSITE_MULTIPLIER
         );
-        uint256 accountRewards = accountIpTokenAmount *
+        uint256 accountIporTokenRewards = accountIpTokenAmount *
             accountPowerUp *
             (compositeMultiplierCumulative - accountCompositeMultiplierCumulative);
-        return IporMath.division(accountRewards, Constants.D45);
+        return IporMath.division(accountIporTokenRewards, Constants.D45);
     }
 
     function _toFixedPoint(uint256 number, uint256 decimals) private view returns (bytes16) {
