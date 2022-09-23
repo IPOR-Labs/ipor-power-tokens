@@ -42,7 +42,7 @@ abstract contract PowerIporInternal is
     // account address -> {endTimestamp, amount}
     mapping(address => PowerIporTypes.PwIporCoolDown) internal _coolDowns;
     uint256 internal _baseTotalSupply;
-    uint256 internal _withdrawFee;
+    uint256 internal _unstakeWithoutCooldownFee;
 
     modifier onlyJohn() {
         require(_msgSender() == _john, MiningErrors.CALLER_NOT_JOHN);
@@ -60,7 +60,7 @@ abstract contract PowerIporInternal is
         __UUPSUpgradeable_init();
         require(iporToken != address(0), IporErrors.WRONG_ADDRESS);
         _iporToken = iporToken;
-        _withdrawFee = Constants.D17 * 5;
+        _unstakeWithoutCooldownFee = Constants.D17 * 5;
     }
 
     function getVersion() external pure override returns (uint256) {
@@ -80,7 +80,7 @@ abstract contract PowerIporInternal is
     }
 
     function setWithdrawFee(uint256 withdrawalFee) external override onlyOwner {
-        _withdrawFee = withdrawalFee;
+        _unstakeWithoutCooldownFee = withdrawalFee;
         emit WithdrawFee(_msgSender(), withdrawalFee);
     }
 
@@ -140,7 +140,11 @@ abstract contract PowerIporInternal is
     }
 
     function _calculateAmountWithoutFee(uint256 baseAmount) internal view returns (uint256) {
-        return IporMath.division((Constants.D18 - _withdrawFee) * baseAmount, Constants.D18);
+        return
+            IporMath.division(
+                (Constants.D18 - _unstakeWithoutCooldownFee) * baseAmount,
+                Constants.D18
+            );
     }
 
     function _calculateBaseAmountToPwIpor(uint256 baseAmount, uint256 exchangeRate)
@@ -159,7 +163,7 @@ abstract contract PowerIporInternal is
         return
             _calculateBaseAmountToPwIpor(_baseBalance[account], exchangeRate) -
             _delegatedBalance[account] -
-            _coolDowns[account].amount;
+            _coolDowns[account].pwIporAmount;
     }
 
     function _balanceOf(address account) internal view returns (uint256) {

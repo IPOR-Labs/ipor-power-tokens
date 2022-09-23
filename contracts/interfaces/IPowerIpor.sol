@@ -24,25 +24,29 @@ interface IPowerIpor {
     /// @return Total supply of pwIpor tokens, represented in 18 decimals
     function totalSupply() external view returns (uint256);
 
-    /// @param Gets balance of pwIpor token for a given account address
+    /// @notice Gets balance of pwIpor token for a given account address
+    /// @param account account address for which is checked balance of pwIpor tokens
     /// @return Returns the amount of pwIpor tokens owned by `account`.
     function balanceOf(address account) external view returns (uint256);
 
-    /// @param Gets delegated balance of pwIpor token for a given account address. Token are delegated from PowerIpor to John smart contract (reponsible for rewards distribution).
+    /// @notice Gets delegated balance of pwIpor token for a given account address. Token are delegated from PowerIpor to John smart contract (reponsible for rewards distribution).
+    /// @param account account address for which is checked balance of delegated pwIpor tokens
     /// @return  Returns the amount of pwIpor tokens owned by `account` and delegated to John contracts.
     function delegatedBalanceOf(address account) external view returns (uint256);
 
-    /// @notice Gets configuration param withdrawal fee which it gets while unstake without cooling down
-    /// @return Percent of fee in 18 decimal
-    function getWithdrawFee() external view returns (uint256);
+    /// @notice Gets configuration param the fee which is taken when account want to unstake Ipor token from PowerIpor in time when cooldown is active.
+    /// @dev Fee value represented in as a percentage in 18 decimals
+    /// @return value, a percentage of  in 18 decimal
+    function getUnstakeWithoutCooldownFee() external view returns (uint256);
 
-    /// @notice State of active cool down for the user. If PowerIporTypes.PowerIporCoolDown contains only zeros
-    /// it represents no active cool down
-    /// @return Object PowerIporTypes.PowerIporCoolDown which represents active cool down
-    function activeCoolDown() external view returns (PowerIporTypes.PwIporCoolDown memory);
+    /// @notice Gets state of active cool down for the account.
+    /// @dev If PowerIporTypes.PowerIporCoolDown contains only zeros it represents no active cool down.
+    /// Struct contain information when cooldown is ended and how many pwIpor tokens are locked.
+    /// @return Object PowerIporTypes.PowerIporCoolDown which represents active cool down, the moment of
+    function getActiveCoolDown() external view returns (PowerIporTypes.PwIporCoolDown memory);
 
-    /// @notice The method allowed to Stake IPOR Tokens and receive Power tokens.
-    /// @param iporTokenAmount IPOR tokens which sender want to stake inside the PowerIpor
+    /// @notice Stakes IPOR Tokens and receive Power Ipor tokens (pwIpor).
+    /// @param iporTokenAmount IPOR tokens which sender want to stake to the PowerIpor smart contract
     function stake(uint256 iporTokenAmount) external;
 
     /// @notice The method allowed one to unstake IPOR Tokens, there is a fee if one wants to unstake without cooling down

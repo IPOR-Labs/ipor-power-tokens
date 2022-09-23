@@ -40,11 +40,11 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         return _delegatedBalance[account];
     }
 
-    function getWithdrawFee() external view override returns (uint256) {
-        return _withdrawFee;
+    function getUnstakeWithoutCooldownFee() external view override returns (uint256) {
+        return _unstakeWithoutCooldownFee;
     }
 
-    function activeCoolDown() external view returns (PowerIporTypes.PwIporCoolDown memory) {
+    function getActiveCoolDown() external view returns (PowerIporTypes.PwIporCoolDown memory) {
         return _coolDowns[_msgSender()];
     }
 
@@ -199,12 +199,12 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         address msgSender = _msgSender();
         PowerIporTypes.PwIporCoolDown memory coolDown = _coolDowns[msgSender];
         require(block.timestamp >= coolDown.endTimestamp, MiningErrors.COOL_DOWN_NOT_FINISH);
-        require(coolDown.amount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(coolDown.pwIporAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
         address iporTokenAddress = _iporToken;
 
         uint256 exchangeRate = _calculateInternalExchangeRate(iporTokenAddress);
         uint256 baseAmountToUnstake = IporMath.division(
-            coolDown.amount * Constants.D18,
+            coolDown.pwIporAmount * Constants.D18,
             exchangeRate
         );
 
@@ -214,8 +214,8 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         _baseTotalSupply -= baseAmountToUnstake;
         _coolDowns[msgSender] = PowerIporTypes.PwIporCoolDown(0, 0);
 
-        IERC20Upgradeable(iporTokenAddress).transfer(msgSender, coolDown.amount);
+        IERC20Upgradeable(iporTokenAddress).transfer(msgSender, coolDown.pwIporAmount);
 
-        emit Redeem(msgSender, coolDown.amount);
+        emit Redeem(msgSender, coolDown.pwIporAmount);
     }
 }

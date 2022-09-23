@@ -62,36 +62,36 @@ describe("PowerIpor unstake", () => {
         // given
         await powerIpor.stake(N1__0_18DEC);
 
-        const coolDownBefore = await powerIpor.activeCoolDown();
+        const coolDownBefore = await powerIpor.getActiveCoolDown();
 
         // when
         await expect(powerIpor.coolDown(ZERO)).to.be.revertedWith("IPOR_004");
 
         // then
-        const coolDownAfter = await powerIpor.activeCoolDown();
+        const coolDownAfter = await powerIpor.getActiveCoolDown();
 
         expect(coolDownBefore.endTimestamp).to.be.equal(ZERO);
-        expect(coolDownBefore.amount).to.be.equal(ZERO);
+        expect(coolDownBefore.pwIporAmount).to.be.equal(ZERO);
         expect(coolDownAfter.endTimestamp).to.be.equal(ZERO);
-        expect(coolDownAfter.amount).to.be.equal(ZERO);
+        expect(coolDownAfter.pwIporAmount).to.be.equal(ZERO);
     });
 
     it("Should not be able coolDown when amount is to big", async () => {
         // given
         await powerIpor.stake(N1__0_18DEC);
 
-        const coolDownBefore = await powerIpor.activeCoolDown();
+        const coolDownBefore = await powerIpor.getActiveCoolDown();
 
         // when
         await expect(powerIpor.coolDown(N2__0_18DEC)).to.be.revertedWith("IPOR_707");
 
         // then
-        const coolDownAfter = await powerIpor.activeCoolDown();
+        const coolDownAfter = await powerIpor.getActiveCoolDown();
 
         expect(coolDownBefore.endTimestamp).to.be.equal(ZERO);
-        expect(coolDownBefore.amount).to.be.equal(ZERO);
+        expect(coolDownBefore.pwIporAmount).to.be.equal(ZERO);
         expect(coolDownAfter.endTimestamp).to.be.equal(ZERO);
-        expect(coolDownAfter.amount).to.be.equal(ZERO);
+        expect(coolDownAfter.pwIporAmount).to.be.equal(ZERO);
     });
 
     it("Should be able cool down when amount is zero", async () => {
@@ -99,18 +99,18 @@ describe("PowerIpor unstake", () => {
         const nowInSeconds = getTimeInSeconds();
         await powerIpor.stake(N1__0_18DEC);
 
-        const coolDownBefore = await powerIpor.activeCoolDown();
+        const coolDownBefore = await powerIpor.getActiveCoolDown();
 
         // when
         await powerIpor.coolDown(N0__5_18DEC);
 
         // then
-        const coolDownAfter = await powerIpor.activeCoolDown();
+        const coolDownAfter = await powerIpor.getActiveCoolDown();
 
         expect(coolDownBefore.endTimestamp).to.be.equal(ZERO);
-        expect(coolDownBefore.amount).to.be.equal(ZERO);
+        expect(coolDownBefore.pwIporAmount).to.be.equal(ZERO);
         expect(coolDownAfter.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
-        expect(coolDownAfter.amount).to.be.equal(N0__5_18DEC);
+        expect(coolDownAfter.pwIporAmount).to.be.equal(N0__5_18DEC);
     });
 
     it("Should be able to override cool down when second time execute method ", async () => {
@@ -119,19 +119,19 @@ describe("PowerIpor unstake", () => {
         await powerIpor.stake(N1__0_18DEC);
 
         await powerIpor.coolDown(N0__5_18DEC);
-        const coolDownBefore = await powerIpor.activeCoolDown();
+        const coolDownBefore = await powerIpor.getActiveCoolDown();
         // when
 
         await powerIpor.coolDown(N0__6_18DEC);
 
         // then
-        const coolDownAfter = await powerIpor.activeCoolDown();
+        const coolDownAfter = await powerIpor.getActiveCoolDown();
 
         expect(coolDownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
-        expect(coolDownBefore.amount).to.be.equal(N0__5_18DEC);
+        expect(coolDownBefore.pwIporAmount).to.be.equal(N0__5_18DEC);
 
         expect(coolDownAfter.endTimestamp.gt(coolDownBefore.endTimestamp)).to.be.true;
-        expect(coolDownAfter.amount).to.be.equal(N0__6_18DEC);
+        expect(coolDownAfter.pwIporAmount).to.be.equal(N0__6_18DEC);
     });
 
     it("Should be able to cancel cool down", async () => {
@@ -140,19 +140,19 @@ describe("PowerIpor unstake", () => {
         await powerIpor.stake(N1__0_18DEC);
 
         await powerIpor.coolDown(N0__5_18DEC);
-        const coolDownBefore = await powerIpor.activeCoolDown();
+        const coolDownBefore = await powerIpor.getActiveCoolDown();
         // when
 
         await powerIpor.cancelCoolDown();
 
         // then
-        const coolDownAfter = await powerIpor.activeCoolDown();
+        const coolDownAfter = await powerIpor.getActiveCoolDown();
 
         expect(coolDownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
-        expect(coolDownBefore.amount).to.be.equal(N0__5_18DEC);
+        expect(coolDownBefore.pwIporAmount).to.be.equal(N0__5_18DEC);
 
         expect(coolDownAfter.endTimestamp).to.be.equal(ZERO);
-        expect(coolDownAfter.amount).to.be.equal(ZERO);
+        expect(coolDownAfter.pwIporAmount).to.be.equal(ZERO);
     });
 
     it("Should not be able to unstake when some amount is in cool down state", async () => {
@@ -163,20 +163,20 @@ describe("PowerIpor unstake", () => {
         await powerIpor.stake(N1__0_18DEC);
         await powerIpor.coolDown(N0__8_18DEC);
 
-        const coolDownBefore = await powerIpor.activeCoolDown();
+        const coolDownBefore = await powerIpor.getActiveCoolDown();
         const balanceBefore = await powerIpor.balanceOf(adminAddress);
         // when
 
         await expect(powerIpor.unstake(N0__5_18DEC)).to.be.revertedWith("IPOR_707");
 
         // then
-        const coolDownAfter = await powerIpor.activeCoolDown();
+        const coolDownAfter = await powerIpor.getActiveCoolDown();
         const balanceAfter = await powerIpor.balanceOf(adminAddress);
 
         expect(coolDownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
-        expect(coolDownBefore.amount).to.be.equal(N0__8_18DEC);
+        expect(coolDownBefore.pwIporAmount).to.be.equal(N0__8_18DEC);
         expect(coolDownAfter.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
-        expect(coolDownAfter.amount).to.be.equal(N0__8_18DEC);
+        expect(coolDownAfter.pwIporAmount).to.be.equal(N0__8_18DEC);
 
         expect(balanceBefore).to.be.equal(N1__0_18DEC);
         expect(balanceAfter).to.be.equal(N1__0_18DEC);
@@ -190,7 +190,7 @@ describe("PowerIpor unstake", () => {
         await powerIpor.stake(N1__0_18DEC);
         await powerIpor.coolDown(N0__8_18DEC);
 
-        const coolDownBefore = await powerIpor.activeCoolDown();
+        const coolDownBefore = await powerIpor.getActiveCoolDown();
         const balanceBefore = await powerIpor.balanceOf(adminAddress);
         const delegatedBalanceBefore = await powerIpor.delegatedBalanceOf(adminAddress);
         // when
@@ -200,14 +200,14 @@ describe("PowerIpor unstake", () => {
         ).to.be.revertedWith("IPOR_705");
 
         // then
-        const coolDownAfter = await powerIpor.activeCoolDown();
+        const coolDownAfter = await powerIpor.getActiveCoolDown();
         const balanceAfter = await powerIpor.balanceOf(adminAddress);
         const delegatedBalanceAfter = await powerIpor.delegatedBalanceOf(adminAddress);
 
         expect(coolDownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
-        expect(coolDownBefore.amount).to.be.equal(N0__8_18DEC);
+        expect(coolDownBefore.pwIporAmount).to.be.equal(N0__8_18DEC);
         expect(coolDownAfter.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
-        expect(coolDownAfter.amount).to.be.equal(N0__8_18DEC);
+        expect(coolDownAfter.pwIporAmount).to.be.equal(N0__8_18DEC);
 
         expect(balanceBefore).to.be.equal(N1__0_18DEC);
         expect(balanceAfter).to.be.equal(N1__0_18DEC);
@@ -221,19 +221,19 @@ describe("PowerIpor unstake", () => {
         await powerIpor.stake(N1__0_18DEC);
 
         await powerIpor.coolDown(N0__5_18DEC);
-        const coolDownBefore = await powerIpor.activeCoolDown();
+        const coolDownBefore = await powerIpor.getActiveCoolDown();
         // when
 
         await expect(powerIpor.redeem()).to.be.revertedWith("IPOR_709");
 
         // then
-        const coolDownAfter = await powerIpor.activeCoolDown();
+        const coolDownAfter = await powerIpor.getActiveCoolDown();
 
         expect(coolDownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
-        expect(coolDownBefore.amount).to.be.equal(N0__5_18DEC);
+        expect(coolDownBefore.pwIporAmount).to.be.equal(N0__5_18DEC);
 
         expect(coolDownAfter.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
-        expect(coolDownAfter.amount).to.be.equal(N0__5_18DEC);
+        expect(coolDownAfter.pwIporAmount).to.be.equal(N0__5_18DEC);
     });
 
     it("Should be able to redeem cool down tokens when 2 weeks pass", async () => {
@@ -245,20 +245,20 @@ describe("PowerIpor unstake", () => {
         const pwBalanceBefore = await powerIpor.balanceOf(adminAddress);
 
         await powerIpor.coolDown(N0__5_18DEC);
-        const coolDownBefore = await powerIpor.activeCoolDown();
+        const coolDownBefore = await powerIpor.getActiveCoolDown();
         // when
         await hre.network.provider.send("evm_increaseTime", [twoWeekesInSeconds + 1]);
         await powerIpor.redeem();
 
         // then
-        const coolDownAfter = await powerIpor.activeCoolDown();
+        const coolDownAfter = await powerIpor.getActiveCoolDown();
         const pwBalanceAfter = await powerIpor.balanceOf(adminAddress);
 
         expect(coolDownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
-        expect(coolDownBefore.amount).to.be.equal(N0__5_18DEC);
+        expect(coolDownBefore.pwIporAmount).to.be.equal(N0__5_18DEC);
 
         expect(coolDownAfter.endTimestamp).to.be.equal(ZERO);
-        expect(coolDownAfter.amount).to.be.equal(ZERO);
+        expect(coolDownAfter.pwIporAmount).to.be.equal(ZERO);
 
         expect(pwBalanceBefore).to.be.equal(N1__0_18DEC);
         expect(pwBalanceAfter).to.be.equal(N0__5_18DEC);
@@ -275,7 +275,7 @@ describe("PowerIpor unstake", () => {
         await powerIpor.coolDown(N0__5_18DEC);
         await iporToken.transfer(powerIpor.address, N1__0_18DEC);
 
-        const coolDownBefore = await powerIpor.activeCoolDown();
+        const coolDownBefore = await powerIpor.getActiveCoolDown();
         const iporTokenBalanceBefore = await iporToken.balanceOf(adminAddress);
 
         // when
@@ -283,15 +283,15 @@ describe("PowerIpor unstake", () => {
         await powerIpor.redeem();
 
         // then
-        const coolDownAfter = await powerIpor.activeCoolDown();
+        const coolDownAfter = await powerIpor.getActiveCoolDown();
         const pwBalanceAfter = await powerIpor.balanceOf(adminAddress);
         const iporTokenBalanceAfter = await iporToken.balanceOf(adminAddress);
 
         expect(coolDownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
-        expect(coolDownBefore.amount).to.be.equal(N0__5_18DEC);
+        expect(coolDownBefore.pwIporAmount).to.be.equal(N0__5_18DEC);
 
         expect(coolDownAfter.endTimestamp).to.be.equal(ZERO);
-        expect(coolDownAfter.amount).to.be.equal(ZERO);
+        expect(coolDownAfter.pwIporAmount).to.be.equal(ZERO);
 
         expect(pwBalanceBefore).to.be.equal(N1__0_18DEC);
         expect(pwBalanceAfter).to.be.equal(N1__0_18DEC.add(N0__5_18DEC));

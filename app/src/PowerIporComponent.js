@@ -245,7 +245,7 @@ export default ({ drizzle, drizzleState }) => {
                                 drizzle={drizzle}
                                 drizzleState={drizzleState}
                                 contract="PowerIpor"
-                                method="getWithdrawFee"
+                                method="getUnstakeWithoutCooldownFee"
                                 render={(value) => (
                                     <div>
                                         {value / 10000000000000000} %
@@ -461,7 +461,7 @@ export default ({ drizzle, drizzleState }) => {
                                 drizzle={drizzle}
                                 drizzleState={drizzleState}
                                 contract="PowerIpor"
-                                method="activeCoolDown"
+                                method="getActiveCoolDown"
                                 render={(value) => (
                                     <div>
                                         <table>
