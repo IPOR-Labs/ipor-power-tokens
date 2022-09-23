@@ -11,7 +11,7 @@ import {
     LiquidityRewardsTestAction,
     LiquidityRewardsAgent,
 } from "../../types";
-import { Tokens, getDeployedTokens, extractMyParam } from "../utils/JohnUtils";
+import { Tokens, getDeployedTokens, extractAccountParam } from "../utils/JohnUtils";
 import {
     N1__0_18DEC,
     ZERO,
@@ -108,8 +108,8 @@ describe("One block/Transaction tests", () => {
         //    then
         const agent1AccountParamsAfter = await agent1.getAccountParams(tokens.ipTokenDai.address);
         const agent2AccountParamsAfter = await agent2.getAccountParams(tokens.ipTokenDai.address);
-        const agent1After = extractMyParam(agent1AccountParamsAfter);
-        const agent2After = extractMyParam(agent2AccountParamsAfter);
+        const agent1After = extractAccountParam(agent1AccountParamsAfter);
+        const agent2After = extractAccountParam(agent2AccountParamsAfter);
 
         expect(agent1After.powerUp).to.be.equal(agent2After.powerUp);
         expect(agent1After.compositeMultiplierCumulative).to.be.equal(
@@ -151,8 +151,8 @@ describe("One block/Transaction tests", () => {
         const agent2AccountParamsAfter = await agent2.getAccountParams(tokens.ipTokenDai.address);
         const agent1PwIporBalanceAfter = await powerIpor.balanceOf(agent1.address);
         const agent2PwIporBalanceAfter = await powerIpor.balanceOf(agent2.address);
-        const agent1After = extractMyParam(agent1AccountParamsAfter);
-        const agent2After = extractMyParam(agent2AccountParamsAfter);
+        const agent1After = extractAccountParam(agent1AccountParamsAfter);
+        const agent2After = extractAccountParam(agent2AccountParamsAfter);
 
         expect(agent1After.powerUp).to.be.equal(agent2After.powerUp);
         expect(agent1After.compositeMultiplierCumulative).to.be.equal(
@@ -380,7 +380,7 @@ describe("One block/Transaction tests", () => {
             await liquidityRewardsTestAction.stakeIpToken(
                 [agent1.address, agent2.address],
                 tokens.ipTokenDai.address,
-                [N1__0_18DEC, N0__1_18DEC]
+                [N1__0_18DEC, N2__0_18DEC]
             );
 
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
@@ -389,7 +389,7 @@ describe("One block/Transaction tests", () => {
             await liquidityRewardsTestAction.unstakeIpToken(
                 [agent1.address, agent2.address],
                 [tokens.ipTokenDai.address, tokens.ipTokenDai.address],
-                [N1__0_18DEC, N0__1_18DEC]
+                [N1__0_18DEC, N2__0_18DEC]
             );
 
             //    then
@@ -401,8 +401,8 @@ describe("One block/Transaction tests", () => {
             );
             agent1PwIporBalanceAfter = await powerIpor.balanceOf(agent1.address);
             agent2PwIporBalanceAfter = await powerIpor.balanceOf(agent2.address);
-            const agent1After = extractMyParam(agent1AccountParamsAfter);
-            const agent2After = extractMyParam(agent2AccountParamsAfter);
+            const agent1After = extractAccountParam(agent1AccountParamsAfter);
+            const agent2After = extractAccountParam(agent2AccountParamsAfter);
             const accruedRewards = await john.calculateAccruedRewards(tokens.ipTokenDai.address);
             const differencesBetweenRewords = accruedRewards
                 .sub(agent2PwIporBalanceAfter)
@@ -411,19 +411,19 @@ describe("One block/Transaction tests", () => {
 
             expect(agent1After.powerUp).to.be.equal(ZERO);
             expect(agent1After.compositeMultiplierCumulative).to.be.equal(
-                BigNumber.from("56552751597425393915610288180")
+                BigNumber.from("29970993406907413561979852524")
             );
             expect(agent1After.ipTokenBalance).to.be.equal(ZERO);
             expect(agent1After.delegatedPowerTokenBalance).to.be.equal(N1__0_18DEC);
-            expect(agent1PwIporBalanceAfter).to.be.equal(BigNumber.from("80173852236395551482"));
+            expect(agent1PwIporBalanceAfter).to.be.equal(BigNumber.from("42959390769670378987"));
 
             expect(agent2After.powerUp).to.be.equal(ZERO);
             expect(agent2After.compositeMultiplierCumulative).to.be.equal(
-                BigNumber.from("56552751597425393915610288180")
+                BigNumber.from("29970993406907413561979852524")
             );
             expect(agent2After.ipTokenBalance).to.be.equal(ZERO);
             expect(agent2After.delegatedPowerTokenBalance).to.be.equal(N1__0_18DEC);
-            expect(agent2PwIporBalanceAfter).to.be.equal(BigNumber.from("22826147763604448541"));
+            expect(agent2PwIporBalanceAfter).to.be.equal(BigNumber.from("60040609230329621013"));
 
             expect(differencesBetweenRewords.lte(BigNumber.from("100"))).to.be.true;
         });
@@ -442,14 +442,14 @@ describe("One block/Transaction tests", () => {
             await liquidityRewardsTestAction.stakeIpToken(
                 [agent1.address, agent2.address],
                 tokens.ipTokenDai.address,
-                [N1__0_18DEC, N0__1_18DEC]
+                [N1__0_18DEC, N2__0_18DEC]
             );
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
             //    when
             await liquidityRewardsTestAction.unstakeIpToken(
                 [agent2.address, agent1.address],
                 [tokens.ipTokenDai.address, tokens.ipTokenDai.address],
-                [N0__1_18DEC, N1__0_18DEC]
+                [N2__0_18DEC, N1__0_18DEC]
             );
 
             //    then

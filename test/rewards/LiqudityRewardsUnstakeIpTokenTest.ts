@@ -214,7 +214,7 @@ describe("John claim", () => {
 
         // when
         for (let i = 0; i < 50; i++) {
-            await john.connect(userTwo).stake(dai, N0__1_18DEC);
+            await john.connect(userTwo).stake(dai, N2__0_18DEC);
             await john.connect(userOne).stake(dai, N2000__0_18DEC);
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
         }

@@ -49,6 +49,16 @@ interface IPowerIpor {
     /// @param pwIporAmounts - list of pwIpor token amount which account want delegate
     function delegateToJohn(address[] memory ipTokens, uint256[] memory pwIporAmounts) external;
 
+    /// @notice The method allowed to delegate power token to rewards
+    /// @param ipTokens - list of ipTokens to which one want delegate tokens
+    /// @param pwIporAmounts - list of pwIpor token amount which account want delegate
+    /// @param ipTokenAmounts - list of ipToken amount which account want stake in john
+    function delegateAndStakeToJohn(
+        address[] memory ipTokens,
+        uint256[] memory pwIporAmounts,
+        uint256[] memory ipTokenAmounts
+    ) external;
+
     /// @notice The method allowed to withdraw power tokens from delegation
     /// @param ipToken - ipToken from which one want withdraw tokens
     /// @param pwIporAmount - amount which one want withdraw
