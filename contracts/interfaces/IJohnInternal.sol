@@ -22,9 +22,9 @@ interface IJohnInternal {
         view
         returns (JohnTypes.GlobalRewardsIndicators memory);
 
-    /// @notice Gets account indicators for a given ipToken
+    /// @notice Gets sender rewards indicators for a given ipToken
     /// @param ipToken ipToken address
-    /// @return {JohnTypes.AccountRewardsIndicators} structur with account indicators used in rewards calculation.
+    /// @return {JohnTypes.AccountRewardsIndicators} structure with sender rewards indicators used in rewards calculation.
     function getAccountIndicators(address ipToken)
         external
         view

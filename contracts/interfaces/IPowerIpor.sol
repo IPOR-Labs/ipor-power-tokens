@@ -34,94 +34,107 @@ interface IPowerIpor {
     /// @return  Returns the amount of pwIpor tokens owned by `account` and delegated to John contracts.
     function delegatedBalanceOf(address account) external view returns (uint256);
 
-    /// @notice Gets configuration param the fee which is taken when account want to unstake Ipor token from PowerIpor in time when cooldown is active.
+    /// @notice Gets configuration param the fee which is taken when sender want to unstake Ipor token from PowerIpor in time when cooldown is active.
     /// @dev Fee value represented in as a percentage in 18 decimals
     /// @return value, a percentage of  in 18 decimal
     function getUnstakeWithoutCooldownFee() external view returns (uint256);
 
-    /// @notice Gets state of active cool down for the account.
+    /// @notice Gets state of active cool down for the sender.
     /// @dev If PowerIporTypes.PowerIporCoolDown contains only zeros it represents no active cool down.
     /// Struct contain information when cooldown is ended and how many pwIpor tokens are locked.
     /// @return Object PowerIporTypes.PowerIporCoolDown which represents active cool down, the moment of
     function getActiveCoolDown() external view returns (PowerIporTypes.PwIporCoolDown memory);
 
-    /// @notice Stakes IPOR Tokens and receive Power Ipor tokens (pwIpor).
+    /// @notice Stakes IPOR Tokens and receives Power Ipor tokens (pwIpor).
     /// @param iporTokenAmount IPOR tokens which sender want to stake to the PowerIpor smart contract
     function stake(uint256 iporTokenAmount) external;
 
-    /// @notice The method allowed one to unstake IPOR Tokens, there is a fee if one wants to unstake without cooling down
-    /// @param pwIporAmount pwIopr tokens amount which account want to unstake
+    /// @notice Unstakes IPOR Tokens amount for a given pwIpor token amount.
+    /// @dev If sender want to unstake without cooling down then additional fee is included predefined in PowerIpor smart contract `UnstakeWithoutCooldownFee`.
+    /// @param pwIporAmount pwIpor tokens amount which will be unstake or a given sender
     function unstake(uint256 pwIporAmount) external;
 
-    /// @notice The method allowed to delegate power token to rewards
-    /// @param ipTokens - list of ipTokens to which one want delegate tokens
-    /// @param pwIporAmounts - list of pwIpor token amount which account want delegate
+    /// @notice Delegates pwIpor tokens to John
+    /// @param ipTokens - list of ipTokens to which are associated in delegation pwIpor tokens
+    /// @param pwIporAmounts - list of pwIpor token amount which are delegated in relation to given ipToken
     function delegateToJohn(address[] memory ipTokens, uint256[] memory pwIporAmounts) external;
 
-    /// @notice The method allowed to delegate power token to rewards
-    /// @param ipTokens - list of ipTokens to which one want delegate tokens
-    /// @param pwIporAmounts - list of pwIpor token amount which account want delegate
-    /// @param ipTokenAmounts - list of ipToken amount which account want stake in john
+    /// @notice Delegates pwIpor tokens and stakes ipTokens
+    /// @param ipTokens - list of ipTokens to which sender delegates pwIpor tokens and stakes ipTokens
+    /// @param pwIporAmounts - list of pwIpor token amount which sender delegates for a given ipToken
+    /// @param ipTokenAmounts - list of ipToken amount which sender stakes in John for a given ipToken
     function delegateAndStakeToJohn(
         address[] memory ipTokens,
         uint256[] memory pwIporAmounts,
         uint256[] memory ipTokenAmounts
     ) external;
 
-    /// @notice The method allowed to withdraw power tokens from delegation
-    /// @param ipToken - ipToken from which one want withdraw tokens
-    /// @param pwIporAmount - amount which one want withdraw
+    /// @notice Undelegates pwIpor token from John
+    /// @param ipToken - ipToken from which sender will undelegate pwIpor tokens
+    /// @param pwIporAmount - amount of pwIpor tokens taken to undelegate from John
     function undelegateFromJohn(address ipToken, uint256 pwIporAmount) external;
 
-    /// @notice The method allowed to freeze power tokens before withdraw Ipor tokens to avoid fees
-    /// @param pwIporAmount pwIpor token amount which sender want to freeze
+    /// @notice Resets freeze of a given pwIpor token amount in the next 2 weeks.
+    /// @dev pwIpor tokens in cool down state cannot be unstaked without fee,
+    /// when time of cool down is elapsed then pwIpor tokens can be unstaked without fee.
+    /// Unstake without coold down is configured in param `_unstakeWithoutCooldownFee`
+    /// pwIpor tokens in cool down state allows sender to redeem Ipor Tokens in relation 1:1 to Power Ipor Tokens.
+    /// @param pwIporAmount pwIpor token amount which sender wants to freeze
     function coolDown(uint256 pwIporAmount) external;
 
-    /// @notice The method allowed to cancel cool down
+    /// @notice Cancel cool down.
+    /// @dev When this method is executed then none of Power Ipor Tokens are in cool down state.
     function cancelCoolDown() external;
 
-    /// @notice The method allowed to redeem the ipor token when cool down time finish
+    /// @notice The method allowed to redeem the Ipor Token when cool down time finish.
+    /// @dev Ipor Tokens are in relation 1:1 to Power Ipor Tokens
+    /// @dev When sender execute `redeem` method then structure {PowerIporTypes.PwIporCoolDown} is cleared for a given sender in `_coolDowns` storage.
     function redeem() external;
 
-    /// @notice Emitted when user stake IPOR tokens
-    /// @param account address
-    /// @param iporTokenAmount of ipor token which should be stake into contract
-    /// @param exchangeRate which was used to calculate base amount
-    /// @param newBaseTokens amount of new base value
+    /// @notice Emitted when account stake IPOR tokens
+    /// @param account account address who execute stake
+    /// @param iporTokenAmount of Ipor Token amount which should be stake into Power Ipor contract
+    /// @param internalExchangeRate internal exchange rate used to calculate base amount
+    /// @param baseAmount calculated value based on iporTokenAmount and internalExchangeRate
     event Stake(
-        address account,
+        address indexed account,
         uint256 iporTokenAmount,
-        uint256 exchangeRate,
-        uint256 newBaseTokens
+        uint256 internalExchangeRate,
+        uint256 baseAmount
     );
 
-    /// @notice Emitted when user unstake IPOR tokens
-    /// @param account address
-    /// @param iporTokenAmount of ipor token which was call to unstake
-    /// @param exchangeRate which was used to calculate base amount
-    /// @param fee value which was subtract from amount
-    event Unstake(address account, uint256 iporTokenAmount, uint256 exchangeRate, uint256 fee);
+    /// @notice Emitted when account unstake IPOR tokens
+    /// @param account address who execute unstake
+    /// @param iporTokenAmount amount of Ipor Token which was unstaked
+    /// @param internalExchangeRate which was used to calculate base amount
+    /// @param fee value which was subtract from iporTokenAmount
+    event Unstake(
+        address indexed account,
+        uint256 iporTokenAmount,
+        uint256 internalExchangeRate,
+        uint256 fee
+    );
 
-    /// @notice Emitted when user delegated tokens to John contract
-    /// @param account address
-    /// @param ipTokens list of token to delegate power tokens
-    /// @param pwIporAmounts list of value how tokens should be delegated by asset
-    event DelegateToJohn(address account, address[] ipTokens, uint256[] pwIporAmounts);
+    /// @notice Emitted when sender delegates Power Ipor Tokens to John contract
+    /// @param account address who delegates Power Ipor Tokens
+    /// @param ipTokens list of token to delegate Power Ipor Tokens
+    /// @param pwIporAmounts list of values how Power Ipor token amount should be distributed across ipTokens
+    event DelegateToJohn(address indexed account, address[] ipTokens, uint256[] pwIporAmounts);
 
-    /// @notice Emitted when user withdraw tokens from delegated
-    /// @param account address
-    /// @param ipToken list of asset to delegate power tokens
-    /// @param pwIporAmount list of value how tokens should be delegated by asset
-    event UndelegateFromJohn(address account, address ipToken, uint256 pwIporAmount);
+    /// @notice Emitted when sender undelegate Power Ipor Tokens from John
+    /// @param account address who undelegates Power Ipor Tokens
+    /// @param ipToken list of assets from Power Ipor Tokens are undelegated
+    /// @param pwIporAmount list of values how Power Ipor token amounts should be undelegated from ipTokens
+    event UndelegateFromJohn(address indexed account, address ipToken, uint256 pwIporAmount);
 
-    /// @notice Emitted when user setup coolDown
-    /// @param account address
-    /// @param pwIporAmount of ipor token which was call to unstake
+    /// @notice Emitted when sender setup coolDown
+    /// @param changedBy account address that has changed CoolDown rules
+    /// @param pwIporAmount amount of Ipor Token which was freeze to unstake
     /// @param endTimestamp time when user will be able to redeem tokens without fee
-    event CoolDown(address account, uint256 pwIporAmount, uint256 endTimestamp);
+    event CoolDownChanged(address indexed changedBy, uint256 pwIporAmount, uint256 endTimestamp);
 
-    /// @notice Emitted when user redeem tokens after cool down
-    /// @param account address
-    /// @param iporTokenAmount of ipor token was transferred to user
-    event Redeem(address account, uint256 iporTokenAmount);
+    /// @notice Emitted when sender redeem Ipor Tokens after cool down
+    /// @param account address who executes redeem
+    /// @param iporTokenAmount amount of Ipor Tokens was transferred to account from PowerIpor smart contract
+    event Redeem(address indexed account, uint256 iporTokenAmount);
 }

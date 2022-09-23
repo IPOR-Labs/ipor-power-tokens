@@ -10,10 +10,10 @@ import "./types/JohnTypes.sol";
 interface IJohn {
     /// @notice Returns balance of staked ipTokens
     /// @param ipToken address of ipToken (ipUSDT, ipUSDC, ipDAI etc.)
-    /// @return balance of ipTokens staked by account
+    /// @return balance of ipTokens staked by sender
     function balanceOf(address ipToken) external view returns (uint256);
 
-    /// @notice Returns balance of delegated pwIpor tokens for a given account and list of ipToken addresses.
+    /// @notice Returns balance of delegated pwIpor tokens for a given `account` and list of ipToken addresses.
     /// @param account address for which we want get information about balance of delegated pwIpor tokens
     /// @param ipTokens list of ipTokens addresses(ipTokens) for which we want fetch balances
     /// @return balances list of {JohnTypes.DelegatedPwIporBalance} structure, with information how much pwIpor token is delegated per ipToken address.
@@ -27,10 +27,10 @@ interface IJohn {
     /// @return accrued rewards from last rebalance saved in storage, represented in 18 decimals.
     function calculateAccruedRewards(address ipToken) external view returns (uint256);
 
-    /// @notice Calculates account rewards based on current state of account and global parameters.
+    /// @notice Calculates account rewards based on current state of sender and global indicators.
     /// @dev Calculation not consider accrued values at current block
     /// @param ipToken address for which asset should calculate rewards
-    /// @return Current account rewards, represented in 18 decimals.
+    /// @return Sender's rewards, represented in 18 decimals.
     function calculateAccountRewards(address ipToken) external view returns (uint256);
 
     /// @notice Stakes ipToken amount into John.

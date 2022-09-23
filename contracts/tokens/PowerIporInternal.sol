@@ -108,9 +108,9 @@ abstract contract PowerIporInternal is
             iporTokenAmount
         );
 
-        uint256 newBaseTokens = IporMath.division(iporTokenAmount * Constants.D18, exchangeRate);
-        _baseBalance[account] += newBaseTokens;
-        _baseTotalSupply += newBaseTokens;
+        uint256 baseAmount = IporMath.division(iporTokenAmount * Constants.D18, exchangeRate);
+        _baseBalance[account] += baseAmount;
+        _baseTotalSupply += baseAmount;
 
         emit ReceiveRewards(account, iporTokenAmount);
     }
