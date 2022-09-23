@@ -40,6 +40,18 @@ interface IJohnInternal {
         uint256[] memory pwIporAmount
     ) external;
 
+    /// @notice method allowed to delegate power token to rewards contract
+    /// @param account address which one delegate power tokens
+    /// @param ipTokens to which power tokens should be delegated
+    /// @param pwIporAmount which should be assigns to assets , represented in 18 decimals
+    /// @param ipTokenAmount which should be stake to john, represented in 18 decimals
+    function delegatePwIporAndStakeIpToken(
+        address account,
+        address[] memory ipTokens,
+        uint256[] memory pwIporAmount,
+        uint256[] memory ipTokenAmount
+    ) external;
+
     /// @notice method allowed to withdraw power token from rewards contract
     /// @param account address which one delegate power tokens
     /// @param ipToken from which you want to withdraw tokens
@@ -91,6 +103,18 @@ interface IJohnInternal {
     /// @param ipToken address of ipToken which should be unstake
     /// @param ipTokenAmount of ipTokens to unstake, represented in 18 decimals
     event DelegatePwIpor(address account, address ipToken, uint256 ipTokenAmount);
+
+    /// @notice Emitted when user delegate power token to rewards contract
+    /// @param account account address
+    /// @param ipToken address of ipToken which should be unstake
+    /// @param pwIporAmount of pwIpor to delegate, represented in 18 decimals
+    /// @param ipTokenAmount of ipTokens to stake, represented in 18 decimals
+    event DelegatePwIporAndStakeIpToken(
+        address account,
+        address ipToken,
+        uint256 pwIporAmount,
+        uint256 ipTokenAmount
+    );
 
     /// @notice Emitted when user undelegate power token from John contract
     /// @param account account address

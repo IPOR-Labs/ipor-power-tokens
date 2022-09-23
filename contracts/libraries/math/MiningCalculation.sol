@@ -19,7 +19,7 @@ library MiningCalculation {
         uint256 verticalShift,
         uint256 horizontalShift
     ) internal view returns (uint256) {
-        if (ipTokenAmount == 0) {
+        if (ipTokenAmount < Constants.D18) {
             return 0;
         }
         bytes16 pwIporAmountFP = _toFixedPoint(pwIporAmount, Constants.D18);

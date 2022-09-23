@@ -11,7 +11,7 @@ import {
     extractGlobalParam,
     expectGlobalParam,
     expectUserParam,
-    extractMyParam,
+    extractAccountParam,
 } from "../utils/JohnUtils";
 import {
     N1__0_18DEC,
@@ -142,7 +142,7 @@ describe("John claim", () => {
         );
 
         expectUserParam(
-            extractMyParam(userParamsBefore),
+            extractAccountParam(userParamsBefore),
             BigNumber.from("1400000000000000000"),
             ZERO,
             BigNumber.from("100000000000000000000"),
@@ -150,7 +150,7 @@ describe("John claim", () => {
         );
 
         expectUserParam(
-            extractMyParam(userParamsAfter),
+            extractAccountParam(userParamsAfter),
             ZERO, //powerUp
             BigNumber.from("721428571428571428571428557"), //Cumulative
             ZERO, // ipToken

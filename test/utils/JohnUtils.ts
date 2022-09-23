@@ -64,20 +64,20 @@ export const getDeployedTokens = async (accounts: Signer[]): Promise<Tokens> => 
     await ipTokenUsdt.setJoseph(await admin.getAddress());
 
     await ipTokenDai.mint(await admin.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
-    await ipTokenUsdc.mint(await admin.getAddress(), N1__0_6DEC.mul(USD_1_000_000));
-    await ipTokenUsdt.mint(await admin.getAddress(), N1__0_6DEC.mul(USD_1_000_000));
+    await ipTokenUsdc.mint(await admin.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
+    await ipTokenUsdt.mint(await admin.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
 
     await ipTokenDai.mint(await userOne.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
-    await ipTokenUsdc.mint(await userOne.getAddress(), N1__0_6DEC.mul(USD_1_000_000));
-    await ipTokenUsdt.mint(await userOne.getAddress(), N1__0_6DEC.mul(USD_1_000_000));
+    await ipTokenUsdc.mint(await userOne.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
+    await ipTokenUsdt.mint(await userOne.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
 
     await ipTokenDai.mint(await userTwo.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
-    await ipTokenUsdc.mint(await userTwo.getAddress(), N1__0_6DEC.mul(USD_1_000_000));
-    await ipTokenUsdt.mint(await userTwo.getAddress(), N1__0_6DEC.mul(USD_1_000_000));
+    await ipTokenUsdc.mint(await userTwo.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
+    await ipTokenUsdt.mint(await userTwo.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
 
     await ipTokenDai.mint(await userThree.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
-    await ipTokenUsdc.mint(await userThree.getAddress(), N1__0_6DEC.mul(USD_1_000_000));
-    await ipTokenUsdt.mint(await userThree.getAddress(), N1__0_6DEC.mul(USD_1_000_000));
+    await ipTokenUsdc.mint(await userThree.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
+    await ipTokenUsdt.mint(await userThree.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
     return {
         tokenDai,
         tokenUsdc,
@@ -140,7 +140,7 @@ export const expectUserParam = (
     expect(params.delegatedPowerTokenBalance).to.be.equal(delegatedPowerTokenBalance);
 };
 
-export const extractMyParam = (value: any): UserParams => {
+export const extractAccountParam = (value: any): UserParams => {
     const powerUp = value[2];
     const compositeMultiplierCumulative = value[0];
     const ipTokenBalance = value[1];

@@ -121,6 +121,37 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         emit DelegateToJohn(_msgSender(), ipTokens, pwIporAmounts);
     }
 
+    function delegateAndStakeToJohn(
+        address[] memory ipTokens,
+        uint256[] memory pwIporAmounts,
+        uint256[] memory ipTokenAmounts
+    ) external override whenNotPaused nonReentrant {
+        require(
+            ipTokens.length == pwIporAmounts.length && ipTokens.length == ipTokenAmounts.length,
+            IporErrors.INPUT_ARRAYS_LENGTH_MISMATCH
+        );
+        uint256 pwIporToDelegate;
+        for (uint256 i = 0; i != pwIporAmounts.length; i++) {
+            pwIporToDelegate += pwIporAmounts[i];
+        }
+
+        require(
+            _getAvailablePwIporAmount(_msgSender(), _calculateInternalExchangeRate(_iporToken)) >=
+                pwIporToDelegate,
+            MiningErrors.STAKED_BALANCE_TOO_LOW
+        );
+
+        _delegatedBalance[_msgSender()] += pwIporToDelegate;
+        IJohnInternal(_john).delegatePwIporAndStakeIpToken(
+            _msgSender(),
+            ipTokens,
+            pwIporAmounts,
+            ipTokenAmounts
+        );
+
+        emit DelegateToJohn(_msgSender(), ipTokens, pwIporAmounts);
+    }
+
     function undelegateFromJohn(address ipToken, uint256 pwIporAmount)
         external
         whenNotPaused
