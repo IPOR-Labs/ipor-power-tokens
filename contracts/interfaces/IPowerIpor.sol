@@ -60,9 +60,9 @@ interface IPowerIpor {
     ) external;
 
     /// @notice The method allowed to withdraw power tokens from delegation
-    /// @param ipToken - ipToken from which one want withdraw tokens
-    /// @param pwIporAmount - amount which one want withdraw
-    function undelegateFromJohn(address ipToken, uint256 pwIporAmount) external;
+    /// @param ipTokens - ipToken from which one want withdraw tokens
+    /// @param pwIporAmounts - amount which one want withdraw
+    function undelegateFromJohn(address[] memory ipTokens, uint256[] memory pwIporAmounts) external;
 
     /// @notice The method allowed to freeze power tokens before withdraw Ipor tokens to avoid fees
     /// @param pwIporAmount pwIpor token amount which sender want to freeze
@@ -101,9 +101,9 @@ interface IPowerIpor {
 
     /// @notice Emitted when user withdraw tokens from delegated
     /// @param account address
-    /// @param ipToken list of asset to delegate power tokens
-    /// @param pwIporAmount list of value how tokens should be delegated by asset
-    event UndelegateFromJohn(address account, address ipToken, uint256 pwIporAmount);
+    /// @param ipTokens list of asset to delegate power tokens
+    /// @param pwIporAmounts list of value how tokens should be undelegate by ipToken
+    event UndelegateFromJohn(address account, address[] ipTokens, uint256[] pwIporAmounts);
 
     /// @notice Emitted when user setup coolDown
     /// @param account address

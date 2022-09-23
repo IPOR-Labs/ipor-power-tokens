@@ -174,28 +174,12 @@ abstract contract JohnInternal is
 
     function undelegatePwIpor(
         address account,
-        address ipToken,
-        uint256 pwIporAmount
+        address[] memory ipTokens,
+        uint256[] memory pwIporAmounts
     ) external onlyPowerIpor whenNotPaused {
-        require(_ipTokens[ipToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
-        JohnTypes.AccountRewardsParams memory accountParams = _accountParams[account][ipToken];
-        require(
-            accountParams.delegatedPwIporBalance >= pwIporAmount,
-            MiningErrors.DELEGATED_BALANCE_TOO_LOW
-        );
-        JohnTypes.GlobalRewardsParams memory globalParams = _globalParams[ipToken];
-
-        _claimWhenRewardsExists(account, globalParams, accountParams);
-        _rebalanceParams(
-            account,
-            ipToken,
-            globalParams,
-            accountParams,
-            accountParams.ipTokenBalance,
-            accountParams.delegatedPwIporBalance - pwIporAmount
-        );
-
-        emit UndelegatePwIpor(account, ipToken, pwIporAmount);
+        for (uint256 i; i != ipTokens.length; i++) {
+            _undelegatePwIpor(account, ipTokens[i], pwIporAmounts[i]);
+        }
     }
 
     function setRewardsPerBlock(address ipToken, uint32 rewardsValue) external override onlyOwner {
@@ -240,7 +224,7 @@ abstract contract JohnInternal is
         emit RewardsPerBlockChanged(_msgSender(), rewardsValue);
     }
 
-    function addIpToken(address ipToken) external onlyOwner whenNotPaused {
+    function addIpToken(address ipToken) external onlyOwner {
         require(ipToken != address(0), IporErrors.WRONG_ADDRESS);
         _ipTokens[ipToken] = true;
         _saveGlobalParams(
@@ -262,6 +246,32 @@ abstract contract JohnInternal is
 
     function unpause() external override onlyOwner {
         _unpause();
+    }
+
+    function _undelegatePwIpor(
+        address account,
+        address ipToken,
+        uint256 pwIporAmount
+    ) internal {
+        require(_ipTokens[ipToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
+        JohnTypes.AccountRewardsParams memory accountParams = _accountParams[account][ipToken];
+        require(
+            accountParams.delegatedPwIporBalance >= pwIporAmount,
+            MiningErrors.DELEGATED_BALANCE_TOO_LOW
+        );
+        JohnTypes.GlobalRewardsParams memory globalParams = _globalParams[ipToken];
+
+        _claimWhenRewardsExists(account, globalParams, accountParams);
+        _rebalanceParams(
+            account,
+            ipToken,
+            globalParams,
+            accountParams,
+            accountParams.ipTokenBalance,
+            accountParams.delegatedPwIporBalance - pwIporAmount
+        );
+
+        emit UndelegatePwIpor(account, ipToken, pwIporAmount);
     }
 
     function _rebalanceParams(

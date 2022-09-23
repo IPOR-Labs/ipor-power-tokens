@@ -149,21 +149,27 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         emit DelegateToJohn(_msgSender(), ipTokens, pwIporAmounts);
     }
 
-    function undelegateFromJohn(address ipToken, uint256 pwIporAmount)
+    function undelegateFromJohn(address[] memory ipTokens, uint256[] memory pwIporAmounts)
         external
         whenNotPaused
         nonReentrant
     {
-        require(pwIporAmount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(ipTokens.length == pwIporAmounts.length, IporErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
+        uint256 pwIporAmountToUndelegate;
+        for (uint256 i; i != ipTokens.length; i++) {
+            require(pwIporAmounts[i] != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+            pwIporAmountToUndelegate += pwIporAmounts[i];
+        }
+
         require(
-            _delegatedBalance[_msgSender()] >= pwIporAmount,
+            _delegatedBalance[_msgSender()] >= pwIporAmountToUndelegate,
             MiningErrors.DELEGATED_BALANCE_TOO_LOW
         );
 
-        IJohnInternal(_john).undelegatePwIpor(_msgSender(), ipToken, pwIporAmount);
-        _delegatedBalance[_msgSender()] -= pwIporAmount;
+        IJohnInternal(_john).undelegatePwIpor(_msgSender(), ipTokens, pwIporAmounts);
+        _delegatedBalance[_msgSender()] -= pwIporAmountToUndelegate;
 
-        emit UndelegateFromJohn(_msgSender(), ipToken, pwIporAmount);
+        emit UndelegateFromJohn(_msgSender(), ipTokens, pwIporAmounts);
     }
 
     function coolDown(uint256 pwIporAmount) external override whenNotPaused {
