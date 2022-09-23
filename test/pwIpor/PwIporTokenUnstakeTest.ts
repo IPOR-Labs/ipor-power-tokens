@@ -150,7 +150,7 @@ describe("PowerIpor unstake", () => {
 
         await powerIpor.delegateToJohn([tokens.ipTokenDai.address], [N0__6_18DEC]);
         //    when
-        await powerIpor.setWithdrawFee(N0__1_18DEC);
+        await powerIpor.setUnstakeWithoutCooldownFee(N0__1_18DEC);
         await powerIpor.unstake(N0__4_18DEC);
 
         //    then

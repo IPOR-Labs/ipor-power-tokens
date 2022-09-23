@@ -5,19 +5,21 @@ import "./types/PowerIporTypes.sol";
 
 /// @title
 interface IPowerIporInternal {
-    /// @notice Returns current version of Power Ipor Token
-    /// @return Current Power Ipor Token version
+    /// @notice Returns current version of Power Ipor smart contract
+    /// @return Current Power Ipor smart contract version
     function getVersion() external pure returns (uint256);
 
+    /// @notice Gets total supply base amount
+    /// @return total supply base amount, represented in 18 decimals
     function totalSupplyBase() external view returns (uint256);
 
-    /// @notice Calculated exchange rate between ipor Token and base value
-    /// @return Current exchange rate between power token and the base value, represented in 18 decimals.
+    /// @notice Calculates internal exchange rate between Ipor Token and total supply of a base amount
+    /// @return Current exchange rate between Ipor Token and the total supply of a base amount, represented in 18 decimals.
     function calculateExchangeRate() external view returns (uint256);
 
     /// @notice Method setup unstake fee
-    /// @param withdrawalFee percent of fee, represented in 18 decimals.
-    function setWithdrawFee(uint256 withdrawalFee) external;
+    /// @param unstakeWithoutCooldownFee percentage of fee, represented in 18 decimals.
+    function setUnstakeWithoutCooldownFee(uint256 unstakeWithoutCooldownFee) external;
 
     /// @notice method allowed to transfer rewards from John contracts to balance of specific account
     /// @param account - address of user who received rewards
@@ -44,10 +46,15 @@ interface IPowerIporInternal {
     /// @param iporTokenAmount of power token received from john
     event ReceiveRewards(address account, uint256 iporTokenAmount);
 
-    /// @notice Emitted when new Fee is setup.
-    /// @param sender account address
-    /// @param fee new value of fee, represented in 18 decimals
-    event WithdrawFee(address sender, uint256 fee);
+    /// @notice Emitted when new fee for unstaking without cool down is setup.
+    /// @param changedBy account address who change this configuration param
+    /// @param oldFee old value of fee, represented in 18 decimals
+    /// @param newFee new value of fee, represented in 18 decimals
+    event UnstakeWithoutCooldownFeeChanged(
+        address indexed changedBy,
+        uint256 oldFee,
+        uint256 newFee
+    );
 
     /// @notice Emmited when John's address is changed by its owner.
     /// @param changedBy account address that has changed John's address

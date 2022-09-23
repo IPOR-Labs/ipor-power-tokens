@@ -33,8 +33,8 @@ abstract contract PowerIporInternal is
 
     address internal _john;
     address internal _iporToken;
-    // account address -> amount 18 decimals
-    /// @dev
+
+    /// @dev account address -> base amount, represented in 18 decimals
     mapping(address => uint256) internal _baseBalance;
 
     /// @dev balance of pwIpor which are delegated to John, information per account, balance represented in 18 decimals
@@ -79,9 +79,14 @@ abstract contract PowerIporInternal is
         return _john;
     }
 
-    function setWithdrawFee(uint256 withdrawalFee) external override onlyOwner {
-        _unstakeWithoutCooldownFee = withdrawalFee;
-        emit WithdrawFee(_msgSender(), withdrawalFee);
+    function setUnstakeWithoutCooldownFee(uint256 unstakeWithoutCooldownFee)
+        external
+        override
+        onlyOwner
+    {
+        uint256 oldValue = _unstakeWithoutCooldownFee;
+        _unstakeWithoutCooldownFee = unstakeWithoutCooldownFee;
+        emit UnstakeWithoutCooldownFeeChanged(_msgSender(), oldValue, unstakeWithoutCooldownFee);
     }
 
     function setJohn(address newJohnAddr) external override onlyOwner whenNotPaused {

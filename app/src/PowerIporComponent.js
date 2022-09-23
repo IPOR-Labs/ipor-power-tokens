@@ -265,7 +265,7 @@ export default ({ drizzle, drizzleState }) => {
                             <ContractForm
                                 drizzle={drizzle}
                                 contract="PowerIpor"
-                                method="setWithdrawFee"
+                                method="setUnstakeWithoutCooldownFee"
                             />
                         </td>
                     </tr>
