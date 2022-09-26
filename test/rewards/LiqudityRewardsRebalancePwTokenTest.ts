@@ -82,7 +82,7 @@ describe("John Stake and balance", () => {
         await powerIpor.setJohn(john.address);
     });
 
-    describe("Rebalance on stake pwIpor token", () => {
+    describe("Rebalance on stake Power Ipor Token", () => {
         it("Should setup usersParams and global params and returns 100 rewards when 100 blocks was mine", async () => {
             //    given
             const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
@@ -164,7 +164,7 @@ describe("John Stake and balance", () => {
             expect(rewards).to.be.equal(BigNumber.from("100000000000000000000"));
         });
 
-        it("Should sum of rewards for 3 users should be equal all rewards when all users staked ipTokens and pwIpor tokens ", async () => {
+        it("Should sum of rewards for 3 users should be equal all rewards when all users staked ipTokens and Power Ipor Tokens ", async () => {
             //    given
             const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
             const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));

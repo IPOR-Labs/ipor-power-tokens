@@ -7,41 +7,42 @@ import "./types/PowerIporTypes.sol";
 /// for managing Power Ipor Token (pwIpor), swap Ipor Token to Power Ipor tokens and
 /// delegating Power Ipor tokens to John contracts.
 interface IPowerIpor {
-    /// @notice Name of the pwIpor token
-    /// @return Returns the name of the pwIpor token.
+    /// @notice Gets name of the Power Ipor Token
+    /// @return Returns the name of the Power Ipor token.
     function name() external pure returns (string memory);
 
-    /// @notice Symbol of the pwIpor token.
-    /// @return Returns the symbol of the token.
+    /// @notice Gets symbol of the Power Ipor token.
+    /// @return Returns the symbol of the Power Ipor token.
     function symbol() external pure returns (string memory);
 
-    /// @notice Returns the number of decimals used in pwIpor token. By default it is 18 decimals.
-    /// @return Returns the number of decimals 18 used to get its user representation.
+    /// @notice Returns the number of decimals used in Power Ipor token. By default it is 18 decimals.
+    /// @return Returns the number of decimals 18.
     function decimals() external pure returns (uint8);
 
-    /// @notice Gets total supply of pwIpor token.
+    /// @notice Gets total supply of Power Ipor Token.
     /// @dev Value is calculated in runtime using baseTotalSupply and internal exchange rate.
-    /// @return Total supply of pwIpor tokens, represented in 18 decimals
+    /// @return Total supply of Power Ipor tokens, represented in 18 decimals
     function totalSupply() external view returns (uint256);
 
-    /// @notice Gets balance of pwIpor token for a given account address
-    /// @param account account address for which is checked balance of pwIpor tokens
-    /// @return Returns the amount of pwIpor tokens owned by `account`.
+    /// @notice Gets balance of Power Ipor Token for a given account address
+    /// @param account account address for which is checked balance of Power Ipor Tokens
+    /// @return Returns the amount of Power Ipor tokens owned by `account`.
     function balanceOf(address account) external view returns (uint256);
 
-    /// @notice Gets delegated balance of pwIpor token for a given account address. Token are delegated from PowerIpor to John smart contract (reponsible for rewards distribution).
-    /// @param account account address for which is checked balance of delegated pwIpor tokens
-    /// @return  Returns the amount of pwIpor tokens owned by `account` and delegated to John contracts.
+    /// @notice Gets delegated balance of Power Ipor Token for a given account address. 
+	/// Token are delegated from PowerIpor to John smart contract (reponsible for rewards distribution).
+    /// @param account account address for which is checked balance of delegated Power Ipor Tokens
+    /// @return  Returns the amount of Power Ipor tokens owned by `account` and delegated to John contracts.
     function delegatedBalanceOf(address account) external view returns (uint256);
 
-    /// @notice Gets configuration param the fee which is taken when sender want to unstake Ipor token from PowerIpor in time when cooldown is active.
+    /// @notice Gets configuration param the fee which is taken when sender want to unstake Ipor Token from PowerIpor in time when cooldown is active.
     /// @dev Fee value represented in as a percentage in 18 decimals
     /// @return value, a percentage of  in 18 decimal
     function getUnstakeWithoutCooldownFee() external view returns (uint256);
 
     /// @notice Gets state of active cool down for the sender.
     /// @dev If PowerIporTypes.PowerIporCoolDown contains only zeros it represents no active cool down.
-    /// Struct contain information when cooldown is ended and how many pwIpor tokens are locked.
+    /// Struct contain information when cooldown is ended and how many Power Ipor Tokens are locked.
     /// @return Object PowerIporTypes.PowerIporCoolDown which represents active cool down, the moment of
     function getActiveCoolDown() external view returns (PowerIporTypes.PwIporCoolDown memory);
 
@@ -49,19 +50,19 @@ interface IPowerIpor {
     /// @param iporTokenAmount IPOR tokens which sender want to stake to the PowerIpor smart contract
     function stake(uint256 iporTokenAmount) external;
 
-    /// @notice Unstakes IPOR Tokens amount for a given pwIpor token amount.
+    /// @notice Unstakes IPOR Tokens amount for a given Power Ipor Token amount.
     /// @dev If sender want to unstake without cooling down then additional fee is included predefined in PowerIpor smart contract `UnstakeWithoutCooldownFee`.
-    /// @param pwIporAmount pwIpor tokens amount which will be unstake or a given sender
+    /// @param pwIporAmount Power Ipor Tokens amount which will be unstake or a given sender
     function unstake(uint256 pwIporAmount) external;
 
-    /// @notice Delegates pwIpor tokens to John
-    /// @param ipTokens - list of ipTokens to which are associated in delegation pwIpor tokens
-    /// @param pwIporAmounts - list of pwIpor token amount which are delegated in relation to given ipToken
+    /// @notice Delegates Power Ipor Tokens to John
+    /// @param ipTokens - list of ipTokens to which are associated in delegation Power Ipor Tokens
+    /// @param pwIporAmounts - list of Power Ipor Token amount which are delegated in relation to given ipToken
     function delegateToJohn(address[] memory ipTokens, uint256[] memory pwIporAmounts) external;
 
-    /// @notice Delegates pwIpor tokens and stakes ipTokens
-    /// @param ipTokens - list of ipTokens to which sender delegates pwIpor tokens and stakes ipTokens
-    /// @param pwIporAmounts - list of pwIpor token amount which sender delegates for a given ipToken
+    /// @notice Delegates Power Ipor Tokens and stakes ipTokens
+    /// @param ipTokens - list of ipTokens to which sender delegates Power Ipor Tokens and stakes ipTokens
+    /// @param pwIporAmounts - list of Power Ipor Token amount which sender delegates for a given ipToken
     /// @param ipTokenAmounts - list of ipToken amount which sender stakes in John for a given ipToken
     function delegateAndStakeToJohn(
         address[] memory ipTokens,
@@ -69,17 +70,17 @@ interface IPowerIpor {
         uint256[] memory ipTokenAmounts
     ) external;
 
-    /// @notice Undelegates pwIpor token from John
-    /// @param ipToken - ipToken from which sender will undelegate pwIpor tokens
-    /// @param pwIporAmount - amount of pwIpor tokens taken to undelegate from John
+    /// @notice Undelegates Power Ipor Token from John
+    /// @param ipToken - ipToken from which sender will undelegate Power Ipor Tokens
+    /// @param pwIporAmount - amount of Power Ipor Tokens taken to undelegate from John
     function undelegateFromJohn(address ipToken, uint256 pwIporAmount) external;
 
-    /// @notice Resets freeze of a given pwIpor token amount in the next 2 weeks.
-    /// @dev pwIpor tokens in cool down state cannot be unstaked without fee,
-    /// when time of cool down is elapsed then pwIpor tokens can be unstaked without fee.
+    /// @notice Resets freeze of a given Power Ipor Token amount in the next 2 weeks.
+    /// @dev Power Ipor Tokens in cool down state cannot be unstaked without fee,
+    /// when time of cool down is elapsed then Power Ipor Tokens can be unstaked without fee.
     /// Unstake without coold down is configured in param `_unstakeWithoutCooldownFee`
-    /// pwIpor tokens in cool down state allows sender to redeem Ipor Tokens in relation 1:1 to Power Ipor Tokens.
-    /// @param pwIporAmount pwIpor token amount which sender wants to freeze
+    /// Power Ipor Tokens in cool down state allows sender to redeem Ipor Tokens in relation 1:1 to Power Ipor Tokens.
+    /// @param pwIporAmount Power Ipor Token amount which sender wants to freeze
     function coolDown(uint256 pwIporAmount) external;
 
     /// @notice Cancel cool down.

@@ -6,7 +6,7 @@ library PowerIporTypes {
     struct PwIporCoolDown {
         // @dev timestamp when account can redeem Ipor Tokens
         uint256 endTimestamp;
-        // @dev amount of pwIpor tokens which can be redeem without fee when cooldown reached `endTimestamp`
+        // @dev amount of Power Ipor Tokens which can be redeem without fee when cooldown reached `endTimestamp`
         uint256 pwIporAmount;
     }
 }

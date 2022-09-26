@@ -7,7 +7,7 @@ library JohnTypes {
     struct DelegatedPwIporBalance {
         /// @notice ipToken address
         address ipToken;
-        /// @notice amount of pwIpor which was delegated for given ipToken
+        /// @notice amount of Power Ipor Token which was delegated for given ipToken
         /// @dev value represented in 18 decimals
         uint256 pwIporAmount;
     }
@@ -42,7 +42,7 @@ library JohnTypes {
         /// parameter used to recalculate composite multiplier.
         /// @dev  powerUp < 100 *10^18
         uint72 powerUp;
-        /// @notice balance of pwIpor tokens which are delegated to John
+        /// @notice balance of Power Ipor Tokens which are delegated to John
         /// @dev delegatedPwTokenBalance < 10^26 < 2^87
         uint96 delegatedPwIporBalance;
     }

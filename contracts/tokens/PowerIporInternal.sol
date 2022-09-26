@@ -37,7 +37,7 @@ abstract contract PowerIporInternal is
     /// @dev account address -> base amount, represented in 18 decimals
     mapping(address => uint256) internal _baseBalance;
 
-    /// @dev balance of pwIpor which are delegated to John, information per account, balance represented in 18 decimals
+    /// @dev balance of Power Ipor Token which are delegated to John, information per account, balance represented in 18 decimals
     mapping(address => uint256) internal _delegatedBalance;
     // account address -> {endTimestamp, amount}
     mapping(address => PowerIporTypes.PwIporCoolDown) internal _coolDowns;

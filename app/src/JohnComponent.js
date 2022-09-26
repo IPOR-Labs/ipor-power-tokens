@@ -530,7 +530,7 @@ export default ({ drizzle, drizzleState }) => (
                                             </td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
-                                            <td>Delegated pwIpor tokens</td>
+                                            <td>Delegated Power Ipor Tokens (pwIpor)</td>
                                             <td style={{ "padding-left": "1rem" }}>
                                                 {value[3] / 1000000000000000000}
                                                 <br />
@@ -577,7 +577,7 @@ export default ({ drizzle, drizzleState }) => (
                                             </td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
-                                            <td>Delegated pwIpor tokens</td>
+                                            <td>Delegated Power Ipor Tokens (pwIpor)</td>
                                             <td style={{ "padding-left": "1rem" }}>
                                                 {value[3] / 1000000000000000000}
                                                 <br />
@@ -624,7 +624,7 @@ export default ({ drizzle, drizzleState }) => (
                                             </td>
                                         </tr>
                                         <tr style={{ border: "none", "padding-left": "1rem" }}>
-                                            <td>Delegated pwIpor tokens</td>
+                                            <td>Delegated Power Ipor Tokens (pwIpor)</td>
                                             <td style={{ "padding-left": "1rem" }}>
                                                 {value[3] / 1000000000000000000}
                                                 <br />
@@ -756,7 +756,7 @@ export default ({ drizzle, drizzleState }) => (
                         <strong>My Delegated power token balance</strong>
                         <br />
                         <small>
-                            Balance of pwIpor tokens delegated from PowerIpor contract, <br />
+                            Balance of Power Ipor Tokens (pwIpor) delegated from PowerIpor contract, <br />
                             represented in 18 decimals
                         </small>
                     </td>

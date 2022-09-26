@@ -53,7 +53,7 @@ describe("John Stake and balance", () => {
         expectedBalances([ZERO, ZERO, ZERO], balances);
     });
 
-    it("Should not be able to stake power token when sender is not pwIpor token", async () => {
+    it("Should not be able to stake power token when sender is not Power Ipor Token", async () => {
         //    given
         //    when
         await expect(

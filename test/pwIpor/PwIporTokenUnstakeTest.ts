@@ -137,7 +137,7 @@ describe("PowerIpor unstake", () => {
         expect(exchangeRateAfter).to.be.equal(BigNumber.from("1333333333333333333"));
     });
 
-    it("Should be able to unstake tokens which is not delegate when withdrawal fee change", async () => {
+    it("Should be able to unstake tokens which is not delegate when unstake without cool down fee change", async () => {
         //    given
         const [admin] = accounts;
 

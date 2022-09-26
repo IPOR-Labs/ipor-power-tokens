@@ -7,8 +7,8 @@ import "./JohnInternal.sol";
 import "hardhat/console.sol";
 
 /// @title Smart contract responsible for distribution IPOR token rewards across accounts contributed in IPOR Protocol
-/// by staking ipTokens and / or delegating pwIpor tokens to John. IpTokens can be staked directly to John,
-/// PwIpor tokens account can get stake IPOR Tokens in PowerIpor smart contract.
+/// by staking ipTokens and / or delegating Power Ipor Tokens to John. IpTokens can be staked directly to John,
+/// Power Ipor Tokens account can get stake IPOR Tokens in PowerIpor smart contract.
 contract John is JohnInternal, IJohn {
     using SafeERC20Upgradeable for IERC20Upgradeable;
     using SafeCast for uint256;

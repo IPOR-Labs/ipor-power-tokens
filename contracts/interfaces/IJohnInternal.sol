@@ -30,20 +30,20 @@ interface IJohnInternal {
         view
         returns (JohnTypes.AccountRewardsIndicators memory);
 
-    /// @notice Delegates pwIpor tokens from a given account to John smart contract.
-    /// @param account account address who want to delegate its own pwIpor tokens to John
-    /// @param ipTokens list of ipToken addresses to which delegated pwIpor tokens are transfered
-    /// @param pwIporAmount list of pwIpor amounts for which should be assigns to given ipTokens defined above, represented in 18 decimals
+    /// @notice Delegates Power Ipor Tokens from a given account to John smart contract.
+    /// @param account account address who want to delegate its own Power Ipor Tokens to John
+    /// @param ipTokens list of ipToken addresses to which delegated Power Ipor Tokens are transfered
+    /// @param pwIporAmount list of Power Ipor amounts for which should be assigns to given ipTokens defined above, represented in 18 decimals
     function delegatePwIpor(
         address account,
         address[] memory ipTokens,
         uint256[] memory pwIporAmount
     ) external;
 
-    /// @notice Delegates pwIpor tokens an stake ipTokens to John.
-    /// @param account account address who want to delegate its pwIpor tokens and stake ipTokens to John
-    /// @param ipTokens list of ipToken addresses to which delegated pwIpor tokens are transfered
-    /// @param pwIporAmounts list of pwIpor amounts which should be assign to ipTokens defined above , represented in 18 decimals
+    /// @notice Delegates Power Ipor Tokens an stake ipTokens to John.
+    /// @param account account address who want to delegate its Power Ipor Tokens and stake ipTokens to John
+    /// @param ipTokens list of ipToken addresses to which delegated Power Ipor Tokens are transfered
+    /// @param pwIporAmounts list of Power Ipor Token amounts which should be assign to ipTokens defined above , represented in 18 decimals
     /// @param ipTokenAmounts list of ipToken amounts which should be stake to john, represented in 18 decimals
     function delegatePwIporAndStakeIpToken(
         address account,
@@ -52,10 +52,10 @@ interface IJohnInternal {
         uint256[] memory ipTokenAmounts
     ) external;
 
-    /// @notice Undelegates pwIpor tokens from John
-    /// @param account address which one undelegate pwIpor tokens
-    /// @param ipToken from which associatted ipToken asset you want to undelegate pwIpor tokens
-    /// @param pwIporAmount amount of pwIpor tokens which will be undelegated, represented in 18 decimals
+    /// @notice Undelegates Power Ipor Tokens from John
+    /// @param account address which one undelegate Power Ipor Tokens
+    /// @param ipToken from which associatted ipToken asset you want to undelegate Power Ipor Tokens
+    /// @param pwIporAmount amount of Power Ipor Tokens which will be undelegated, represented in 18 decimals
     function undelegatePwIpor(
         address account,
         address ipToken,
@@ -105,16 +105,16 @@ interface IJohnInternal {
     /// @param ipToken address of ipToken
     event IpTokenRemoved(address account, address ipToken);
 
-    /// @notice Emitted when account delegates pwIpor tokens to John
+    /// @notice Emitted when account delegates Power Ipor Tokens to John
     /// @param account account address in the context of which activities of delegation are performed
-    /// @param ipToken address of ipToken for which pwIpor token are delegated
+    /// @param ipToken address of ipToken for which Power Ipor Token are delegated
     /// @param ipTokenAmount amount of ipTokens delegated to John, represented in 18 decimals
     event DelegatePwIpor(address account, address ipToken, uint256 ipTokenAmount);
 
-    /// @notice Emitted when account delegates pwIpor tokens and stake ipTokens to the John
+    /// @notice Emitted when account delegates Power Ipor Tokens and stake ipTokens to the John
     /// @param account account address in the context of which activities of delegation and staking are performed
     /// @param ipToken address of ipToken which should be unstake
-    /// @param pwIporAmount of pwIpor to delegate, represented in 18 decimals
+    /// @param pwIporAmount of Power Ipor Token to delegate, represented in 18 decimals
     /// @param ipTokenAmount of ipTokens to stake, represented in 18 decimals
     event DelegatePwIporAndStakeIpToken(
         address account,
@@ -123,9 +123,9 @@ interface IJohnInternal {
         uint256 ipTokenAmount
     );
 
-    /// @notice Emitted when account undelegate pwIpor tokens from John contract
+    /// @notice Emitted when account undelegate Power Ipor Tokens from John contract
     /// @param account account address in the context of which activities of undelegation are performed
     /// @param ipToken address of ipToken
-    /// @param ipTokenAmount amount of pwIpor token which was undelegated, represented in 18 decimals
+    /// @param ipTokenAmount amount of Power Ipor Token which was undelegated, represented in 18 decimals
     event UndelegatePwIpor(address account, address ipToken, uint256 ipTokenAmount);
 }

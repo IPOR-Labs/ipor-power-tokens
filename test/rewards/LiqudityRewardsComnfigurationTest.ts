@@ -36,7 +36,7 @@ describe("John configuration, deploy tests", () => {
         expect(john.address).to.be.not.equal("");
     });
 
-    it("Should not be able to deploy contract when pwIpor address is zero", async () => {
+    it("Should not be able to deploy contract when Power Ipor Token address is zero", async () => {
         // given
         const John = await hre.ethers.getContractFactory("John");
         // when

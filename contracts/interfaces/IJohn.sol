@@ -5,18 +5,18 @@ import "./types/JohnTypes.sol";
 
 /// @title Interface for interaction with John.
 /// John is responsible for distribution IPOR token rewards across accounts contributed in IPOR Protocol
-/// by staking ipTokens and / or delegating pwIpor tokens to John. IpTokens can be staked directly to John,
-/// PwIpor tokens account can get stake IPOR Tokens in PowerIpor smart contract.
+/// by staking ipTokens and / or delegating Power Ipor Tokens to John. IpTokens can be staked directly to John,
+/// Power Ipor Tokens account can get stake IPOR Tokens in PowerIpor smart contract.
 interface IJohn {
     /// @notice Returns balance of staked ipTokens
     /// @param ipToken address of ipToken (ipUSDT, ipUSDC, ipDAI etc.)
     /// @return balance of ipTokens staked by sender
     function balanceOf(address ipToken) external view returns (uint256);
 
-    /// @notice Returns balance of delegated pwIpor tokens for a given `account` and list of ipToken addresses.
-    /// @param account address for which we want get information about balance of delegated pwIpor tokens
+    /// @notice Returns balance of delegated Power Ipor Tokens for a given `account` and list of ipToken addresses.
+    /// @param account address for which we want get information about balance of delegated Power Ipor Tokens
     /// @param ipTokens list of ipTokens addresses(ipTokens) for which we want fetch balances
-    /// @return balances list of {JohnTypes.DelegatedPwIporBalance} structure, with information how much pwIpor token is delegated per ipToken address.
+    /// @return balances list of {JohnTypes.DelegatedPwIporBalance} structure, with information how much Power Ipor Token is delegated per ipToken address.
     function balanceOfDelegatedPwIpor(address account, address[] memory ipTokens)
         external
         view
