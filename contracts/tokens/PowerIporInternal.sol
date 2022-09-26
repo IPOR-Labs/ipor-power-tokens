@@ -28,19 +28,21 @@ abstract contract PowerIporInternal is
 {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
-    // 2 weeks
+    /// @dev 2 weeks
     uint256 public constant COOL_DOWN_IN_SECONDS = 2 * 7 * 24 * 60 * 60;
 
     address internal _john;
     address internal _iporToken;
-    // account address -> amount 18 decimals
+
+    /// @dev account address -> base amount, represented in 18 decimals
     mapping(address => uint256) internal _baseBalance;
-    // account address -> amount 18 decimals
+
+    /// @dev balance of Power Ipor Token which are delegated to John, information per account, balance represented in 18 decimals
     mapping(address => uint256) internal _delegatedBalance;
     // account address -> {endTimestamp, amount}
     mapping(address => PowerIporTypes.PwIporCoolDown) internal _coolDowns;
     uint256 internal _baseTotalSupply;
-    uint256 internal _withdrawFee;
+    uint256 internal _unstakeWithoutCooldownFee;
 
     modifier onlyJohn() {
         require(_msgSender() == _john, MiningErrors.CALLER_NOT_JOHN);
@@ -58,7 +60,7 @@ abstract contract PowerIporInternal is
         __UUPSUpgradeable_init();
         require(iporToken != address(0), IporErrors.WRONG_ADDRESS);
         _iporToken = iporToken;
-        _withdrawFee = Constants.D17 * 5;
+        _unstakeWithoutCooldownFee = Constants.D17 * 5;
     }
 
     function getVersion() external pure override returns (uint256) {
@@ -70,16 +72,21 @@ abstract contract PowerIporInternal is
     }
 
     function calculateExchangeRate() external view override returns (uint256) {
-        return _calculateExchangeRate(_iporToken);
+        return _calculateInternalExchangeRate(_iporToken);
     }
 
     function getJohn() external view override returns (address) {
         return _john;
     }
 
-    function setWithdrawFee(uint256 withdrawalFee) external override onlyOwner {
-        _withdrawFee = withdrawalFee;
-        emit WithdrawFee(_msgSender(), withdrawalFee);
+    function setUnstakeWithoutCooldownFee(uint256 unstakeWithoutCooldownFee)
+        external
+        override
+        onlyOwner
+    {
+        uint256 oldValue = _unstakeWithoutCooldownFee;
+        _unstakeWithoutCooldownFee = unstakeWithoutCooldownFee;
+        emit UnstakeWithoutCooldownFeeChanged(_msgSender(), oldValue, unstakeWithoutCooldownFee);
     }
 
     function setJohn(address newJohnAddr) external override onlyOwner {
@@ -97,7 +104,7 @@ abstract contract PowerIporInternal is
     {
         address iporTokenAddress = _iporToken;
         // We need this value before transfer tokens
-        uint256 exchangeRate = _calculateExchangeRate(iporTokenAddress);
+        uint256 exchangeRate = _calculateInternalExchangeRate(iporTokenAddress);
         require(iporTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         IERC20Upgradeable(iporTokenAddress).safeTransferFrom(
@@ -106,9 +113,9 @@ abstract contract PowerIporInternal is
             iporTokenAmount
         );
 
-        uint256 newBaseTokens = IporMath.division(iporTokenAmount * Constants.D18, exchangeRate);
-        _baseBalance[account] += newBaseTokens;
-        _baseTotalSupply += newBaseTokens;
+        uint256 baseAmount = IporMath.division(iporTokenAmount * Constants.D18, exchangeRate);
+        _baseBalance[account] += baseAmount;
+        _baseTotalSupply += baseAmount;
 
         emit ReceiveRewards(account, iporTokenAmount);
     }
@@ -121,7 +128,11 @@ abstract contract PowerIporInternal is
         _unpause();
     }
 
-    function _calculateExchangeRate(address iporTokenAddress) internal view returns (uint256) {
+    function _calculateInternalExchangeRate(address iporTokenAddress)
+        internal
+        view
+        returns (uint256)
+    {
         uint256 baseTotalSupply = _baseTotalSupply;
         if (baseTotalSupply == 0) {
             return Constants.D18;
@@ -134,7 +145,11 @@ abstract contract PowerIporInternal is
     }
 
     function _calculateAmountWithoutFee(uint256 baseAmount) internal view returns (uint256) {
-        return IporMath.division((Constants.D18 - _withdrawFee) * baseAmount, Constants.D18);
+        return
+            IporMath.division(
+                (Constants.D18 - _unstakeWithoutCooldownFee) * baseAmount,
+                Constants.D18
+            );
     }
 
     function _calculateBaseAmountToPwIpor(uint256 baseAmount, uint256 exchangeRate)
@@ -153,12 +168,15 @@ abstract contract PowerIporInternal is
         return
             _calculateBaseAmountToPwIpor(_baseBalance[account], exchangeRate) -
             _delegatedBalance[account] -
-            _coolDowns[account].amount;
+            _coolDowns[account].pwIporAmount;
     }
 
     function _balanceOf(address account) internal view returns (uint256) {
         return
-            _calculateBaseAmountToPwIpor(_baseBalance[account], _calculateExchangeRate(_iporToken));
+            _calculateBaseAmountToPwIpor(
+                _baseBalance[account],
+                _calculateInternalExchangeRate(_iporToken)
+            );
     }
 
     //solhint-disable no-empty-blocks

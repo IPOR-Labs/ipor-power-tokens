@@ -79,7 +79,7 @@ describe("John Stake and balance", () => {
     it("Should not be able to stake when IpToken(usdt) is deactivated", async () => {
         // given
         const balanceBefore = await john.connect(userOne).balanceOf(tokens.ipTokenUsdc.address);
-        await john.removeIpToken(tokens.ipTokenUsdt.address);
+        await john.removeIpTokenAsset(tokens.ipTokenUsdt.address);
         // when
         await expect(
             john.connect(userOne).stake(tokens.ipTokenUsdt.address, N1__0_6DEC)

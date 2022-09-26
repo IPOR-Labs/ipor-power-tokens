@@ -34,20 +34,20 @@ contract LiquidityRewardsAgent {
         return _john.calculateAccountRewards(ipToken);
     }
 
-    function getAccountParams(address ipToken)
+    function getAccountIndicators(address ipToken)
         external
         view
-        returns (JohnTypes.AccountRewardsParams memory)
+        returns (JohnTypes.AccountRewardsIndicators memory)
     {
-        return _john.getAccountParams(ipToken);
+        return _john.getAccountIndicators(ipToken);
     }
 
     function balanceOfDelegatedPwIpor(address account, address[] memory requestIpTokens)
         external
         view
-        returns (JohnTypes.BalanceOfDelegatedPwIpor memory)
+        returns (JohnTypes.DelegatedPwIporBalance[] memory balances)
     {
-        return _john.balanceOfDelegatedPwIpor(account, requestIpTokens);
+        balances = _john.balanceOfDelegatedPwIpor(account, requestIpTokens);
     }
 
     function balanceOf(address ipToken) external view returns (uint256) {

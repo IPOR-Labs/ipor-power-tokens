@@ -153,7 +153,7 @@ describe("John claim", () => {
         expect(powerIporBalanceAfter2Stake).to.be.equal(BigNumber.from("201000000000000000000"));
     });
 
-    it("Should count proper rewards when one user stake pwIpor tokens twice", async () => {
+    it("Should count proper rewards when one user stake Power Ipor Tokens (pwIpor) twice", async () => {
         //    given
         const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));

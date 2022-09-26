@@ -26,7 +26,10 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
     function totalSupply() external view override returns (uint256) {
         return
-            IporMath.division(_baseTotalSupply * _calculateExchangeRate(_iporToken), Constants.D18);
+            IporMath.division(
+                _baseTotalSupply * _calculateInternalExchangeRate(_iporToken),
+                Constants.D18
+            );
     }
 
     function balanceOf(address account) external view override returns (uint256) {
@@ -37,11 +40,11 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         return _delegatedBalance[account];
     }
 
-    function getWithdrawFee() external view override returns (uint256) {
-        return _withdrawFee;
+    function getUnstakeWithoutCooldownFee() external view override returns (uint256) {
+        return _unstakeWithoutCooldownFee;
     }
 
-    function activeCoolDown() external view returns (PowerIporTypes.PwIporCoolDown memory) {
+    function getActiveCoolDown() external view returns (PowerIporTypes.PwIporCoolDown memory) {
         return _coolDowns[_msgSender()];
     }
 
@@ -50,7 +53,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         address iporTokenAddress = _iporToken;
         address msgSender = _msgSender();
 
-        uint256 exchangeRate = _calculateExchangeRate(iporTokenAddress);
+        uint256 exchangeRate = _calculateInternalExchangeRate(iporTokenAddress);
 
         IERC20Upgradeable(iporTokenAddress).safeTransferFrom(
             msgSender,
@@ -58,12 +61,12 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
             iporTokenAmount
         );
 
-        uint256 newBaseTokens = IporMath.division(iporTokenAmount * Constants.D18, exchangeRate);
+        uint256 baseAmount = IporMath.division(iporTokenAmount * Constants.D18, exchangeRate);
 
-        _baseBalance[msgSender] += newBaseTokens;
-        _baseTotalSupply += newBaseTokens;
+        _baseBalance[msgSender] += baseAmount;
+        _baseTotalSupply += baseAmount;
 
-        emit Stake(msgSender, iporTokenAmount, exchangeRate, newBaseTokens);
+        emit Stake(msgSender, iporTokenAmount, exchangeRate, baseAmount);
     }
 
     function unstake(uint256 pwIporAmount) external override whenNotPaused nonReentrant {
@@ -71,11 +74,11 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         address iporTokenAddress = _iporToken;
         address msgSender = _msgSender();
 
-        uint256 exchangeRate = _calculateExchangeRate(iporTokenAddress);
-        uint256 undelegatedPwIporAmount = _getAvailablePwIporAmount(msgSender, exchangeRate);
+        uint256 exchangeRate = _calculateInternalExchangeRate(iporTokenAddress);
+        uint256 availablePwIporAmount = _getAvailablePwIporAmount(msgSender, exchangeRate);
 
         require(
-            undelegatedPwIporAmount >= pwIporAmount,
+            availablePwIporAmount >= pwIporAmount,
             MiningErrors.STAKE_AND_UNDELEGATED_BALANCE_TOO_LOW
         );
 
@@ -107,7 +110,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         }
 
         require(
-            _getAvailablePwIporAmount(_msgSender(), _calculateExchangeRate(_iporToken)) >=
+            _getAvailablePwIporAmount(_msgSender(), _calculateInternalExchangeRate(_iporToken)) >=
                 pwIporToDelegate,
             MiningErrors.STAKED_BALANCE_TOO_LOW
         );
@@ -133,7 +136,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         }
 
         require(
-            _getAvailablePwIporAmount(_msgSender(), _calculateExchangeRate(_iporToken)) >=
+            _getAvailablePwIporAmount(_msgSender(), _calculateInternalExchangeRate(_iporToken)) >=
                 pwIporToDelegate,
             MiningErrors.STAKED_BALANCE_TOO_LOW
         );
@@ -151,6 +154,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
     function undelegateFromJohn(address[] memory ipTokens, uint256[] memory pwIporAmounts)
         external
+        override
         whenNotPaused
         nonReentrant
     {
@@ -174,11 +178,12 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
     function coolDown(uint256 pwIporAmount) external override whenNotPaused {
         require(pwIporAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+
         address msgSender = _msgSender();
 
         uint256 availablePwIporAmount = _calculateBaseAmountToPwIpor(
             _baseBalance[msgSender],
-            _calculateExchangeRate(_iporToken)
+            _calculateInternalExchangeRate(_iporToken)
         ) - _delegatedBalance[msgSender];
 
         require(
@@ -190,24 +195,27 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
             block.timestamp + COOL_DOWN_IN_SECONDS,
             pwIporAmount
         );
-        emit CoolDown(msgSender, pwIporAmount, block.timestamp + COOL_DOWN_IN_SECONDS);
+        emit CoolDownChanged(msgSender, pwIporAmount, block.timestamp + COOL_DOWN_IN_SECONDS);
     }
 
     function cancelCoolDown() external override whenNotPaused {
-        _coolDowns[_msgSender()] = PowerIporTypes.PwIporCoolDown(0, 0);
-        emit CoolDown(_msgSender(), 0, 0);
+        delete _coolDowns[_msgSender()];
+        emit CoolDownChanged(_msgSender(), 0, 0);
     }
 
     function redeem() external override whenNotPaused nonReentrant {
         address msgSender = _msgSender();
+
         PowerIporTypes.PwIporCoolDown memory coolDown = _coolDowns[msgSender];
+
         require(block.timestamp >= coolDown.endTimestamp, MiningErrors.COOL_DOWN_NOT_FINISH);
-        require(coolDown.amount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(coolDown.pwIporAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+
         address iporTokenAddress = _iporToken;
 
-        uint256 exchangeRate = _calculateExchangeRate(iporTokenAddress);
+        uint256 exchangeRate = _calculateInternalExchangeRate(iporTokenAddress);
         uint256 baseAmountToUnstake = IporMath.division(
-            coolDown.amount * Constants.D18,
+            coolDown.pwIporAmount * Constants.D18,
             exchangeRate
         );
 
@@ -215,10 +223,10 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
         _baseBalance[msgSender] -= baseAmountToUnstake;
         _baseTotalSupply -= baseAmountToUnstake;
-        _coolDowns[msgSender] = PowerIporTypes.PwIporCoolDown(0, 0);
+        delete _coolDowns[msgSender];
 
-        IERC20Upgradeable(iporTokenAddress).transfer(msgSender, coolDown.amount);
+        IERC20Upgradeable(iporTokenAddress).transfer(msgSender, coolDown.pwIporAmount);
 
-        emit Redeem(msgSender, coolDown.amount);
+        emit Redeem(msgSender, coolDown.pwIporAmount);
     }
 }

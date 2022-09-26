@@ -30,7 +30,7 @@ describe("John Stake and balance", () => {
             "2"
         );
         //    when
-        const result = await miningCalculation.calculateUserPowerUp(
+        const result = await miningCalculation.calculateAccountPowerUp(
             pwIporAmount,
             ipTokenAmount,
             verticalShift,
@@ -49,7 +49,7 @@ describe("John Stake and balance", () => {
             N1__0_18DEC.toString()
         );
         //    when
-        const result = await miningCalculation.calculateUserPowerUp(
+        const result = await miningCalculation.calculateAccountPowerUp(
             pwIporAmount,
             ipTokenAmount,
             verticalShift,
@@ -68,7 +68,7 @@ describe("John Stake and balance", () => {
             N1__0_18DEC.toString()
         );
         //    when
-        const result = await miningCalculation.calculateUserPowerUp(
+        const result = await miningCalculation.calculateAccountPowerUp(
             pwIporAmount,
             ipTokenAmount,
             verticalShift,
@@ -87,7 +87,7 @@ describe("John Stake and balance", () => {
             N1__0_18DEC.toString()
         );
         //    when
-        const result = await miningCalculation.calculateUserPowerUp(
+        const result = await miningCalculation.calculateAccountPowerUp(
             pwIporAmount,
             ipTokenAmount,
             verticalShift,
@@ -140,7 +140,7 @@ describe("John Stake and balance", () => {
             N1__0_18DEC.toString()
         );
         //    when
-        const result = await miningCalculation.calculateUserPowerUp(
+        const result = await miningCalculation.calculateAccountPowerUp(
             pwIporAmount,
             ipTokenAmount,
             verticalShift,

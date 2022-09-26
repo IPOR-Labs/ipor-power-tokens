@@ -14,10 +14,10 @@ const { expect } = chai;
 
 const expectedBalances = (
     amounts: BigNumber[],
-    response: JohnTypes.BalanceOfDelegatedPwIporStructOutput
+    response: JohnTypes.DelegatedPwIporBalanceStruct[]
 ) => {
     for (let i = 0; i < 3; i++) {
-        expect(response.balances[i].amount).to.be.equal(amounts[i]);
+        expect(response[i].pwIporAmount).to.be.equal(amounts[i]);
     }
 };
 
@@ -53,7 +53,7 @@ describe("John Stake and balance", () => {
         expectedBalances([ZERO, ZERO, ZERO], balances);
     });
 
-    it("Should not be able to stake power token when sender is not pwIpor token", async () => {
+    it("Should not be able to stake power token when sender is not Power Ipor Token", async () => {
         //    given
         //    when
         await expect(

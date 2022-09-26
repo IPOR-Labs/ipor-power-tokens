@@ -104,18 +104,18 @@ describe("John claim", () => {
 
         await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokens);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
-        const globalParamsBefore = await john.getGlobalParams(tokens.ipTokenDai.address);
+        const globalIndicatorsBefore = await john.getGlobalIndicators(tokens.ipTokenDai.address);
         const userParamsBefore = await john
             .connect(userOne)
-            .getAccountParams(tokens.ipTokenDai.address);
+            .getAccountIndicators(tokens.ipTokenDai.address);
         const ipTokenBalanceBefore = await tokens.ipTokenDai.balanceOf(await userOne.getAddress());
         //    when
         await john.connect(userOne).unstake(tokens.ipTokenDai.address, stakedIpTokens);
         //    then
-        const globalParamsAfter = await john.getGlobalParams(tokens.ipTokenDai.address);
+        const globalIndicatorsAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
         const userParamsAfter = await john
             .connect(userOne)
-            .getAccountParams(tokens.ipTokenDai.address);
+            .getAccountIndicators(tokens.ipTokenDai.address);
         const ipTokenBalanceAfter = await tokens.ipTokenDai.balanceOf(await userOne.getAddress());
 
         const pwIporBalanceAfter = await powerIpor
@@ -123,7 +123,7 @@ describe("John claim", () => {
             .balanceOf(await userOne.getAddress());
 
         expectGlobalParam(
-            extractGlobalParam(globalParamsBefore),
+            extractGlobalParam(globalIndicatorsBefore),
             BigNumber.from("140000000000000000000"),
             ZERO,
             BigNumber.from("7142857142857142857142857"),
@@ -132,7 +132,7 @@ describe("John claim", () => {
             100000000
         );
         expectGlobalParam(
-            extractGlobalParam(globalParamsAfter),
+            extractGlobalParam(globalIndicatorsAfter),
             ZERO,
             BigNumber.from("101000000000000000000"),
             ZERO,
@@ -194,9 +194,9 @@ describe("John claim", () => {
         await john.connect(userOne).unstake(tokens.ipTokenDai.address, stakedIpTokens);
         await john.connect(userTwo).unstake(tokens.ipTokenDai.address, stakedIpTokens);
         //    then
-        const globalParamsAfter = await john.getGlobalParams(tokens.ipTokenDai.address);
+        const globalIndicatorsAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
         expectGlobalParam(
-            extractGlobalParam(globalParamsAfter),
+            extractGlobalParam(globalIndicatorsAfter),
             ZERO,
             BigNumber.from("309000000000000000000"),
             ZERO,
@@ -286,8 +286,8 @@ describe("John claim", () => {
             .connect(userTwo)
             .unstake(tokens.ipTokenDai.address, N1__0_18DEC.mul(BigNumber.from("20")));
         //    then
-        const globalParamsAfter = await john.getGlobalParams(tokens.ipTokenDai.address);
-        expect(extractGlobalParam(globalParamsAfter).aggregatePowerUp).to.be.equal(ZERO);
+        const globalIndicatorsAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
+        expect(extractGlobalParam(globalIndicatorsAfter).aggregatedPowerUp).to.be.equal(ZERO);
     });
 
     it("Should not add rewards when no ipToken was stake", async () => {

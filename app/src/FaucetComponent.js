@@ -162,7 +162,7 @@ export default ({ drizzle, drizzleState }) => (
                 <ContractForm drizzle={drizzle} contract="TestnetFaucet" method="transferEth" />
             </div>
             <div className="col-md-4">
-                <strong>Transfer TOKENS to your wallet</strong>
+                <strong>Transfer Ipor Tokens to your wallet</strong>
                 <br />
                 <label>Max allowed value $1 000 000 USD</label>
                 <br />
