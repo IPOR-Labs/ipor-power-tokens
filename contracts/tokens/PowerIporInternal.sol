@@ -82,7 +82,7 @@ abstract contract PowerIporInternal is
         emit WithdrawFee(_msgSender(), withdrawalFee);
     }
 
-    function setJohn(address newJohnAddr) external override onlyOwner whenNotPaused {
+    function setJohn(address newJohnAddr) external override onlyOwner {
         require(newJohnAddr != address(0), IporErrors.WRONG_ADDRESS);
         address oldJohnAddr = _john;
         _john = newJohnAddr;
