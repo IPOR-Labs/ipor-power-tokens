@@ -57,7 +57,7 @@ describe("PowerIpor configuration, deploy tests", () => {
         await powerIpor.stake(N1__0_18DEC);
         //    when
         await expect(
-            powerIpor.undelegateFromJohn(tokens.ipTokenDai.address, ZERO)
+            powerIpor.undelegateFromJohn([tokens.ipTokenDai.address], [ZERO])
         ).to.be.revertedWith("IPOR_004");
     });
 
@@ -66,32 +66,83 @@ describe("PowerIpor configuration, deploy tests", () => {
         await powerIpor.stake(N1__0_18DEC);
         //    when
         await expect(
-            powerIpor.undelegateFromJohn(tokens.ipTokenDai.address, N0__1_18DEC)
+            powerIpor.undelegateFromJohn([tokens.ipTokenDai.address], [N0__1_18DEC])
         ).to.be.revertedWith("IPOR_706");
     });
 
-    it("Should revert transaction when delegate amount is less then withdraw amont", async () => {
+    it("Should revert transaction when delegate amount is less then withdraw amount", async () => {
         //    given
         await powerIpor.stake(N1__0_18DEC);
         await powerIpor.delegateToJohn([tokens.ipTokenDai.address], [N0__1_18DEC]);
         //    when
         await expect(
-            powerIpor.undelegateFromJohn(tokens.ipTokenDai.address, N0__5_18DEC)
+            powerIpor.undelegateFromJohn([tokens.ipTokenDai.address], [N0__5_18DEC])
         ).to.be.revertedWith("IPOR_706");
+    });
+
+    it("Should revert transaction when delegated pwIpor amount is less than staked ipToken amount", async () => {
+        //    given
+        await powerIpor.stake(N2__0_18DEC);
+        await powerIpor.delegateToJohn(
+            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
+            [N1__0_18DEC, N1__0_18DEC]
+        );
+        //    when
+        await expect(
+            powerIpor.undelegateFromJohn(
+                [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
+                [N1__0_18DEC, N2__0_18DEC]
+            )
+        ).to.be.revertedWith("IPOR_706");
+    });
+
+    it("Should revert transaction when mismatch array length - case 1", async () => {
+        //    given
+        await powerIpor.stake(N2__0_18DEC);
+        await powerIpor.delegateToJohn(
+            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
+            [N1__0_18DEC, N1__0_18DEC]
+        );
+        //    when
+        await expect(
+            powerIpor.undelegateFromJohn(
+                [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
+                [N1__0_18DEC]
+            )
+        ).to.be.revertedWith("IPOR_005");
+    });
+
+    it("Should revert transaction when mismatch array length - case 2", async () => {
+        //    given
+        await powerIpor.stake(N2__0_18DEC);
+        await powerIpor.delegateToJohn(
+            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
+            [N1__0_18DEC, N1__0_18DEC]
+        );
+        //    when
+        await expect(
+            powerIpor.undelegateFromJohn([tokens.ipTokenDai.address], [N1__0_18DEC, N1__0_18DEC])
+        ).to.be.revertedWith("IPOR_005");
     });
 
     it("Should withdraw tokens when delegate more tokens", async () => {
         //    given
         const [admin] = accounts;
         await powerIpor.stake(N2__0_18DEC);
-        await powerIpor.delegateToJohn([tokens.ipTokenDai.address], [N1__0_18DEC]);
+        await powerIpor.delegateToJohn(
+            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
+            [N1__0_18DEC, N1__0_18DEC]
+        );
         const delegatedBalanceBefore = await powerIpor.delegatedBalanceOf(await admin.getAddress());
         const exchangeRateBefore = await powerIpor.calculateExchangeRate();
         const pwIporBalanceBefore = await powerIpor.balanceOf(await admin.getAddress());
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
         //    when
-        await powerIpor.undelegateFromJohn(tokens.ipTokenDai.address, N1__0_18DEC);
+        await powerIpor.undelegateFromJohn(
+            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
+            [N1__0_18DEC, N0__1_18DEC]
+        );
 
         //    then
 
@@ -99,11 +150,11 @@ describe("PowerIpor configuration, deploy tests", () => {
         const exchangeRateAfter = await powerIpor.calculateExchangeRate();
         const pwIporBalanceAfter = await powerIpor.balanceOf(await admin.getAddress());
 
-        expect(delegatedBalanceBefore).to.be.equal(N1__0_18DEC);
+        expect(delegatedBalanceBefore).to.be.equal(N2__0_18DEC);
         expect(exchangeRateBefore).to.be.equal(N1__0_18DEC);
         expect(pwIporBalanceBefore).to.be.equal(N2__0_18DEC);
 
-        expect(delegatedBalanceAfter).to.be.equal(ZERO);
+        expect(delegatedBalanceAfter).to.be.equal(N0__1_18DEC.mul(BigNumber.from("9")));
         expect(exchangeRateAfter).to.be.equal(N1__0_18DEC);
         expect(pwIporBalanceAfter).to.be.equal(N2__0_18DEC);
     });

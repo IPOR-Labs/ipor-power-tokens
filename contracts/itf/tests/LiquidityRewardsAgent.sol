@@ -74,7 +74,7 @@ contract LiquidityRewardsAgent {
         _powerIpor.delegateToJohn(ipTokens, pwIporAmounts);
     }
 
-    function undelegatePwIpor(address ipToken, uint256 pwIporAmount) external {
-        _powerIpor.undelegateFromJohn(ipToken, pwIporAmount);
+    function undelegatePwIpor(address[] memory ipTokens, uint256[] memory pwIporAmounts) external {
+        _powerIpor.undelegateFromJohn(ipTokens, pwIporAmounts);
     }
 }

@@ -66,7 +66,7 @@ const randomWithdrawPwIpor = async (
 
     if (balance.lte(ZERO)) return;
 
-    await powerIpor.connect(account).undelegateFromJohn(ipToken, withdrawAmount);
+    await powerIpor.connect(account).undelegateFromJohn([ipToken], [withdrawAmount]);
 };
 
 const randomStakeIpToken = async (account: Signer, ipToken: string, john: John) => {

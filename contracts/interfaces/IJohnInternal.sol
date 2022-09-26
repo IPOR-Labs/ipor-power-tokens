@@ -54,12 +54,12 @@ interface IJohnInternal {
 
     /// @notice Undelegates Power Ipor Tokens from John
     /// @param account address which one undelegate Power Ipor Tokens
-    /// @param ipToken from which associatted ipToken asset you want to undelegate Power Ipor Tokens
-    /// @param pwIporAmount amount of Power Ipor Tokens which will be undelegated, represented in 18 decimals
+    /// @param ipTokens list of ipTokens from which you want to undelegate Power Ipor Tokens
+    /// @param pwIporAmounts list of amounts of Power Ipor Tokens which will be undelegated, represented in 18 decimals
     function undelegatePwIpor(
         address account,
-        address ipToken,
-        uint256 pwIporAmount
+        address[] memory ipTokens,
+        uint256[] memory pwIporAmounts
     ) external;
 
     /// @notice Sets global configuration indicator rewardsPerBlock for a given ipToken

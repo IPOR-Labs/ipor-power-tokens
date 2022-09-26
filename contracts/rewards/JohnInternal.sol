@@ -178,30 +178,12 @@ abstract contract JohnInternal is
 
     function undelegatePwIpor(
         address account,
-        address ipToken,
-        uint256 pwIporAmount
+        address[] memory ipTokens,
+        uint256[] memory pwIporAmounts
     ) external onlyPowerIpor whenNotPaused {
-        require(_ipTokens[ipToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
-        JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[account][
-            ipToken
-        ];
-        require(
-            accountIndicators.delegatedPwIporBalance >= pwIporAmount,
-            MiningErrors.DELEGATED_BALANCE_TOO_LOW
-        );
-        JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
-
-        _claimWhenRewardsExists(account, globalIndicators, accountIndicators);
-        _rebalanceParams(
-            account,
-            ipToken,
-            globalIndicators,
-            accountIndicators,
-            accountIndicators.ipTokenBalance,
-            accountIndicators.delegatedPwIporBalance - pwIporAmount
-        );
-
-        emit UndelegatePwIpor(account, ipToken, pwIporAmount);
+        for (uint256 i; i != ipTokens.length; i++) {
+            _undelegatePwIpor(account, ipTokens[i], pwIporAmounts[i]);
+        }
     }
 
     function setRewardsPerBlock(address ipToken, uint32 iporTokenAmount)
@@ -276,6 +258,34 @@ abstract contract JohnInternal is
 
     function unpause() external override onlyOwner {
         _unpause();
+    }
+
+    function _undelegatePwIpor(
+        address account,
+        address ipToken,
+        uint256 pwIporAmount
+    ) internal {
+        require(_ipTokens[ipToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
+        JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[account][
+            ipToken
+        ];
+        require(
+            accountIndicators.delegatedPwIporBalance >= pwIporAmount,
+            MiningErrors.DELEGATED_BALANCE_TOO_LOW
+        );
+        JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
+
+        _claimWhenRewardsExists(account, globalIndicators, accountIndicators);
+        _rebalanceParams(
+            account,
+            ipToken,
+            globalIndicators,
+            accountIndicators,
+            accountIndicators.ipTokenBalance,
+            accountIndicators.delegatedPwIporBalance - pwIporAmount
+        );
+
+        emit UndelegatePwIpor(account, ipToken, pwIporAmount);
     }
 
     function _rebalanceParams(

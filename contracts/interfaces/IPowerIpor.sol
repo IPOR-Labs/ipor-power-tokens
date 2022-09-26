@@ -29,8 +29,8 @@ interface IPowerIpor {
     /// @return Returns the amount of Power Ipor tokens owned by `account`.
     function balanceOf(address account) external view returns (uint256);
 
-    /// @notice Gets delegated balance of Power Ipor Token for a given account address. 
-	/// Token are delegated from PowerIpor to John smart contract (reponsible for rewards distribution).
+    /// @notice Gets delegated balance of Power Ipor Token for a given account address.
+    /// Token are delegated from PowerIpor to John smart contract (reponsible for rewards distribution).
     /// @param account account address for which is checked balance of delegated Power Ipor Tokens
     /// @return  Returns the amount of Power Ipor tokens owned by `account` and delegated to John contracts.
     function delegatedBalanceOf(address account) external view returns (uint256);
@@ -71,9 +71,9 @@ interface IPowerIpor {
     ) external;
 
     /// @notice Undelegates Power Ipor Token from John
-    /// @param ipToken - ipToken from which sender will undelegate Power Ipor Tokens
-    /// @param pwIporAmount - amount of Power Ipor Tokens taken to undelegate from John
-    function undelegateFromJohn(address ipToken, uint256 pwIporAmount) external;
+    /// @param ipTokens - list of ipToken from which sender will undelegate Power Ipor Tokens
+    /// @param pwIporAmounts - list of amounts of Power Ipor Tokens taken to undelegate from John
+    function undelegateFromJohn(address[] memory ipTokens, uint256[] memory pwIporAmounts) external;
 
     /// @notice Resets freeze of a given Power Ipor Token amount in the next 2 weeks.
     /// @dev Power Ipor Tokens in cool down state cannot be unstaked without fee,
@@ -124,9 +124,9 @@ interface IPowerIpor {
 
     /// @notice Emitted when sender undelegate Power Ipor Tokens from John
     /// @param account address who undelegates Power Ipor Tokens
-    /// @param ipToken list of assets from Power Ipor Tokens are undelegated
-    /// @param pwIporAmount list of values how Power Ipor token amounts should be undelegated from ipTokens
-    event UndelegateFromJohn(address indexed account, address ipToken, uint256 pwIporAmount);
+    /// @param ipTokens list of assets from Power Ipor Tokens are undelegated
+    /// @param pwIporAmounts list of values how Power Ipor token amounts should be undelegated from ipTokens
+    event UndelegateFromJohn(address indexed account, address[] ipTokens, uint256[] pwIporAmounts);
 
     /// @notice Emitted when sender setup coolDown
     /// @param changedBy account address that has changed CoolDown rules
