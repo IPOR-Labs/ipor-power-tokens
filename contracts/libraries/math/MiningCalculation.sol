@@ -72,16 +72,18 @@ library MiningCalculation {
     }
 
     function calculateAccruedRewards(
-        uint256 blocNumber,
+        uint256 blockNumber,
         uint256 lastRebalanceBlockNumber,
-        uint256 blockRewards,
+        uint256 rewardsPerBlock,
         uint256 previousAccruedRewards
     ) internal view returns (uint256) {
         require(
-            blocNumber >= lastRebalanceBlockNumber,
+            blockNumber >= lastRebalanceBlockNumber,
             MiningErrors.BLOCK_NUMBER_GREATER_OR_EQUAL_THAN_PREVIOUS_BLOCK_NUMBER
         );
-        uint256 newRewards = (blocNumber - lastRebalanceBlockNumber) * blockRewards * Constants.D10;
+        uint256 newRewards = (blockNumber - lastRebalanceBlockNumber) *
+            rewardsPerBlock *
+            Constants.D10;
         return previousAccruedRewards + newRewards;
     }
 
@@ -104,36 +106,43 @@ library MiningCalculation {
     }
 
     // returns value with 27 decimals
-    function compositeMultiplier(uint256 blockRewards, uint256 aggregatePowerUp)
+    function compositeMultiplier(uint256 rewardsPerBlock, uint256 aggregatedPowerUp)
         internal
         view
         returns (uint256)
     {
-        if (aggregatePowerUp == 0) {
+        if (aggregatedPowerUp == 0) {
             return 0;
         }
-        return IporMath.division(blockRewards * Constants.D18 * Constants.D19, aggregatePowerUp);
+        return
+            IporMath.division(rewardsPerBlock * Constants.D18 * Constants.D19, aggregatedPowerUp);
     }
 
+    /// @notice calculates account rewards represented in Ipor Tokens
+    /// @param accountIpTokenAmount amount of ipToken for a given account
+    /// @param accountPowerUp value of powerUp param for a given account
+    /// @param compositeMultiplierCumulative value of param Composite Multiplier Cumulative global
+    /// @param accountCompositeMultiplierCumulative value of param Composite Multiplier Cumulative for a given account
+    /// @return rewards, amount of Ipor Tokens
     function calculateAccountRewards(
         uint256 accountIpTokenAmount,
         uint256 accountPowerUp,
-        uint256 compositeMultiplierCumulative,
-        uint256 accountCompositeMultiplierCumulative
+        uint256 accountCompositeMultiplierCumulative,
+        uint256 compositeMultiplierCumulative
     ) internal view returns (uint256) {
         require(
             compositeMultiplierCumulative >= accountCompositeMultiplierCumulative,
             MiningErrors.COMPOSITE_MULTIPLIER_GREATER_OR_EQUAL_THAN_ACCOUNT_COMPOSITE_MULTIPLIER
         );
-        uint256 accountRewards = accountIpTokenAmount *
+        uint256 accountIporTokenRewards = accountIpTokenAmount *
             accountPowerUp *
             (compositeMultiplierCumulative - accountCompositeMultiplierCumulative);
-        return IporMath.division(accountRewards, Constants.D45);
+        return IporMath.division(accountIporTokenRewards, Constants.D45);
     }
 
-    function _toFixedPoint(uint256 number, uint256 decimals) internal view returns (bytes16) {
+    function _toFixedPoint(uint256 number, uint256 decimals) private view returns (bytes16) {
         if (number % decimals > 0) {
-            //            when we calculate we lost this value in conversion
+            // when we calculate we lost this value in conversion
             number += 1;
         }
         bytes16 nominator = ABDKMathQuad.fromUInt(number);

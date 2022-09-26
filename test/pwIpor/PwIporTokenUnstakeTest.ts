@@ -92,7 +92,7 @@ describe("PowerIpor unstake", () => {
         expect(iporBalanceAfter).to.be.equal(iporBalanceBefore.add(N0__5_18DEC));
     });
 
-    it("Should not be able to unstake when user delegated tokens to liquidity rewards contract", async () => {
+    it("Should not be able to unstake when user delegated tokens to John", async () => {
         //    given
         await powerIpor.stake(N1__0_18DEC);
 
@@ -106,7 +106,7 @@ describe("PowerIpor unstake", () => {
         );
     });
 
-    it("Should be able to unstake tokens which is not delegate when he delegated tokens to liquidity rewards contract", async () => {
+    it("Should be able to unstake tokens which is not delegate when he delegated tokens to John", async () => {
         //    given
         const [admin] = accounts;
 
@@ -137,7 +137,7 @@ describe("PowerIpor unstake", () => {
         expect(exchangeRateAfter).to.be.equal(BigNumber.from("1333333333333333333"));
     });
 
-    it("Should be able to unstake tokens which is not delegate when withdrawal fee change", async () => {
+    it("Should be able to unstake tokens which is not delegate when unstake without cool down fee change", async () => {
         //    given
         const [admin] = accounts;
 
@@ -146,11 +146,11 @@ describe("PowerIpor unstake", () => {
         const totalSupplyBefore = await powerIpor.totalSupplyBase();
         const iporBalanceBefore = await iporToken.balanceOf(await admin.getAddress());
         const exchangeRateBefore = await powerIpor.calculateExchangeRate();
-        const withdrawalFeeBefore = await powerIpor.getWithdrawFee();
+        const withdrawalFeeBefore = await powerIpor.getUnstakeWithoutCooldownFee();
 
         await powerIpor.delegateToJohn([tokens.ipTokenDai.address], [N0__6_18DEC]);
         //    when
-        await powerIpor.setWithdrawFee(N0__1_18DEC);
+        await powerIpor.setUnstakeWithoutCooldownFee(N0__1_18DEC);
         await powerIpor.unstake(N0__4_18DEC);
 
         //    then
@@ -158,7 +158,7 @@ describe("PowerIpor unstake", () => {
         const totalSupplyAfter = await powerIpor.totalSupplyBase();
         const iporBalanceAfter = await iporToken.balanceOf(await admin.getAddress());
         const exchangeRateAfter = await powerIpor.calculateExchangeRate();
-        const withdrawalFeeAfter = await powerIpor.getWithdrawFee();
+        const withdrawalFeeAfter = await powerIpor.getUnstakeWithoutCooldownFee();
 
         expect(balanceBefore).to.be.equal(N1__0_18DEC);
         expect(totalSupplyBefore).to.be.equal(N1__0_18DEC);

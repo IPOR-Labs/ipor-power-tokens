@@ -308,18 +308,6 @@ export default ({ drizzle, drizzleState }) => (
                 </td>
             </tr>
             <tr>
-                <td>John</td>
-                <td>{drizzle.contracts.John.address}</td>
-                <td>
-                    <ContractData
-                        drizzle={drizzle}
-                        drizzleState={drizzleState}
-                        contract="John"
-                        method="getVersion"
-                    />
-                </td>
-            </tr>
-            <tr>
                 <td>PowerIpor</td>
                 <td>{drizzle.contracts.PowerIpor.address}</td>
                 <td>
@@ -327,6 +315,18 @@ export default ({ drizzle, drizzleState }) => (
                         drizzle={drizzle}
                         drizzleState={drizzleState}
                         contract="PowerIpor"
+                        method="getVersion"
+                    />
+                </td>
+            </tr>
+            <tr>
+                <td>John</td>
+                <td>{drizzle.contracts.John.address}</td>
+                <td>
+                    <ContractData
+                        drizzle={drizzle}
+                        drizzleState={drizzleState}
+                        contract="John"
                         method="getVersion"
                     />
                 </td>
@@ -1262,7 +1262,7 @@ export default ({ drizzle, drizzleState }) => (
                 </td>
             </tr>
             <tr>
-                <td>Liquidity Rewards</td>
+                <td>John</td>
                 <td>{drizzle.contracts.John.address}</td>
                 <td>
                     <ContractData
@@ -1752,7 +1752,7 @@ export default ({ drizzle, drizzleState }) => (
                 </td>
             </tr>
             <tr>
-                <td>Liquidity Rewards</td>
+                <td>John</td>
                 <td>{drizzle.contracts.John.address}</td>
                 <td>
                     <ContractData

@@ -61,7 +61,7 @@ const randomWithdrawPwIpor = async (
         await account.getAddress(),
         [ipToken]
     );
-    const balance = balanceOfDelegatedPwIpor.balances[0].amount.div(N1__0_18DEC);
+    const balance = balanceOfDelegatedPwIpor[0].pwIporAmount.div(N1__0_18DEC);
     const withdrawAmount = randomBigNumberFromInterval(1, balance.toNumber(), N1__0_18DEC);
 
     if (balance.lte(ZERO)) return;
@@ -381,7 +381,7 @@ describe("John claim", () => {
         expect(pwIporExchangeRateBefore).to.be.equal(pwIporExchangeRateAfter);
     });
 
-    it("Should random stake and delegate to rewards contracts", async () => {
+    it("Should random stake and delegate to John", async () => {
         //    given
         const ipDai = tokens.ipTokenDai.address;
         await hre.network.provider.send("hardhat_mine", ["0x9999999"]);

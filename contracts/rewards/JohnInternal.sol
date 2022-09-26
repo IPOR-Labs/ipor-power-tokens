@@ -37,9 +37,10 @@ abstract contract JohnInternal is
     mapping(address => bool) internal _ipTokens;
 
     //  ipToken (ipUSDT, ipUSDC, ipDAI, etc) address -> global parameters for ipToken
-    mapping(address => JohnTypes.GlobalRewardsParams) internal _globalParams;
+    mapping(address => JohnTypes.GlobalRewardsIndicators) internal _globalIndicators;
     //  account address => ipToken address => account params
-    mapping(address => mapping(address => JohnTypes.AccountRewardsParams)) internal _accountParams;
+    mapping(address => mapping(address => JohnTypes.AccountRewardsIndicators))
+        internal _accountIndicators;
 
     modifier onlyPowerIpor() {
         require(_msgSender() == _getPowerIpor(), MiningErrors.CALLER_NOT_PW_IPOR);
@@ -73,9 +74,9 @@ abstract contract JohnInternal is
 
             _ipTokens[ipTokens[i]] = true;
 
-            _saveGlobalParams(
+            _saveGlobalIndicators(
                 ipTokens[i],
-                JohnTypes.GlobalRewardsParams(0, 0, 0, 0, uint32(Constants.D8), 0)
+                JohnTypes.GlobalRewardsIndicators(0, 0, 0, 0, uint32(Constants.D8), 0)
             );
         }
     }
@@ -88,22 +89,22 @@ abstract contract JohnInternal is
         return _ipTokens[ipToken];
     }
 
-    function getGlobalParams(address ipToken)
+    function getGlobalIndicators(address ipToken)
         external
         view
         override
-        returns (JohnTypes.GlobalRewardsParams memory)
+        returns (JohnTypes.GlobalRewardsIndicators memory)
     {
-        return _globalParams[ipToken];
+        return _globalIndicators[ipToken];
     }
 
-    function getAccountParams(address ipToken)
+    function getAccountIndicators(address ipToken)
         external
         view
         override
-        returns (JohnTypes.AccountRewardsParams memory)
+        returns (JohnTypes.AccountRewardsIndicators memory)
     {
-        return _accountParams[_msgSender()][ipToken];
+        return _accountIndicators[_msgSender()][ipToken];
     }
 
     function delegatePwIpor(
@@ -126,10 +127,12 @@ abstract contract JohnInternal is
         for (uint256 i = 0; i != ipTokens.length; i++) {
             require(_ipTokens[ipTokens[i]], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
 
-            JohnTypes.AccountRewardsParams memory accountParams = _accountParams[account][
+            JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[
+                account
+            ][ipTokens[i]];
+            JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[
                 ipTokens[i]
             ];
-            JohnTypes.GlobalRewardsParams memory globalParams = _globalParams[ipTokens[i]];
 
             //stake
             if (ipTokenAmounts[i] != 0) {
@@ -140,28 +143,29 @@ abstract contract JohnInternal is
                 );
             }
             // delegate
-            if (accountParams.ipTokenBalance == 0 && ipTokenAmounts[i] == 0) {
-                uint256 newBalance = accountParams.delegatedPwIporBalance + pwIporAmounts[i];
-                _accountParams[account][ipTokens[i]].delegatedPwIporBalance = newBalance.toUint96();
+            if (accountIndicators.ipTokenBalance == 0 && ipTokenAmounts[i] == 0) {
+                uint256 newBalance = accountIndicators.delegatedPwIporBalance + pwIporAmounts[i];
+                _accountIndicators[account][ipTokens[i]].delegatedPwIporBalance = newBalance
+                    .toUint96();
                 emit DelegatePwIpor(account, ipTokens[i], pwIporAmounts[i]);
                 continue;
             }
 
             // assumption we start counting from first person who can get rewards
             //            TODO: to remove
-            if (globalParams.blockNumber == 0) {
-                globalParams.blockNumber = block.number.toUint32();
+            if (globalIndicators.blockNumber == 0) {
+                globalIndicators.blockNumber = block.number.toUint32();
             }
 
-            _claimWhenRewardsExists(account, globalParams, accountParams);
+            _claimWhenRewardsExists(account, globalIndicators, accountIndicators);
 
             _rebalanceParams(
                 account,
                 ipTokens[i],
-                globalParams,
-                accountParams,
-                accountParams.ipTokenBalance + ipTokenAmounts[i],
-                accountParams.delegatedPwIporBalance + pwIporAmounts[i]
+                globalIndicators,
+                accountIndicators,
+                accountIndicators.ipTokenBalance + ipTokenAmounts[i],
+                accountIndicators.delegatedPwIporBalance + pwIporAmounts[i]
             );
             emit DelegatePwIporAndStakeIpToken(
                 account,
@@ -182,59 +186,67 @@ abstract contract JohnInternal is
         }
     }
 
-    function setRewardsPerBlock(address ipToken, uint32 rewardsValue) external override onlyOwner {
+    function setRewardsPerBlock(address ipToken, uint32 iporTokenAmount)
+        external
+        override
+        onlyOwner
+    {
         require(_ipTokens[ipToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
 
-        JohnTypes.GlobalRewardsParams memory globalParams = _globalParams[ipToken];
+        JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
         uint256 blockNumber = block.number;
 
-        uint256 compositeMultiplierCumulativeBeforeBlock = globalParams
-            .compositeMultiplierCumulativeBeforeBlock +
-            (blockNumber - globalParams.blockNumber) *
-            globalParams.compositeMultiplierInTheBlock;
+        uint256 compositeMultiplierCumulativePrevBlock = globalIndicators
+            .compositeMultiplierCumulativePrevBlock +
+            (blockNumber - globalIndicators.blockNumber) *
+            globalIndicators.compositeMultiplierInTheBlock;
 
         uint256 accruedRewards;
-        if (globalParams.aggregatePowerUp != 0) {
+        if (globalIndicators.aggregatedPowerUp != 0) {
             accruedRewards = MiningCalculation.calculateAccruedRewards(
                 blockNumber.toUint32(),
-                globalParams.blockNumber,
-                globalParams.blockRewards,
-                globalParams.accruedRewards
+                globalIndicators.blockNumber,
+                globalIndicators.rewardsPerBlock,
+                globalIndicators.accruedRewards
             );
         } else {
-            accruedRewards = globalParams.accruedRewards;
+            accruedRewards = globalIndicators.accruedRewards;
         }
 
         uint256 compositeMultiplier = MiningCalculation.compositeMultiplier(
-            rewardsValue,
-            globalParams.aggregatePowerUp
+            iporTokenAmount,
+            globalIndicators.aggregatedPowerUp
         );
 
-        _saveGlobalParams(
+        _saveGlobalIndicators(
             ipToken,
-            JohnTypes.GlobalRewardsParams(
-                globalParams.aggregatePowerUp,
+            JohnTypes.GlobalRewardsIndicators(
+                globalIndicators.aggregatedPowerUp,
                 compositeMultiplier.toUint128(),
-                compositeMultiplierCumulativeBeforeBlock.toUint128(),
+                compositeMultiplierCumulativePrevBlock.toUint128(),
                 blockNumber.toUint32(),
-                rewardsValue,
+                iporTokenAmount,
                 accruedRewards.toUint88()
             )
         );
-        emit RewardsPerBlockChanged(_msgSender(), rewardsValue);
+        emit RewardsPerBlockChanged(
+            _msgSender(),
+            globalIndicators.rewardsPerBlock,
+            iporTokenAmount
+        );
     }
 
-    function addIpToken(address ipToken) external onlyOwner {
+    function addIpTokenAsset(address ipToken) external onlyOwner {
         require(ipToken != address(0), IporErrors.WRONG_ADDRESS);
         _ipTokens[ipToken] = true;
-        _saveGlobalParams(
+        _saveGlobalIndicators(
             ipToken,
-            JohnTypes.GlobalRewardsParams(0, 0, 0, 0, uint32(Constants.D8), 0)
+            JohnTypes.GlobalRewardsIndicators(0, 0, 0, 0, uint32(Constants.D8), 0)
         );
         emit IpTokenAdded(_msgSender(), ipToken);
     }
 
-    function removeIpToken(address ipToken) external override onlyOwner {
+    function removeIpTokenAsset(address ipToken) external override onlyOwner {
         require(ipToken != address(0), IporErrors.WRONG_ADDRESS);
         _ipTokens[ipToken] = false;
         emit IpTokenRemoved(_msgSender(), ipToken);
@@ -254,21 +266,23 @@ abstract contract JohnInternal is
         uint256 pwIporAmount
     ) internal {
         require(_ipTokens[ipToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
-        JohnTypes.AccountRewardsParams memory accountParams = _accountParams[account][ipToken];
+        JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[account][
+            ipToken
+        ];
         require(
-            accountParams.delegatedPwIporBalance >= pwIporAmount,
+            accountIndicators.delegatedPwIporBalance >= pwIporAmount,
             MiningErrors.DELEGATED_BALANCE_TOO_LOW
         );
-        JohnTypes.GlobalRewardsParams memory globalParams = _globalParams[ipToken];
+        JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
 
-        _claimWhenRewardsExists(account, globalParams, accountParams);
+        _claimWhenRewardsExists(account, globalIndicators, accountIndicators);
         _rebalanceParams(
             account,
             ipToken,
-            globalParams,
-            accountParams,
-            accountParams.ipTokenBalance,
-            accountParams.delegatedPwIporBalance - pwIporAmount
+            globalIndicators,
+            accountIndicators,
+            accountIndicators.ipTokenBalance,
+            accountIndicators.delegatedPwIporBalance - pwIporAmount
         );
 
         emit UndelegatePwIpor(account, ipToken, pwIporAmount);
@@ -277,8 +291,8 @@ abstract contract JohnInternal is
     function _rebalanceParams(
         address account,
         address ipToken,
-        JohnTypes.GlobalRewardsParams memory globalParams,
-        JohnTypes.AccountRewardsParams memory accountParams,
+        JohnTypes.GlobalRewardsIndicators memory globalIndicators,
+        JohnTypes.AccountRewardsIndicators memory accountIndicators,
         uint256 ipTokenBalance,
         uint256 delegatedPwIporBalance
     ) internal {
@@ -289,54 +303,55 @@ abstract contract JohnInternal is
             _horizontalShift()
         );
 
-        uint256 compositeMultiplierCumulativeBeforeBlock = globalParams
-            .compositeMultiplierCumulativeBeforeBlock +
-            (block.number - globalParams.blockNumber) *
-            globalParams.compositeMultiplierInTheBlock;
-        _saveAccountParams(
+        uint256 compositeMultiplierCumulativePrevBlock = globalIndicators
+            .compositeMultiplierCumulativePrevBlock +
+            (block.number - globalIndicators.blockNumber) *
+            globalIndicators.compositeMultiplierInTheBlock;
+        _saveAccountIndicators(
             account,
             ipToken,
-            JohnTypes.AccountRewardsParams(
-                compositeMultiplierCumulativeBeforeBlock.toUint128(),
+            JohnTypes.AccountRewardsIndicators(
+                compositeMultiplierCumulativePrevBlock.toUint128(),
                 ipTokenBalance.toUint128(),
                 accountPowerUp.toUint72(),
                 delegatedPwIporBalance.toUint96()
             )
         );
 
-        uint256 aggregatePowerUp = MiningCalculation.calculateAggregatePowerUp(
+        uint256 aggregatedPowerUp = MiningCalculation.calculateAggregatePowerUp(
             accountPowerUp,
             ipTokenBalance,
-            accountParams.powerUp,
-            accountParams.ipTokenBalance,
-            globalParams.aggregatePowerUp
+            accountIndicators.powerUp,
+            accountIndicators.ipTokenBalance,
+            globalIndicators.aggregatedPowerUp
         );
 
         uint256 accruedRewards;
-        //        check if we should update rewards, it should happened when at least one accounts stake ipTokens
-        if (globalParams.aggregatePowerUp == 0) {
-            accruedRewards = globalParams.accruedRewards;
+
+        /// @dev check if we should update rewards, it should happened when at least one account stake ipTokens
+        if (globalIndicators.aggregatedPowerUp == 0) {
+            accruedRewards = globalIndicators.accruedRewards;
         } else {
             accruedRewards = MiningCalculation.calculateAccruedRewards(
                 block.number,
-                globalParams.blockNumber,
-                globalParams.blockRewards,
-                globalParams.accruedRewards
+                globalIndicators.blockNumber,
+                globalIndicators.rewardsPerBlock,
+                globalIndicators.accruedRewards
             );
         }
         uint256 compositeMultiplier = MiningCalculation.compositeMultiplier(
-            globalParams.blockRewards,
-            aggregatePowerUp
+            globalIndicators.rewardsPerBlock,
+            aggregatedPowerUp
         );
 
-        _saveGlobalParams(
+        _saveGlobalIndicators(
             ipToken,
-            JohnTypes.GlobalRewardsParams(
-                aggregatePowerUp,
+            JohnTypes.GlobalRewardsIndicators(
+                aggregatedPowerUp,
                 compositeMultiplier.toUint128(),
-                compositeMultiplierCumulativeBeforeBlock.toUint128(),
+                compositeMultiplierCumulativePrevBlock.toUint128(),
                 block.number.toUint32(),
-                globalParams.blockRewards,
+                globalIndicators.rewardsPerBlock,
                 accruedRewards.toUint88()
             )
         );
@@ -347,35 +362,37 @@ abstract contract JohnInternal is
         address ipToken,
         uint256 pwIporAmount
     ) internal {
-        JohnTypes.AccountRewardsParams memory accountParams = _accountParams[account][ipToken];
-        JohnTypes.GlobalRewardsParams memory globalParams = _globalParams[ipToken];
+        JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[account][
+            ipToken
+        ];
+        JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
 
-        if (accountParams.ipTokenBalance == 0) {
-            uint256 newBalance = accountParams.delegatedPwIporBalance + pwIporAmount;
-            _accountParams[account][ipToken].delegatedPwIporBalance = newBalance.toUint96();
+        if (accountIndicators.ipTokenBalance == 0) {
+            uint256 newBalance = accountIndicators.delegatedPwIporBalance + pwIporAmount;
+            _accountIndicators[account][ipToken].delegatedPwIporBalance = newBalance.toUint96();
             emit DelegatePwIpor(account, ipToken, pwIporAmount);
             return;
         }
 
-        _claimWhenRewardsExists(account, globalParams, accountParams);
+        _claimWhenRewardsExists(account, globalIndicators, accountIndicators);
 
         _rebalanceParams(
             account,
             ipToken,
-            globalParams,
-            accountParams,
-            accountParams.ipTokenBalance,
-            accountParams.delegatedPwIporBalance + pwIporAmount
+            globalIndicators,
+            accountIndicators,
+            accountIndicators.ipTokenBalance,
+            accountIndicators.delegatedPwIporBalance + pwIporAmount
         );
         emit DelegatePwIpor(account, ipToken, pwIporAmount);
     }
 
     function _claimWhenRewardsExists(
         address account,
-        JohnTypes.GlobalRewardsParams memory globalParams,
-        JohnTypes.AccountRewardsParams memory accountParams
+        JohnTypes.GlobalRewardsIndicators memory globalIndicators,
+        JohnTypes.AccountRewardsIndicators memory accountIndicators
     ) internal {
-        uint256 rewards = _calculateAccountRewards(accountParams, globalParams);
+        uint256 rewards = _calculateAccountRewards(accountIndicators, globalIndicators);
 
         if (rewards > 0) {
             _claim(account, rewards);
@@ -383,20 +400,20 @@ abstract contract JohnInternal is
     }
 
     function _calculateAccountRewards(
-        JohnTypes.AccountRewardsParams memory accountParams,
-        JohnTypes.GlobalRewardsParams memory globalParams
+        JohnTypes.AccountRewardsIndicators memory accountIndicators,
+        JohnTypes.GlobalRewardsIndicators memory globalIndicators
     ) internal view returns (uint256) {
-        uint256 compositeMultiplierCumulativeBeforeBlock = globalParams
-            .compositeMultiplierCumulativeBeforeBlock +
-            (block.number - globalParams.blockNumber) *
-            globalParams.compositeMultiplierInTheBlock;
+        uint256 compositeMultiplierCumulativePrevBlock = globalIndicators
+            .compositeMultiplierCumulativePrevBlock +
+            (block.number - globalIndicators.blockNumber) *
+            globalIndicators.compositeMultiplierInTheBlock;
 
         return
             MiningCalculation.calculateAccountRewards(
-                accountParams.ipTokenBalance,
-                accountParams.powerUp,
-                compositeMultiplierCumulativeBeforeBlock,
-                accountParams.compositeMultiplierCumulative
+                accountIndicators.ipTokenBalance,
+                accountIndicators.powerUp,
+                accountIndicators.compositeMultiplierCumulative,
+                compositeMultiplierCumulativePrevBlock
             );
     }
 
@@ -416,19 +433,19 @@ abstract contract JohnInternal is
         return _powerIpor;
     }
 
-    function _saveAccountParams(
+    function _saveAccountIndicators(
         address account,
         address ipToken,
-        JohnTypes.AccountRewardsParams memory params
+        JohnTypes.AccountRewardsIndicators memory params
     ) internal virtual {
-        _accountParams[account][ipToken] = params;
+        _accountIndicators[account][ipToken] = params;
     }
 
-    function _saveGlobalParams(address ipToken, JohnTypes.GlobalRewardsParams memory params)
+    function _saveGlobalIndicators(address ipToken, JohnTypes.GlobalRewardsIndicators memory params)
         internal
         virtual
     {
-        _globalParams[ipToken] = params;
+        _globalIndicators[ipToken] = params;
     }
 
     //solhint-disable no-empty-blocks

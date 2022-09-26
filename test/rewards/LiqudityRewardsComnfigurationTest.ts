@@ -36,7 +36,7 @@ describe("John configuration, deploy tests", () => {
         expect(john.address).to.be.not.equal("");
     });
 
-    it("Should not be able to deploy contract when pwIpor address is zero", async () => {
+    it("Should not be able to deploy contract when Power Ipor Token address is zero", async () => {
         // given
         const John = await hre.ethers.getContractFactory("John");
         // when
@@ -99,8 +99,8 @@ describe("John configuration, deploy tests", () => {
         const isUsdcActiveBefore = await john.isIpTokenSupported(tokens.ipTokenUsdc.address);
         const isUsdtActiveBefore = await john.isIpTokenSupported(tokens.ipTokenUsdt.address);
         // when
-        await john.addIpToken(tokens.ipTokenUsdc.address);
-        await john.addIpToken(tokens.ipTokenUsdt.address);
+        await john.addIpTokenAsset(tokens.ipTokenUsdc.address);
+        await john.addIpTokenAsset(tokens.ipTokenUsdt.address);
         // then
         const isDaiActiveAfter = await john.isIpTokenSupported(tokens.ipTokenDai.address);
         const isUsdcActiveAfter = await john.isIpTokenSupported(tokens.ipTokenUsdc.address);
@@ -128,7 +128,7 @@ describe("John configuration, deploy tests", () => {
         // when
         await expect(
             //when
-            john.connect(userOne).addIpToken(tokens.ipTokenUsdc.address)
+            john.connect(userOne).addIpTokenAsset(tokens.ipTokenUsdc.address)
             //then
         ).to.be.revertedWith("Ownable: caller is not the owner");
     });

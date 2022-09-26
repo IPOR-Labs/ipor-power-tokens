@@ -4,7 +4,7 @@ pragma solidity 0.8.16;
 import "../libraries/math/MiningCalculation.sol";
 
 contract MockMiningCalculation {
-    function calculateUserPowerUp(
+    function calculateAccountPowerUp(
         uint256 pwIporAmount,
         uint256 ipTokenAmount,
         uint256 verticalShift,
@@ -39,24 +39,24 @@ contract MockMiningCalculation {
     function calculateAccruedRewards(
         uint256 blocNumber,
         uint256 lastRebalanceBlockNumber,
-        uint256 blockRewards,
+        uint256 rewardsPerBlock,
         uint256 previousAccruedRewards
     ) public view returns (uint256) {
         return
             MiningCalculation.calculateAccruedRewards(
                 blocNumber,
                 lastRebalanceBlockNumber,
-                blockRewards,
+                rewardsPerBlock,
                 previousAccruedRewards
             );
     }
 
-    function compositeMultiplier(uint256 blockRewards, uint256 aggregatePowerUp)
+    function compositeMultiplier(uint256 rewardsPerBlock, uint256 aggregatedPowerUp)
         public
         view
         returns (uint256)
     {
-        return MiningCalculation.compositeMultiplier(blockRewards, aggregatePowerUp);
+        return MiningCalculation.compositeMultiplier(rewardsPerBlock, aggregatedPowerUp);
     }
 
     function compositeMultiplierCumulative(
@@ -76,18 +76,18 @@ contract MockMiningCalculation {
             );
     }
 
-    function calculateUserRewards(
-        uint256 userIpTokenAmount,
-        uint256 userPowerUp,
-        uint256 compositeMultiplier,
-        uint256 userCompositeMultiplier
+    function calculateAccountRewards(
+        uint256 accountIpTokenAmount,
+        uint256 accountPowerUp,
+        uint256 accountCompositeMultiplier,
+        uint256 compositeMultiplier
     ) public view returns (uint256) {
         return
             MiningCalculation.calculateAccountRewards(
-                userIpTokenAmount,
-                userPowerUp,
-                compositeMultiplier,
-                userCompositeMultiplier
+                accountIpTokenAmount,
+                accountPowerUp,
+                accountCompositeMultiplier,
+                compositeMultiplier
             );
     }
 }
