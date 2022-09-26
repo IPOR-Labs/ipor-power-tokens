@@ -80,7 +80,7 @@ describe("PowerIpor configuration, deploy tests", () => {
         ).to.be.revertedWith("IPOR_706");
     });
 
-    it("Should revert transaction when delegate amount is less then withdraw amount", async () => {
+    it("Should revert transaction when delegated pwIpor amount is less than staked ipToken amount", async () => {
         //    given
         await powerIpor.stake(N2__0_18DEC);
         await powerIpor.delegateToJohn(
