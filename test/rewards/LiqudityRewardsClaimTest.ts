@@ -140,7 +140,7 @@ describe("John claim", () => {
             .calculateAccountRewards(tokens.ipTokenDai.address);
         const accruedRewardsMiddle = await john
             .connect(userOne)
-            .calculateAccountRewards(tokens.ipTokenDai.address);
+            .calculateAccruedRewards(tokens.ipTokenDai.address);
 
         await john.connect(userOne).stake(tokens.ipTokenDai.address, N1__0_18DEC);
 
@@ -155,7 +155,7 @@ describe("John claim", () => {
             .calculateAccountRewards(tokens.ipTokenDai.address);
         const accruedRewardsAfter = await john
             .connect(userOne)
-            .calculateAccountRewards(tokens.ipTokenDai.address);
+            .calculateAccruedRewards(tokens.ipTokenDai.address);
 
         expect(accountRewardsBefore).to.be.equal(ZERO);
         expect(accruedRewardsBefore).to.be.equal(ZERO);
