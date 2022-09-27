@@ -98,7 +98,7 @@ describe("John Stake and balance", () => {
         //    then
     });
 
-    it.only("Should be able to stake power token", async () => {
+    it("Should be able to stake power token", async () => {
         //    given
         const balancesBefore = await john.balanceOfDelegatedPwIpor(await admin.getAddress(), [
             tokens.ipTokenDai.address,
