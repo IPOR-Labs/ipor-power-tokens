@@ -1,11 +1,11 @@
-import hre, { upgrades } from "hardhat";
+import hre, { network, upgrades } from "hardhat";
 import chai from "chai";
 
 import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
 import { John, IporToken, PowerIpor } from "../../types";
-import { Tokens, getDeployedTokens } from "../utils/JohnUtils";
+import { Tokens, getDeployedTokens, extractGlobalParam } from "../utils/JohnUtils";
 import {
     N1__0_18DEC,
     ZERO,
@@ -14,6 +14,7 @@ import {
     N2__0_18DEC,
     N0__1_18DEC,
     N0__01_18DEC,
+    USD_1_000_000_18DEC,
 } from "../utils/Constants";
 
 chai.use(solidity);
@@ -460,5 +461,47 @@ describe("John claim", () => {
 
         expect(allRewardsMinusUsersRewards.lt(BigNumber.from("100000"))).to.be.true;
         expect(pwIporExchangeRateBefore).to.be.equal(pwIporExchangeRateAfter);
+    });
+
+    it("Should stop adding rewards when unstake and left 0.5 ipDai", async () => {
+        //    given
+        const ipDai = tokens.ipTokenDai.address;
+        await tokens.ipTokenDai.mint(await admin.getAddress(), USD_1_000_000_18DEC);
+        await tokens.ipTokenDai.approve(john.address, USD_1_000_000_18DEC);
+
+        await network.provider.send("evm_setAutomine", [false]);
+        await john.stake(ipDai, N2__0_18DEC);
+        const blockNumberStake = (await hre.ethers.provider.getBlock("latest")).number;
+        await hre.network.provider.send("hardhat_mine", ["0x64"]);
+        const accountRewardsBefore = await john.calculateAccountRewards(ipDai);
+        const accruedRewardsBefore = await john.calculateAccruedRewards(ipDai);
+        const globalIndicatorsBefore = await john.getGlobalIndicators(ipDai);
+        const blockNumberBefore = (await hre.ethers.provider.getBlock("latest")).number;
+
+        //    when
+        await john.unstake(ipDai, N0__1_18DEC.mul(BigNumber.from(15)));
+        await hre.network.provider.send("hardhat_mine", ["0x64"]);
+        //    then
+
+        const accountRewardsAfter = await john.calculateAccountRewards(ipDai);
+        const accruedRewardsAfter = await john.calculateAccruedRewards(ipDai);
+        const globalIndicatorsAfter = await john.getGlobalIndicators(ipDai);
+        const blockNumberAfter = (await hre.ethers.provider.getBlock("latest")).number;
+
+        const globalIndicatorsBeforeExtract = extractGlobalParam(globalIndicatorsBefore);
+        const globalIndicatorsAfterExtract = extractGlobalParam(globalIndicatorsAfter);
+
+        await network.provider.send("evm_setAutomine", [true]);
+        expect(accountRewardsAfter).to.be.equal(ZERO);
+        expect(accruedRewardsAfter).to.be.equal(accruedRewardsBefore.add(N1__0_18DEC));
+
+        expect(globalIndicatorsBeforeExtract.aggregatedPowerUp).to.be.equal(
+            BigNumber.from("800000000000000000")
+        );
+        expect(globalIndicatorsAfterExtract.aggregatedPowerUp).to.be.equal(ZERO);
+        expect(globalIndicatorsBeforeExtract.compositeMultiplierInTheBlock).to.be.equal(
+            BigNumber.from("1250000000").mul(N1__0_18DEC)
+        );
+        expect(globalIndicatorsAfterExtract.compositeMultiplierInTheBlock).to.be.equal(ZERO);
     });
 });
