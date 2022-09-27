@@ -490,23 +490,6 @@ describe("John claim", () => {
 
         const globalIndicatorsBeforeExtract = extractGlobalParam(globalIndicatorsBefore);
         const globalIndicatorsAfterExtract = extractGlobalParam(globalIndicatorsAfter);
-        console.table({
-            blockNumberStake,
-            blockNumberBefore,
-            blockNumberAfter,
-            accountRewardsBefore: accountRewardsBefore.toString(),
-            accountRewardsAfter: accountRewardsAfter.toString(),
-            accruedRewardsBefore: accruedRewardsBefore.toString(),
-            accruedRewardsAfter: accruedRewardsAfter.toString(),
-            rewardsPerBlockBefore: globalIndicatorsBeforeExtract.rewardsPerBlock,
-            rewardsPerBlockAfter: globalIndicatorsAfterExtract.rewardsPerBlock,
-            aggregatedPowerUpBefore: globalIndicatorsBeforeExtract.aggregatedPowerUp.toString(),
-            aggregatedPowerUpAfter: globalIndicatorsAfterExtract.aggregatedPowerUp.toString(),
-            compositeMultiplierInTheBlockBefore:
-                globalIndicatorsBeforeExtract.compositeMultiplierInTheBlock.toString(),
-            compositeMultiplierInTheBlockAfter:
-                globalIndicatorsAfterExtract.compositeMultiplierInTheBlock.toString(),
-        });
 
         await network.provider.send("evm_setAutomine", [true]);
         expect(accountRewardsAfter).to.be.equal(ZERO);

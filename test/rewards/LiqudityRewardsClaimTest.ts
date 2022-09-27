@@ -124,7 +124,7 @@ describe("John claim", () => {
             .calculateAccountRewards(tokens.ipTokenDai.address);
         const accruedRewardsBefore = await john
             .connect(userOne)
-            .calculateAccountRewards(tokens.ipTokenDai.address);
+            .calculateAccruedRewards(tokens.ipTokenDai.address);
 
         await powerIpor
             .connect(userOne)

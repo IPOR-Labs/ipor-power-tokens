@@ -165,23 +165,6 @@ describe("John Stake and balance", () => {
 
         const globalIndicatorsBeforeExtract = extractGlobalParam(globalIndicatorsBefore);
         const globalIndicatorsAfterExtract = extractGlobalParam(globalIndicatorsAfter);
-        console.table({
-            blockNumberStake,
-            blockNumberBefore,
-            blockNumberAfter,
-            accountRewardsBefore: accountRewardsBefore.toString(),
-            accountRewardsAfter: accountRewardsAfter.toString(),
-            accruedRewardsBefore: accruedRewardsBefore.toString(),
-            accruedRewardsAfter: accruedRewardsAfter.toString(),
-            rewardsPerBlockBefore: globalIndicatorsBeforeExtract.rewardsPerBlock,
-            rewardsPerBlockAfter: globalIndicatorsAfterExtract.rewardsPerBlock,
-            aggregatedPowerUpBefore: globalIndicatorsBeforeExtract.aggregatedPowerUp.toString(),
-            aggregatedPowerUpAfter: globalIndicatorsAfterExtract.aggregatedPowerUp.toString(),
-            compositeMultiplierInTheBlockBefore:
-                globalIndicatorsBeforeExtract.compositeMultiplierInTheBlock.toString(),
-            compositeMultiplierInTheBlockAfter:
-                globalIndicatorsAfterExtract.compositeMultiplierInTheBlock.toString(),
-        });
 
         await network.provider.send("evm_setAutomine", [true]);
         expect(accountRewardsAfter).to.be.equal(accountRewardsBefore.add(N1__0_18DEC));
@@ -229,23 +212,6 @@ describe("John Stake and balance", () => {
 
         const globalIndicatorsBeforeExtract = extractGlobalParam(globalIndicatorsBefore);
         const globalIndicatorsAfterExtract = extractGlobalParam(globalIndicatorsAfter);
-        console.table({
-            blockNumberStake,
-            blockNumberBefore,
-            blockNumberAfter,
-            accountRewardsBefore: accountRewardsBefore.toString(),
-            accountRewardsAfter: accountRewardsAfter.toString(),
-            accruedRewardsBefore: accruedRewardsBefore.toString(),
-            accruedRewardsAfter: accruedRewardsAfter.toString(),
-            rewardsPerBlockBefore: globalIndicatorsBeforeExtract.rewardsPerBlock,
-            rewardsPerBlockAfter: globalIndicatorsAfterExtract.rewardsPerBlock,
-            aggregatedPowerUpBefore: globalIndicatorsBeforeExtract.aggregatedPowerUp.toString(),
-            aggregatedPowerUpAfter: globalIndicatorsAfterExtract.aggregatedPowerUp.toString(),
-            compositeMultiplierInTheBlockBefore:
-                globalIndicatorsBeforeExtract.compositeMultiplierInTheBlock.toString(),
-            compositeMultiplierInTheBlockAfter:
-                globalIndicatorsAfterExtract.compositeMultiplierInTheBlock.toString(),
-        });
 
         await network.provider.send("evm_setAutomine", [true]);
         expect(accountRewardsBefore).to.be.equal(N1__0_18DEC.mul(BigNumber.from("100")));
