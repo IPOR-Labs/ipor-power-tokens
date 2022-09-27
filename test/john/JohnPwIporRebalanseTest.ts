@@ -21,7 +21,7 @@ const expectedBalances = (
     }
 };
 
-describe("John Stake and balance", () => {
+describe("John rebalance ", () => {
     let tokens: Tokens;
     let john: John;
     let admin: Signer, userOne: Signer, userTwo: Signer, userThree: Signer;
@@ -53,7 +53,7 @@ describe("John Stake and balance", () => {
         expectedBalances([ZERO, ZERO, ZERO], balances);
     });
 
-    it("Should not be able to stake power token when sender is not Power Ipor Token", async () => {
+    it("Should not be able to stake power token when sender is not Power Ipor", async () => {
         //    given
         //    when
         await expect(
@@ -68,7 +68,7 @@ describe("John Stake and balance", () => {
         //    then
     });
 
-    it("Should not be able to stake power token when asset is not supported", async () => {
+    it("Should not be able to stake power token when ipToken is not supported", async () => {
         //    given
         //    when
         await expect(
@@ -77,7 +77,7 @@ describe("John Stake and balance", () => {
         //    then
     });
 
-    it("Should be able to stake power token", async () => {
+    it("Should be able to delegate pwIpor", async () => {
         //    given
         const balancesBefore = await john.balanceOfDelegatedPwIpor(await admin.getAddress(), [
             tokens.ipTokenDai.address,
@@ -104,7 +104,7 @@ describe("John Stake and balance", () => {
         expectedBalances(amounts, balancesAfter);
     });
 
-    it("Should not be able to stake power token when contract is pause", async () => {
+    it("Should not be able to delegate pwIpor when contract is pause", async () => {
         //    given
         const amounts = [N1__0_18DEC, N0__1_18DEC, N0__01_18DEC];
         await john.pause();
@@ -117,6 +117,5 @@ describe("John Stake and balance", () => {
                 amounts
             )
         ).to.be.revertedWith("Pausable: paused");
-        //    then
     });
 });
