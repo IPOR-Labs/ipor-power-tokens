@@ -74,12 +74,6 @@ contract John is JohnInternal, IJohn {
         ][ipToken];
         JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
 
-        // assumption we start counting from first person who can get rewards
-        //        TODO remove
-        if (globalIndicators.blockNumber == 0) {
-            globalIndicators.blockNumber = block.number.toUint32();
-        }
-
         _claimWhenRewardsExists(_msgSender(), globalIndicators, accountIndicators);
         _rebalanceParams(
             _msgSender(),
