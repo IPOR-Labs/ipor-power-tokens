@@ -77,7 +77,7 @@ contract John is JohnInternal, IJohn {
         JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
 
         _claimWhenRewardsExists(msgSender, globalIndicators, accountIndicators);
-        _rebalanceParams(
+        _rebalanceIndicators(
             msgSender,
             ipToken,
             globalIndicators,
@@ -110,7 +110,7 @@ contract John is JohnInternal, IJohn {
 
         _claimWhenRewardsExists(msgSender, globalIndicators, accountIndicators);
 
-        _rebalanceParams(
+        _rebalanceIndicators(
             msgSender,
             ipToken,
             globalIndicators,
