@@ -11,7 +11,7 @@ import { N1__0_18DEC, N2__0_18DEC, USD_1_000_000_18DEC, ZERO } from "../utils/Co
 chai.use(solidity);
 const { expect } = chai;
 
-describe("John Stake and balance", () => {
+describe("John Rewards per block", () => {
     const N1_0_8D = BigNumber.from("100000000");
     const N2_0_8D = BigNumber.from("200000000");
     const N0_1_8D = BigNumber.from("10000000");
@@ -34,7 +34,7 @@ describe("John Stake and balance", () => {
         ])) as John;
     });
 
-    it("Should set up one asset", async () => {
+    it("Should set up block rewards for ipToken", async () => {
         // given
         const globalIndicatorsUsdcBefore = await john.getGlobalIndicators(
             tokens.ipTokenUsdc.address
@@ -54,7 +54,7 @@ describe("John Stake and balance", () => {
         expect(rewardsAfter).to.be.equal(N2_0_8D);
     });
 
-    it("Should not update Accrued rewards when update block rewords", async () => {
+    it("Should not update accrued rewards when update block rewords", async () => {
         //    given
         const globalIndicatorsUsdcBefore = await john.getGlobalIndicators(
             tokens.ipTokenUsdc.address
@@ -77,7 +77,7 @@ describe("John Stake and balance", () => {
         expect(extractGlobalParam(globalIndicatorsUsdcAfter).accruedRewards).to.be.equal(ZERO);
     });
 
-    it("Should setup 3 asset", async () => {
+    it("Should setup block rewards for 3 ipTokens", async () => {
         //    given
         const globalIndicatorsDaiBefore = await john.getGlobalIndicators(tokens.ipTokenDai.address);
         const rewardsDaiBefore = globalIndicatorsDaiBefore.rewardsPerBlock;
@@ -146,22 +146,19 @@ describe("John Stake and balance", () => {
 
         await network.provider.send("evm_setAutomine", [false]);
         await john.stake(ipDai, N2__0_18DEC);
-        const blockNumberStake = (await hre.ethers.provider.getBlock("latest")).number;
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
         const accountRewardsBefore = await john.calculateAccountRewards(ipDai);
         const accruedRewardsBefore = await john.calculateAccruedRewards(ipDai);
         const globalIndicatorsBefore = await john.getGlobalIndicators(ipDai);
-        const blockNumberBefore = (await hre.ethers.provider.getBlock("latest")).number;
 
         //    when
         await john.setRewardsPerBlock(ipDai, ZERO);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
-        //    then
 
+        //    then
         const accountRewardsAfter = await john.calculateAccountRewards(ipDai);
         const accruedRewardsAfter = await john.calculateAccruedRewards(ipDai);
         const globalIndicatorsAfter = await john.getGlobalIndicators(ipDai);
-        const blockNumberAfter = (await hre.ethers.provider.getBlock("latest")).number;
 
         const globalIndicatorsBeforeExtract = extractGlobalParam(globalIndicatorsBefore);
         const globalIndicatorsAfterExtract = extractGlobalParam(globalIndicatorsAfter);
@@ -191,25 +188,21 @@ describe("John Stake and balance", () => {
 
         await network.provider.send("evm_setAutomine", [false]);
         await john.stake(ipDai, N2__0_18DEC);
-        const blockNumberStake = (await hre.ethers.provider.getBlock("latest")).number;
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
         await john.setRewardsPerBlock(ipDai, ZERO);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
         const accountRewardsBefore = await john.calculateAccountRewards(ipDai);
         const accruedRewardsBefore = await john.calculateAccruedRewards(ipDai);
         const globalIndicatorsBefore = await john.getGlobalIndicators(ipDai);
-        const blockNumberBefore = (await hre.ethers.provider.getBlock("latest")).number;
 
         //    when
         await john.setRewardsPerBlock(ipDai, BigNumber.from("100000000"));
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
-        //    then
 
+        //    then
         const accountRewardsAfter = await john.calculateAccountRewards(ipDai);
         const accruedRewardsAfter = await john.calculateAccruedRewards(ipDai);
         const globalIndicatorsAfter = await john.getGlobalIndicators(ipDai);
-        const blockNumberAfter = (await hre.ethers.provider.getBlock("latest")).number;
-
         const globalIndicatorsBeforeExtract = extractGlobalParam(globalIndicatorsBefore);
         const globalIndicatorsAfterExtract = extractGlobalParam(globalIndicatorsAfter);
 
