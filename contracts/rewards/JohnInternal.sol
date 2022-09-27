@@ -74,9 +74,13 @@ abstract contract JohnInternal is
 
             _ipTokens[ipTokens[i]] = true;
 
-            _saveGlobalIndicators(
-                ipTokens[i],
-                JohnTypes.GlobalRewardsIndicators(0, 0, 0, 0, uint32(Constants.D8), 0)
+            _globalIndicators[ipTokens[i]] = JohnTypes.GlobalRewardsIndicators(
+                0,
+                0,
+                0,
+                0,
+                uint32(Constants.D8),
+                0
             );
         }
     }
@@ -218,17 +222,15 @@ abstract contract JohnInternal is
             globalIndicators.aggregatedPowerUp
         );
 
-        _saveGlobalIndicators(
-            ipToken,
-            JohnTypes.GlobalRewardsIndicators(
-                globalIndicators.aggregatedPowerUp,
-                compositeMultiplier.toUint128(),
-                compositeMultiplierCumulativePrevBlock.toUint128(),
-                blockNumber.toUint32(),
-                iporTokenAmount,
-                accruedRewards.toUint88()
-            )
+        _globalIndicators[ipToken] = JohnTypes.GlobalRewardsIndicators(
+            globalIndicators.aggregatedPowerUp,
+            compositeMultiplier.toUint128(),
+            compositeMultiplierCumulativePrevBlock.toUint128(),
+            blockNumber.toUint32(),
+            iporTokenAmount,
+            accruedRewards.toUint88()
         );
+
         emit RewardsPerBlockChanged(
             _msgSender(),
             globalIndicators.rewardsPerBlock,
@@ -239,10 +241,15 @@ abstract contract JohnInternal is
     function addIpTokenAsset(address ipToken) external onlyOwner {
         require(ipToken != address(0), IporErrors.WRONG_ADDRESS);
         _ipTokens[ipToken] = true;
-        _saveGlobalIndicators(
-            ipToken,
-            JohnTypes.GlobalRewardsIndicators(0, 0, 0, 0, uint32(Constants.D8), 0)
+        _globalIndicators[ipToken] = JohnTypes.GlobalRewardsIndicators(
+            0,
+            0,
+            0,
+            0,
+            uint32(Constants.D8),
+            0
         );
+
         emit IpTokenAdded(_msgSender(), ipToken);
     }
 
@@ -276,6 +283,7 @@ abstract contract JohnInternal is
         JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
 
         _claimWhenRewardsExists(account, globalIndicators, accountIndicators);
+		
         _rebalanceParams(
             account,
             ipToken,
@@ -307,15 +315,12 @@ abstract contract JohnInternal is
             .compositeMultiplierCumulativePrevBlock +
             (block.number - globalIndicators.blockNumber) *
             globalIndicators.compositeMultiplierInTheBlock;
-        _saveAccountIndicators(
-            account,
-            ipToken,
-            JohnTypes.AccountRewardsIndicators(
-                compositeMultiplierCumulativePrevBlock.toUint128(),
-                ipTokenBalance.toUint128(),
-                accountPowerUp.toUint72(),
-                delegatedPwIporBalance.toUint96()
-            )
+
+        _accountIndicators[account][ipToken] = JohnTypes.AccountRewardsIndicators(
+            compositeMultiplierCumulativePrevBlock.toUint128(),
+            ipTokenBalance.toUint128(),
+            accountPowerUp.toUint72(),
+            delegatedPwIporBalance.toUint96()
         );
 
         uint256 aggregatedPowerUp = MiningCalculation.calculateAggregatePowerUp(
@@ -339,21 +344,19 @@ abstract contract JohnInternal is
                 globalIndicators.accruedRewards
             );
         }
+
         uint256 compositeMultiplier = MiningCalculation.compositeMultiplier(
             globalIndicators.rewardsPerBlock,
             aggregatedPowerUp
         );
 
-        _saveGlobalIndicators(
-            ipToken,
-            JohnTypes.GlobalRewardsIndicators(
-                aggregatedPowerUp,
-                compositeMultiplier.toUint128(),
-                compositeMultiplierCumulativePrevBlock.toUint128(),
-                block.number.toUint32(),
-                globalIndicators.rewardsPerBlock,
-                accruedRewards.toUint88()
-            )
+        _globalIndicators[ipToken] = JohnTypes.GlobalRewardsIndicators(
+            aggregatedPowerUp,
+            compositeMultiplier.toUint128(),
+            compositeMultiplierCumulativePrevBlock.toUint128(),
+            block.number.toUint32(),
+            globalIndicators.rewardsPerBlock,
+            accruedRewards.toUint88()
         );
     }
 
@@ -431,21 +434,6 @@ abstract contract JohnInternal is
 
     function _getPowerIpor() internal view returns (address) {
         return _powerIpor;
-    }
-
-    function _saveAccountIndicators(
-        address account,
-        address ipToken,
-        JohnTypes.AccountRewardsIndicators memory params
-    ) internal virtual {
-        _accountIndicators[account][ipToken] = params;
-    }
-
-    function _saveGlobalIndicators(address ipToken, JohnTypes.GlobalRewardsIndicators memory params)
-        internal
-        virtual
-    {
-        _globalIndicators[ipToken] = params;
     }
 
     //solhint-disable no-empty-blocks

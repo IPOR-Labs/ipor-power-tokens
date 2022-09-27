@@ -67,11 +67,13 @@ contract John is JohnInternal, IJohn {
         require(ipTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
         require(_ipTokens[ipToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
 
-        IERC20Upgradeable(ipToken).safeTransferFrom(_msgSender(), address(this), ipTokenAmount);
+        address msgSender = _msgSender();
 
-        JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[
-            _msgSender()
-        ][ipToken];
+        IERC20Upgradeable(ipToken).safeTransferFrom(msgSender, address(this), ipTokenAmount);
+
+        JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[msgSender][
+            ipToken
+        ];
         JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
 
         // assumption we start counting from first person who can get rewards
@@ -80,16 +82,16 @@ contract John is JohnInternal, IJohn {
             globalIndicators.blockNumber = block.number.toUint32();
         }
 
-        _claimWhenRewardsExists(_msgSender(), globalIndicators, accountIndicators);
+        _claimWhenRewardsExists(msgSender, globalIndicators, accountIndicators);
         _rebalanceParams(
-            _msgSender(),
+            msgSender,
             ipToken,
             globalIndicators,
             accountIndicators,
             accountIndicators.ipTokenBalance + ipTokenAmount,
             accountIndicators.delegatedPwIporBalance
         );
-        emit StakeIpTokens(_msgSender(), ipToken, ipTokenAmount);
+        emit StakeIpTokens(msgSender, ipToken, ipTokenAmount);
     }
 
     function unstake(address ipToken, uint256 ipTokenAmount)
@@ -99,20 +101,23 @@ contract John is JohnInternal, IJohn {
         whenNotPaused
     {
         require(_ipTokens[ipToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
-        JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
-        JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[
-            _msgSender()
-        ][ipToken];
 
-        _claimWhenRewardsExists(_msgSender(), globalIndicators, accountIndicators);
+        address msgSender = _msgSender();
+
+        JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
+        JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[msgSender][
+            ipToken
+        ];
 
         require(
             ipTokenAmount <= accountIndicators.ipTokenBalance,
             MiningErrors.STAKED_BALANCE_TOO_LOW
         );
 
+        _claimWhenRewardsExists(msgSender, globalIndicators, accountIndicators);
+
         _rebalanceParams(
-            _msgSender(),
+            msgSender,
             ipToken,
             globalIndicators,
             accountIndicators,
@@ -120,21 +125,23 @@ contract John is JohnInternal, IJohn {
             accountIndicators.delegatedPwIporBalance
         );
 
-        IERC20Upgradeable(ipToken).transfer(_msgSender(), ipTokenAmount);
+        IERC20Upgradeable(ipToken).transfer(msgSender, ipTokenAmount);
 
-        emit UnstakeIpTokens(_msgSender(), ipToken, ipTokenAmount);
+        emit UnstakeIpTokens(msgSender, ipToken, ipTokenAmount);
     }
 
     function claim(address ipToken) external override whenNotPaused nonReentrant {
-        JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[
-            _msgSender()
-        ][ipToken];
+        address msgSender = _msgSender();
+
+        JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[msgSender][
+            ipToken
+        ];
         JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
 
         uint256 iporTokenAmount = _calculateAccountRewards(accountIndicators, globalIndicators);
         require(iporTokenAmount > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
 
-        _claim(_msgSender(), iporTokenAmount);
+        _claim(msgSender, iporTokenAmount);
 
         uint256 accountPowerUp = MiningCalculation.calculateAccountPowerUp(
             accountIndicators.delegatedPwIporBalance,
@@ -147,17 +154,14 @@ contract John is JohnInternal, IJohn {
             .compositeMultiplierCumulativePrevBlock +
             (block.number - globalIndicators.blockNumber) *
             globalIndicators.compositeMultiplierInTheBlock;
-        _saveAccountIndicators(
-            _msgSender(),
-            ipToken,
-            JohnTypes.AccountRewardsIndicators(
-                compositeMultiplierCumulativePrevBlock.toUint128(),
-                accountIndicators.ipTokenBalance,
-                accountPowerUp.toUint72(),
-                accountIndicators.delegatedPwIporBalance
-            )
+
+        _accountIndicators[msgSender][ipToken] = JohnTypes.AccountRewardsIndicators(
+            compositeMultiplierCumulativePrevBlock.toUint128(),
+            accountIndicators.ipTokenBalance,
+            accountPowerUp.toUint72(),
+            accountIndicators.delegatedPwIporBalance
         );
 
-        emit Claim(_msgSender(), ipToken, iporTokenAmount);
+        emit Claim(msgSender, ipToken, iporTokenAmount);
     }
 }
