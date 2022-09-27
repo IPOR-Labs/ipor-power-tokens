@@ -374,10 +374,10 @@ describe("One block/Transaction tests", () => {
     });
 
     describe("Should not depends on order of unstake", () => {
-        let agent1PwIporBalanceAfter: BigNumber;
-        let agent2PwIporBalanceAfter: BigNumber;
+        let agent1PwIporBalanceCase1After: BigNumber;
+        let agent2PwIporBalanceCase1After: BigNumber;
 
-        it("Should unstake agent 1 and agent 2", async () => {
+        it("Should unstake agent 1 and agent 2 - case 1", async () => {
             //    given
             await liquidityRewardsTestAction.stakeIporToken(
                 [agent1.address, agent2.address],
@@ -410,14 +410,14 @@ describe("One block/Transaction tests", () => {
             const agent2AccountIndicatorsAfter = await agent2.getAccountIndicators(
                 tokens.ipTokenDai.address
             );
-            agent1PwIporBalanceAfter = await powerIpor.balanceOf(agent1.address);
-            agent2PwIporBalanceAfter = await powerIpor.balanceOf(agent2.address);
+            agent1PwIporBalanceCase1After = await powerIpor.balanceOf(agent1.address);
+            agent2PwIporBalanceCase1After = await powerIpor.balanceOf(agent2.address);
             const agent1After = extractAccountParam(agent1AccountIndicatorsAfter);
             const agent2After = extractAccountParam(agent2AccountIndicatorsAfter);
             const accruedRewards = await john.calculateAccruedRewards(tokens.ipTokenDai.address);
             const differencesBetweenRewords = accruedRewards
-                .sub(agent2PwIporBalanceAfter)
-                .sub(agent1PwIporBalanceAfter)
+                .sub(agent2PwIporBalanceCase1After)
+                .sub(agent1PwIporBalanceCase1After)
                 .sub(N2__0_18DEC);
 
             expect(agent1After.powerUp).to.be.equal(ZERO);
@@ -426,7 +426,9 @@ describe("One block/Transaction tests", () => {
             );
             expect(agent1After.ipTokenBalance).to.be.equal(ZERO);
             expect(agent1After.delegatedPowerTokenBalance).to.be.equal(N1__0_18DEC);
-            expect(agent1PwIporBalanceAfter).to.be.equal(BigNumber.from("42959390769670378987"));
+            expect(agent1PwIporBalanceCase1After).to.be.equal(
+                BigNumber.from("42959390769670378987")
+            );
 
             expect(agent2After.powerUp).to.be.equal(ZERO);
             expect(agent2After.compositeMultiplierCumulative).to.be.equal(
@@ -434,12 +436,14 @@ describe("One block/Transaction tests", () => {
             );
             expect(agent2After.ipTokenBalance).to.be.equal(ZERO);
             expect(agent2After.delegatedPowerTokenBalance).to.be.equal(N1__0_18DEC);
-            expect(agent2PwIporBalanceAfter).to.be.equal(BigNumber.from("60040609230329621013"));
+            expect(agent2PwIporBalanceCase1After).to.be.equal(
+                BigNumber.from("60040609230329621013")
+            );
 
             expect(differencesBetweenRewords.lte(BigNumber.from("100"))).to.be.true;
         });
 
-        it("Should unstake agent 2 and agent 1", async () => {
+        it("Should unstake agent 2 and agent 1 - case 2", async () => {
             //    given
             await liquidityRewardsTestAction.stakeIporToken(
                 [agent1.address, agent2.address],
@@ -467,8 +471,8 @@ describe("One block/Transaction tests", () => {
             const agent1PwIporBalanceCase2After = await powerIpor.balanceOf(agent1.address);
             const agent2PwIporBalanceCase2After = await powerIpor.balanceOf(agent2.address);
 
-            expect(agent1PwIporBalanceAfter).to.be.equal(agent1PwIporBalanceCase2After);
-            expect(agent2PwIporBalanceAfter).to.be.equal(agent2PwIporBalanceCase2After);
+            expect(agent1PwIporBalanceCase1After).to.be.equal(agent1PwIporBalanceCase2After);
+            expect(agent2PwIporBalanceCase1After).to.be.equal(agent2PwIporBalanceCase2After);
         });
     });
 });
