@@ -192,7 +192,6 @@ describe("John Stake and balance", () => {
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
             //    then
-
             const rewardsAdmin = await john.calculateAccountRewards(tokens.ipTokenDai.address);
             const rewardsUserOne = await john
                 .connect(userOne)
@@ -231,7 +230,7 @@ describe("John Stake and balance", () => {
             expect(rewardsAfterSecondStake).to.be.equal(BigNumber.from("100000000000000000000"));
         });
 
-        it("should should not be set new block reward when asset not active", async () => {
+        it("should not be able to set new block reward when asset not active", async () => {
             //    given
             //    when
             await expect(john.setRewardsPerBlock(randomAddress, ZERO)).to.be.revertedWith(
