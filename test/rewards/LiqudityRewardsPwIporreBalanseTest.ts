@@ -1,5 +1,6 @@
 import hre, { upgrades } from "hardhat";
 import chai from "chai";
+const helpers = require("@nomicfoundation/hardhat-network-helpers");
 
 import { BigNumber, Signer } from "ethers";
 
@@ -91,9 +92,19 @@ describe("John Stake and balance", () => {
 
     it("Should not be able to stake power token when asset is not supported", async () => {
         //    given
+        const John = await hre.ethers.getContractFactory("John");
+        const johnInternal = (await upgrades.deployProxy(John, [
+            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
+            await admin.getAddress(),
+            iporToken.address,
+        ])) as John;
         //    when
         await expect(
-            john.delegatePwIpor(await admin.getAddress(), [tokens.tokenDai.address], [N1__0_18DEC])
+            johnInternal.delegatePwIpor(
+                await admin.getAddress(),
+                [tokens.tokenDai.address],
+                [N1__0_18DEC]
+            )
         ).to.be.revertedWith("IPOR_701");
         //    then
     });
@@ -139,12 +150,19 @@ describe("John Stake and balance", () => {
 
     it("Should not be able to stake power token when contract is pause", async () => {
         //    given
+        const John = await hre.ethers.getContractFactory("John");
+        const johnInternal = (await upgrades.deployProxy(John, [
+            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
+            await admin.getAddress(),
+            iporToken.address,
+        ])) as John;
+
         const amounts = [N1__0_18DEC, N0__1_18DEC, N0__01_18DEC];
-        await john.pause();
+        await johnInternal.pause();
 
         //    when
         await expect(
-            john.delegatePwIpor(
+            johnInternal.delegatePwIpor(
                 await admin.getAddress(),
                 [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
                 amounts
