@@ -5,12 +5,13 @@ import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
 import { John, IporToken, PowerIpor } from "../../types";
-import { Tokens, getDeployedTokens } from "../utils/JohnUtils";
+import { Tokens, getDeployedTokens, extractGlobalParam } from "../utils/JohnUtils";
 import {
     N1__0_18DEC,
     ZERO,
     TOTAL_SUPPLY_18_DECIMALS,
     TOTAL_SUPPLY_6_DECIMALS,
+    N0__1_18DEC,
 } from "../utils/Constants";
 
 chai.use(solidity);
@@ -107,6 +108,61 @@ describe("John claim", () => {
 
         expect(powerIporBalanceBefore).to.be.equal(BigNumber.from("100000000000000000000"));
         expect(powerIporBalanceAfter).to.be.equal(BigNumber.from("201000000000000000000"));
+    });
+
+    it("Should get 100 rewards when first stake 0.1 dai and after 1 Dai, 200 blocks mint", async () => {
+        //    given
+        const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
+        const stakedIpTokens = N0__1_18DEC;
+
+        await powerIpor.connect(userOne).stake(delegatedIporToken);
+        const globalIndicatorsBefore = extractGlobalParam(
+            await john.getGlobalIndicators(tokens.ipTokenDai.address)
+        );
+        const accountRewardsBefore = await john
+            .connect(userOne)
+            .calculateAccountRewards(tokens.ipTokenDai.address);
+        const accruedRewardsBefore = await john
+            .connect(userOne)
+            .calculateAccountRewards(tokens.ipTokenDai.address);
+
+        await powerIpor
+            .connect(userOne)
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
+
+        //    when
+        await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokens);
+
+        await hre.network.provider.send("hardhat_mine", ["0x64"]);
+
+        const accountRewardsMiddle = await john
+            .connect(userOne)
+            .calculateAccountRewards(tokens.ipTokenDai.address);
+        const accruedRewardsMiddle = await john
+            .connect(userOne)
+            .calculateAccountRewards(tokens.ipTokenDai.address);
+
+        await john.connect(userOne).stake(tokens.ipTokenDai.address, N1__0_18DEC);
+
+        await hre.network.provider.send("hardhat_mine", ["0x64"]);
+        //    then
+
+        const globalIndicatorsAfter = extractGlobalParam(
+            await john.getGlobalIndicators(tokens.ipTokenDai.address)
+        );
+        const accountRewardsAfter = await john
+            .connect(userOne)
+            .calculateAccountRewards(tokens.ipTokenDai.address);
+        const accruedRewardsAfter = await john
+            .connect(userOne)
+            .calculateAccountRewards(tokens.ipTokenDai.address);
+
+        expect(accountRewardsBefore).to.be.equal(ZERO);
+        expect(accruedRewardsBefore).to.be.equal(ZERO);
+        expect(accountRewardsMiddle).to.be.equal(ZERO);
+        expect(accruedRewardsMiddle).to.be.equal(ZERO);
+        expect(accountRewardsAfter).to.be.equal(N1__0_18DEC.mul(BigNumber.from("100")));
+        expect(accruedRewardsAfter).to.be.equal(N1__0_18DEC.mul(BigNumber.from("100")));
     });
 
     it("Should count proper transfer rewards when one user stake ipTokens twice", async () => {

@@ -151,12 +151,6 @@ abstract contract JohnInternal is
                 continue;
             }
 
-            // assumption we start counting from first person who can get rewards
-            //            TODO: to remove
-            if (globalIndicators.blockNumber == 0) {
-                globalIndicators.blockNumber = block.number.toUint32();
-            }
-
             _claimWhenRewardsExists(account, globalIndicators, accountIndicators);
 
             _rebalanceParams(

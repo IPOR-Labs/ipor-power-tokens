@@ -1,4 +1,4 @@
-import hre, { upgrades } from "hardhat";
+import hre, { network, upgrades } from "hardhat";
 import chai from "chai";
 
 import { BigNumber, Signer } from "ethers";
@@ -6,7 +6,7 @@ import { BigNumber, Signer } from "ethers";
 import { solidity } from "ethereum-waffle";
 import { John } from "../../types";
 import { Tokens, getDeployedTokens, extractGlobalParam } from "../utils/JohnUtils";
-import { ZERO } from "../utils/Constants";
+import { N1__0_18DEC, N2__0_18DEC, USD_1_000_000_18DEC, ZERO } from "../utils/Constants";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -136,5 +136,133 @@ describe("John Stake and balance", () => {
 
         expect(rewardsDaiBefore).to.be.equal(N1_0_8D);
         expect(rewardsDaiAfter).to.be.equal(N1_0_8D);
+    });
+
+    it("Should stop adding new rewards when rewards per block setup to zero", async () => {
+        //    given
+        const ipDai = tokens.ipTokenDai.address;
+        await tokens.ipTokenDai.mint(await admin.getAddress(), USD_1_000_000_18DEC);
+        await tokens.ipTokenDai.approve(john.address, USD_1_000_000_18DEC);
+
+        await network.provider.send("evm_setAutomine", [false]);
+        await john.stake(ipDai, N2__0_18DEC);
+        const blockNumberStake = (await hre.ethers.provider.getBlock("latest")).number;
+        await hre.network.provider.send("hardhat_mine", ["0x64"]);
+        const accountRewardsBefore = await john.calculateAccountRewards(ipDai);
+        const accruedRewardsBefore = await john.calculateAccruedRewards(ipDai);
+        const globalIndicatorsBefore = await john.getGlobalIndicators(ipDai);
+        const blockNumberBefore = (await hre.ethers.provider.getBlock("latest")).number;
+
+        //    when
+        await john.setRewardsPerBlock(ipDai, ZERO);
+        await hre.network.provider.send("hardhat_mine", ["0x64"]);
+        //    then
+
+        const accountRewardsAfter = await john.calculateAccountRewards(ipDai);
+        const accruedRewardsAfter = await john.calculateAccruedRewards(ipDai);
+        const globalIndicatorsAfter = await john.getGlobalIndicators(ipDai);
+        const blockNumberAfter = (await hre.ethers.provider.getBlock("latest")).number;
+
+        const globalIndicatorsBeforeExtract = extractGlobalParam(globalIndicatorsBefore);
+        const globalIndicatorsAfterExtract = extractGlobalParam(globalIndicatorsAfter);
+        console.table({
+            blockNumberStake,
+            blockNumberBefore,
+            blockNumberAfter,
+            accountRewardsBefore: accountRewardsBefore.toString(),
+            accountRewardsAfter: accountRewardsAfter.toString(),
+            accruedRewardsBefore: accruedRewardsBefore.toString(),
+            accruedRewardsAfter: accruedRewardsAfter.toString(),
+            rewardsPerBlockBefore: globalIndicatorsBeforeExtract.rewardsPerBlock,
+            rewardsPerBlockAfter: globalIndicatorsAfterExtract.rewardsPerBlock,
+            aggregatedPowerUpBefore: globalIndicatorsBeforeExtract.aggregatedPowerUp.toString(),
+            aggregatedPowerUpAfter: globalIndicatorsAfterExtract.aggregatedPowerUp.toString(),
+            compositeMultiplierInTheBlockBefore:
+                globalIndicatorsBeforeExtract.compositeMultiplierInTheBlock.toString(),
+            compositeMultiplierInTheBlockAfter:
+                globalIndicatorsAfterExtract.compositeMultiplierInTheBlock.toString(),
+        });
+
+        await network.provider.send("evm_setAutomine", [true]);
+        expect(accountRewardsAfter).to.be.equal(accountRewardsBefore.add(N1__0_18DEC));
+        expect(accruedRewardsAfter).to.be.equal(accruedRewardsBefore.add(N1__0_18DEC));
+
+        expect(globalIndicatorsBeforeExtract.rewardsPerBlock).to.be.equal(
+            BigNumber.from("100000000")
+        );
+        expect(globalIndicatorsAfterExtract.rewardsPerBlock).to.be.equal(ZERO);
+        expect(globalIndicatorsBeforeExtract.aggregatedPowerUp).to.be.equal(
+            globalIndicatorsAfterExtract.aggregatedPowerUp
+        );
+        expect(globalIndicatorsBeforeExtract.compositeMultiplierInTheBlock).to.be.equal(
+            BigNumber.from("1250000000").mul(N1__0_18DEC)
+        );
+        expect(globalIndicatorsAfterExtract.compositeMultiplierInTheBlock).to.be.equal(ZERO);
+    });
+
+    it("Should restart grant rewards  when rewards per block setup from zero to one", async () => {
+        //    given
+        const ipDai = tokens.ipTokenDai.address;
+        await tokens.ipTokenDai.mint(await admin.getAddress(), USD_1_000_000_18DEC);
+        await tokens.ipTokenDai.approve(john.address, USD_1_000_000_18DEC);
+
+        await network.provider.send("evm_setAutomine", [false]);
+        await john.stake(ipDai, N2__0_18DEC);
+        const blockNumberStake = (await hre.ethers.provider.getBlock("latest")).number;
+        await hre.network.provider.send("hardhat_mine", ["0x64"]);
+        await john.setRewardsPerBlock(ipDai, ZERO);
+        await hre.network.provider.send("hardhat_mine", ["0x64"]);
+        const accountRewardsBefore = await john.calculateAccountRewards(ipDai);
+        const accruedRewardsBefore = await john.calculateAccruedRewards(ipDai);
+        const globalIndicatorsBefore = await john.getGlobalIndicators(ipDai);
+        const blockNumberBefore = (await hre.ethers.provider.getBlock("latest")).number;
+
+        //    when
+        await john.setRewardsPerBlock(ipDai, BigNumber.from("100000000"));
+        await hre.network.provider.send("hardhat_mine", ["0x64"]);
+        //    then
+
+        const accountRewardsAfter = await john.calculateAccountRewards(ipDai);
+        const accruedRewardsAfter = await john.calculateAccruedRewards(ipDai);
+        const globalIndicatorsAfter = await john.getGlobalIndicators(ipDai);
+        const blockNumberAfter = (await hre.ethers.provider.getBlock("latest")).number;
+
+        const globalIndicatorsBeforeExtract = extractGlobalParam(globalIndicatorsBefore);
+        const globalIndicatorsAfterExtract = extractGlobalParam(globalIndicatorsAfter);
+        console.table({
+            blockNumberStake,
+            blockNumberBefore,
+            blockNumberAfter,
+            accountRewardsBefore: accountRewardsBefore.toString(),
+            accountRewardsAfter: accountRewardsAfter.toString(),
+            accruedRewardsBefore: accruedRewardsBefore.toString(),
+            accruedRewardsAfter: accruedRewardsAfter.toString(),
+            rewardsPerBlockBefore: globalIndicatorsBeforeExtract.rewardsPerBlock,
+            rewardsPerBlockAfter: globalIndicatorsAfterExtract.rewardsPerBlock,
+            aggregatedPowerUpBefore: globalIndicatorsBeforeExtract.aggregatedPowerUp.toString(),
+            aggregatedPowerUpAfter: globalIndicatorsAfterExtract.aggregatedPowerUp.toString(),
+            compositeMultiplierInTheBlockBefore:
+                globalIndicatorsBeforeExtract.compositeMultiplierInTheBlock.toString(),
+            compositeMultiplierInTheBlockAfter:
+                globalIndicatorsAfterExtract.compositeMultiplierInTheBlock.toString(),
+        });
+
+        await network.provider.send("evm_setAutomine", [true]);
+        expect(accountRewardsBefore).to.be.equal(N1__0_18DEC.mul(BigNumber.from("100")));
+        expect(accountRewardsAfter).to.be.equal(BigNumber.from("199000000000000000000"));
+        expect(accruedRewardsBefore).to.be.equal(N1__0_18DEC.mul(BigNumber.from("100")));
+        expect(accruedRewardsAfter).to.be.equal(BigNumber.from("199000000000000000000"));
+
+        expect(globalIndicatorsBeforeExtract.rewardsPerBlock).to.be.equal(ZERO);
+        expect(globalIndicatorsAfterExtract.rewardsPerBlock).to.be.equal(
+            BigNumber.from("100000000")
+        );
+        expect(globalIndicatorsBeforeExtract.aggregatedPowerUp).to.be.equal(
+            globalIndicatorsAfterExtract.aggregatedPowerUp
+        );
+        expect(globalIndicatorsAfterExtract.compositeMultiplierInTheBlock).to.be.equal(
+            BigNumber.from("1250000000").mul(N1__0_18DEC)
+        );
+        expect(globalIndicatorsBeforeExtract.compositeMultiplierInTheBlock).to.be.equal(ZERO);
     });
 });
