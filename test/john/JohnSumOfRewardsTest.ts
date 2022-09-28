@@ -8,10 +8,10 @@ import { John, IporToken, PowerIpor } from "../../types";
 import {
     Tokens,
     getDeployedTokens,
-    extractGlobalParam,
-    expectGlobalParam,
-    expectUserParam,
-    extractAccountParam,
+    extractGlobalIndicators,
+    expectGlobalIndicators,
+    expectAccountIndicators,
+    extractAccountIndicators,
 } from "../utils/JohnUtils";
 import {
     N1__0_18DEC,
@@ -23,7 +23,7 @@ import {
 chai.use(solidity);
 const { expect } = chai;
 
-describe("John claim", () => {
+describe("John sum of rewards", () => {
     let tokens: Tokens;
     let john: John;
     let admin: Signer, userOne: Signer, userTwo: Signer, userThree: Signer;
@@ -122,8 +122,8 @@ describe("John claim", () => {
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
-        expectGlobalParam(
-            extractGlobalParam(globalIndicatorsBefore),
+        expectGlobalIndicators(
+            extractGlobalIndicators(globalIndicatorsBefore),
             BigNumber.from("140000000000000000000"),
             ZERO,
             BigNumber.from("7142857142857142857142857"),
@@ -131,8 +131,8 @@ describe("John claim", () => {
             -1,
             100000000
         );
-        expectGlobalParam(
-            extractGlobalParam(globalIndicatorsAfter),
+        expectGlobalIndicators(
+            extractGlobalIndicators(globalIndicatorsAfter),
             ZERO,
             BigNumber.from("101000000000000000000"),
             ZERO,
@@ -141,16 +141,16 @@ describe("John claim", () => {
             100000000
         );
 
-        expectUserParam(
-            extractAccountParam(userParamsBefore),
+        expectAccountIndicators(
+            extractAccountIndicators(userParamsBefore),
             BigNumber.from("1400000000000000000"),
             ZERO,
             BigNumber.from("100000000000000000000"),
             BigNumber.from("100000000000000000000")
         );
 
-        expectUserParam(
-            extractAccountParam(userParamsAfter),
+        expectAccountIndicators(
+            extractAccountIndicators(userParamsAfter),
             ZERO, //powerUp
             BigNumber.from("721428571428571428571428557"), //Cumulative
             ZERO, // ipToken
@@ -195,8 +195,8 @@ describe("John claim", () => {
         await john.connect(userTwo).unstake(tokens.ipTokenDai.address, stakedIpTokens);
         //    then
         const globalIndicatorsAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
-        expectGlobalParam(
-            extractGlobalParam(globalIndicatorsAfter),
+        expectGlobalIndicators(
+            extractGlobalIndicators(globalIndicatorsAfter),
             ZERO,
             BigNumber.from("309000000000000000000"),
             ZERO,
@@ -215,7 +215,7 @@ describe("John claim", () => {
         expect(rewardsAdmin.add(rewardsUserOne).add(rewardsUserTwo)).to.be.equal(ZERO);
     });
 
-    it("Should aggregate powerUp should be zero", async () => {
+    it("Should aggregate powerUp be equal zero", async () => {
         //    given
         const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
@@ -287,7 +287,7 @@ describe("John claim", () => {
             .unstake(tokens.ipTokenDai.address, N1__0_18DEC.mul(BigNumber.from("20")));
         //    then
         const globalIndicatorsAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
-        expect(extractGlobalParam(globalIndicatorsAfter).aggregatedPowerUp).to.be.equal(ZERO);
+        expect(extractGlobalIndicators(globalIndicatorsAfter).aggregatedPowerUp).to.be.equal(ZERO);
     });
 
     it("Should not add rewards when no ipToken was stake", async () => {
