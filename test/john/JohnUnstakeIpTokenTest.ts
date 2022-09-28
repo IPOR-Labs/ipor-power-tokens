@@ -5,7 +5,7 @@ import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
 import { John, IporToken, PowerIpor } from "../../types";
-import { Tokens, getDeployedTokens, extractGlobalParam } from "../utils/JohnUtils";
+import { Tokens, getDeployedTokens, extractGlobalIndicators } from "../utils/JohnUtils";
 import {
     N1__0_18DEC,
     ZERO,
@@ -86,7 +86,7 @@ const randomUnstakeIpToken = async (account: Signer, ipToken: string, john: John
         .unstake(ipToken, randomBigNumberFromInterval(1, unstakeAmount, N1__0_18DEC));
 };
 
-describe("John claim", () => {
+describe("John unstake ipToken", () => {
     const N100__0_18DEC = N1__0_18DEC.mul(BigNumber.from("100"));
     const N300__0_18DEC = N1__0_18DEC.mul(BigNumber.from("300"));
     const N2000__0_18DEC = N2__0_18DEC.mul(BigNumber.from("1000"));
@@ -156,7 +156,7 @@ describe("John claim", () => {
         await powerIpor.setJohn(john.address);
     });
 
-    it("Should stake 1 users", async () => {
+    it("Should stake and unstake 1 users", async () => {
         //    given
         const dai = tokens.ipTokenDai.address;
 
@@ -191,7 +191,7 @@ describe("John claim", () => {
         expect(pwIporExchangeRateBefore).to.be.equal(pwIporExchangeRateAfter);
     });
 
-    it("Should stake 2 users", async () => {
+    it("Should stake and unstake 2 users", async () => {
         //    given
         const dai = tokens.ipTokenDai.address;
 
@@ -244,7 +244,7 @@ describe("John claim", () => {
         expect(pwIporExchangeRateBefore).to.be.equal(pwIporExchangeRateAfter);
     });
 
-    it("Should stake 3 users", async () => {
+    it("Should stake and unstake 3 users", async () => {
         //    given
         const dai = tokens.ipTokenDai.address;
 
@@ -313,7 +313,7 @@ describe("John claim", () => {
         expect(pwIporExchangeRateBefore).to.be.equal(pwIporExchangeRateAfter);
     });
 
-    it("Should stake 3 users when block rewards change", async () => {
+    it("Should stake and unstake, 3 users when block rewards change", async () => {
         //    given
         const dai = tokens.ipTokenDai.address;
 
@@ -386,7 +386,6 @@ describe("John claim", () => {
         //    given
         const ipDai = tokens.ipTokenDai.address;
         await hre.network.provider.send("hardhat_mine", ["0x9999999"]);
-        const blockNumberBefore = (await hre.ethers.provider.getBlock("latest")).number;
 
         await powerIpor.stake(N100__0_18DEC);
         await powerIpor.connect(userOne).stake(N100__0_18DEC);
@@ -471,12 +470,9 @@ describe("John claim", () => {
 
         await network.provider.send("evm_setAutomine", [false]);
         await john.stake(ipDai, N2__0_18DEC);
-        const blockNumberStake = (await hre.ethers.provider.getBlock("latest")).number;
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
-        const accountRewardsBefore = await john.calculateAccountRewards(ipDai);
         const accruedRewardsBefore = await john.calculateAccruedRewards(ipDai);
         const globalIndicatorsBefore = await john.getGlobalIndicators(ipDai);
-        const blockNumberBefore = (await hre.ethers.provider.getBlock("latest")).number;
 
         //    when
         await john.unstake(ipDai, N0__1_18DEC.mul(BigNumber.from(15)));
@@ -486,10 +482,9 @@ describe("John claim", () => {
         const accountRewardsAfter = await john.calculateAccountRewards(ipDai);
         const accruedRewardsAfter = await john.calculateAccruedRewards(ipDai);
         const globalIndicatorsAfter = await john.getGlobalIndicators(ipDai);
-        const blockNumberAfter = (await hre.ethers.provider.getBlock("latest")).number;
 
-        const globalIndicatorsBeforeExtract = extractGlobalParam(globalIndicatorsBefore);
-        const globalIndicatorsAfterExtract = extractGlobalParam(globalIndicatorsAfter);
+        const globalIndicatorsBeforeExtract = extractGlobalIndicators(globalIndicatorsBefore);
+        const globalIndicatorsAfterExtract = extractGlobalIndicators(globalIndicatorsAfter);
 
         await network.provider.send("evm_setAutomine", [true]);
         expect(accountRewardsAfter).to.be.equal(ZERO);

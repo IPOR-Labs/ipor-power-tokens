@@ -5,7 +5,7 @@ import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
 import { John, IporToken, PowerIpor } from "../../types";
-import { Tokens, getDeployedTokens, extractGlobalParam } from "../utils/JohnUtils";
+import { Tokens, getDeployedTokens, extractGlobalIndicators } from "../utils/JohnUtils";
 import {
     N1__0_18DEC,
     ZERO,
@@ -83,20 +83,21 @@ describe("John claim", () => {
 
     it("Should claim rewards when 100 blocks were mint", async () => {
         //    given
-        const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
-        const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
+        const delegatedPwIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
+        const stakeIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
+        const stakedIpTokensAmount = N1__0_18DEC.mul(BigNumber.from("100"));
 
-        await powerIpor.connect(userOne).stake(delegatedIporToken);
+        await powerIpor.connect(userOne).stake(stakeIporAmount);
 
         await powerIpor
             .connect(userOne)
-            .delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedPwIporAmount]);
 
         const powerIporBalanceBefore = await powerIpor
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
-        await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokens);
+        await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokensAmount);
 
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
         //    when
@@ -112,13 +113,12 @@ describe("John claim", () => {
 
     it("Should get 100 rewards when first stake 0.1 dai and after 1 Dai, 200 blocks mint", async () => {
         //    given
-        const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
-        const stakedIpTokens = N0__1_18DEC;
+        const delegatedPwIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
+        const stakeIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
+        const stakedIpTokensAmount = N0__1_18DEC;
 
-        await powerIpor.connect(userOne).stake(delegatedIporToken);
-        const globalIndicatorsBefore = extractGlobalParam(
-            await john.getGlobalIndicators(tokens.ipTokenDai.address)
-        );
+        await powerIpor.connect(userOne).stake(stakeIporAmount);
+
         const accountRewardsBefore = await john
             .connect(userOne)
             .calculateAccountRewards(tokens.ipTokenDai.address);
@@ -128,10 +128,10 @@ describe("John claim", () => {
 
         await powerIpor
             .connect(userOne)
-            .delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedPwIporAmount]);
 
         //    when
-        await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokens);
+        await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokensAmount);
 
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
@@ -145,11 +145,8 @@ describe("John claim", () => {
         await john.connect(userOne).stake(tokens.ipTokenDai.address, N1__0_18DEC);
 
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
-        //    then
 
-        const globalIndicatorsAfter = extractGlobalParam(
-            await john.getGlobalIndicators(tokens.ipTokenDai.address)
-        );
+        //    then
         const accountRewardsAfter = await john
             .connect(userOne)
             .calculateAccountRewards(tokens.ipTokenDai.address);
@@ -167,19 +164,20 @@ describe("John claim", () => {
 
     it("Should count proper transfer rewards when one user stake ipTokens twice", async () => {
         //    given
-        const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
-        const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
-        await powerIpor.connect(userOne).stake(delegatedIporToken);
+        const delegatedPwIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
+        const stakeIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
+        const stakedIpTokensAmount = N1__0_18DEC.mul(BigNumber.from("100"));
+        await powerIpor.connect(userOne).stake(delegatedPwIporAmount);
         await powerIpor
             .connect(userOne)
-            .delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
+            .delegateToJohn([tokens.ipTokenDai.address], [stakeIporAmount]);
 
         const powerIporBalanceBefore = await powerIpor
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
         // when
-        await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokens);
+        await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokensAmount);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
         const powerIporBalanceAfter1Stake = await powerIpor
@@ -190,7 +188,7 @@ describe("John claim", () => {
             .connect(userOne)
             .calculateAccountRewards(tokens.ipTokenDai.address);
 
-        await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokens);
+        await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokensAmount);
 
         //    then
         const powerIporBalanceAfter2Stake = await powerIpor
@@ -211,20 +209,21 @@ describe("John claim", () => {
 
     it("Should count proper rewards when one user stake Power Ipor Tokens (pwIpor) twice", async () => {
         //    given
-        const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
-        const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
+        const delegatedPwIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
+        const stakeIporAmount = N1__0_18DEC.mul(BigNumber.from("200"));
+        const stakedIpTokensAmount = N1__0_18DEC.mul(BigNumber.from("100"));
 
         //    when
-        await powerIpor.connect(userOne).stake(delegatedIporToken.mul(BigNumber.from("2")));
+        await powerIpor.connect(userOne).stake(stakeIporAmount);
 
         const powerIporBalanceBefore = await powerIpor
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
-        await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokens);
+        await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokensAmount);
         await powerIpor
             .connect(userOne)
-            .delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedPwIporAmount]);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
         const powerIporBalanceAfter1Stake = await powerIpor
@@ -236,13 +235,13 @@ describe("John claim", () => {
 
         await powerIpor
             .connect(userOne)
-            .delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedPwIporAmount]);
 
         const rewardsAfterSecondStake = await john
             .connect(userOne)
             .calculateAccountRewards(tokens.ipTokenDai.address);
-        //    then
 
+        //    then
         const powerIporBalanceAfter2Stake = await powerIpor
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
