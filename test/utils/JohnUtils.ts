@@ -88,7 +88,7 @@ export const getDeployedTokens = async (accounts: Signer[]): Promise<Tokens> => 
     };
 };
 
-export const extractGlobalParam = (value: any): GlobalIndicators => {
+export const extractGlobalIndicators = (value: any): GlobalIndicators => {
     const aggregatedPowerUp = value[0];
     const accruedRewards = value[5];
     const compositeMultiplierInTheBlock = value[1];
@@ -106,7 +106,7 @@ export const extractGlobalParam = (value: any): GlobalIndicators => {
     };
 };
 
-export const expectGlobalParam = (
+export const expectGlobalIndicators = (
     params: GlobalIndicators,
     aggregatedPowerUp: BigNumber,
     accruedRewards: BigNumber,
@@ -127,7 +127,7 @@ export const expectGlobalParam = (
     expect(params.rewardsPerBlock).to.be.equal(rewardsPerBlock);
 };
 
-export const expectUserParam = (
+export const expectAccountIndicators = (
     params: UserParams,
     powerUp: BigNumber,
     compositeMultiplierCumulative: BigNumber,
@@ -140,7 +140,7 @@ export const expectUserParam = (
     expect(params.delegatedPowerTokenBalance).to.be.equal(delegatedPowerTokenBalance);
 };
 
-export const extractAccountParam = (value: any): UserParams => {
+export const extractAccountIndicators = (value: any): UserParams => {
     const powerUp = value[2];
     const compositeMultiplierCumulative = value[0];
     const ipTokenBalance = value[1];

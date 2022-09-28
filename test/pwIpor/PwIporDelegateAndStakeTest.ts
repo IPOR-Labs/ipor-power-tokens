@@ -14,10 +14,10 @@ import {
 } from "../utils/Constants";
 import { it } from "mocha";
 import {
-    expectGlobalParam,
-    expectUserParam,
-    extractGlobalParam,
-    extractAccountParam,
+    expectGlobalIndicators,
+    expectAccountIndicators,
+    extractGlobalIndicators,
+    extractAccountIndicators,
     getDeployedTokens,
     Tokens,
 } from "../utils/JohnUtils";
@@ -167,8 +167,8 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
         const globalIndicatorsAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
         const accountIndicatorsAfter = await john.getAccountIndicators(tokens.ipTokenDai.address);
 
-        expectGlobalParam(
-            extractGlobalParam(globalIndicatorsBefore),
+        expectGlobalIndicators(
+            extractGlobalIndicators(globalIndicatorsBefore),
             ZERO,
             ZERO,
             ZERO,
@@ -176,8 +176,8 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
             -1,
             100000000
         );
-        expectGlobalParam(
-            extractGlobalParam(globalIndicatorsAfter),
+        expectGlobalIndicators(
+            extractGlobalIndicators(globalIndicatorsAfter),
             BigNumber.from("1400000000000000000"),
             ZERO,
             BigNumber.from("714285714285714285714285714"),
@@ -186,9 +186,15 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
             100000000
         );
 
-        expectUserParam(extractAccountParam(accountIndicatorsBefore), ZERO, ZERO, ZERO, ZERO);
-        expectUserParam(
-            extractAccountParam(accountIndicatorsAfter),
+        expectAccountIndicators(
+            extractAccountIndicators(accountIndicatorsBefore),
+            ZERO,
+            ZERO,
+            ZERO,
+            ZERO
+        );
+        expectAccountIndicators(
+            extractAccountIndicators(accountIndicatorsAfter),
             BigNumber.from("1400000000000000000"),
             ZERO,
             N1__0_18DEC,
@@ -239,8 +245,8 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
         expect(delegatedBalanceBefore).to.be.equal(ZERO);
         expect(delegatedBalanceAfter).to.be.equal(N2__0_18DEC);
 
-        expectGlobalParam(
-            extractGlobalParam(globalIndicatorsDaiBefore),
+        expectGlobalIndicators(
+            extractGlobalIndicators(globalIndicatorsDaiBefore),
             ZERO,
             ZERO,
             ZERO,
@@ -248,8 +254,8 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
             -1,
             100000000
         );
-        expectGlobalParam(
-            extractGlobalParam(globalIndicatorsDaiAfter),
+        expectGlobalIndicators(
+            extractGlobalIndicators(globalIndicatorsDaiAfter),
             BigNumber.from("1400000000000000000"),
             ZERO,
             BigNumber.from("714285714285714285714285714"),
@@ -258,8 +264,8 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
             100000000
         );
 
-        expectGlobalParam(
-            extractGlobalParam(globalIndicatorsUsdcBefore),
+        expectGlobalIndicators(
+            extractGlobalIndicators(globalIndicatorsUsdcBefore),
             ZERO,
             ZERO,
             ZERO,
@@ -267,8 +273,8 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
             -1,
             100000000
         );
-        expectGlobalParam(
-            extractGlobalParam(globalIndicatorsUsdcAfter),
+        expectGlobalIndicators(
+            extractGlobalIndicators(globalIndicatorsUsdcAfter),
             BigNumber.from("1400000000000000000"),
             ZERO,
             BigNumber.from("714285714285714285714285714"),
@@ -276,17 +282,29 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
             -1,
             100000000
         );
-        expectUserParam(extractAccountParam(accountIndicatorsDaiBefore), ZERO, ZERO, ZERO, ZERO);
-        expectUserParam(
-            extractAccountParam(accountIndicatorsDaiAfter),
+        expectAccountIndicators(
+            extractAccountIndicators(accountIndicatorsDaiBefore),
+            ZERO,
+            ZERO,
+            ZERO,
+            ZERO
+        );
+        expectAccountIndicators(
+            extractAccountIndicators(accountIndicatorsDaiAfter),
             BigNumber.from("1400000000000000000"),
             ZERO,
             N1__0_18DEC,
             N1__0_18DEC
         );
-        expectUserParam(extractAccountParam(accountIndicatorsUsdcBefore), ZERO, ZERO, ZERO, ZERO);
-        expectUserParam(
-            extractAccountParam(accountIndicatorsUsdcAfter),
+        expectAccountIndicators(
+            extractAccountIndicators(accountIndicatorsUsdcBefore),
+            ZERO,
+            ZERO,
+            ZERO,
+            ZERO
+        );
+        expectAccountIndicators(
+            extractAccountIndicators(accountIndicatorsUsdcAfter),
             BigNumber.from("1400000000000000000"),
             ZERO,
             N1__0_18DEC,
@@ -334,64 +352,75 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
         expect(delegatedBalanceBefore).to.be.equal(ZERO);
         expect(delegatedBalanceAfter).to.be.equal(N1__0_18DEC.mul(BigNumber.from("4")));
 
-        expect(extractGlobalParam(globalIndicatorsDaiBefore).aggregatedPowerUp).to.be.equal(
-            extractGlobalParam(globalIndicatorsUsdcBefore).aggregatedPowerUp
+        expect(extractGlobalIndicators(globalIndicatorsDaiBefore).aggregatedPowerUp).to.be.equal(
+            extractGlobalIndicators(globalIndicatorsUsdcBefore).aggregatedPowerUp
         );
-        expect(extractGlobalParam(globalIndicatorsDaiBefore).accruedRewards).to.be.equal(
-            extractGlobalParam(globalIndicatorsUsdcBefore).accruedRewards
+        expect(extractGlobalIndicators(globalIndicatorsDaiBefore).accruedRewards).to.be.equal(
+            extractGlobalIndicators(globalIndicatorsUsdcBefore).accruedRewards
         );
         expect(
-            extractGlobalParam(globalIndicatorsDaiBefore).compositeMultiplierCumulativePrevBlock
+            extractGlobalIndicators(globalIndicatorsDaiBefore)
+                .compositeMultiplierCumulativePrevBlock
         ).to.be.equal(
-            extractGlobalParam(globalIndicatorsUsdcBefore).compositeMultiplierCumulativePrevBlock
+            extractGlobalIndicators(globalIndicatorsUsdcBefore)
+                .compositeMultiplierCumulativePrevBlock
         );
         expect(
-            extractGlobalParam(globalIndicatorsDaiBefore).compositeMultiplierInTheBlock
-        ).to.be.equal(extractGlobalParam(globalIndicatorsUsdcBefore).compositeMultiplierInTheBlock);
-
-        expect(extractGlobalParam(globalIndicatorsDaiAfter).aggregatedPowerUp).to.be.equal(
-            extractGlobalParam(globalIndicatorsUsdcAfter).aggregatedPowerUp
-        );
-        expect(extractGlobalParam(globalIndicatorsDaiAfter).accruedRewards).to.be.equal(
-            extractGlobalParam(globalIndicatorsUsdcAfter).accruedRewards
-        );
-        expect(
-            extractGlobalParam(globalIndicatorsDaiAfter).compositeMultiplierCumulativePrevBlock
+            extractGlobalIndicators(globalIndicatorsDaiBefore).compositeMultiplierInTheBlock
         ).to.be.equal(
-            extractGlobalParam(globalIndicatorsUsdcAfter).compositeMultiplierCumulativePrevBlock
-        );
-        expect(
-            extractGlobalParam(globalIndicatorsDaiAfter).compositeMultiplierInTheBlock
-        ).to.be.equal(extractGlobalParam(globalIndicatorsUsdcAfter).compositeMultiplierInTheBlock);
-
-        expect(extractAccountParam(accountIndicatorsDaiBefore).powerUp).to.be.equal(
-            extractAccountParam(accountIndicatorsUsdcBefore).powerUp
-        );
-        expect(
-            extractAccountParam(accountIndicatorsDaiBefore).compositeMultiplierCumulative
-        ).to.be.equal(
-            extractAccountParam(accountIndicatorsUsdcBefore).compositeMultiplierCumulative
-        );
-        expect(
-            extractAccountParam(accountIndicatorsDaiBefore).delegatedPowerTokenBalance
-        ).to.be.equal(extractAccountParam(accountIndicatorsUsdcBefore).delegatedPowerTokenBalance);
-        expect(extractAccountParam(accountIndicatorsDaiBefore).ipTokenBalance).to.be.equal(
-            extractAccountParam(accountIndicatorsUsdcBefore).ipTokenBalance
+            extractGlobalIndicators(globalIndicatorsUsdcBefore).compositeMultiplierInTheBlock
         );
 
-        expect(extractAccountParam(accountIndicatorsDaiAfter).powerUp).to.be.equal(
-            extractAccountParam(accountIndicatorsUsdcAfter).powerUp
+        expect(extractGlobalIndicators(globalIndicatorsDaiAfter).aggregatedPowerUp).to.be.equal(
+            extractGlobalIndicators(globalIndicatorsUsdcAfter).aggregatedPowerUp
+        );
+        expect(extractGlobalIndicators(globalIndicatorsDaiAfter).accruedRewards).to.be.equal(
+            extractGlobalIndicators(globalIndicatorsUsdcAfter).accruedRewards
         );
         expect(
-            extractAccountParam(accountIndicatorsDaiAfter).compositeMultiplierCumulative
+            extractGlobalIndicators(globalIndicatorsDaiAfter).compositeMultiplierCumulativePrevBlock
         ).to.be.equal(
-            extractAccountParam(accountIndicatorsUsdcAfter).compositeMultiplierCumulative
+            extractGlobalIndicators(globalIndicatorsUsdcAfter)
+                .compositeMultiplierCumulativePrevBlock
         );
         expect(
-            extractAccountParam(accountIndicatorsDaiAfter).delegatedPowerTokenBalance
-        ).to.be.equal(extractAccountParam(accountIndicatorsUsdcAfter).delegatedPowerTokenBalance);
-        expect(extractAccountParam(accountIndicatorsDaiAfter).ipTokenBalance).to.be.equal(
-            extractAccountParam(accountIndicatorsUsdcAfter).ipTokenBalance
+            extractGlobalIndicators(globalIndicatorsDaiAfter).compositeMultiplierInTheBlock
+        ).to.be.equal(
+            extractGlobalIndicators(globalIndicatorsUsdcAfter).compositeMultiplierInTheBlock
+        );
+
+        expect(extractAccountIndicators(accountIndicatorsDaiBefore).powerUp).to.be.equal(
+            extractAccountIndicators(accountIndicatorsUsdcBefore).powerUp
+        );
+        expect(
+            extractAccountIndicators(accountIndicatorsDaiBefore).compositeMultiplierCumulative
+        ).to.be.equal(
+            extractAccountIndicators(accountIndicatorsUsdcBefore).compositeMultiplierCumulative
+        );
+        expect(
+            extractAccountIndicators(accountIndicatorsDaiBefore).delegatedPowerTokenBalance
+        ).to.be.equal(
+            extractAccountIndicators(accountIndicatorsUsdcBefore).delegatedPowerTokenBalance
+        );
+        expect(extractAccountIndicators(accountIndicatorsDaiBefore).ipTokenBalance).to.be.equal(
+            extractAccountIndicators(accountIndicatorsUsdcBefore).ipTokenBalance
+        );
+
+        expect(extractAccountIndicators(accountIndicatorsDaiAfter).powerUp).to.be.equal(
+            extractAccountIndicators(accountIndicatorsUsdcAfter).powerUp
+        );
+        expect(
+            extractAccountIndicators(accountIndicatorsDaiAfter).compositeMultiplierCumulative
+        ).to.be.equal(
+            extractAccountIndicators(accountIndicatorsUsdcAfter).compositeMultiplierCumulative
+        );
+        expect(
+            extractAccountIndicators(accountIndicatorsDaiAfter).delegatedPowerTokenBalance
+        ).to.be.equal(
+            extractAccountIndicators(accountIndicatorsUsdcAfter).delegatedPowerTokenBalance
+        );
+        expect(extractAccountIndicators(accountIndicatorsDaiAfter).ipTokenBalance).to.be.equal(
+            extractAccountIndicators(accountIndicatorsUsdcAfter).ipTokenBalance
         );
     });
 });

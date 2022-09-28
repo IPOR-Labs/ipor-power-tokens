@@ -39,6 +39,7 @@ describe("John configuration, deploy tests", () => {
     it("Should not be able to deploy contract when Power Ipor Token address is zero", async () => {
         // given
         const John = await hre.ethers.getContractFactory("John");
+
         // when
         await expect(
             upgrades.deployProxy(John, [
@@ -52,12 +53,14 @@ describe("John configuration, deploy tests", () => {
     it("Should deploy contract with 3 assets", async () => {
         // given
         const John = await hre.ethers.getContractFactory("John");
+
         // when
         const john = (await upgrades.deployProxy(John, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
             randomAddress,
             tokens.ipTokenUsdt.address,
         ])) as John;
+
         // then
         const isDaiActive = await john.isIpTokenSupported(tokens.ipTokenDai.address);
         const isUsdcActive = await john.isIpTokenSupported(tokens.ipTokenUsdc.address);
@@ -71,12 +74,14 @@ describe("John configuration, deploy tests", () => {
     it("Should deploy contract with 1 assets", async () => {
         // given
         const John = await hre.ethers.getContractFactory("John");
+
         // when
         const john = (await upgrades.deployProxy(John, [
             [tokens.ipTokenDai.address],
             randomAddress,
             tokens.ipTokenUsdt.address,
         ])) as John;
+
         // then
         const isDaiActive = await john.isIpTokenSupported(tokens.ipTokenDai.address);
         const isUsdcActive = await john.isIpTokenSupported(tokens.ipTokenUsdc.address);
@@ -98,9 +103,11 @@ describe("John configuration, deploy tests", () => {
         const isDaiActiveBefore = await john.isIpTokenSupported(tokens.ipTokenDai.address);
         const isUsdcActiveBefore = await john.isIpTokenSupported(tokens.ipTokenUsdc.address);
         const isUsdtActiveBefore = await john.isIpTokenSupported(tokens.ipTokenUsdt.address);
+
         // when
         await john.addIpTokenAsset(tokens.ipTokenUsdc.address);
         await john.addIpTokenAsset(tokens.ipTokenUsdt.address);
+
         // then
         const isDaiActiveAfter = await john.isIpTokenSupported(tokens.ipTokenDai.address);
         const isUsdcActiveAfter = await john.isIpTokenSupported(tokens.ipTokenUsdc.address);
@@ -123,8 +130,8 @@ describe("John configuration, deploy tests", () => {
             randomAddress,
             tokens.ipTokenUsdt.address,
         ])) as John;
-        const isUsdcActiveBefore = await john.isIpTokenSupported(tokens.ipTokenUsdc.address);
-        const [admin, userOne] = accounts;
+        const [_, userOne] = accounts;
+
         // when
         await expect(
             //when
@@ -144,9 +151,11 @@ describe("John configuration, deploy tests", () => {
 
         const [admin, userOne] = accounts;
         const ownerAddressBefore = await john.owner();
+
         // when
         await john.transferOwnership(await userOne.getAddress());
         await john.connect(userOne).confirmTransferOwnership();
+
         // then
         const ownerAddressAfter = await john.owner();
 
@@ -163,8 +172,8 @@ describe("John configuration, deploy tests", () => {
             tokens.ipTokenUsdt.address,
         ])) as John;
 
-        const [admin, userOne] = accounts;
-        const ownerAddressBefore = await john.owner();
+        const [_, userOne] = accounts;
+
         // when
         await expect(
             //when
@@ -183,8 +192,10 @@ describe("John configuration, deploy tests", () => {
         ])) as John;
 
         const isPausedBefore = await john.paused();
+
         // when
         await john.pause();
+
         // then
         const isPausedAfter = await john.paused();
 
@@ -201,12 +212,14 @@ describe("John configuration, deploy tests", () => {
             tokens.ipTokenUsdt.address,
         ])) as John;
 
-        const [admin, userOne] = accounts;
+        const [_, userOne] = accounts;
         const isPausedBefore = await john.paused();
+
         // when
         await expect(john.connect(userOne).pause()).to.be.revertedWith(
             "Ownable: caller is not the owner"
         );
+
         // then
         const isPausedAfter = await john.paused();
 
@@ -224,8 +237,10 @@ describe("John configuration, deploy tests", () => {
         ])) as John;
         await john.pause();
         const isPausedBefore = await john.paused();
+
         // when
         await john.unpause();
+
         // then
         const isPausedAfter = await john.paused();
 
@@ -242,13 +257,15 @@ describe("John configuration, deploy tests", () => {
             tokens.ipTokenUsdt.address,
         ])) as John;
 
-        const [admin, userOne] = accounts;
+        const [_, userOne] = accounts;
         await john.pause();
         const isPausedBefore = await john.paused();
+
         // when
         await expect(john.connect(userOne).unpause()).to.be.revertedWith(
             "Ownable: caller is not the owner"
         );
+
         // then
         const isPausedAfter = await john.paused();
 
