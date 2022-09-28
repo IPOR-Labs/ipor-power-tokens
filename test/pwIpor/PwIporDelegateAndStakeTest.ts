@@ -138,7 +138,10 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
 
         //    then
         const delegatedBalanceAfter = await powerIpor.delegatedBalanceOf(await admin.getAddress());
-        const ipTokenBalanceAfter = await john.balanceOf(tokens.ipTokenDai.address);
+        const ipTokenBalanceAfter = await john.balanceOf(
+            await admin.getAddress(),
+            tokens.ipTokenDai.address
+        );
 
         expect(delegatedBalanceBefore).to.be.equal(ZERO);
         expect(delegatedBalanceAfter).to.be.equal(N0__1_18DEC);
@@ -163,7 +166,10 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
 
         //    then
         const delegatedBalanceAfter = await powerIpor.delegatedBalanceOf(await admin.getAddress());
-        const ipTokenBalanceAfter = await john.balanceOf(tokens.ipTokenDai.address);
+        const ipTokenBalanceAfter = await john.balanceOf(
+            await admin.getAddress(),
+            tokens.ipTokenDai.address
+        );
         const globalIndicatorsAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
         const accountIndicatorsAfter = await john.getAccountIndicators(tokens.ipTokenDai.address);
 

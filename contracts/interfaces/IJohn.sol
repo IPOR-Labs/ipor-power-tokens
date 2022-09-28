@@ -9,9 +9,10 @@ import "./types/JohnTypes.sol";
 /// Power Ipor Tokens account can get stake IPOR Tokens in PowerIpor smart contract.
 interface IJohn {
     /// @notice Returns balance of staked ipTokens
+    /// @param account account address
     /// @param ipToken address of ipToken (ipUSDT, ipUSDC, ipDAI etc.)
     /// @return balance of ipTokens staked by sender
-    function balanceOf(address ipToken) external view returns (uint256);
+    function balanceOf(address account, address ipToken) external view returns (uint256);
 
     /// @notice Returns balance of delegated Power Ipor Tokens for a given `account` and list of ipToken addresses.
     /// @param account address for which we want get information about balance of delegated Power Ipor Tokens

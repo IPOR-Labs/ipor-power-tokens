@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.16;
 
-import "../../rewards/John.sol";
+import "../../john/John.sol";
 import "../../tokens/PowerIpor.sol";
 
 contract LiquidityRewardsAgent {
@@ -51,7 +51,7 @@ contract LiquidityRewardsAgent {
     }
 
     function balanceOf(address ipToken) external view returns (uint256) {
-        return _john.balanceOf(ipToken);
+        return _john.balanceOf(address(this), ipToken);
     }
 
     function claim(address ipToken) external {
