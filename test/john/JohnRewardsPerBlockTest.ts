@@ -5,7 +5,7 @@ import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
 import { John } from "../../types";
-import { Tokens, getDeployedTokens, extractGlobalParam } from "../utils/JohnUtils";
+import { Tokens, getDeployedTokens, extractGlobalIndicators } from "../utils/JohnUtils";
 import { N1__0_18DEC, N2__0_18DEC, USD_1_000_000_18DEC, ZERO } from "../utils/Constants";
 
 chai.use(solidity);
@@ -73,8 +73,8 @@ describe("John Rewards per block", () => {
 
         expect(rewardsBefore).to.be.equal(N1_0_8D);
         expect(rewardsAfter).to.be.equal(N2_0_8D);
-        expect(extractGlobalParam(globalIndicatorsBefore).accruedRewards).to.be.equal(ZERO);
-        expect(extractGlobalParam(globalIndicatorsUsdcAfter).accruedRewards).to.be.equal(ZERO);
+        expect(extractGlobalIndicators(globalIndicatorsBefore).accruedRewards).to.be.equal(ZERO);
+        expect(extractGlobalIndicators(globalIndicatorsUsdcAfter).accruedRewards).to.be.equal(ZERO);
     });
 
     it("Should setup block rewards for 3 ipTokens", async () => {
@@ -160,8 +160,8 @@ describe("John Rewards per block", () => {
         const accruedRewardsAfter = await john.calculateAccruedRewards(ipDai);
         const globalIndicatorsAfter = await john.getGlobalIndicators(ipDai);
 
-        const globalIndicatorsBeforeExtract = extractGlobalParam(globalIndicatorsBefore);
-        const globalIndicatorsAfterExtract = extractGlobalParam(globalIndicatorsAfter);
+        const globalIndicatorsBeforeExtract = extractGlobalIndicators(globalIndicatorsBefore);
+        const globalIndicatorsAfterExtract = extractGlobalIndicators(globalIndicatorsAfter);
 
         await network.provider.send("evm_setAutomine", [true]);
         expect(accountRewardsAfter).to.be.equal(accountRewardsBefore.add(N1__0_18DEC));
@@ -203,8 +203,8 @@ describe("John Rewards per block", () => {
         const accountRewardsAfter = await john.calculateAccountRewards(ipDai);
         const accruedRewardsAfter = await john.calculateAccruedRewards(ipDai);
         const globalIndicatorsAfter = await john.getGlobalIndicators(ipDai);
-        const globalIndicatorsBeforeExtract = extractGlobalParam(globalIndicatorsBefore);
-        const globalIndicatorsAfterExtract = extractGlobalParam(globalIndicatorsAfter);
+        const globalIndicatorsBeforeExtract = extractGlobalIndicators(globalIndicatorsBefore);
+        const globalIndicatorsAfterExtract = extractGlobalIndicators(globalIndicatorsAfter);
 
         await network.provider.send("evm_setAutomine", [true]);
         expect(accountRewardsBefore).to.be.equal(N1__0_18DEC.mul(BigNumber.from("100")));

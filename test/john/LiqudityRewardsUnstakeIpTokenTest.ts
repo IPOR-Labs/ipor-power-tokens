@@ -5,7 +5,7 @@ import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
 import { John, IporToken, PowerIpor } from "../../types";
-import { Tokens, getDeployedTokens, extractGlobalParam } from "../utils/JohnUtils";
+import { Tokens, getDeployedTokens, extractGlobalIndicators } from "../utils/JohnUtils";
 import {
     N1__0_18DEC,
     ZERO,
@@ -488,8 +488,8 @@ describe("John claim", () => {
         const globalIndicatorsAfter = await john.getGlobalIndicators(ipDai);
         const blockNumberAfter = (await hre.ethers.provider.getBlock("latest")).number;
 
-        const globalIndicatorsBeforeExtract = extractGlobalParam(globalIndicatorsBefore);
-        const globalIndicatorsAfterExtract = extractGlobalParam(globalIndicatorsAfter);
+        const globalIndicatorsBeforeExtract = extractGlobalIndicators(globalIndicatorsBefore);
+        const globalIndicatorsAfterExtract = extractGlobalIndicators(globalIndicatorsAfter);
 
         await network.provider.send("evm_setAutomine", [true]);
         expect(accountRewardsAfter).to.be.equal(ZERO);

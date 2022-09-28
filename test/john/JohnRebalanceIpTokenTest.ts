@@ -8,10 +8,10 @@ import { John, IporToken, PowerIpor } from "../../types";
 import {
     Tokens,
     getDeployedTokens,
-    extractGlobalParam,
-    expectGlobalParam,
-    expectUserParam,
-    extractAccountParam,
+    extractGlobalIndicators,
+    expectGlobalIndicators,
+    expectAccountIndicators,
+    extractAccountIndicators,
 } from "../utils/JohnUtils";
 import {
     N1__0_18DEC,
@@ -95,8 +95,8 @@ describe("John Stake and balance", () => {
             const initUserParamResponse = await john.getAccountIndicators(
                 tokens.ipTokenDai.address
             );
-            expectGlobalParam(
-                extractGlobalParam(initGlobalParamResponse),
+            expectGlobalIndicators(
+                extractGlobalIndicators(initGlobalParamResponse),
                 ZERO,
                 ZERO,
                 ZERO,
@@ -104,7 +104,13 @@ describe("John Stake and balance", () => {
                 0,
                 100000000
             );
-            expectUserParam(extractAccountParam(initUserParamResponse), ZERO, ZERO, ZERO, ZERO);
+            expectAccountIndicators(
+                extractAccountIndicators(initUserParamResponse),
+                ZERO,
+                ZERO,
+                ZERO,
+                ZERO
+            );
 
             await powerIpor.stake(delegatedIporToken);
             await powerIpor.delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
@@ -116,8 +122,8 @@ describe("John Stake and balance", () => {
                 tokens.ipTokenDai.address
             );
 
-            expectGlobalParam(
-                extractGlobalParam(afterDelegatePwIporGPR),
+            expectGlobalIndicators(
+                extractGlobalIndicators(afterDelegatePwIporGPR),
                 ZERO,
                 ZERO,
                 ZERO,
@@ -125,8 +131,8 @@ describe("John Stake and balance", () => {
                 0,
                 100000000
             );
-            expectUserParam(
-                extractAccountParam(afterDelegatePwIporUPR),
+            expectAccountIndicators(
+                extractAccountIndicators(afterDelegatePwIporUPR),
                 ZERO,
                 ZERO,
                 ZERO,
@@ -141,8 +147,8 @@ describe("John Stake and balance", () => {
                 tokens.ipTokenDai.address
             );
 
-            expectGlobalParam(
-                extractGlobalParam(afterStakeIpTokensGPR),
+            expectGlobalIndicators(
+                extractGlobalIndicators(afterStakeIpTokensGPR),
                 BigNumber.from("140000000000000000000"),
                 ZERO,
                 BigNumber.from("7142857142857142857142857"),
@@ -151,8 +157,8 @@ describe("John Stake and balance", () => {
                 100000000
             );
 
-            expectUserParam(
-                extractAccountParam(afterStakeIpTokensUPR),
+            expectAccountIndicators(
+                extractAccountIndicators(afterStakeIpTokensUPR),
                 BigNumber.from("1400000000000000000"),
                 ZERO,
                 stakedIpTokens,
@@ -256,7 +262,7 @@ describe("John Stake and balance", () => {
             // then
             const globalIndicatorsAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
 
-            expectGlobalParam(
+            expectGlobalIndicators(
                 globalIndicatorsBefore,
                 BigNumber.from("140000000000000000000"),
                 ZERO,
@@ -265,7 +271,7 @@ describe("John Stake and balance", () => {
                 -1,
                 100000000
             );
-            expectGlobalParam(
+            expectGlobalIndicators(
                 globalIndicatorsAfter,
                 BigNumber.from("140000000000000000000"),
                 BigNumber.from("101000000000000000000"),
