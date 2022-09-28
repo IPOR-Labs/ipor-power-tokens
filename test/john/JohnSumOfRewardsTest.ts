@@ -23,7 +23,7 @@ import {
 chai.use(solidity);
 const { expect } = chai;
 
-describe("John claim", () => {
+describe("John sum of rewards", () => {
     let tokens: Tokens;
     let john: John;
     let admin: Signer, userOne: Signer, userTwo: Signer, userThree: Signer;
@@ -215,7 +215,7 @@ describe("John claim", () => {
         expect(rewardsAdmin.add(rewardsUserOne).add(rewardsUserTwo)).to.be.equal(ZERO);
     });
 
-    it("Should aggregate powerUp should be zero", async () => {
+    it("Should aggregate powerUp be equal zero", async () => {
         //    given
         const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
