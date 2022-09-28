@@ -133,7 +133,9 @@ describe("PowerIpor configuration, deploy tests", () => {
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
             [N1__0_18DEC, N1__0_18DEC]
         );
-        const delegatedBalanceBefore = await powerIpor.delegatedBalanceOf(await admin.getAddress());
+        const delegatedBalanceBefore = await powerIpor.delegatedToJohnBalanceOf(
+            await admin.getAddress()
+        );
         const exchangeRateBefore = await powerIpor.calculateExchangeRate();
         const pwIporBalanceBefore = await powerIpor.balanceOf(await admin.getAddress());
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
@@ -146,7 +148,9 @@ describe("PowerIpor configuration, deploy tests", () => {
 
         //    then
 
-        const delegatedBalanceAfter = await powerIpor.delegatedBalanceOf(await admin.getAddress());
+        const delegatedBalanceAfter = await powerIpor.delegatedToJohnBalanceOf(
+            await admin.getAddress()
+        );
         const exchangeRateAfter = await powerIpor.calculateExchangeRate();
         const pwIporBalanceAfter = await powerIpor.balanceOf(await admin.getAddress());
 

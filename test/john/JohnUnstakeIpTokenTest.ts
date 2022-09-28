@@ -42,7 +42,7 @@ const randomDelegateIporToken = async (
 ) => {
     if (flipCoin()) return;
     const balance = await powerIpor.balanceOf(await account.getAddress());
-    const delegatedBalance = await powerIpor.delegatedBalanceOf(await account.getAddress());
+    const delegatedBalance = await powerIpor.delegatedToJohnBalanceOf(await account.getAddress());
     const allowToDelegate = balance.sub(delegatedBalance).div(N1__0_18DEC).toNumber();
 
     if (allowToDelegate <= 0) return;
