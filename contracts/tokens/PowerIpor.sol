@@ -50,6 +50,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
     function stake(uint256 iporTokenAmount) external override whenNotPaused nonReentrant {
         require(iporTokenAmount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+
         address iporTokenAddress = _iporToken;
         address msgSender = _msgSender();
 
@@ -71,6 +72,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
     function unstake(uint256 pwIporAmount) external override whenNotPaused nonReentrant {
         require(pwIporAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+
         address iporTokenAddress = _iporToken;
         address msgSender = _msgSender();
 
@@ -89,12 +91,19 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         _baseBalance[msgSender] -= baseAmountToUnstake;
         _baseTotalSupply -= baseAmountToUnstake;
 
-        uint256 amountToTransfer = _calculateBaseAmountToPwIpor(
+        uint256 iporTokenAmountToTransfer = _calculateBaseAmountToPwIpor(
             _calculateAmountWithoutFee(baseAmountToUnstake),
             exchangeRate
         );
-        IERC20Upgradeable(iporTokenAddress).transfer(msgSender, amountToTransfer);
-        emit Unstake(msgSender, pwIporAmount, exchangeRate, pwIporAmount - amountToTransfer);
+
+        IERC20Upgradeable(iporTokenAddress).transfer(msgSender, iporTokenAmountToTransfer);
+
+        emit Unstake(
+            msgSender,
+            pwIporAmount,
+            exchangeRate,
+            pwIporAmount - iporTokenAmountToTransfer
+        );
     }
 
     function delegateToJohn(address[] memory ipTokens, uint256[] memory pwIporAmounts)
