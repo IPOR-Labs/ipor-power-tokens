@@ -90,6 +90,7 @@ describe("John - Rebalance on delegate pwIpor", () => {
                 tokens.ipTokenDai.address
             );
             const initUserIndicatorsResponse = await john.getAccountIndicators(
+                await admin.getAddress(),
                 tokens.ipTokenDai.address
             );
 
@@ -100,6 +101,7 @@ describe("John - Rebalance on delegate pwIpor", () => {
                 tokens.ipTokenDai.address
             );
             const afterDelegatePwIporUPR = await john.getAccountIndicators(
+                await admin.getAddress(),
                 tokens.ipTokenDai.address
             );
 
@@ -110,6 +112,7 @@ describe("John - Rebalance on delegate pwIpor", () => {
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
             const afterStakeIpTokensGPR = await john.getGlobalIndicators(tokens.ipTokenDai.address);
             const afterStakeIpTokensUPR = await john.getAccountIndicators(
+                await admin.getAddress(),
                 tokens.ipTokenDai.address
             );
 

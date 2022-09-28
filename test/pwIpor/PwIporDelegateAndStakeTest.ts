@@ -155,7 +155,10 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
         const delegatedBalanceBefore = await powerIpor.delegatedBalanceOf(await admin.getAddress());
         await tokens.ipTokenDai.approve(john.address, TOTAL_SUPPLY_18_DECIMALS);
         const globalIndicatorsBefore = await john.getGlobalIndicators(tokens.ipTokenDai.address);
-        const accountIndicatorsBefore = await john.getAccountIndicators(tokens.ipTokenDai.address);
+        const accountIndicatorsBefore = await john.getAccountIndicators(
+            await admin.getAddress(),
+            tokens.ipTokenDai.address
+        );
 
         //    when
         await powerIpor.delegateAndStakeToJohn(
@@ -171,7 +174,10 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
             tokens.ipTokenDai.address
         );
         const globalIndicatorsAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
-        const accountIndicatorsAfter = await john.getAccountIndicators(tokens.ipTokenDai.address);
+        const accountIndicatorsAfter = await john.getAccountIndicators(
+            await admin.getAddress(),
+            tokens.ipTokenDai.address
+        );
 
         expectGlobalIndicators(
             extractGlobalIndicators(globalIndicatorsBefore),
@@ -221,12 +227,14 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
         const delegatedBalanceBefore = await powerIpor.delegatedBalanceOf(await admin.getAddress());
         const globalIndicatorsDaiBefore = await john.getGlobalIndicators(tokens.ipTokenDai.address);
         const accountIndicatorsDaiBefore = await john.getAccountIndicators(
+            await admin.getAddress(),
             tokens.ipTokenDai.address
         );
         const globalIndicatorsUsdcBefore = await john.getGlobalIndicators(
             tokens.ipTokenUsdc.address
         );
         const accountIndicatorsUsdcBefore = await john.getAccountIndicators(
+            await admin.getAddress(),
             tokens.ipTokenUsdc.address
         );
         //    when
@@ -239,12 +247,14 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
         const delegatedBalanceAfter = await powerIpor.delegatedBalanceOf(await admin.getAddress());
         const globalIndicatorsDaiAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
         const accountIndicatorsDaiAfter = await john.getAccountIndicators(
+            await admin.getAddress(),
             tokens.ipTokenDai.address
         );
         const globalIndicatorsUsdcAfter = await john.getGlobalIndicators(
             tokens.ipTokenUsdc.address
         );
         const accountIndicatorsUsdcAfter = await john.getAccountIndicators(
+            await admin.getAddress(),
             tokens.ipTokenUsdc.address
         );
 
@@ -328,12 +338,14 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
         const delegatedBalanceBefore = await powerIpor.delegatedBalanceOf(await admin.getAddress());
         const globalIndicatorsDaiBefore = await john.getGlobalIndicators(tokens.ipTokenDai.address);
         const accountIndicatorsDaiBefore = await john.getAccountIndicators(
+            await admin.getAddress(),
             tokens.ipTokenDai.address
         );
         const globalIndicatorsUsdcBefore = await john.getGlobalIndicators(
             tokens.ipTokenUsdc.address
         );
         const accountIndicatorsUsdcBefore = await john.getAccountIndicators(
+            await admin.getAddress(),
             tokens.ipTokenUsdc.address
         );
         //    when
@@ -346,12 +358,14 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
         const delegatedBalanceAfter = await powerIpor.delegatedBalanceOf(await admin.getAddress());
         const globalIndicatorsDaiAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
         const accountIndicatorsDaiAfter = await john.getAccountIndicators(
+            await admin.getAddress(),
             tokens.ipTokenDai.address
         );
         const globalIndicatorsUsdcAfter = await john.getGlobalIndicators(
             tokens.ipTokenUsdc.address
         );
         const accountIndicatorsUsdcAfter = await john.getAccountIndicators(
+            await admin.getAddress(),
             tokens.ipTokenUsdc.address
         );
 

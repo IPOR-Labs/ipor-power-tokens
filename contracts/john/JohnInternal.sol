@@ -102,13 +102,13 @@ abstract contract JohnInternal is
         return _globalIndicators[ipToken];
     }
 
-    function getAccountIndicators(address ipToken)
+    function getAccountIndicators(address account, address ipToken)
         external
         view
         override
         returns (JohnTypes.AccountRewardsIndicators memory)
     {
-        return _accountIndicators[_msgSender()][ipToken];
+        return _accountIndicators[account][ipToken];
     }
 
     function delegatePwIpor(

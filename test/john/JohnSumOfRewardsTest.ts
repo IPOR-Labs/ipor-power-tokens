@@ -105,17 +105,19 @@ describe("John sum of rewards", () => {
         await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokens);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
         const globalIndicatorsBefore = await john.getGlobalIndicators(tokens.ipTokenDai.address);
-        const userParamsBefore = await john
-            .connect(userOne)
-            .getAccountIndicators(tokens.ipTokenDai.address);
+        const userParamsBefore = await john.getAccountIndicators(
+            await userOne.getAddress(),
+            tokens.ipTokenDai.address
+        );
         const ipTokenBalanceBefore = await tokens.ipTokenDai.balanceOf(await userOne.getAddress());
         //    when
         await john.connect(userOne).unstake(tokens.ipTokenDai.address, stakedIpTokens);
         //    then
         const globalIndicatorsAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
-        const userParamsAfter = await john
-            .connect(userOne)
-            .getAccountIndicators(tokens.ipTokenDai.address);
+        const userParamsAfter = await john.getAccountIndicators(
+            await userOne.getAddress(),
+            tokens.ipTokenDai.address
+        );
         const ipTokenBalanceAfter = await tokens.ipTokenDai.balanceOf(await userOne.getAddress());
 
         const pwIporBalanceAfter = await powerIpor

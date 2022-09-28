@@ -97,6 +97,7 @@ describe("John Stake and balance", () => {
                 tokens.ipTokenDai.address
             );
             const initUserParamResponse = await john.getAccountIndicators(
+                await admin.getAddress(),
                 tokens.ipTokenDai.address
             );
             expectGlobalIndicators(
@@ -123,6 +124,7 @@ describe("John Stake and balance", () => {
                 tokens.ipTokenDai.address
             );
             const afterDelegatePwIporUPR = await john.getAccountIndicators(
+                await admin.getAddress(),
                 tokens.ipTokenDai.address
             );
 
@@ -148,6 +150,7 @@ describe("John Stake and balance", () => {
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
             const afterStakeIpTokensGPR = await john.getGlobalIndicators(tokens.ipTokenDai.address);
             const afterStakeIpTokensUPR = await john.getAccountIndicators(
+                await admin.getAddress(),
                 tokens.ipTokenDai.address
             );
 
