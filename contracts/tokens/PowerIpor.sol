@@ -44,8 +44,12 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         return _unstakeWithoutCooldownFee;
     }
 
-    function getActiveCoolDown() external view returns (PowerIporTypes.PwIporCoolDown memory) {
-        return _coolDowns[_msgSender()];
+    function getActiveCoolDown(address account)
+        external
+        view
+        returns (PowerIporTypes.PwIporCoolDown memory)
+    {
+        return _coolDowns[account];
     }
 
     function stake(uint256 iporTokenAmount) external override whenNotPaused nonReentrant {
