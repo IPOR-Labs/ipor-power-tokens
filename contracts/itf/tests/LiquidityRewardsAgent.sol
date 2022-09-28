@@ -31,7 +31,7 @@ contract LiquidityRewardsAgent {
     }
 
     function calculateAccountRewards(address ipToken) external view returns (uint256) {
-        return _john.calculateAccountRewards(ipToken);
+        return _john.calculateAccountRewards(address(this), ipToken);
     }
 
     function getAccountIndicators(address ipToken)

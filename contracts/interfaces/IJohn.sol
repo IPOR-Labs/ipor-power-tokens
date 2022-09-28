@@ -30,9 +30,13 @@ interface IJohn {
 
     /// @notice Calculates account rewards based on current state of sender and global indicators.
     /// @dev Calculation not consider accrued values at current block
+    /// @param account address for which we want get information about rewards
     /// @param ipToken address for which asset should calculate rewards
     /// @return Sender's rewards, represented in 18 decimals.
-    function calculateAccountRewards(address ipToken) external view returns (uint256);
+    function calculateAccountRewards(address account, address ipToken)
+        external
+        view
+        returns (uint256);
 
     /// @notice Stakes ipToken amount into John.
     /// @param ipToken address for a specific asset (ipUSDT, ipUSDC, ipDAI, etc.)

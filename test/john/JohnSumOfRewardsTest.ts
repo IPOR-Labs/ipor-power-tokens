@@ -205,13 +205,18 @@ describe("John sum of rewards", () => {
             100000000
         );
 
-        const rewardsAdmin = await john.calculateAccountRewards(tokens.ipTokenDai.address);
-        const rewardsUserOne = await john
-            .connect(userOne)
-            .calculateAccountRewards(tokens.ipTokenDai.address);
-        const rewardsUserTwo = await john
-            .connect(userTwo)
-            .calculateAccountRewards(tokens.ipTokenDai.address);
+        const rewardsAdmin = await john.calculateAccountRewards(
+            await admin.getAddress(),
+            tokens.ipTokenDai.address
+        );
+        const rewardsUserOne = await john.calculateAccountRewards(
+            await userOne.getAddress(),
+            tokens.ipTokenDai.address
+        );
+        const rewardsUserTwo = await john.calculateAccountRewards(
+            await userTwo.getAddress(),
+            tokens.ipTokenDai.address
+        );
         expect(rewardsAdmin.add(rewardsUserOne).add(rewardsUserTwo)).to.be.equal(ZERO);
     });
 
@@ -335,7 +340,10 @@ describe("John sum of rewards", () => {
 
         //    then
 
-        const accountRewardsAfter = await john.calculateAccountRewards(tokens.ipTokenDai.address);
+        const accountRewardsAfter = await john.calculateAccountRewards(
+            await admin.getAddress(),
+            tokens.ipTokenDai.address
+        );
         const pwIporBalanceAfter = await powerIpor
             .connect(userOne)
             .balanceOf(await userOne.getAddress());

@@ -50,11 +50,16 @@ contract John is JohnInternal, IJohn {
             );
     }
 
-    function calculateAccountRewards(address ipToken) external view override returns (uint256) {
+    function calculateAccountRewards(address account, address ipToken)
+        external
+        view
+        override
+        returns (uint256)
+    {
         JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
-        JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[
-            _msgSender()
-        ][ipToken];
+        JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[account][
+            ipToken
+        ];
         return _calculateAccountRewards(accountIndicators, globalIndicators);
     }
 

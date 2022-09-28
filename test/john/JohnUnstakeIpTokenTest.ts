@@ -488,7 +488,10 @@ describe("John unstake ipToken", () => {
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
         //    then
 
-        const accountRewardsAfter = await john.calculateAccountRewards(ipDai);
+        const accountRewardsAfter = await john.calculateAccountRewards(
+            await admin.getAddress(),
+            ipDai
+        );
         const accruedRewardsAfter = await john.calculateAccruedRewards(ipDai);
         const globalIndicatorsAfter = await john.getGlobalIndicators(ipDai);
 
