@@ -38,7 +38,7 @@ abstract contract PowerIporInternal is
     mapping(address => uint256) internal _baseBalance;
 
     /// @dev balance of Power Ipor Token which are delegated to John, information per account, balance represented in 18 decimals
-    mapping(address => uint256) internal _delegatedBalance;
+    mapping(address => uint256) internal _delegatedToJohnBalance;
     // account address -> {endTimestamp, amount}
     mapping(address => PowerIporTypes.PwIporCoolDown) internal _coolDowns;
     uint256 internal _baseTotalSupply;
@@ -167,7 +167,7 @@ abstract contract PowerIporInternal is
     {
         return
             _calculateBaseAmountToPwIpor(_baseBalance[account], exchangeRate) -
-            _delegatedBalance[account] -
+            _delegatedToJohnBalance[account] -
             _coolDowns[account].pwIporAmount;
     }
 

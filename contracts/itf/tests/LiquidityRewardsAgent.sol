@@ -58,8 +58,8 @@ contract LiquidityRewardsAgent {
         _john.claim(ipToken);
     }
 
-    function delegatedBalanceOf(address account) external view returns (uint256) {
-        return _powerIpor.delegatedBalanceOf(account);
+    function delegatedToJohnBalanceOf(address account) external view returns (uint256) {
+        return _powerIpor.delegatedToJohnBalanceOf(account);
     }
 
     function stakeIporToken(uint256 iporTokenAmount) external {
