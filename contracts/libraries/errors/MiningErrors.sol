@@ -13,6 +13,7 @@ library MiningErrors {
     string public constant COOL_DOWN_NOT_FINISH = "IPOR_709";
     string public constant AGGREGATE_POWER_UP_COULD_NOT_BE_NEGATIVE = "IPOR_710";
     string public constant BLOCK_NUMBER_GREATER_OR_EQUAL_THAN_PREVIOUS_BLOCK_NUMBER = "IPOR_711";
-    string public constant COMPOSITE_MULTIPLIER_GREATER_OR_EQUAL_THAN_ACCOUNT_COMPOSITE_MULTIPLIER =
-        "IPOR_712";
+
+    /// @notice Composite Multiplier indicator greater or equal than Account Composit Multiplier indicator
+    string public constant COMPOSITE_MULTIPLIER_GTE_ACCOUNT_COMPOSITE_MULTIPLIER = "IPOR_712";
 }
