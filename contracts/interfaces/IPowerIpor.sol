@@ -43,8 +43,12 @@ interface IPowerIpor {
     /// @notice Gets state of active cool down for the sender.
     /// @dev If PowerIporTypes.PowerIporCoolDown contains only zeros it represents no active cool down.
     /// Struct contain information when cooldown is ended and how many Power Ipor Tokens are locked.
+    /// @param account account address which cooldown should be returned
     /// @return Object PowerIporTypes.PowerIporCoolDown which represents active cool down, the moment of
-    function getActiveCoolDown() external view returns (PowerIporTypes.PwIporCoolDown memory);
+    function getActiveCoolDown(address account)
+        external
+        view
+        returns (PowerIporTypes.PwIporCoolDown memory);
 
     /// @notice Stakes IPOR Tokens and receives Power Ipor tokens (pwIpor).
     /// @param iporTokenAmount IPOR tokens which sender want to stake to the PowerIpor smart contract

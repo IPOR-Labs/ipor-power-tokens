@@ -90,6 +90,7 @@ describe("John - Rebalance on delegate pwIpor", () => {
                 tokens.ipTokenDai.address
             );
             const initUserIndicatorsResponse = await john.getAccountIndicators(
+                await admin.getAddress(),
                 tokens.ipTokenDai.address
             );
 
@@ -100,6 +101,7 @@ describe("John - Rebalance on delegate pwIpor", () => {
                 tokens.ipTokenDai.address
             );
             const afterDelegatePwIporUPR = await john.getAccountIndicators(
+                await admin.getAddress(),
                 tokens.ipTokenDai.address
             );
 
@@ -110,6 +112,7 @@ describe("John - Rebalance on delegate pwIpor", () => {
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
             const afterStakeIpTokensGPR = await john.getGlobalIndicators(tokens.ipTokenDai.address);
             const afterStakeIpTokensUPR = await john.getAccountIndicators(
+                await admin.getAddress(),
                 tokens.ipTokenDai.address
             );
 
@@ -165,7 +168,10 @@ describe("John - Rebalance on delegate pwIpor", () => {
                 delegatedIporToken
             );
 
-            const rewards = await john.calculateAccountRewards(tokens.ipTokenDai.address);
+            const rewards = await john.calculateAccountRewards(
+                await admin.getAddress(),
+                tokens.ipTokenDai.address
+            );
             expect(rewards).to.be.equal(BigNumber.from("100000000000000000000"));
         });
 
@@ -199,13 +205,18 @@ describe("John - Rebalance on delegate pwIpor", () => {
 
             //    then
 
-            const rewardsAdmin = await john.calculateAccountRewards(tokens.ipTokenDai.address);
-            const rewardsUserOne = await john
-                .connect(userOne)
-                .calculateAccountRewards(tokens.ipTokenDai.address);
-            const rewardsUserTwo = await john
-                .connect(userTwo)
-                .calculateAccountRewards(tokens.ipTokenDai.address);
+            const rewardsAdmin = await john.calculateAccountRewards(
+                await admin.getAddress(),
+                tokens.ipTokenDai.address
+            );
+            const rewardsUserOne = await john.calculateAccountRewards(
+                await userOne.getAddress(),
+                tokens.ipTokenDai.address
+            );
+            const rewardsUserTwo = await john.calculateAccountRewards(
+                await userTwo.getAddress(),
+                tokens.ipTokenDai.address
+            );
             expect(rewardsAdmin.add(rewardsUserOne).add(rewardsUserTwo)).to.be.equal(
                 BigNumber.from("305652777777777777777")
             );
@@ -223,6 +234,7 @@ describe("John - Rebalance on delegate pwIpor", () => {
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
             const rewardsAfterFirstStake = await john.calculateAccountRewards(
+                await admin.getAddress(),
                 tokens.ipTokenDai.address
             );
 
@@ -231,6 +243,7 @@ describe("John - Rebalance on delegate pwIpor", () => {
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
             const rewardsAfterSecondStake = await john.calculateAccountRewards(
+                await admin.getAddress(),
                 tokens.ipTokenDai.address
             );
             //    then

@@ -77,7 +77,7 @@ const randomStakeIpToken = async (account: Signer, ipToken: string, john: John) 
 
 const randomUnstakeIpToken = async (account: Signer, ipToken: string, john: John) => {
     if (flipCoin()) return;
-    const balance = (await john.connect(account).balanceOf(ipToken)).div(N1__0_18DEC);
+    const balance = (await john.balanceOf(await account.getAddress(), ipToken)).div(N1__0_18DEC);
     const unstakeAmount = balance.toNumber();
 
     if (unstakeAmount <= 0) return;
@@ -94,11 +94,20 @@ describe("John unstake ipToken", () => {
     let tokens: Tokens;
     let john: John;
     let admin: Signer, userOne: Signer, userTwo: Signer, userThree: Signer;
+    let adminAddress: string,
+        userOneAddress: string,
+        userTwoAddress: string,
+        userThreeAddress: string;
+
     let iporToken: IporToken;
     let powerIpor: PowerIpor;
 
     before(async () => {
         [admin, userOne, userTwo, userThree] = await hre.ethers.getSigners();
+        adminAddress = await admin.getAddress();
+        userOneAddress = await userOne.getAddress();
+        userTwoAddress = await userTwo.getAddress();
+        userThreeAddress = await userThree.getAddress();
 
         tokens = await getDeployedTokens([admin, userOne, userTwo, userThree]);
     });
@@ -219,8 +228,8 @@ describe("John unstake ipToken", () => {
             await john.connect(userOne).stake(dai, N2000__0_18DEC);
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
         }
-        const userOneBalance = await john.connect(userOne).balanceOf(dai);
-        const userTwoBalance = await john.connect(userTwo).balanceOf(dai);
+        const userOneBalance = await john.balanceOf(userOneAddress, dai);
+        const userTwoBalance = await john.balanceOf(userTwoAddress, dai);
         await john.connect(userOne).unstake(dai, userOneBalance);
         await john.connect(userTwo).unstake(dai, userTwoBalance);
 
@@ -283,9 +292,9 @@ describe("John unstake ipToken", () => {
         await john.connect(userOne).unstake(dai, N1__0_18DEC);
         await john.connect(userTwo).unstake(dai, N1__0_18DEC);
 
-        const adminBalance = await john.balanceOf(dai);
-        const userOneBalance = await john.connect(userOne).balanceOf(dai);
-        const userTwoBalance = await john.connect(userTwo).balanceOf(dai);
+        const adminBalance = await john.balanceOf(adminAddress, dai);
+        const userOneBalance = await john.balanceOf(userOneAddress, dai);
+        const userTwoBalance = await john.balanceOf(userTwoAddress, dai);
         await john.unstake(dai, adminBalance);
         await john.connect(userOne).unstake(dai, userOneBalance);
         await john.connect(userTwo).unstake(dai, userTwoBalance);
@@ -353,9 +362,9 @@ describe("John unstake ipToken", () => {
             }
         }
 
-        const adminBalance = await john.balanceOf(dai);
-        const userOneBalance = await john.connect(userOne).balanceOf(dai);
-        const userTwoBalance = await john.connect(userTwo).balanceOf(dai);
+        const adminBalance = await john.balanceOf(adminAddress, dai);
+        const userOneBalance = await john.balanceOf(userOneAddress, dai);
+        const userTwoBalance = await john.balanceOf(userTwoAddress, dai);
         await john.unstake(dai, adminBalance);
         await john.connect(userOne).unstake(dai, userOneBalance);
         await john.connect(userTwo).unstake(dai, userTwoBalance);
@@ -425,10 +434,10 @@ describe("John unstake ipToken", () => {
             }
         }
 
-        const adminBalance = await john.balanceOf(ipDai);
-        const userOneBalance = await john.connect(userOne).balanceOf(ipDai);
-        const userTwoBalance = await john.connect(userTwo).balanceOf(ipDai);
-        const userThreeBalance = await john.connect(userThree).balanceOf(ipDai);
+        const adminBalance = await john.balanceOf(adminAddress, ipDai);
+        const userOneBalance = await john.balanceOf(userOneAddress, ipDai);
+        const userTwoBalance = await john.balanceOf(userTwoAddress, ipDai);
+        const userThreeBalance = await john.balanceOf(userThreeAddress, ipDai);
 
         await john.unstake(ipDai, adminBalance);
         await john.connect(userOne).unstake(ipDai, userOneBalance);
@@ -479,7 +488,10 @@ describe("John unstake ipToken", () => {
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
         //    then
 
-        const accountRewardsAfter = await john.calculateAccountRewards(ipDai);
+        const accountRewardsAfter = await john.calculateAccountRewards(
+            await admin.getAddress(),
+            ipDai
+        );
         const accruedRewardsAfter = await john.calculateAccruedRewards(ipDai);
         const globalIndicatorsAfter = await john.getGlobalIndicators(ipDai);
 

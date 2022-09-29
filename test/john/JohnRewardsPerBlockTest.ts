@@ -147,7 +147,10 @@ describe("John Rewards per block", () => {
         await network.provider.send("evm_setAutomine", [false]);
         await john.stake(ipDai, N2__0_18DEC);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
-        const accountRewardsBefore = await john.calculateAccountRewards(ipDai);
+        const accountRewardsBefore = await john.calculateAccountRewards(
+            await admin.getAddress(),
+            ipDai
+        );
         const accruedRewardsBefore = await john.calculateAccruedRewards(ipDai);
         const globalIndicatorsBefore = await john.getGlobalIndicators(ipDai);
 
@@ -156,7 +159,10 @@ describe("John Rewards per block", () => {
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
         //    then
-        const accountRewardsAfter = await john.calculateAccountRewards(ipDai);
+        const accountRewardsAfter = await john.calculateAccountRewards(
+            await admin.getAddress(),
+            ipDai
+        );
         const accruedRewardsAfter = await john.calculateAccruedRewards(ipDai);
         const globalIndicatorsAfter = await john.getGlobalIndicators(ipDai);
 
@@ -191,7 +197,10 @@ describe("John Rewards per block", () => {
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
         await john.setRewardsPerBlock(ipDai, ZERO);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
-        const accountRewardsBefore = await john.calculateAccountRewards(ipDai);
+        const accountRewardsBefore = await john.calculateAccountRewards(
+            await admin.getAddress(),
+            ipDai
+        );
         const accruedRewardsBefore = await john.calculateAccruedRewards(ipDai);
         const globalIndicatorsBefore = await john.getGlobalIndicators(ipDai);
 
@@ -200,7 +209,10 @@ describe("John Rewards per block", () => {
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
         //    then
-        const accountRewardsAfter = await john.calculateAccountRewards(ipDai);
+        const accountRewardsAfter = await john.calculateAccountRewards(
+            await admin.getAddress(),
+            ipDai
+        );
         const accruedRewardsAfter = await john.calculateAccruedRewards(ipDai);
         const globalIndicatorsAfter = await john.getGlobalIndicators(ipDai);
         const globalIndicatorsBeforeExtract = extractGlobalIndicators(globalIndicatorsBefore);
