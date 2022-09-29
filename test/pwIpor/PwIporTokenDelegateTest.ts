@@ -82,13 +82,17 @@ describe("PowerIpor configuration, deploy tests", () => {
         //    given
         const [admin] = accounts;
         await powerIpor.stake(N1__0_18DEC);
-        const delegatedBalanceBefore = await powerIpor.delegatedBalanceOf(await admin.getAddress());
+        const delegatedBalanceBefore = await powerIpor.delegatedToJohnBalanceOf(
+            await admin.getAddress()
+        );
 
         //    when
         await powerIpor.delegateToJohn([tokens.ipTokenDai.address], [N0__1_18DEC]);
 
         //    then
-        const delegatedBalanceAfter = await powerIpor.delegatedBalanceOf(await admin.getAddress());
+        const delegatedBalanceAfter = await powerIpor.delegatedToJohnBalanceOf(
+            await admin.getAddress()
+        );
         const balance = await john.balanceOfDelegatedPwIpor(await admin.getAddress(), [
             tokens.ipTokenDai.address,
         ]);
@@ -101,14 +105,18 @@ describe("PowerIpor configuration, deploy tests", () => {
         //    given
         const [admin] = accounts;
         await powerIpor.stake(N1__0_18DEC);
-        const delegatedBalanceBefore = await powerIpor.delegatedBalanceOf(await admin.getAddress());
+        const delegatedBalanceBefore = await powerIpor.delegatedToJohnBalanceOf(
+            await admin.getAddress()
+        );
         //    when
         await powerIpor.delegateToJohn(
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
             [N0__1_18DEC, N0__1_18DEC]
         );
         //    then
-        const delegatedBalanceAfter = await powerIpor.delegatedBalanceOf(await admin.getAddress());
+        const delegatedBalanceAfter = await powerIpor.delegatedToJohnBalanceOf(
+            await admin.getAddress()
+        );
 
         expect(delegatedBalanceBefore).to.be.equal(ZERO);
         expect(delegatedBalanceAfter).to.be.equal(N0__1_18DEC.add(N0__1_18DEC));

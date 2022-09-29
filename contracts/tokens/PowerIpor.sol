@@ -36,8 +36,8 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         return _balanceOf(account);
     }
 
-    function delegatedBalanceOf(address account) external view override returns (uint256) {
-        return _delegatedBalance[account];
+    function delegatedToJohnBalanceOf(address account) external view override returns (uint256) {
+        return _delegatedToJohnBalance[account];
     }
 
     function getUnstakeWithoutCooldownFee() external view override returns (uint256) {
@@ -128,7 +128,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
             MiningErrors.STAKED_BALANCE_TOO_LOW
         );
 
-        _delegatedBalance[_msgSender()] += pwIporToDelegate;
+        _delegatedToJohnBalance[_msgSender()] += pwIporToDelegate;
         IJohnInternal(_john).delegatePwIpor(_msgSender(), ipTokens, pwIporAmounts);
 
         emit DelegateToJohn(_msgSender(), ipTokens, pwIporAmounts);
@@ -154,7 +154,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
             MiningErrors.STAKED_BALANCE_TOO_LOW
         );
 
-        _delegatedBalance[_msgSender()] += pwIporToDelegate;
+        _delegatedToJohnBalance[_msgSender()] += pwIporToDelegate;
         IJohnInternal(_john).delegatePwIporAndStakeIpToken(
             _msgSender(),
             ipTokens,
@@ -179,12 +179,12 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         }
 
         require(
-            _delegatedBalance[_msgSender()] >= pwIporAmountToUndelegate,
+            _delegatedToJohnBalance[_msgSender()] >= pwIporAmountToUndelegate,
             MiningErrors.DELEGATED_BALANCE_TOO_LOW
         );
 
         IJohnInternal(_john).undelegatePwIpor(_msgSender(), ipTokens, pwIporAmounts);
-        _delegatedBalance[_msgSender()] -= pwIporAmountToUndelegate;
+        _delegatedToJohnBalance[_msgSender()] -= pwIporAmountToUndelegate;
 
         emit UndelegateFromJohn(_msgSender(), ipTokens, pwIporAmounts);
     }
@@ -197,7 +197,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         uint256 availablePwIporAmount = _calculateBaseAmountToPwIpor(
             _baseBalance[msgSender],
             _calculateInternalExchangeRate(_iporToken)
-        ) - _delegatedBalance[msgSender];
+        ) - _delegatedToJohnBalance[msgSender];
 
         require(
             availablePwIporAmount >= pwIporAmount,

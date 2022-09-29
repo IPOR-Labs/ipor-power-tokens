@@ -173,7 +173,7 @@ export default ({ drizzle, drizzleState }) => {
                                 drizzle={drizzle}
                                 drizzleState={drizzleState}
                                 contract="PowerIpor"
-                                method="delegatedBalanceOf"
+                                method="delegatedToJohnBalanceOf"
                                 methodArgs={[drizzleState.accounts[0]]}
                                 render={(value) => (
                                     <div>

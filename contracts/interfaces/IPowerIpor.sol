@@ -33,7 +33,7 @@ interface IPowerIpor {
     /// Token are delegated from PowerIpor to John smart contract (reponsible for rewards distribution).
     /// @param account account address for which is checked balance of delegated Power Ipor Tokens
     /// @return  Returns the amount of Power Ipor tokens owned by `account` and delegated to John contracts.
-    function delegatedBalanceOf(address account) external view returns (uint256);
+    function delegatedToJohnBalanceOf(address account) external view returns (uint256);
 
     /// @notice Gets configuration param the fee which is taken when sender want to unstake Ipor Token from PowerIpor in time when cooldown is active.
     /// @dev Fee value represented in as a percentage in 18 decimals
