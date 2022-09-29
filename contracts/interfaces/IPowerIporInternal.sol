@@ -29,9 +29,17 @@ interface IPowerIporInternal {
     /// @notice method return actual address of liquidity rewards contract - the John
     function getJohn() external view returns (address);
 
+    /// @notice Gets Pause Manager address
+    /// @return Pause Manager's address
+    function getPauseManager() external view returns (address);
+
     /// @notice method setup address of John
     /// @param john - new address of John contract
     function setJohn(address john) external;
+
+    /// @notice Sets new Pause Manager address
+    /// @param newPauseManagerAddr - new address of Pauyse Manager
+    function setPauseManager(address newPauseManagerAddr) external;
 
     /// @notice Pauses current smart contract, it can be executed only by the Owner
     /// @dev Emits {Paused} event.
@@ -56,9 +64,19 @@ interface IPowerIporInternal {
         uint256 newFee
     );
 
-    /// @notice Emmited when John's address is changed by its owner.
+    /// @notice Emmited when PauseManager's address is changed by its owner.
     /// @param changedBy account address that has changed John's address
-    /// @param oldJohn John's old address
-    /// @param newJohn John's new address
+    /// @param oldJohn PauseManager's old address
+    /// @param newJohn PauseManager's new address
     event JohnChanged(address indexed changedBy, address indexed oldJohn, address indexed newJohn);
+
+    /// @notice Emmited when PauseManager's address is changed by its owner.
+    /// @param changedBy account address that has changed John's address
+    /// @param oldPauseManager PauseManager's old address
+    /// @param newPauseManager PauseManager's new address
+    event PauseManagerChanged(
+        address indexed changedBy,
+        address indexed oldPauseManager,
+        address indexed newPauseManager
+    );
 }

@@ -33,6 +33,7 @@ abstract contract PowerIporInternal is
 
     address internal _john;
     address internal _iporToken;
+    address internal _pauseManager;
 
     /// @dev account address -> base amount, represented in 18 decimals
     mapping(address => uint256) internal _baseBalance;
@@ -49,6 +50,11 @@ abstract contract PowerIporInternal is
         _;
     }
 
+    modifier onlyPauseManager() {
+        require(_msgSender() == _pauseManager, MiningErrors.CALLER_NOT_PAUSE_MANAGER);
+        _;
+    }
+
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
@@ -60,6 +66,7 @@ abstract contract PowerIporInternal is
         __UUPSUpgradeable_init();
         require(iporToken != address(0), IporErrors.WRONG_ADDRESS);
         _iporToken = iporToken;
+        _pauseManager = _msgSender();
         _unstakeWithoutCooldownFee = Constants.D17 * 5;
     }
 
@@ -79,6 +86,10 @@ abstract contract PowerIporInternal is
         return _john;
     }
 
+    function getPauseManager() external view override returns (address) {
+        return _pauseManager;
+    }
+
     function setUnstakeWithoutCooldownFee(uint256 unstakeWithoutCooldownFee)
         external
         override
@@ -94,6 +105,13 @@ abstract contract PowerIporInternal is
         address oldJohnAddr = _john;
         _john = newJohnAddr;
         emit JohnChanged(_msgSender(), oldJohnAddr, newJohnAddr);
+    }
+
+    function setPauseManager(address newPauseManagerAddr) external override onlyOwner {
+        require(newPauseManagerAddr != address(0), IporErrors.WRONG_ADDRESS);
+        address oldPauseManagerAddr = _pauseManager;
+        _pauseManager = newPauseManagerAddr;
+        emit PauseManagerChanged(_msgSender(), oldPauseManagerAddr, newPauseManagerAddr);
     }
 
     function receiveRewards(address account, uint256 iporTokenAmount)
@@ -120,11 +138,11 @@ abstract contract PowerIporInternal is
         emit ReceiveRewards(account, iporTokenAmount);
     }
 
-    function pause() external override onlyOwner {
+    function pause() external override onlyPauseManager {
         _pause();
     }
 
-    function unpause() external override onlyOwner {
+    function unpause() external override onlyPauseManager {
         _unpause();
     }
 
