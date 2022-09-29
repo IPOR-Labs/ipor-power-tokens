@@ -105,17 +105,19 @@ describe("John sum of rewards", () => {
         await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokens);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
         const globalIndicatorsBefore = await john.getGlobalIndicators(tokens.ipTokenDai.address);
-        const userParamsBefore = await john
-            .connect(userOne)
-            .getAccountIndicators(tokens.ipTokenDai.address);
+        const userParamsBefore = await john.getAccountIndicators(
+            await userOne.getAddress(),
+            tokens.ipTokenDai.address
+        );
         const ipTokenBalanceBefore = await tokens.ipTokenDai.balanceOf(await userOne.getAddress());
         //    when
         await john.connect(userOne).unstake(tokens.ipTokenDai.address, stakedIpTokens);
         //    then
         const globalIndicatorsAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
-        const userParamsAfter = await john
-            .connect(userOne)
-            .getAccountIndicators(tokens.ipTokenDai.address);
+        const userParamsAfter = await john.getAccountIndicators(
+            await userOne.getAddress(),
+            tokens.ipTokenDai.address
+        );
         const ipTokenBalanceAfter = await tokens.ipTokenDai.balanceOf(await userOne.getAddress());
 
         const pwIporBalanceAfter = await powerIpor
@@ -205,13 +207,18 @@ describe("John sum of rewards", () => {
             100000000
         );
 
-        const rewardsAdmin = await john.calculateAccountRewards(tokens.ipTokenDai.address);
-        const rewardsUserOne = await john
-            .connect(userOne)
-            .calculateAccountRewards(tokens.ipTokenDai.address);
-        const rewardsUserTwo = await john
-            .connect(userTwo)
-            .calculateAccountRewards(tokens.ipTokenDai.address);
+        const rewardsAdmin = await john.calculateAccountRewards(
+            await admin.getAddress(),
+            tokens.ipTokenDai.address
+        );
+        const rewardsUserOne = await john.calculateAccountRewards(
+            await userOne.getAddress(),
+            tokens.ipTokenDai.address
+        );
+        const rewardsUserTwo = await john.calculateAccountRewards(
+            await userTwo.getAddress(),
+            tokens.ipTokenDai.address
+        );
         expect(rewardsAdmin.add(rewardsUserOne).add(rewardsUserTwo)).to.be.equal(ZERO);
     });
 
@@ -335,7 +342,10 @@ describe("John sum of rewards", () => {
 
         //    then
 
-        const accountRewardsAfter = await john.calculateAccountRewards(tokens.ipTokenDai.address);
+        const accountRewardsAfter = await john.calculateAccountRewards(
+            await admin.getAddress(),
+            tokens.ipTokenDai.address
+        );
         const pwIporBalanceAfter = await powerIpor
             .connect(userOne)
             .balanceOf(await userOne.getAddress());

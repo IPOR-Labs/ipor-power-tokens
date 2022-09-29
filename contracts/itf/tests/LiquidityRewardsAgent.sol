@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.16;
 
-import "../../rewards/John.sol";
+import "../../john/John.sol";
 import "../../tokens/PowerIpor.sol";
 
 contract LiquidityRewardsAgent {
@@ -31,7 +31,7 @@ contract LiquidityRewardsAgent {
     }
 
     function calculateAccountRewards(address ipToken) external view returns (uint256) {
-        return _john.calculateAccountRewards(ipToken);
+        return _john.calculateAccountRewards(address(this), ipToken);
     }
 
     function getAccountIndicators(address ipToken)
@@ -39,7 +39,7 @@ contract LiquidityRewardsAgent {
         view
         returns (JohnTypes.AccountRewardsIndicators memory)
     {
-        return _john.getAccountIndicators(ipToken);
+        return _john.getAccountIndicators(address(this), ipToken);
     }
 
     function balanceOfDelegatedPwIpor(address account, address[] memory requestIpTokens)
@@ -51,7 +51,7 @@ contract LiquidityRewardsAgent {
     }
 
     function balanceOf(address ipToken) external view returns (uint256) {
-        return _john.balanceOf(ipToken);
+        return _john.balanceOf(address(this), ipToken);
     }
 
     function claim(address ipToken) external {

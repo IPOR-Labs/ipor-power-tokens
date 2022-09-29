@@ -14,8 +14,8 @@ contract John is JohnInternal, IJohn {
     using SafeCast for uint256;
     using SafeCast for int256;
 
-    function balanceOf(address ipToken) external view override returns (uint256) {
-        return _accountIndicators[_msgSender()][ipToken].ipTokenBalance;
+    function balanceOf(address account, address ipToken) external view override returns (uint256) {
+        return _accountIndicators[account][ipToken].ipTokenBalance;
     }
 
     function balanceOfDelegatedPwIpor(address account, address[] memory requestIpTokens)
@@ -50,11 +50,16 @@ contract John is JohnInternal, IJohn {
             );
     }
 
-    function calculateAccountRewards(address ipToken) external view override returns (uint256) {
+    function calculateAccountRewards(address account, address ipToken)
+        external
+        view
+        override
+        returns (uint256)
+    {
         JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
-        JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[
-            _msgSender()
-        ][ipToken];
+        JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[account][
+            ipToken
+        ];
         return _calculateAccountRewards(accountIndicators, globalIndicators);
     }
 

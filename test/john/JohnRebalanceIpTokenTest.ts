@@ -29,11 +29,15 @@ describe("John Stake and balance", () => {
     let tokens: Tokens;
     let john: John;
     let admin: Signer, userOne: Signer, userTwo: Signer, userThree: Signer;
+    let adminAddress: string, userOneAddress: string, userTwoAddress: string;
     let iporToken: IporToken;
     let powerIpor: PowerIpor;
 
     before(async () => {
         [admin, userOne, userTwo, userThree] = await hre.ethers.getSigners();
+        adminAddress = await admin.getAddress();
+        userOneAddress = await userOne.getAddress();
+        userTwoAddress = await userTwo.getAddress();
 
         tokens = await getDeployedTokens([admin, userOne, userTwo, userThree]);
     });
@@ -93,6 +97,7 @@ describe("John Stake and balance", () => {
                 tokens.ipTokenDai.address
             );
             const initUserParamResponse = await john.getAccountIndicators(
+                await admin.getAddress(),
                 tokens.ipTokenDai.address
             );
             expectGlobalIndicators(
@@ -119,6 +124,7 @@ describe("John Stake and balance", () => {
                 tokens.ipTokenDai.address
             );
             const afterDelegatePwIporUPR = await john.getAccountIndicators(
+                await admin.getAddress(),
                 tokens.ipTokenDai.address
             );
 
@@ -144,6 +150,7 @@ describe("John Stake and balance", () => {
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
             const afterStakeIpTokensGPR = await john.getGlobalIndicators(tokens.ipTokenDai.address);
             const afterStakeIpTokensUPR = await john.getAccountIndicators(
+                await admin.getAddress(),
                 tokens.ipTokenDai.address
             );
 
@@ -165,7 +172,10 @@ describe("John Stake and balance", () => {
                 delegatedIporToken
             );
 
-            const rewards = await john.calculateAccountRewards(tokens.ipTokenDai.address);
+            const rewards = await john.calculateAccountRewards(
+                adminAddress,
+                tokens.ipTokenDai.address
+            );
             expect(rewards).to.be.equal(BigNumber.from("100000000000000000000"));
         });
 
@@ -198,13 +208,18 @@ describe("John Stake and balance", () => {
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
             //    then
-            const rewardsAdmin = await john.calculateAccountRewards(tokens.ipTokenDai.address);
-            const rewardsUserOne = await john
-                .connect(userOne)
-                .calculateAccountRewards(tokens.ipTokenDai.address);
-            const rewardsUserTwo = await john
-                .connect(userTwo)
-                .calculateAccountRewards(tokens.ipTokenDai.address);
+            const rewardsAdmin = await john.calculateAccountRewards(
+                adminAddress,
+                tokens.ipTokenDai.address
+            );
+            const rewardsUserOne = await john.calculateAccountRewards(
+                userOneAddress,
+                tokens.ipTokenDai.address
+            );
+            const rewardsUserTwo = await john.calculateAccountRewards(
+                userTwoAddress,
+                tokens.ipTokenDai.address
+            );
             expect(rewardsAdmin.add(rewardsUserOne).add(rewardsUserTwo)).to.be.equal(
                 BigNumber.from("305999999999999999999")
             );
@@ -222,6 +237,7 @@ describe("John Stake and balance", () => {
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
             const rewardsAfterFirstStake = await john.calculateAccountRewards(
+                adminAddress,
                 tokens.ipTokenDai.address
             );
 
@@ -229,6 +245,7 @@ describe("John Stake and balance", () => {
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
             const rewardsAfterSecondStake = await john.calculateAccountRewards(
+                adminAddress,
                 tokens.ipTokenDai.address
             );
             //    then
@@ -294,6 +311,7 @@ describe("John Stake and balance", () => {
                 tokens.ipTokenDai.address
             );
             const accountRewardsBefore = await john.calculateAccountRewards(
+                adminAddress,
                 tokens.ipTokenDai.address
             );
 
@@ -306,6 +324,7 @@ describe("John Stake and balance", () => {
                 tokens.ipTokenDai.address
             );
             const accountRewardsAfter = await john.calculateAccountRewards(
+                adminAddress,
                 tokens.ipTokenDai.address
             );
 
@@ -327,6 +346,7 @@ describe("John Stake and balance", () => {
                 tokens.ipTokenDai.address
             );
             const accountRewardsBefore = await john.calculateAccountRewards(
+                adminAddress,
                 tokens.ipTokenDai.address
             );
 
@@ -339,6 +359,7 @@ describe("John Stake and balance", () => {
                 tokens.ipTokenDai.address
             );
             const accountRewardsAfter = await john.calculateAccountRewards(
+                adminAddress,
                 tokens.ipTokenDai.address
             );
 

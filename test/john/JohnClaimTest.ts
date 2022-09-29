@@ -119,9 +119,10 @@ describe("John claim", () => {
 
         await powerIpor.connect(userOne).stake(stakeIporAmount);
 
-        const accountRewardsBefore = await john
-            .connect(userOne)
-            .calculateAccountRewards(tokens.ipTokenDai.address);
+        const accountRewardsBefore = await john.calculateAccountRewards(
+            await userOne.getAddress(),
+            tokens.ipTokenDai.address
+        );
         const accruedRewardsBefore = await john
             .connect(userOne)
             .calculateAccruedRewards(tokens.ipTokenDai.address);
@@ -135,9 +136,10 @@ describe("John claim", () => {
 
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
-        const accountRewardsMiddle = await john
-            .connect(userOne)
-            .calculateAccountRewards(tokens.ipTokenDai.address);
+        const accountRewardsMiddle = await john.calculateAccountRewards(
+            await userOne.getAddress(),
+            tokens.ipTokenDai.address
+        );
         const accruedRewardsMiddle = await john
             .connect(userOne)
             .calculateAccruedRewards(tokens.ipTokenDai.address);
@@ -147,9 +149,10 @@ describe("John claim", () => {
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
         //    then
-        const accountRewardsAfter = await john
-            .connect(userOne)
-            .calculateAccountRewards(tokens.ipTokenDai.address);
+        const accountRewardsAfter = await john.calculateAccountRewards(
+            await userOne.getAddress(),
+            tokens.ipTokenDai.address
+        );
         const accruedRewardsAfter = await john
             .connect(userOne)
             .calculateAccruedRewards(tokens.ipTokenDai.address);
@@ -184,9 +187,10 @@ describe("John claim", () => {
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
-        const rewardsAfterFirstStake = await john
-            .connect(userOne)
-            .calculateAccountRewards(tokens.ipTokenDai.address);
+        const rewardsAfterFirstStake = await john.calculateAccountRewards(
+            await userOne.getAddress(),
+            tokens.ipTokenDai.address
+        );
 
         await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokensAmount);
 
@@ -195,9 +199,10 @@ describe("John claim", () => {
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
-        const rewardsAfterSecondStake = await john
-            .connect(userOne)
-            .calculateAccountRewards(tokens.ipTokenDai.address);
+        const rewardsAfterSecondStake = await john.calculateAccountRewards(
+            await userOne.getAddress(),
+            tokens.ipTokenDai.address
+        );
 
         expect(rewardsAfterFirstStake).to.be.equal(BigNumber.from("100000000000000000000"));
         expect(rewardsAfterSecondStake).to.be.equal(ZERO);
@@ -229,17 +234,19 @@ describe("John claim", () => {
         const powerIporBalanceAfter1Stake = await powerIpor
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
-        const rewardsAfterFirstStake = await john
-            .connect(userOne)
-            .calculateAccountRewards(tokens.ipTokenDai.address);
+        const rewardsAfterFirstStake = await john.calculateAccountRewards(
+            await userOne.getAddress(),
+            tokens.ipTokenDai.address
+        );
 
         await powerIpor
             .connect(userOne)
             .delegateToJohn([tokens.ipTokenDai.address], [delegatedPwIporAmount]);
 
-        const rewardsAfterSecondStake = await john
-            .connect(userOne)
-            .calculateAccountRewards(tokens.ipTokenDai.address);
+        const rewardsAfterSecondStake = await john.calculateAccountRewards(
+            await userOne.getAddress(),
+            tokens.ipTokenDai.address
+        );
 
         //    then
         const powerIporBalanceAfter2Stake = await powerIpor
