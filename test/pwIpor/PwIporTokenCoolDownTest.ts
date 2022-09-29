@@ -192,7 +192,7 @@ describe("PowerIpor unstake", () => {
 
         const coolDownBefore = await powerIpor.getActiveCoolDown();
         const balanceBefore = await powerIpor.balanceOf(adminAddress);
-        const delegatedBalanceBefore = await powerIpor.delegatedBalanceOf(adminAddress);
+        const delegatedBalanceBefore = await powerIpor.delegatedToJohnBalanceOf(adminAddress);
         // when
 
         await expect(
@@ -202,7 +202,7 @@ describe("PowerIpor unstake", () => {
         // then
         const coolDownAfter = await powerIpor.getActiveCoolDown();
         const balanceAfter = await powerIpor.balanceOf(adminAddress);
-        const delegatedBalanceAfter = await powerIpor.delegatedBalanceOf(adminAddress);
+        const delegatedBalanceAfter = await powerIpor.delegatedToJohnBalanceOf(adminAddress);
 
         expect(coolDownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
         expect(coolDownBefore.pwIporAmount).to.be.equal(N0__8_18DEC);
