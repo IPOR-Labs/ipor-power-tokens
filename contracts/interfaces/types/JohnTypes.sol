@@ -15,19 +15,20 @@ library JohnTypes {
     /// @title Global indicators used in rewards calculation.
     struct GlobalRewardsIndicators {
         /// @notice powerUp indicator aggregated
-        /// @dev represended in 18 decimals
+        /// @dev could be change many times per transaction, represended in 18 decimals
         uint256 aggregatedPowerUp;
         /// @notice composite multiplier in a given block described in field blockNumber
-        /// @dev represented in 27 decimals
+        /// @dev could be change many times per transaction, represented in 27 decimals
         uint128 compositeMultiplierInTheBlock;
-        /// @dev represented in 27 decimals
+        /// @dev could be changed one time per block, represented in 27 decimals
         uint128 compositeMultiplierCumulativePrevBlock;
-        /// @dev Block number in which all others params in this structure are updated
+        /// @dev could be changed one time per block, Block number in which all others params in this structure are updated
         uint32 blockNumber;
         /// @notice value describes how many rewards are per one block,
-        /// @dev represented in 8 decimals
+        /// @dev could be changed at most one time per block, represented in 8 decimals
         uint32 rewardsPerBlock;
         /// @notice amount of accrued rewards in all history
+        /// @dev could be changed at most one time per block, represented in 8 decimals
         uint88 accruedRewards;
     }
 
