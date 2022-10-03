@@ -45,7 +45,7 @@ abstract contract JohnInternal is
         internal _accountIndicators;
 
     modifier onlyPowerIpor() {
-        require(_msgSender() == _getPowerIpor(), MiningErrors.CALLER_NOT_PW_IPOR);
+        require(_msgSender() == _getPowerIpor(), MiningErrors.CALLER_NOT_POWER_IPOR);
         _;
     }
 
