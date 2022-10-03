@@ -59,23 +59,6 @@ contract MockMiningCalculation {
         return MiningCalculation.compositeMultiplier(rewardsPerBlock, aggregatedPowerUp);
     }
 
-    function compositeMultiplierCumulative(
-        uint256 lastRebalanseBlockNumber,
-        uint256 blockNumber,
-        uint256 previousCompositeMultiplierCumulative,
-        uint256 previousCompositeMultiplier,
-        uint256 compositeMultiplier
-    ) public view returns (uint256) {
-        return
-            MiningCalculation.compositeMultiplierCumulative(
-                lastRebalanseBlockNumber,
-                blockNumber,
-                previousCompositeMultiplierCumulative,
-                previousCompositeMultiplier,
-                compositeMultiplier
-            );
-    }
-
     function calculateAccountRewards(
         uint256 accountIpTokenAmount,
         uint256 accountPowerUp,
