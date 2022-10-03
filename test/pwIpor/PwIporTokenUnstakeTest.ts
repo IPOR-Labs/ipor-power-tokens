@@ -108,6 +108,7 @@ describe("PowerIpor unstake", () => {
 
     it("Should be able to unstake tokens which is not delegate when he delegated tokens to John", async () => {
         //    given
+        const powerIporIporBalanceBefore = await iporToken.balanceOf(powerIpor.address);
         const [admin] = accounts;
 
         await powerIpor.stake(N1__0_18DEC);
@@ -121,6 +122,7 @@ describe("PowerIpor unstake", () => {
         await powerIpor.unstake(N0__4_18DEC);
 
         //    then
+        const powerIporIporBalanceAfter = await iporToken.balanceOf(powerIpor.address);
         const balanceAfter = await powerIpor.balanceOf(await admin.getAddress());
         const totalSupplyAfter = await powerIpor.totalSupplyBase();
         const iporBalanceAfter = await iporToken.balanceOf(await admin.getAddress());
@@ -135,10 +137,14 @@ describe("PowerIpor unstake", () => {
 
         expect(exchangeRateBefore).to.be.equal(N1__0_18DEC);
         expect(exchangeRateAfter).to.be.equal(BigNumber.from("1333333333333333333"));
+        expect(powerIporIporBalanceAfter).to.be.equal(
+            powerIporIporBalanceBefore.add(BigNumber.from("800000000000000000"))
+        );
     });
 
     it("Should be able to unstake tokens which is not delegate when unstake without cool down fee change", async () => {
         //    given
+        const powerIporIporBalanceBefore = await iporToken.balanceOf(powerIpor.address);
         const [admin] = accounts;
 
         await powerIpor.stake(N1__0_18DEC);
@@ -154,6 +160,7 @@ describe("PowerIpor unstake", () => {
         await powerIpor.unstake(N0__4_18DEC);
 
         //    then
+        const powerIporIporBalanceAfter = await iporToken.balanceOf(powerIpor.address);
         const balanceAfter = await powerIpor.balanceOf(await admin.getAddress());
         const totalSupplyAfter = await powerIpor.totalSupplyBase();
         const iporBalanceAfter = await iporToken.balanceOf(await admin.getAddress());
@@ -173,5 +180,8 @@ describe("PowerIpor unstake", () => {
 
         expect(withdrawalFeeBefore).to.be.equal(N0__5_18DEC);
         expect(withdrawalFeeAfter).to.be.equal(N0__1_18DEC);
+        expect(powerIporIporBalanceAfter).to.be.equal(
+            powerIporIporBalanceBefore.add(BigNumber.from("640000000000000000"))
+        );
     });
 });

@@ -86,6 +86,9 @@ describe("John - Rebalance on delegate pwIpor", () => {
             const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
             const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
 
+            const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
+            const powerIporIporBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+
             const initGlobalIndicatorsResponse = await john.getGlobalIndicators(
                 tokens.ipTokenDai.address
             );
@@ -115,6 +118,9 @@ describe("John - Rebalance on delegate pwIpor", () => {
                 await admin.getAddress(),
                 tokens.ipTokenDai.address
             );
+
+            const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
+            const powerIporIporBalanceAfter = await iporToken.balanceOf(powerIpor.address);
 
             expectGlobalIndicators(
                 extractGlobalIndicators(initGlobalIndicatorsResponse),
@@ -173,12 +179,20 @@ describe("John - Rebalance on delegate pwIpor", () => {
                 tokens.ipTokenDai.address
             );
             expect(rewards).to.be.equal(BigNumber.from("100000000000000000000"));
+
+            expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore.add(stakedIpTokens));
+            expect(powerIporIporBalanceAfter).to.be.equal(
+                powerIporIporBalanceBefore.add(delegatedIporToken).add(N1__0_18DEC)
+            );
         });
 
         it("Should sum of rewards for 3 account should be equal all rewards when all accounts staked ipTokens and Power Ipor Tokens ", async () => {
             //    given
             const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
             const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
+
+            const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
+            const powerIporIporBalanceBefore = await iporToken.balanceOf(powerIpor.address);
 
             //    when
             // Admin
@@ -205,6 +219,9 @@ describe("John - Rebalance on delegate pwIpor", () => {
 
             //    then
 
+            const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
+            const powerIporIporBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+
             const rewardsAdmin = await john.calculateAccountRewards(
                 await admin.getAddress(),
                 tokens.ipTokenDai.address
@@ -219,6 +236,16 @@ describe("John - Rebalance on delegate pwIpor", () => {
             );
             expect(rewardsAdmin.add(rewardsUserOne).add(rewardsUserTwo)).to.be.equal(
                 BigNumber.from("305652777777777777777")
+            );
+            expect(johnIpDaiBalanceAfter).to.be.equal(
+                johnIpDaiBalanceBefore.add(stakedIpTokens).add(stakedIpTokens).add(stakedIpTokens)
+            );
+            expect(powerIporIporBalanceAfter).to.be.equal(
+                powerIporIporBalanceBefore
+                    .add(delegatedIporToken)
+                    .add(delegatedIporToken)
+                    .add(delegatedIporToken)
+                    .add(BigNumber.from("1347222222222222222"))
             );
         });
 

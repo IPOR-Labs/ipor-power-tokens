@@ -1,6 +1,5 @@
 import hre, { upgrades } from "hardhat";
 import chai from "chai";
-const helpers = require("@nomicfoundation/hardhat-network-helpers");
 
 import { BigNumber, Signer } from "ethers";
 
@@ -117,6 +116,11 @@ describe("John rebalance ", () => {
             tokens.ipTokenUsdt.address,
         ]);
 
+        const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
+        const johnIpUsdcBalanceBefore = await tokens.ipTokenUsdc.balanceOf(john.address);
+        const johnIpUsdtBalanceBefore = await tokens.ipTokenUsdt.balanceOf(john.address);
+        const powerIporIporBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+
         await tokens.ipTokenDai.mint(await admin.getAddress(), N2__0_18DEC);
         await tokens.ipTokenUsdc.mint(await admin.getAddress(), N2__0_18DEC);
         await tokens.ipTokenUsdt.mint(await admin.getAddress(), N2__0_18DEC);
@@ -144,8 +148,20 @@ describe("John rebalance ", () => {
             tokens.ipTokenUsdt.address,
         ]);
 
+        const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
+        const johnIpUsdcBalanceAfter = await tokens.ipTokenUsdc.balanceOf(john.address);
+        const johnIpUsdtBalanceAfter = await tokens.ipTokenUsdt.balanceOf(john.address);
+        const powerIporIporBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+
         expectedBalances([ZERO, ZERO, ZERO], balancesBefore);
         expectedBalances(amounts, balancesAfter);
+
+        expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore.add(N1__0_18DEC));
+        expect(johnIpUsdcBalanceAfter).to.be.equal(johnIpUsdcBalanceBefore.add(N1__0_18DEC));
+        expect(johnIpUsdtBalanceAfter).to.be.equal(johnIpUsdtBalanceBefore.add(N1__0_18DEC));
+        expect(powerIporIporBalanceAfter).to.be.equal(
+            powerIporIporBalanceBefore.add(N1__0_18DEC.mul(BigNumber.from("14")))
+        );
     });
 
     it("Should not be able to delegate pwIpor when contract is pause", async () => {

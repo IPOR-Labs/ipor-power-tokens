@@ -81,6 +81,7 @@ describe("PowerIpor configuration, deploy tests", () => {
     it("Should be able to stake into one asset when pass one asset", async () => {
         //    given
         const [admin] = accounts;
+        const powerIporIporBalanceBefore = await iporToken.balanceOf(powerIpor.address);
         await powerIpor.stake(N1__0_18DEC);
         const delegatedBalanceBefore = await powerIpor.delegatedToJohnBalanceOf(
             await admin.getAddress()
@@ -90,20 +91,20 @@ describe("PowerIpor configuration, deploy tests", () => {
         await powerIpor.delegateToJohn([tokens.ipTokenDai.address], [N0__1_18DEC]);
 
         //    then
+        const powerIporIporBalanceAfter = await iporToken.balanceOf(powerIpor.address);
         const delegatedBalanceAfter = await powerIpor.delegatedToJohnBalanceOf(
             await admin.getAddress()
         );
-        const balance = await john.balanceOfDelegatedPwIpor(await admin.getAddress(), [
-            tokens.ipTokenDai.address,
-        ]);
 
         expect(delegatedBalanceBefore).to.be.equal(ZERO);
         expect(delegatedBalanceAfter).to.be.equal(N0__1_18DEC);
+        expect(powerIporIporBalanceAfter).to.be.equal(powerIporIporBalanceBefore.add(N1__0_18DEC));
     });
 
     it("Should be able to stake into two asset when pass two asset", async () => {
         //    given
         const [admin] = accounts;
+        const powerIporIporBalanceBefore = await iporToken.balanceOf(powerIpor.address);
         await powerIpor.stake(N1__0_18DEC);
         const delegatedBalanceBefore = await powerIpor.delegatedToJohnBalanceOf(
             await admin.getAddress()
@@ -114,11 +115,13 @@ describe("PowerIpor configuration, deploy tests", () => {
             [N0__1_18DEC, N0__1_18DEC]
         );
         //    then
+        const powerIporIporBalanceAfter = await iporToken.balanceOf(powerIpor.address);
         const delegatedBalanceAfter = await powerIpor.delegatedToJohnBalanceOf(
             await admin.getAddress()
         );
 
         expect(delegatedBalanceBefore).to.be.equal(ZERO);
         expect(delegatedBalanceAfter).to.be.equal(N0__1_18DEC.add(N0__1_18DEC));
+        expect(powerIporIporBalanceAfter).to.be.equal(powerIporIporBalanceBefore.add(N1__0_18DEC));
     });
 });
