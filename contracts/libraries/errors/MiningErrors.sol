@@ -5,6 +5,7 @@ library MiningErrors {
     string public constant IP_TOKEN_NOT_SUPPORTED = "IPOR_701";
     string public constant CALLER_NOT_PW_IPOR = "IPOR_702";
     string public constant CALLER_NOT_JOHN = "IPOR_703";
+    string public constant CALLER_NOT_PAUSE_MANAGER = "IPOR_713";
     string public constant BASE_BALANCE_TOO_LOW = "IPOR_704";
     string public constant STAKED_BALANCE_TOO_LOW = "IPOR_705";
     string public constant DELEGATED_BALANCE_TOO_LOW = "IPOR_706";
