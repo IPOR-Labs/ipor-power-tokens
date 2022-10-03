@@ -9,6 +9,10 @@ interface IJohnInternal {
     /// @return Current John (Liquidity Rewards) version
     function getVersion() external pure returns (uint256);
 
+    /// @notice Gets Pause Manager address
+    /// @return Pause Manager's address
+    function getPauseManager() external view returns (address);
+
     /// @notice Checks if ipToken is supported in liquidity mining module.
     /// @param ipToken ipToken address
     /// @return returns true if is supported by John, false otherwise
@@ -78,6 +82,10 @@ interface IJohnInternal {
     /// @param ipToken address of ipToken asset
     function removeIpTokenAsset(address ipToken) external;
 
+    /// @notice Sets new Pause Manager address
+    /// @param newPauseManagerAddr - new address of Pauyse Manager
+    function setPauseManager(address newPauseManagerAddr) external;
+
     /// @notice Pauses current smart contract, it can be executed only by the Owner
     /// @dev Emits {Paused} event.
     function pause() external;
@@ -129,4 +137,14 @@ interface IJohnInternal {
     /// @param ipToken address of ipToken
     /// @param ipTokenAmount amount of Power Ipor Token which was undelegated, represented in 18 decimals
     event UndelegatePwIpor(address account, address ipToken, uint256 ipTokenAmount);
+
+    /// @notice Emmited when PauseManager's address is changed by its owner.
+    /// @param changedBy account address that has changed John's address
+    /// @param oldPauseManager PauseManager's old address
+    /// @param newPauseManager PauseManager's new address
+    event PauseManagerChanged(
+        address indexed changedBy,
+        address indexed oldPauseManager,
+        address indexed newPauseManager
+    );
 }

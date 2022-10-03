@@ -34,6 +34,8 @@ abstract contract JohnInternal is
     using SafeCast for int256;
 
     address internal _powerIpor;
+    address internal _pauseManager;
+
     mapping(address => bool) internal _ipTokens;
 
     //  ipToken (ipUSDT, ipUSDC, ipDAI, etc) address -> global parameters for ipToken
@@ -44,6 +46,11 @@ abstract contract JohnInternal is
 
     modifier onlyPowerIpor() {
         require(_msgSender() == _getPowerIpor(), MiningErrors.CALLER_NOT_PW_IPOR);
+        _;
+    }
+
+    modifier onlyPauseManager() {
+        require(_msgSender() == _pauseManager, MiningErrors.CALLER_NOT_PAUSE_MANAGER);
         _;
     }
 
@@ -65,7 +72,9 @@ abstract contract JohnInternal is
         require(iporToken != address(0), IporErrors.WRONG_ADDRESS);
 
         uint256 ipTokensLength = ipTokens.length;
+
         _powerIpor = powerIpor;
+        _pauseManager = _msgSender();
 
         IporToken(iporToken).approve(powerIpor, Constants.MAX_VALUE);
 
@@ -87,6 +96,10 @@ abstract contract JohnInternal is
 
     function getVersion() external pure override returns (uint256) {
         return 1;
+    }
+
+    function getPauseManager() external view override returns (address) {
+        return _pauseManager;
     }
 
     function isIpTokenSupported(address ipToken) external view override returns (bool) {
@@ -323,11 +336,18 @@ abstract contract JohnInternal is
         emit IpTokenRemoved(_msgSender(), ipToken);
     }
 
-    function pause() external override onlyOwner {
+    function setPauseManager(address newPauseManagerAddr) external override onlyOwner {
+        require(newPauseManagerAddr != address(0), IporErrors.WRONG_ADDRESS);
+        address oldPauseManagerAddr = _pauseManager;
+        _pauseManager = newPauseManagerAddr;
+        emit PauseManagerChanged(_msgSender(), oldPauseManagerAddr, newPauseManagerAddr);
+    }
+
+    function pause() external override onlyPauseManager {
         _pause();
     }
 
-    function unpause() external override onlyOwner {
+    function unpause() external override onlyPauseManager {
         _unpause();
     }
 

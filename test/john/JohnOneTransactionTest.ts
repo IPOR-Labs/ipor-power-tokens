@@ -263,10 +263,12 @@ describe("One block/Transaction tests", () => {
 
         const agent1IpTokenBalanceAfter = await tokens.ipTokenDai.balanceOf(agent1.address);
         const agent1IporTokenBalanceAfter = await iporToken.balanceOf(agent1.address);
+		const agent1PwIporBalanceAfter = await powerIpor.balanceOf(agent1.address);
         const userOneIpTokenBalanceAfter = await tokens.ipTokenDai.balanceOf(
             await userOne.getAddress()
         );
         const userOneIporTokenBalanceAfter = await iporToken.balanceOf(await userOne.getAddress());
+		
 
         const accruedRewardsAfter = await john.calculateAccruedRewards(ipDai);
         const userOnePwIporBalanceAfter = await powerIpor.balanceOf(await userOne.getAddress());
@@ -280,7 +282,7 @@ describe("One block/Transaction tests", () => {
         expect(agent1IpTokenBalanceBefore).to.be.equal(agent1IpTokenBalanceAfter);
         expect(agent1IpTokenBalanceBefore).to.be.equal(agent1IpTokenBalanceAfter);
         expect(agent1IporTokenBalanceBefore).to.be.equal(agent1IporTokenBalanceAfter);
-        expect(agent1PwIporBalanceBefore).to.be.equal(agent1PwIporBalanceBefore);
+        expect(agent1PwIporBalanceBefore).to.be.equal(agent1PwIporBalanceAfter);
 
         expect(userOneIpTokenBalanceBefore).to.be.equal(
             userOneIpTokenBalanceAfter.sub(N1000__0_18DEC)
