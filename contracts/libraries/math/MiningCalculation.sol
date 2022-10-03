@@ -88,24 +88,6 @@ library MiningCalculation {
     }
 
     // returns value with 27 decimals
-    function compositeMultiplierCumulative(
-        uint256 lastRebalanseBlockNumber,
-        uint256 blockNumber,
-        uint256 previousCompositeMultiplierCumulative,
-        uint256 previousCompositeMultiplier,
-        uint256 compositeMultiplier
-    ) internal view returns (uint256) {
-        if (blockNumber == lastRebalanseBlockNumber) {
-            return previousCompositeMultiplierCumulative;
-        }
-        return
-            (blockNumber - lastRebalanseBlockNumber - 1) *
-            previousCompositeMultiplier +
-            previousCompositeMultiplierCumulative +
-            compositeMultiplier;
-    }
-
-    // returns value with 27 decimals
     function compositeMultiplier(uint256 rewardsPerBlock, uint256 aggregatedPowerUp)
         internal
         view
