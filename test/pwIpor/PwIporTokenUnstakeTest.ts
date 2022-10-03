@@ -102,7 +102,7 @@ describe("PowerIpor unstake", () => {
         );
         //    when
         await expect(powerIpor.unstake(N0__1_18DEC.mul(BigNumber.from("6")))).to.be.revertedWith(
-            "IPOR_707"
+            "IPOR_708"
         );
     });
 

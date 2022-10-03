@@ -83,7 +83,7 @@ describe("PowerIpor unstake", () => {
         const coolDownBefore = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
 
         // when
-        await expect(powerIpor.coolDown(N2__0_18DEC)).to.be.revertedWith("IPOR_707");
+        await expect(powerIpor.coolDown(N2__0_18DEC)).to.be.revertedWith("IPOR_708");
 
         // then
         const coolDownAfter = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
@@ -167,7 +167,7 @@ describe("PowerIpor unstake", () => {
         const balanceBefore = await powerIpor.balanceOf(adminAddress);
         // when
 
-        await expect(powerIpor.unstake(N0__5_18DEC)).to.be.revertedWith("IPOR_707");
+        await expect(powerIpor.unstake(N0__5_18DEC)).to.be.revertedWith("IPOR_708");
 
         // then
         const coolDownAfter = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
@@ -197,7 +197,7 @@ describe("PowerIpor unstake", () => {
 
         await expect(
             powerIpor.delegateToJohn([tokens.ipTokenDai.address], [N0__5_18DEC])
-        ).to.be.revertedWith("IPOR_705");
+        ).to.be.revertedWith("IPOR_706");
 
         // then
         const coolDownAfter = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
@@ -224,7 +224,7 @@ describe("PowerIpor unstake", () => {
         const coolDownBefore = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
         // when
 
-        await expect(powerIpor.redeem()).to.be.revertedWith("IPOR_709");
+        await expect(powerIpor.redeem()).to.be.revertedWith("IPOR_710");
 
         // then
         const coolDownAfter = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
