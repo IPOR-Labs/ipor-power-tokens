@@ -238,23 +238,37 @@ export default ({ drizzle, drizzleState }) => {
                 <table className="table" align="center">
                     <tr>
                         <td>
+                            <strong>Set Pause Manager address</strong>
+                        </td>
+                        <td>
+                            Current Pause Manager:{" "}
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="PowerIpor"
+                                method="getPauseManager"
+                            />
+                            <br />
+                            <ContractForm
+                                drizzle={drizzle}
+                                contract="PowerIpor"
+                                method="setPauseManager"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
                             <strong>Set John address</strong>
                             <br />
                             <small>John address: {drizzle.contracts.John.address}</small>
                         </td>
                         <td>
+                            Current John address:{" "}
                             <ContractData
                                 drizzle={drizzle}
                                 drizzleState={drizzleState}
                                 contract="PowerIpor"
                                 method="getJohn"
-                                render={(value) =>
-                                    value !== "0x0000000000000000000000000000000000000000" ? (
-                                        value
-                                    ) : (
-                                        <b>Not setup</b>
-                                    )
-                                }
                             />
                             <br />
                             <ContractForm drizzle={drizzle} contract="PowerIpor" method="setJohn" />
@@ -325,7 +339,10 @@ export default ({ drizzle, drizzleState }) => {
                                 drizzleState={drizzleState}
                                 contract="John"
                                 method="getAccountIndicators"
-                                methodArgs={[drizzle.contracts.IpTokenUsdt.address]}
+                                methodArgs={[
+                                    drizzleState.accounts[0],
+                                    drizzle.contracts.IpTokenUsdt.address,
+                                ]}
                                 render={(value) => {
                                     return (
                                         <span>
@@ -343,7 +360,10 @@ export default ({ drizzle, drizzleState }) => {
                                 drizzleState={drizzleState}
                                 contract="John"
                                 method="getAccountIndicators"
-                                methodArgs={[drizzle.contracts.IpTokenUsdc.address]}
+                                methodArgs={[
+                                    drizzleState.accounts[0],
+                                    drizzle.contracts.IpTokenUsdc.address,
+                                ]}
                                 render={(value) => {
                                     return (
                                         <span>
@@ -361,7 +381,10 @@ export default ({ drizzle, drizzleState }) => {
                                 drizzleState={drizzleState}
                                 contract="John"
                                 method="getAccountIndicators"
-                                methodArgs={[drizzle.contracts.IpTokenDai.address]}
+                                methodArgs={[
+                                    drizzleState.accounts[0],
+                                    drizzle.contracts.IpTokenDai.address,
+                                ]}
                                 render={(value) => {
                                     return (
                                         <span>
@@ -482,6 +505,7 @@ export default ({ drizzle, drizzleState }) => {
                                 drizzleState={drizzleState}
                                 contract="PowerIpor"
                                 method="getActiveCoolDown"
+                                methodArgs={[drizzleState.accounts[0]]}
                                 render={(value) => (
                                     <div>
                                         <table>

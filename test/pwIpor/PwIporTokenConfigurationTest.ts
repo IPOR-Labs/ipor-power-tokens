@@ -77,7 +77,7 @@ describe("PowerIpor configuration, deploy tests", () => {
         ).to.be.revertedWith("Ownable: caller is not the owner");
     });
 
-    it("Should be able to pause contract when owner", async () => {
+    it("Should be able to pause contract when owner (initial deployment)", async () => {
         // given
         const PowerIpor = await ethers.getContractFactory("PowerIpor");
         const powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
@@ -94,6 +94,32 @@ describe("PowerIpor configuration, deploy tests", () => {
         expect(isPausedAfter).to.be.true;
     });
 
+    it("Should be able to pause contract when Pause Manager", async () => {
+        // given
+
+        const PowerIpor = await ethers.getContractFactory("PowerIpor");
+        const powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
+
+        const [admin, userOne, userThree] = accounts;
+
+        const isPausedBefore = await powerIpor.paused();
+
+        const oldPauseManager = await powerIpor.getPauseManager();
+        await powerIpor.setPauseManager(await userThree.getAddress());
+
+        // when
+        await powerIpor.connect(userThree).pause();
+
+        // then
+        const isPausedAfter = await powerIpor.paused();
+
+        expect(isPausedBefore).to.be.false;
+        expect(isPausedAfter).to.be.true;
+
+        //clean up
+        await powerIpor.setPauseManager(oldPauseManager);
+    });
+
     it("Should not be able to pause contract when no owner", async () => {
         // given
         const PowerIpor = await ethers.getContractFactory("PowerIpor");
@@ -102,9 +128,7 @@ describe("PowerIpor configuration, deploy tests", () => {
         const [admin, userOne] = accounts;
         const isPausedBefore = await powerIpor.paused();
         // when
-        await expect(powerIpor.connect(userOne).pause()).to.be.revertedWith(
-            "Ownable: caller is not the owner"
-        );
+        await expect(powerIpor.connect(userOne).pause()).to.be.revertedWith("IPOR_713");
         // then
         const isPausedAfter = await powerIpor.paused();
 
@@ -112,7 +136,7 @@ describe("PowerIpor configuration, deploy tests", () => {
         expect(isPausedAfter).to.be.false;
     });
 
-    it("Should be able to unpause contract when owner", async () => {
+    it("Should be able to unpause contract when owner (initial deployment)", async () => {
         // given
         const PowerIpor = await ethers.getContractFactory("PowerIpor");
         const powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
@@ -127,6 +151,29 @@ describe("PowerIpor configuration, deploy tests", () => {
         expect(isPausedAfter).to.be.false;
     });
 
+    it("Should be able to unpause contract when Pause Manager", async () => {
+        // given
+        const [admin, userOne, userThree] = accounts;
+        const PowerIpor = await ethers.getContractFactory("PowerIpor");
+        const powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
+        await powerIpor.pause();
+        const isPausedBefore = await powerIpor.paused();
+
+        const oldPauseManager = await powerIpor.getPauseManager();
+        await powerIpor.setPauseManager(await userThree.getAddress());
+
+        // when
+        await powerIpor.connect(userThree).unpause();
+        // then
+        const isPausedAfter = await powerIpor.paused();
+
+        expect(isPausedBefore).to.be.true;
+        expect(isPausedAfter).to.be.false;
+
+        //clean up
+        await powerIpor.setPauseManager(oldPauseManager);
+    });
+
     it("Should not be able to unpause contract when no owner", async () => {
         // given
         const PowerIpor = await ethers.getContractFactory("PowerIpor");
@@ -136,13 +183,35 @@ describe("PowerIpor configuration, deploy tests", () => {
         await powerIpor.pause();
         const isPausedBefore = await powerIpor.paused();
         // when
-        await expect(powerIpor.connect(userOne).unpause()).to.be.revertedWith(
-            "Ownable: caller is not the owner"
-        );
+        await expect(powerIpor.connect(userOne).unpause()).to.be.revertedWith("IPOR_713");
         // then
         const isPausedAfter = await powerIpor.paused();
 
         expect(isPausedBefore).to.be.true;
         expect(isPausedAfter).to.be.true;
+    });
+
+    it("Should not be able to unpause contract when initial Pause Manager changed", async () => {
+        // given
+        const PowerIpor = await ethers.getContractFactory("PowerIpor");
+        const powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
+
+        const [admin, userOne, userThree] = accounts;
+        await powerIpor.pause();
+        const isPausedBefore = await powerIpor.paused();
+        const oldPauseManager = await powerIpor.getPauseManager();
+        await powerIpor.setPauseManager(await userThree.getAddress());
+
+        // when
+        await expect(powerIpor.unpause()).to.be.revertedWith("IPOR_713");
+
+        // then
+        const isPausedAfter = await powerIpor.paused();
+
+        expect(isPausedBefore).to.be.true;
+        expect(isPausedAfter).to.be.true;
+
+        //clean up
+        await powerIpor.setPauseManager(oldPauseManager);
     });
 });
