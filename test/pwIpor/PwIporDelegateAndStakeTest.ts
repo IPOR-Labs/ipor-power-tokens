@@ -129,6 +129,10 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
 
     it("Should be able to delegate into one asset and no stake ipToken when pass one asset", async () => {
         //    given
+
+        const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+
         const [admin] = accounts;
         await powerIpor.stake(N1__0_18DEC);
         const delegatedBalanceBefore = await powerIpor.delegatedToJohnBalanceOf(
@@ -139,6 +143,9 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
         await powerIpor.delegateAndStakeToJohn([tokens.ipTokenDai.address], [N0__1_18DEC], [ZERO]);
 
         //    then
+
+        const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
         const delegatedBalanceAfter = await powerIpor.delegatedToJohnBalanceOf(
             await admin.getAddress()
         );
@@ -150,10 +157,19 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
         expect(delegatedBalanceBefore).to.be.equal(ZERO);
         expect(delegatedBalanceAfter).to.be.equal(N0__1_18DEC);
         expect(ipTokenBalanceAfter).to.be.equal(ZERO);
+        expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore);
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore.add(N1__0_18DEC)
+        );
     });
 
     it("Should be able to delegate into one asset and stake ipToken when pass one asset", async () => {
         //    given
+        const delegatePwTokenToJohn = N1__0_18DEC;
+        const stakeIpTokenToJohn = N1__0_18DEC;
+
+        const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
         const [admin] = accounts;
         await powerIpor.stake(N1__0_18DEC);
         const delegatedBalanceBefore = await powerIpor.delegatedToJohnBalanceOf(
@@ -169,11 +185,14 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
         //    when
         await powerIpor.delegateAndStakeToJohn(
             [tokens.ipTokenDai.address],
-            [N1__0_18DEC],
-            [N1__0_18DEC]
+            [delegatePwTokenToJohn],
+            [stakeIpTokenToJohn]
         );
 
         //    then
+
+        const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
         const delegatedBalanceAfter = await powerIpor.delegatedToJohnBalanceOf(
             await admin.getAddress()
         );
@@ -223,6 +242,10 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
         expect(delegatedBalanceBefore).to.be.equal(ZERO);
         expect(delegatedBalanceAfter).to.be.equal(N1__0_18DEC);
         expect(ipTokenBalanceAfter).to.be.equal(N1__0_18DEC);
+        expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore.add(stakeIpTokenToJohn));
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore.add(delegatePwTokenToJohn)
+        );
     });
 
     it("Should be able to stake and delegate two asset when pass two asset", async () => {

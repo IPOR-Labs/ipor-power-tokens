@@ -127,6 +127,8 @@ describe("PowerIpor configuration, deploy tests", () => {
 
     it("Should withdraw tokens when delegate more tokens", async () => {
         //    given
+
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
         const [admin] = accounts;
         await powerIpor.stake(N2__0_18DEC);
         await powerIpor.delegateToJohn(
@@ -147,7 +149,7 @@ describe("PowerIpor configuration, deploy tests", () => {
         );
 
         //    then
-
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
         const delegatedBalanceAfter = await powerIpor.delegatedToJohnBalanceOf(
             await admin.getAddress()
         );
@@ -161,5 +163,8 @@ describe("PowerIpor configuration, deploy tests", () => {
         expect(delegatedBalanceAfter).to.be.equal(N0__1_18DEC.mul(BigNumber.from("9")));
         expect(exchangeRateAfter).to.be.equal(N1__0_18DEC);
         expect(pwIporBalanceAfter).to.be.equal(N2__0_18DEC);
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore.add(N2__0_18DEC)
+        );
     });
 });

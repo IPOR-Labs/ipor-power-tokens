@@ -81,29 +81,36 @@ describe("PowerIpor configuration, deploy tests", () => {
     it("Should be able to stake into one asset when pass one asset", async () => {
         //    given
         const [admin] = accounts;
+        const pwTokenDelegationAmount = N0__1_18DEC;
+        const iporTokenStakeAmount = N1__0_18DEC;
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
         await powerIpor.stake(N1__0_18DEC);
         const delegatedBalanceBefore = await powerIpor.delegatedToJohnBalanceOf(
             await admin.getAddress()
         );
 
         //    when
-        await powerIpor.delegateToJohn([tokens.ipTokenDai.address], [N0__1_18DEC]);
+        await powerIpor.delegateToJohn([tokens.ipTokenDai.address], [pwTokenDelegationAmount]);
 
         //    then
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
         const delegatedBalanceAfter = await powerIpor.delegatedToJohnBalanceOf(
             await admin.getAddress()
         );
-        const balance = await john.balanceOfDelegatedPwIpor(await admin.getAddress(), [
-            tokens.ipTokenDai.address,
-        ]);
 
         expect(delegatedBalanceBefore).to.be.equal(ZERO);
-        expect(delegatedBalanceAfter).to.be.equal(N0__1_18DEC);
+        expect(delegatedBalanceAfter).to.be.equal(pwTokenDelegationAmount);
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore.add(iporTokenStakeAmount)
+        );
     });
 
     it("Should be able to stake into two asset when pass two asset", async () => {
         //    given
         const [admin] = accounts;
+        const iporTokenStakeAmount = N1__0_18DEC;
+        const pwTokenDelegationAmount = N0__1_18DEC;
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
         await powerIpor.stake(N1__0_18DEC);
         const delegatedBalanceBefore = await powerIpor.delegatedToJohnBalanceOf(
             await admin.getAddress()
@@ -111,14 +118,20 @@ describe("PowerIpor configuration, deploy tests", () => {
         //    when
         await powerIpor.delegateToJohn(
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
-            [N0__1_18DEC, N0__1_18DEC]
+            [pwTokenDelegationAmount, pwTokenDelegationAmount]
         );
         //    then
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
         const delegatedBalanceAfter = await powerIpor.delegatedToJohnBalanceOf(
             await admin.getAddress()
         );
 
         expect(delegatedBalanceBefore).to.be.equal(ZERO);
-        expect(delegatedBalanceAfter).to.be.equal(N0__1_18DEC.add(N0__1_18DEC));
+        expect(delegatedBalanceAfter).to.be.equal(
+            pwTokenDelegationAmount.add(pwTokenDelegationAmount)
+        );
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore.add(iporTokenStakeAmount)
+        );
     });
 });
