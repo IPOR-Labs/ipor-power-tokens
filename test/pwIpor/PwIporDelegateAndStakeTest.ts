@@ -165,6 +165,8 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
 
     it("Should be able to delegate into one asset and stake ipToken when pass one asset", async () => {
         //    given
+        const delegatePwTokenToJohn = N1__0_18DEC;
+        const stakeIpTokenToJohn = N1__0_18DEC;
 
         const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
         const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
@@ -183,8 +185,8 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
         //    when
         await powerIpor.delegateAndStakeToJohn(
             [tokens.ipTokenDai.address],
-            [N1__0_18DEC],
-            [N1__0_18DEC]
+            [delegatePwTokenToJohn],
+            [stakeIpTokenToJohn]
         );
 
         //    then
@@ -240,9 +242,9 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
         expect(delegatedBalanceBefore).to.be.equal(ZERO);
         expect(delegatedBalanceAfter).to.be.equal(N1__0_18DEC);
         expect(ipTokenBalanceAfter).to.be.equal(N1__0_18DEC);
-        expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore.add(N1__0_18DEC));
+        expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore.add(stakeIpTokenToJohn));
         expect(powerIporIporTokenBalanceAfter).to.be.equal(
-            powerIporIporTokenBalanceBefore.add(N1__0_18DEC)
+            powerIporIporTokenBalanceBefore.add(delegatePwTokenToJohn)
         );
     });
 

@@ -185,11 +185,9 @@ describe("John Stake and balance", () => {
             );
             expect(rewards).to.be.equal(BigNumber.from("100000000000000000000"));
 
-            expect(johnIpDaiBalanceAfter).to.be.equal(
-                johnIpDaiBalanceBefore.add(delegatedIporToken)
-            );
+            expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore.add(stakedIpTokens));
             expect(powerIporIporTokenBalanceAfter).to.be.equal(
-                powerIporIporTokenBalanceBefore.add(stakedIpTokens)
+                powerIporIporTokenBalanceBefore.add(delegatedIporToken)
             );
         });
 

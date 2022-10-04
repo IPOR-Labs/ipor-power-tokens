@@ -79,6 +79,8 @@ describe("PowerIpor configuration, deploy tests", () => {
     it("Should exchange rate increase when transfer iporToken to powerIpor address", async () => {
         // given
         const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+        const stakeIporTokenAmount = N1__0_18DEC;
+        const transferIporTokenAmount = N1__0_18DEC;
 
         const two = N1__0_18DEC.mul(BigNumber.from("2"));
         await iporToken.increaseAllowance(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
@@ -88,8 +90,8 @@ describe("PowerIpor configuration, deploy tests", () => {
         const balanceBefore = await powerIpor.balanceOf(adminAddress);
 
         // when
-        await powerIpor.stake(N1__0_18DEC);
-        await iporToken.transfer(powerIpor.address, N1__0_18DEC);
+        await powerIpor.stake(stakeIporTokenAmount);
+        await iporToken.transfer(powerIpor.address, transferIporTokenAmount);
 
         // then
         const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
@@ -101,12 +103,14 @@ describe("PowerIpor configuration, deploy tests", () => {
         expect(balanceAfter).to.be.equal(two);
         expect(exchangeRateAfter).to.be.equal(two);
         expect(powerIporIporTokenBalanceAfter).to.be.equal(
-            powerIporIporTokenBalanceBefore.add(N2__0_18DEC)
+            powerIporIporTokenBalanceBefore.add(transferIporTokenAmount).add(stakeIporTokenAmount)
         );
     });
 
     it("Should increase balance of users when exchange rate increase", async () => {
         //    given
+        const iporTokenStakeAmount = N1__0_18DEC;
+        const iporTokenTransferAmount = N1__0_18DEC;
         const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
         const [admin, userOne, userTwo] = accounts;
         await iporToken.transfer(await userOne.getAddress(), N1__0_18DEC);
@@ -118,15 +122,15 @@ describe("PowerIpor configuration, deploy tests", () => {
             .connect(userTwo)
             .increaseAllowance(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
 
-        await powerIpor.connect(userOne).stake(N1__0_18DEC);
-        await powerIpor.connect(userTwo).stake(N1__0_18DEC);
+        await powerIpor.connect(userOne).stake(iporTokenStakeAmount);
+        await powerIpor.connect(userTwo).stake(iporTokenStakeAmount);
 
         const userOneBalanceBefore = await powerIpor.balanceOf(await userOne.getAddress());
         const userTwoBalanceBefore = await powerIpor.balanceOf(await userTwo.getAddress());
         const exchangeRateBefore = await powerIpor.calculateExchangeRate();
 
         //    when
-        await iporToken.transfer(powerIpor.address, N1__0_18DEC);
+        await iporToken.transfer(powerIpor.address, iporTokenTransferAmount);
 
         //    then
         const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
@@ -142,11 +146,16 @@ describe("PowerIpor configuration, deploy tests", () => {
         expect(userTwoBalanceAfter).to.be.equal(N1__5_18DEC);
         expect(exchangeRateAfter).to.be.equal(N1__5_18DEC);
         expect(powerIporIporTokenBalanceAfter).to.be.equal(
-            powerIporIporTokenBalanceBefore.add(N2__0_18DEC).add(N1__0_18DEC)
+            powerIporIporTokenBalanceBefore
+                .add(iporTokenTransferAmount)
+                .add(iporTokenStakeAmount)
+                .add(iporTokenStakeAmount)
         );
     });
     it("Should increase balance of userOne and no increase userTwo when exchange rate increase before userTwo stake", async () => {
         //    given
+        const iporTokenStakeAmount = N1__0_18DEC;
+        const iporTokenTransferAmount = N1__0_18DEC;
         const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
         const [admin, userOne, userTwo] = accounts;
         await iporToken.transfer(await userOne.getAddress(), N1__0_18DEC);
@@ -158,15 +167,15 @@ describe("PowerIpor configuration, deploy tests", () => {
             .connect(userTwo)
             .increaseAllowance(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
 
-        await powerIpor.connect(userOne).stake(N1__0_18DEC);
+        await powerIpor.connect(userOne).stake(iporTokenStakeAmount);
 
         const userOneBalanceBefore = await powerIpor.balanceOf(await userOne.getAddress());
         const userTwoBalanceBefore = await powerIpor.balanceOf(await userTwo.getAddress());
         const exchangeRateBefore = await powerIpor.calculateExchangeRate();
 
         //    when
-        await iporToken.transfer(powerIpor.address, N1__0_18DEC);
-        await powerIpor.connect(userTwo).stake(N1__0_18DEC);
+        await iporToken.transfer(powerIpor.address, iporTokenTransferAmount);
+        await powerIpor.connect(userTwo).stake(iporTokenStakeAmount);
 
         //    then
         const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
@@ -182,7 +191,10 @@ describe("PowerIpor configuration, deploy tests", () => {
         expect(userTwoBalanceAfter).to.be.equal(N1__0_18DEC);
         expect(exchangeRateAfter).to.be.equal(N2__0_18DEC);
         expect(powerIporIporTokenBalanceAfter).to.be.equal(
-            powerIporIporTokenBalanceBefore.add(N2__0_18DEC).add(N1__0_18DEC)
+            powerIporIporTokenBalanceBefore
+                .add(iporTokenTransferAmount)
+                .add(iporTokenStakeAmount)
+                .add(iporTokenStakeAmount)
         );
     });
 });

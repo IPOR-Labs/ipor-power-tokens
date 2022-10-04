@@ -239,6 +239,7 @@ describe("PowerIpor unstake", () => {
     it("Should be able to redeem cool down tokens when 2 weeks pass", async () => {
         // given
 
+        const expectedCoolDownPwIporAmount = N0__5_18DEC;
         const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
         const twoWeekesInSeconds = 2 * 7 * 24 * 60 * 60;
         const adminAddress = await accounts[0].getAddress();
@@ -259,7 +260,7 @@ describe("PowerIpor unstake", () => {
         const pwBalanceAfter = await powerIpor.balanceOf(adminAddress);
 
         expect(coolDownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
-        expect(coolDownBefore.pwIporAmount).to.be.equal(N0__5_18DEC);
+        expect(coolDownBefore.pwIporAmount).to.be.equal(expectedCoolDownPwIporAmount);
 
         expect(coolDownAfter.endTimestamp).to.be.equal(ZERO);
         expect(coolDownAfter.pwIporAmount).to.be.equal(ZERO);
@@ -267,12 +268,15 @@ describe("PowerIpor unstake", () => {
         expect(pwBalanceBefore).to.be.equal(N1__0_18DEC);
         expect(pwBalanceAfter).to.be.equal(N0__5_18DEC);
         expect(powerIporIporTokenBalanceAfter).to.be.equal(
-            powerIporIporTokenBalanceBefore.add(N0__5_18DEC)
+            powerIporIporTokenBalanceBefore.add(expectedCoolDownPwIporAmount)
         );
     });
 
     it("Should be able to redeem cool down tokens when 2 weeks pass and exchange rate changed", async () => {
         // given
+        const stakeIporAmount = N1__0_18DEC;
+        const cooldownAmount = N0__5_18DEC;
+        const transferAmount = N1__0_18DEC;
 
         const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
         const twoWeekesInSeconds = 2 * 7 * 24 * 60 * 60;
@@ -309,8 +313,9 @@ describe("PowerIpor unstake", () => {
         expect(iporTokenBalanceAfter).to.be.equal(iporTokenBalanceBefore.add(N0__5_18DEC));
         expect(powerIporIporTokenBalanceAfter).to.be.equal(
             powerIporIporTokenBalanceBefore
-                .add(N0__5_18DEC) // from stake
-                .add(N1__0_18DEC) // from transfer
+                .add(transferAmount)
+                .add(stakeIporAmount)
+                .sub(cooldownAmount)
         );
     });
 });
