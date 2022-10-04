@@ -67,7 +67,7 @@ describe("PowerIpor configuration, deploy tests", () => {
         //    when
         await expect(
             powerIpor.undelegateFromJohn([tokens.ipTokenDai.address], [N0__1_18DEC])
-        ).to.be.revertedWith("IPOR_706");
+        ).to.be.revertedWith("IPOR_707");
     });
 
     it("Should revert transaction when delegate amount is less then withdraw amount", async () => {
@@ -77,7 +77,7 @@ describe("PowerIpor configuration, deploy tests", () => {
         //    when
         await expect(
             powerIpor.undelegateFromJohn([tokens.ipTokenDai.address], [N0__5_18DEC])
-        ).to.be.revertedWith("IPOR_706");
+        ).to.be.revertedWith("IPOR_707");
     });
 
     it("Should revert transaction when delegated pwIpor amount is less than staked ipToken amount", async () => {
@@ -93,7 +93,7 @@ describe("PowerIpor configuration, deploy tests", () => {
                 [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
                 [N1__0_18DEC, N2__0_18DEC]
             )
-        ).to.be.revertedWith("IPOR_706");
+        ).to.be.revertedWith("IPOR_707");
     });
 
     it("Should revert transaction when mismatch array length - case 1", async () => {

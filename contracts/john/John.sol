@@ -60,7 +60,10 @@ contract John is JohnInternal, IJohn {
         JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[account][
             ipToken
         ];
-        return _calculateAccountRewards(accountIndicators, globalIndicators);
+
+        (uint256 rewards, ) = _calculateAccountRewards(globalIndicators, accountIndicators);
+
+        return rewards;
     }
 
     function stake(address ipToken, uint256 ipTokenAmount)
@@ -81,10 +84,19 @@ contract John is JohnInternal, IJohn {
         ];
         JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
 
-        _claimWhenRewardsExists(msgSender, globalIndicators, accountIndicators);
+        (
+            uint256 rewards,
+            uint256 accruedCompMultiplierCumulativePrevBlock
+        ) = _calculateAccountRewards(globalIndicators, accountIndicators);
+
+        if (rewards > 0) {
+            _claim(msgSender, rewards);
+        }
+
         _rebalanceIndicators(
             msgSender,
             ipToken,
+            accruedCompMultiplierCumulativePrevBlock,
             globalIndicators,
             accountIndicators,
             accountIndicators.ipTokenBalance + ipTokenAmount,
@@ -113,11 +125,19 @@ contract John is JohnInternal, IJohn {
             MiningErrors.STAKED_BALANCE_TOO_LOW
         );
 
-        _claimWhenRewardsExists(msgSender, globalIndicators, accountIndicators);
+        (
+            uint256 rewards,
+            uint256 accruedCompMultiplierCumulativePrevBlock
+        ) = _calculateAccountRewards(globalIndicators, accountIndicators);
+
+        if (rewards > 0) {
+            _claim(msgSender, rewards);
+        }
 
         _rebalanceIndicators(
             msgSender,
             ipToken,
+            accruedCompMultiplierCumulativePrevBlock,
             globalIndicators,
             accountIndicators,
             accountIndicators.ipTokenBalance - ipTokenAmount,
@@ -137,7 +157,17 @@ contract John is JohnInternal, IJohn {
         ];
         JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
 
-        uint256 iporTokenAmount = _calculateAccountRewards(accountIndicators, globalIndicators);
+        uint256 accruedCompMultiplierCumulativePrevBlock = _calculateAccruedCompMultiplierCumulativePrevBlock(
+                globalIndicators
+            );
+
+        uint256 iporTokenAmount = MiningCalculation.calculateAccountRewards(
+            accountIndicators.ipTokenBalance,
+            accountIndicators.powerUp,
+            accountIndicators.compositeMultiplierCumulativePrevBlock,
+            accruedCompMultiplierCumulativePrevBlock
+        );
+
         require(iporTokenAmount > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
 
         _claim(msgSender, iporTokenAmount);
@@ -149,13 +179,8 @@ contract John is JohnInternal, IJohn {
             _horizontalShift()
         );
 
-        uint256 compositeMultiplierCumulativePrevBlock = globalIndicators
-            .compositeMultiplierCumulativePrevBlock +
-            (block.number - globalIndicators.blockNumber) *
-            globalIndicators.compositeMultiplierInTheBlock;
-
         _accountIndicators[msgSender][ipToken] = JohnTypes.AccountRewardsIndicators(
-            compositeMultiplierCumulativePrevBlock.toUint128(),
+            accruedCompMultiplierCumulativePrevBlock.toUint128(),
             accountIndicators.ipTokenBalance,
             accountPowerUp.toUint72(),
             accountIndicators.delegatedPwIporBalance

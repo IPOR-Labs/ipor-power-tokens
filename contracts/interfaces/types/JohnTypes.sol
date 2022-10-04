@@ -20,6 +20,7 @@ library JohnTypes {
         /// @notice composite multiplier in a given block described in field blockNumber
         /// @dev could be change many times per transaction, represented in 27 decimals
         uint128 compositeMultiplierInTheBlock;
+        /// @notice Composite multiplier updated in block {blockNumber} but calculated for PREVIOUS (!) block.
         /// @dev could be changed one time per block, represented in 27 decimals
         uint128 compositeMultiplierCumulativePrevBlock;
         /// @dev could be changed one time per block, Block number in which all others params in this structure are updated
@@ -34,9 +35,10 @@ library JohnTypes {
 
     /// @title Rewards params specified for one account. Params used in algorithm responsible for rewards distribution.
     struct AccountRewardsIndicators {
-        /// @notice composite multiplier cumulative
+        /// @notice composite multiplier cumulative calculated for previous block
+        //TODO: check if blockNumber potrzebny
         /// @dev represented in 27 decimals
-        uint128 compositeMultiplierCumulative;
+        uint128 compositeMultiplierCumulativePrevBlock;
         /// @notice ipToken account's balance
         uint128 ipTokenBalance;
         /// @notive PowerUp is a result of logarythmic equastion defined in documentation,

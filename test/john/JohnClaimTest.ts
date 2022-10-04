@@ -79,7 +79,7 @@ describe("John claim", () => {
     it("Should not claim when no stake ipTokens", async () => {
         //    given
         //    when
-        await expect(john.claim(tokens.ipTokenDai.address)).to.be.revertedWith("IPOR_708");
+        await expect(john.claim(tokens.ipTokenDai.address)).to.be.revertedWith("IPOR_709");
     });
 
     it("Should claim rewards when 100 blocks were mint", async () => {
@@ -105,9 +105,14 @@ describe("John claim", () => {
         await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokensAmount);
 
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
-        //    when
+
+        const exchangeRateBefore = await powerIpor.calculateExchangeRate();
+
+        //when
         await john.connect(userOne).claim(tokens.ipTokenDai.address);
-        //    then
+
+        //then
+        const exchangeRateAfter = await powerIpor.calculateExchangeRate();
         const powerIporBalanceAfter = await powerIpor
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
@@ -122,6 +127,7 @@ describe("John claim", () => {
             powerIporIporTokenBalanceBefore.add(stakeIporAmount).add(expectedRewards)
         );
         expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore.add(stakedIpTokensAmount));
+        expect(exchangeRateBefore).to.be.equal(exchangeRateAfter);
     });
 
     it("Should get 100 rewards when first stake 0.1 dai and after 1 Dai, 200 blocks mint", async () => {

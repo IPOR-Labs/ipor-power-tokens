@@ -111,7 +111,7 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
                 [N1__0_18DEC],
                 [N1__0_18DEC]
             )
-        ).to.be.revertedWith("IPOR_705");
+        ).to.be.revertedWith("IPOR_706");
     });
 
     it("Should revert transaction when insufficient number of tokens to stake, two assets", async () => {
@@ -124,7 +124,7 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
                 [N1__0_18DEC, N0__1_18DEC],
                 [N1__0_18DEC, N0__1_18DEC]
             )
-        ).to.be.revertedWith("IPOR_705");
+        ).to.be.revertedWith("IPOR_706");
     });
 
     it("Should be able to delegate into one asset and no stake ipToken when pass one asset", async () => {
@@ -452,9 +452,9 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
             extractAccountIndicators(accountIndicatorsUsdcBefore).powerUp
         );
         expect(
-            extractAccountIndicators(accountIndicatorsDaiBefore).compositeMultiplierCumulative
+            extractAccountIndicators(accountIndicatorsDaiBefore).compositeMultiplierCumulativePrevBlock
         ).to.be.equal(
-            extractAccountIndicators(accountIndicatorsUsdcBefore).compositeMultiplierCumulative
+            extractAccountIndicators(accountIndicatorsUsdcBefore).compositeMultiplierCumulativePrevBlock
         );
         expect(
             extractAccountIndicators(accountIndicatorsDaiBefore).delegatedPowerTokenBalance
@@ -469,9 +469,9 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
             extractAccountIndicators(accountIndicatorsUsdcAfter).powerUp
         );
         expect(
-            extractAccountIndicators(accountIndicatorsDaiAfter).compositeMultiplierCumulative
+            extractAccountIndicators(accountIndicatorsDaiAfter).compositeMultiplierCumulativePrevBlock
         ).to.be.equal(
-            extractAccountIndicators(accountIndicatorsUsdcAfter).compositeMultiplierCumulative
+            extractAccountIndicators(accountIndicatorsUsdcAfter).compositeMultiplierCumulativePrevBlock
         );
         expect(
             extractAccountIndicators(accountIndicatorsDaiAfter).delegatedPowerTokenBalance

@@ -13,7 +13,7 @@ chai.use(solidity);
 const { expect } = chai;
 const { ethers } = hre;
 
-describe("PowerIpor configuration, deploy tests", () => {
+describe("PowerIpor token delegate", () => {
     let accounts: Signer[];
     let iporToken: IporToken;
     let powerIpor: PowerIpor;
@@ -62,7 +62,7 @@ describe("PowerIpor configuration, deploy tests", () => {
         //    when
         await expect(
             powerIpor.delegateToJohn([await admin.getAddress()], [N1__0_18DEC])
-        ).to.be.revertedWith("IPOR_705");
+        ).to.be.revertedWith("IPOR_706");
     });
 
     it("Should revert transaction when insufficient number of tokens to stake, two assets", async () => {
@@ -75,7 +75,7 @@ describe("PowerIpor configuration, deploy tests", () => {
                 [tokens.tokenDai.address, tokens.tokenUsdc.address],
                 [N1__0_18DEC, N0__1_18DEC]
             )
-        ).to.be.revertedWith("IPOR_705");
+        ).to.be.revertedWith("IPOR_706");
     });
 
     it("Should be able to stake into one asset when pass one asset", async () => {
