@@ -12,6 +12,7 @@ import {
     TOTAL_SUPPLY_18_DECIMALS,
     TOTAL_SUPPLY_6_DECIMALS,
     N0__1_18DEC,
+    N2__0_18DEC,
 } from "../utils/Constants";
 
 chai.use(solidity);
@@ -86,7 +87,11 @@ describe("John claim", () => {
         const delegatedPwIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakeIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedIpTokensAmount = N1__0_18DEC.mul(BigNumber.from("100"));
+        const expectedRewards = BigNumber.from("101000000000000000000");
 
+        const userOneIporBalanceBefore = await iporToken.balanceOf(await userOne.getAddress());
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+        const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
         await powerIpor.connect(userOne).stake(stakeIporAmount);
 
         await powerIpor
@@ -106,9 +111,17 @@ describe("John claim", () => {
         const powerIporBalanceAfter = await powerIpor
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
+        const userOneIporBalanceAfter = await iporToken.balanceOf(await userOne.getAddress());
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+        const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
 
         expect(powerIporBalanceBefore).to.be.equal(BigNumber.from("100000000000000000000"));
-        expect(powerIporBalanceAfter).to.be.equal(BigNumber.from("201000000000000000000"));
+        expect(powerIporBalanceAfter).to.be.equal(powerIporBalanceBefore.add(expectedRewards));
+        expect(userOneIporBalanceAfter).to.be.equal(userOneIporBalanceBefore.sub(stakeIporAmount));
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore.add(stakeIporAmount).add(expectedRewards)
+        );
+        expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore.add(stakedIpTokensAmount));
     });
 
     it("Should get 100 rewards when first stake 0.1 dai and after 1 Dai, 200 blocks mint", async () => {
@@ -116,6 +129,11 @@ describe("John claim", () => {
         const delegatedPwIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakeIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedIpTokensAmount = N0__1_18DEC;
+        const expectedRewards = BigNumber.from("100000000000000000000");
+
+        const userOneIporBalanceBefore = await iporToken.balanceOf(await userOne.getAddress());
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+        const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
 
         await powerIpor.connect(userOne).stake(stakeIporAmount);
 
@@ -143,7 +161,7 @@ describe("John claim", () => {
         const accruedRewardsMiddle = await john
             .connect(userOne)
             .calculateAccruedRewards(tokens.ipTokenDai.address);
-
+        // rewards is zero no transfer to powerIpor
         await john.connect(userOne).stake(tokens.ipTokenDai.address, N1__0_18DEC);
 
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
@@ -156,13 +174,24 @@ describe("John claim", () => {
         const accruedRewardsAfter = await john
             .connect(userOne)
             .calculateAccruedRewards(tokens.ipTokenDai.address);
+        const userOneIporBalanceAfter = await iporToken.balanceOf(await userOne.getAddress());
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+        const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
 
         expect(accountRewardsBefore).to.be.equal(ZERO);
         expect(accruedRewardsBefore).to.be.equal(ZERO);
         expect(accountRewardsMiddle).to.be.equal(ZERO);
         expect(accruedRewardsMiddle).to.be.equal(ZERO);
-        expect(accountRewardsAfter).to.be.equal(N1__0_18DEC.mul(BigNumber.from("100")));
-        expect(accruedRewardsAfter).to.be.equal(N1__0_18DEC.mul(BigNumber.from("100")));
+        expect(accountRewardsAfter).to.be.equal(expectedRewards);
+        expect(accruedRewardsAfter).to.be.equal(expectedRewards);
+        expect(userOneIporBalanceAfter).to.be.equal(userOneIporBalanceBefore.sub(stakeIporAmount));
+
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore.add(stakeIporAmount)
+        );
+        expect(johnIpDaiBalanceAfter).to.be.equal(
+            johnIpDaiBalanceBefore.add(N1__0_18DEC).add(N0__1_18DEC)
+        );
     });
 
     it("Should count proper transfer rewards when one user stake ipTokens twice", async () => {
@@ -170,6 +199,13 @@ describe("John claim", () => {
         const delegatedPwIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakeIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedIpTokensAmount = N1__0_18DEC.mul(BigNumber.from("100"));
+
+        const expectedRewards = BigNumber.from("100000000000000000000");
+
+        const userOneIporBalanceBefore = await iporToken.balanceOf(await userOne.getAddress());
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+        const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
+
         await powerIpor.connect(userOne).stake(delegatedPwIporAmount);
         await powerIpor
             .connect(userOne)
@@ -204,12 +240,27 @@ describe("John claim", () => {
             tokens.ipTokenDai.address
         );
 
+        const userOneIporBalanceAfter = await iporToken.balanceOf(await userOne.getAddress());
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+        const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
+
         expect(rewardsAfterFirstStake).to.be.equal(BigNumber.from("100000000000000000000"));
         expect(rewardsAfterSecondStake).to.be.equal(ZERO);
 
         expect(powerIporBalanceBefore).to.be.equal(BigNumber.from("100000000000000000000"));
         expect(powerIporBalanceAfter1Stake).to.be.equal(BigNumber.from("100000000000000000000"));
         expect(powerIporBalanceAfter2Stake).to.be.equal(BigNumber.from("201000000000000000000"));
+
+        expect(userOneIporBalanceAfter).to.be.equal(userOneIporBalanceBefore.sub(stakeIporAmount));
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore
+                .add(stakeIporAmount)
+                .add(stakeIporAmount)
+                .add(N1__0_18DEC)
+        );
+        expect(johnIpDaiBalanceAfter).to.be.equal(
+            johnIpDaiBalanceBefore.add(stakedIpTokensAmount).add(stakedIpTokensAmount)
+        );
     });
 
     it("Should count proper rewards when one user stake Power Ipor Tokens (pwIpor) twice", async () => {
@@ -217,6 +268,12 @@ describe("John claim", () => {
         const delegatedPwIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakeIporAmount = N1__0_18DEC.mul(BigNumber.from("200"));
         const stakedIpTokensAmount = N1__0_18DEC.mul(BigNumber.from("100"));
+
+        const expectedRewards = BigNumber.from("100000000000000000000");
+
+        const userOneIporBalanceBefore = await iporToken.balanceOf(await userOne.getAddress());
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+        const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
 
         //    when
         await powerIpor.connect(userOne).stake(stakeIporAmount);
@@ -253,6 +310,10 @@ describe("John claim", () => {
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
+        const userOneIporBalanceAfter = await iporToken.balanceOf(await userOne.getAddress());
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+        const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
+
         expect(rewardsAfterFirstStake).to.be.equal(BigNumber.from("100000000000000000000"));
         expect(rewardsAfterSecondStake).to.be.equal(ZERO);
 
@@ -261,5 +322,14 @@ describe("John claim", () => {
         expect(powerIporBalanceAfter1Stake).to.be.equal(BigNumber.from("201000000000000000000"));
         // 100 transfer after second delegateToJohn
         expect(powerIporBalanceAfter2Stake).to.be.equal(BigNumber.from("302000000000000000000"));
+
+        expect(userOneIporBalanceAfter).to.be.equal(userOneIporBalanceBefore.sub(stakeIporAmount));
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore
+                .add(stakeIporAmount)
+                .add(expectedRewards)
+                .add(N2__0_18DEC)
+        );
+        expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore.add(stakedIpTokensAmount));
     });
 });

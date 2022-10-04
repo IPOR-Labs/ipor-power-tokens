@@ -169,6 +169,9 @@ describe("John sum of rewards", () => {
         const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
 
+        const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+
         // Admin
         await powerIpor.stake(delegatedIporToken);
         await powerIpor.delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
@@ -197,6 +200,9 @@ describe("John sum of rewards", () => {
         await john.connect(userTwo).unstake(tokens.ipTokenDai.address, stakedIpTokens);
         //    then
         const globalIndicatorsAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
+        const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+
         expectGlobalIndicators(
             extractGlobalIndicators(globalIndicatorsAfter),
             ZERO,
@@ -220,12 +226,20 @@ describe("John sum of rewards", () => {
             tokens.ipTokenDai.address
         );
         expect(rewardsAdmin.add(rewardsUserOne).add(rewardsUserTwo)).to.be.equal(ZERO);
+
+        expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore);
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore.add(BigNumber.from("609000000000000000001"))
+        );
     });
 
     it("Should aggregate powerUp be equal zero", async () => {
         //    given
         const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
+
+        const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
 
         // Admin
         await powerIpor.stake(delegatedIporToken);
@@ -293,14 +307,24 @@ describe("John sum of rewards", () => {
             .connect(userTwo)
             .unstake(tokens.ipTokenDai.address, N1__0_18DEC.mul(BigNumber.from("20")));
         //    then
+
+        const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
         const globalIndicatorsAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
         expect(extractGlobalIndicators(globalIndicatorsAfter).aggregatedPowerUp).to.be.equal(ZERO);
+        expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore);
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore.add(BigNumber.from("813").mul(N1__0_18DEC))
+        );
     });
 
     it("Should not add rewards when no ipToken was stake", async () => {
         //    given
         const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
+
+        const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
 
         const accruedRewardsBefore = await john.calculateAccruedRewards(tokens.ipTokenDai.address);
         await powerIpor.connect(userOne).stake(delegatedIporToken);
@@ -342,6 +366,8 @@ describe("John sum of rewards", () => {
 
         //    then
 
+        const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
         const accountRewardsAfter = await john.calculateAccountRewards(
             await admin.getAddress(),
             tokens.ipTokenDai.address
@@ -364,5 +390,9 @@ describe("John sum of rewards", () => {
         expect(pwIporBalanceAfter1Unstake).to.be.equal(BigNumber.from("201000000000000000000"));
         expect(pwIporBalanceAfter).to.be.equal(BigNumber.from("302000000000000000000"));
         expect(accountRewardsAfter).to.be.equal(ZERO);
+        expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore);
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore.add(BigNumber.from("302").mul(N1__0_18DEC))
+        );
     });
 });
