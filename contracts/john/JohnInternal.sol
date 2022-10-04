@@ -295,10 +295,9 @@ abstract contract JohnInternal is
         JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
         uint256 blockNumber = block.number;
 
-        uint256 compositeMultiplierCumulativePrevBlock = globalIndicators
-            .compositeMultiplierCumulativePrevBlock +
-            (blockNumber - globalIndicators.blockNumber) *
-            globalIndicators.compositeMultiplierInTheBlock;
+        uint256 accruedCompositeMultiplierCumulativePrevBlock = _calculateAccruedCompMultiplierCumulativePrevBlock(
+                globalIndicators
+            );
 
         uint256 accruedRewards;
         if (globalIndicators.aggregatedPowerUp != 0) {
@@ -320,7 +319,7 @@ abstract contract JohnInternal is
         _globalIndicators[ipToken] = JohnTypes.GlobalRewardsIndicators(
             globalIndicators.aggregatedPowerUp,
             compositeMultiplier.toUint128(),
-            compositeMultiplierCumulativePrevBlock.toUint128(),
+            accruedCompositeMultiplierCumulativePrevBlock.toUint128(),
             blockNumber.toUint32(),
             iporTokenAmount,
             accruedRewards.toUint88()

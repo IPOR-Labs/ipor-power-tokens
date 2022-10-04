@@ -246,11 +246,14 @@ describe("PowerIpor unstake", () => {
 
         await powerIpor.coolDown(N0__5_18DEC);
         const coolDownBefore = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
+        const exchangeRateBefore = await powerIpor.calculateExchangeRate();
+
         // when
         await hre.network.provider.send("evm_increaseTime", [twoWeekesInSeconds + 1]);
         await powerIpor.redeem();
 
         // then
+        const exchangeRateAfter = await powerIpor.calculateExchangeRate();
         const coolDownAfter = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
         const pwBalanceAfter = await powerIpor.balanceOf(adminAddress);
 
@@ -262,6 +265,7 @@ describe("PowerIpor unstake", () => {
 
         expect(pwBalanceBefore).to.be.equal(N1__0_18DEC);
         expect(pwBalanceAfter).to.be.equal(N0__5_18DEC);
+        expect(exchangeRateBefore).to.be.equal(exchangeRateAfter);
     });
 
     it("Should be able to redeem cool down tokens when 2 weeks pass and exchange rate changed", async () => {
@@ -277,12 +281,14 @@ describe("PowerIpor unstake", () => {
 
         const coolDownBefore = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
         const iporTokenBalanceBefore = await iporToken.balanceOf(adminAddress);
+        const exchangeRateBefore = await powerIpor.calculateExchangeRate();
 
         // when
         await hre.network.provider.send("evm_increaseTime", [twoWeekesInSeconds + 1]);
         await powerIpor.redeem();
 
         // then
+        const exchangeRateAfter = await powerIpor.calculateExchangeRate();
         const coolDownAfter = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
         const pwBalanceAfter = await powerIpor.balanceOf(adminAddress);
         const iporTokenBalanceAfter = await iporToken.balanceOf(adminAddress);
@@ -297,5 +303,7 @@ describe("PowerIpor unstake", () => {
         expect(pwBalanceAfter).to.be.equal(N1__0_18DEC.add(N0__5_18DEC));
 
         expect(iporTokenBalanceAfter).to.be.equal(iporTokenBalanceBefore.add(N0__5_18DEC));
+
+        expect(exchangeRateBefore).to.be.equal(exchangeRateAfter);
     });
 });

@@ -79,7 +79,7 @@ library MiningCalculation {
     ) internal view returns (uint256) {
         require(
             blockNumber >= lastRebalanceBlockNumber,
-            MiningErrors.BLOCK_NUMBER_GREATER_OR_EQUAL_THAN_PREVIOUS_BLOCK_NUMBER
+            MiningErrors.BLOCK_NUMBER_LOWER_THAN_PREVIOUS_BLOCK_NUMBER
         );
         uint256 newRewards = (blockNumber - lastRebalanceBlockNumber) *
             rewardsPerBlock *

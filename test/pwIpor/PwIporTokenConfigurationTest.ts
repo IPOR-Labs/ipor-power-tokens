@@ -214,4 +214,15 @@ describe("PowerIpor configuration, deploy tests", () => {
         //clean up
         await powerIpor.setPauseManager(oldPauseManager);
     });
+
+    it("Should not be able execute receiveRewards because sender is not a John", async () => {
+        //given
+        const PowerIpor = await ethers.getContractFactory("PowerIpor");
+        const powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
+        const [admin, userOne, userThree] = accounts;
+        //when
+        await expect(
+            powerIpor.receiveRewards(await userOne.getAddress(), BigNumber.from("123"))
+        ).to.be.revertedWith("IPOR_703");
+    });
 });

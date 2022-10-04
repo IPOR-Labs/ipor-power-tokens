@@ -5,7 +5,13 @@ import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
 import { IporToken, John, PowerIpor } from "../../types";
-import { N1__0_18DEC, ZERO, TOTAL_SUPPLY_18_DECIMALS, N0__1_18DEC } from "../utils/Constants";
+import {
+    N1__0_18DEC,
+    ZERO,
+    TOTAL_SUPPLY_18_DECIMALS,
+    N0__01_18DEC,
+    N0__1_18DEC,
+} from "../utils/Constants";
 import { it } from "mocha";
 import { getDeployedTokens, Tokens } from "../utils/JohnUtils";
 
@@ -15,6 +21,7 @@ const { ethers } = hre;
 
 describe("PowerIpor unstake", () => {
     const N0__2_18DEC = N0__1_18DEC.mul(BigNumber.from("2"));
+    const N0__25_18DEC = N0__01_18DEC.mul(BigNumber.from("25"));
     const N0__4_18DEC = N0__1_18DEC.mul(BigNumber.from("4"));
     const N0__5_18DEC = N0__1_18DEC.mul(BigNumber.from("5"));
     const N0__6_18DEC = N0__1_18DEC.mul(BigNumber.from("6"));
@@ -77,10 +84,13 @@ describe("PowerIpor unstake", () => {
         const balanceBefore = await powerIpor.balanceOf(adminAddress);
         const totalSupplyBefore = await powerIpor.totalSupplyBase();
         const iporBalanceBefore = await iporToken.balanceOf(adminAddress);
+        const exchangeRateBefore = await powerIpor.calculateExchangeRate();
 
         // when
         await powerIpor.unstake(N1__0_18DEC);
+
         // then
+        const exchangeRateAfter = await powerIpor.calculateExchangeRate();
         const balanceAfter = await powerIpor.balanceOf(adminAddress);
         const totalSupplyAfter = await powerIpor.totalSupplyBase();
         const iporBalanceAfter = await iporToken.balanceOf(adminAddress);
@@ -90,6 +100,35 @@ describe("PowerIpor unstake", () => {
         expect(totalSupplyBefore).to.be.equal(N1__0_18DEC);
         expect(totalSupplyAfter).to.be.equal(ZERO);
         expect(iporBalanceAfter).to.be.equal(iporBalanceBefore.add(N0__5_18DEC));
+        expect(exchangeRateBefore).to.be.equal(exchangeRateAfter);
+    });
+
+    it("Should be able unstake part of staked balance", async () => {
+        // given
+        await powerIpor.stake(N1__0_18DEC);
+
+        const adminAddress = await accounts[0].getAddress();
+        const balanceBefore = await powerIpor.balanceOf(adminAddress);
+        const totalSupplyBefore = await powerIpor.totalSupplyBase();
+        const iporBalanceBefore = await iporToken.balanceOf(adminAddress);
+        const exchangeRateBefore = await powerIpor.calculateExchangeRate();
+
+        // when
+        await powerIpor.unstake(N0__5_18DEC);
+
+        // then
+        const exchangeRateAfter = await powerIpor.calculateExchangeRate();
+        const balanceAfter = await powerIpor.balanceOf(adminAddress);
+        const totalSupplyAfter = await powerIpor.totalSupplyBase();
+        const iporBalanceAfter = await iporToken.balanceOf(adminAddress);
+
+        expect(balanceBefore).to.be.equal(N1__0_18DEC);
+        expect(balanceAfter).to.be.equal(BigNumber.from("750000000000000000"));
+        expect(totalSupplyBefore).to.be.equal(N1__0_18DEC);
+        expect(totalSupplyAfter).to.be.equal(BigNumber.from("500000000000000000"));
+        expect(iporBalanceAfter).to.be.equal(iporBalanceBefore.add(N0__25_18DEC));
+        expect(exchangeRateBefore).to.be.equal(N1__0_18DEC);
+        expect(exchangeRateAfter).to.be.equal(BigNumber.from("1500000000000000000"));
     });
 
     it("Should not be able to unstake when user delegated tokens to John", async () => {

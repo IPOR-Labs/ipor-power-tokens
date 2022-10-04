@@ -85,7 +85,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
         require(
             availablePwIporAmount >= pwIporAmount,
-            MiningErrors.STAKE_AND_UNDELEGATED_BALANCE_TOO_LOW
+            MiningErrors.AVAILABLE_POWER_IPOR_BALANCE_IS_TOO_LOW
         );
 
         uint256 baseAmountToUnstake = IporMath.division(pwIporAmount * Constants.D18, exchangeRate);
@@ -201,7 +201,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
         require(
             availablePwIporAmount >= pwIporAmount,
-            MiningErrors.STAKE_AND_UNDELEGATED_BALANCE_TOO_LOW
+            MiningErrors.AVAILABLE_POWER_IPOR_BALANCE_IS_TOO_LOW
         );
 
         _coolDowns[msgSender] = PowerIporTypes.PwIporCoolDown(
@@ -232,12 +232,18 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
             exchangeRate
         );
 
+		console.log("exchangeRate=",exchangeRate);
+		console.log("baseAmountToUnstake=",baseAmountToUnstake);
+		console.log("_baseBalance[msgSender]=",_baseBalance[msgSender]);
+
         require(_baseBalance[msgSender] >= baseAmountToUnstake, MiningErrors.BASE_BALANCE_TOO_LOW);
 
         _baseBalance[msgSender] -= baseAmountToUnstake;
         _baseTotalSupply -= baseAmountToUnstake;
+
         delete _coolDowns[msgSender];
 
+        ///@dev We can transfer pwIporAmount because is in relation 1:1 to Ipor Token
         IERC20Upgradeable(iporTokenAddress).transfer(msgSender, coolDown.pwIporAmount);
 
         emit Redeem(msgSender, coolDown.pwIporAmount);

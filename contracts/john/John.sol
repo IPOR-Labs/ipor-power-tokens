@@ -61,18 +61,9 @@ contract John is JohnInternal, IJohn {
             ipToken
         ];
 
-        uint256 accruedCompMultiplierCumulativePrevBlock = globalIndicators
-            .compositeMultiplierCumulativePrevBlock +
-            (block.number - globalIndicators.blockNumber) *
-            globalIndicators.compositeMultiplierInTheBlock;
+        (uint256 rewards, ) = _calculateAccountRewards(globalIndicators, accountIndicators);
 
-        return
-            MiningCalculation.calculateAccountRewards(
-                accountIndicators.ipTokenBalance,
-                accountIndicators.powerUp,
-                accountIndicators.compositeMultiplierCumulativePrevBlock,
-                accruedCompMultiplierCumulativePrevBlock
-            );
+        return rewards;
     }
 
     function stake(address ipToken, uint256 ipTokenAmount)
@@ -146,7 +137,7 @@ contract John is JohnInternal, IJohn {
         _rebalanceIndicators(
             msgSender,
             ipToken,
-			accruedCompMultiplierCumulativePrevBlock,
+            accruedCompMultiplierCumulativePrevBlock,
             globalIndicators,
             accountIndicators,
             accountIndicators.ipTokenBalance - ipTokenAmount,
@@ -166,10 +157,9 @@ contract John is JohnInternal, IJohn {
         ];
         JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
 
-        uint256 accruedCompMultiplierCumulativePrevBlock = globalIndicators
-            .compositeMultiplierCumulativePrevBlock +
-            (block.number - globalIndicators.blockNumber) *
-            globalIndicators.compositeMultiplierInTheBlock;
+        uint256 accruedCompMultiplierCumulativePrevBlock = _calculateAccruedCompMultiplierCumulativePrevBlock(
+                globalIndicators
+            );
 
         uint256 iporTokenAmount = MiningCalculation.calculateAccountRewards(
             accountIndicators.ipTokenBalance,

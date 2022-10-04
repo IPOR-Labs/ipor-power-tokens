@@ -110,9 +110,11 @@ describe("John sum of rewards", () => {
             tokens.ipTokenDai.address
         );
         const ipTokenBalanceBefore = await tokens.ipTokenDai.balanceOf(await userOne.getAddress());
+
         //    when
         await john.connect(userOne).unstake(tokens.ipTokenDai.address, stakedIpTokens);
-        //    then
+        
+		//    then
         const globalIndicatorsAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
         const userParamsAfter = await john.getAccountIndicators(
             await userOne.getAddress(),

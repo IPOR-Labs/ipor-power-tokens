@@ -100,15 +100,21 @@ describe("John claim", () => {
         await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokensAmount);
 
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
-        //    when
+
+        const exchangeRateBefore = await powerIpor.calculateExchangeRate();
+
+        //when
         await john.connect(userOne).claim(tokens.ipTokenDai.address);
-        //    then
+
+        //then
+        const exchangeRateAfter = await powerIpor.calculateExchangeRate();
         const powerIporBalanceAfter = await powerIpor
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
         expect(powerIporBalanceBefore).to.be.equal(BigNumber.from("100000000000000000000"));
         expect(powerIporBalanceAfter).to.be.equal(BigNumber.from("201000000000000000000"));
+        expect(exchangeRateBefore).to.be.equal(exchangeRateAfter);
     });
 
     it("Should get 100 rewards when first stake 0.1 dai and after 1 Dai, 200 blocks mint", async () => {

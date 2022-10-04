@@ -9,11 +9,11 @@ library MiningErrors {
     string public constant BASE_BALANCE_TOO_LOW = "IPOR_705";
     string public constant STAKED_BALANCE_TOO_LOW = "IPOR_706";
     string public constant DELEGATED_BALANCE_TOO_LOW = "IPOR_707";
-    string public constant STAKE_AND_UNDELEGATED_BALANCE_TOO_LOW = "IPOR_708";
+    string public constant AVAILABLE_POWER_IPOR_BALANCE_IS_TOO_LOW = "IPOR_708";
     string public constant NO_REWARDS_TO_CLAIM = "IPOR_709";
     string public constant COOL_DOWN_NOT_FINISH = "IPOR_710";
     string public constant AGGREGATE_POWER_UP_COULD_NOT_BE_NEGATIVE = "IPOR_711";
-    string public constant BLOCK_NUMBER_GREATER_OR_EQUAL_THAN_PREVIOUS_BLOCK_NUMBER = "IPOR_712";
+    string public constant BLOCK_NUMBER_LOWER_THAN_PREVIOUS_BLOCK_NUMBER = "IPOR_712";
 
     /// @notice Account Composite Multiplier indicator greater or equal than Composit Multiplier indicator, but should be less or equal
     string public constant ACCOUNT_COMPOSITE_MULTIPLIER_GT_COMPOSITE_MULTIPLIER = "IPOR_713";
