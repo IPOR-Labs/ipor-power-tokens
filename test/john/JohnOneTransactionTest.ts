@@ -543,7 +543,7 @@ describe("One block/Transaction tests", () => {
             expect(agent2PwIporBalanceCase1After).to.be.equal(agent2PwIporBalanceCase2After);
         });
 
-        it.only("Should calculate proper rewards, based on excel from documentation", async () => {
+        it("Should calculate proper rewards, based on excel from documentation", async () => {
             //    given
             const rewardsPerBlock = BigNumber.from("300000000");
             const accountOneIpTokenAmount = BigNumber.from("100").mul(N1__0_18DEC);
@@ -583,6 +583,9 @@ describe("One block/Transaction tests", () => {
             await network.provider.send("evm_setAutomine", [false]);
             await john.setRewardsPerBlock(tokens.ipTokenDai.address, rewardsPerBlock);
             await hre.network.provider.send("evm_mine");
+
+            const johnIpBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
+            const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
 
             //    when
 
@@ -632,9 +635,25 @@ describe("One block/Transaction tests", () => {
                 await userThree.getAddress(),
                 tokens.ipTokenDai.address
             );
+
+            const johnIpBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
+            const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+
             const sumOfRewards = accountOneRewards.add(accountTwoRewards).add(accountThreeRewards);
 
             expect(sumOfRewards).to.be.equal(N1__0_18DEC.mul(BigNumber.from("15")));
+            expect(johnIpBalanceAfter).to.be.equal(
+                johnIpBalanceBefore
+                    .add(accountOneIpTokenAmount)
+                    .add(accountTwoIpTokenAmount)
+                    .add(accountThreeIpTokenAmount)
+            );
+            expect(powerIporIporTokenBalanceAfter).to.be.equal(
+                powerIporIporTokenBalanceBefore
+                    .add(accountOnePwIporAmount)
+                    .add(accountTwoPwIporAmount)
+                    .add(accountTwoPwIporAmount)
+            );
 
             await network.provider.send("evm_setAutomine", [true]);
         });
