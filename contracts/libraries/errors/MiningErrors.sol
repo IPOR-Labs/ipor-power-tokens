@@ -15,6 +15,6 @@ library MiningErrors {
     string public constant AGGREGATE_POWER_UP_COULD_NOT_BE_NEGATIVE = "IPOR_711";
     string public constant BLOCK_NUMBER_GREATER_OR_EQUAL_THAN_PREVIOUS_BLOCK_NUMBER = "IPOR_712";
 
-    /// @notice Composite Multiplier indicator greater or equal than Account Composit Multiplier indicator
-    string public constant COMPOSITE_MULTIPLIER_GTE_ACCOUNT_COMPOSITE_MULTIPLIER = "IPOR_713";
+    /// @notice Account Composite Multiplier indicator greater or equal than Composit Multiplier indicator, but should be less or equal
+    string public constant ACCOUNT_COMPOSITE_MULTIPLIER_GT_COMPOSITE_MULTIPLIER = "IPOR_713";
 }

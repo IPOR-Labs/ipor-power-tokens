@@ -429,9 +429,9 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
             extractAccountIndicators(accountIndicatorsUsdcBefore).powerUp
         );
         expect(
-            extractAccountIndicators(accountIndicatorsDaiBefore).compositeMultiplierCumulative
+            extractAccountIndicators(accountIndicatorsDaiBefore).compositeMultiplierCumulativePrevBlock
         ).to.be.equal(
-            extractAccountIndicators(accountIndicatorsUsdcBefore).compositeMultiplierCumulative
+            extractAccountIndicators(accountIndicatorsUsdcBefore).compositeMultiplierCumulativePrevBlock
         );
         expect(
             extractAccountIndicators(accountIndicatorsDaiBefore).delegatedPowerTokenBalance
@@ -446,9 +446,9 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
             extractAccountIndicators(accountIndicatorsUsdcAfter).powerUp
         );
         expect(
-            extractAccountIndicators(accountIndicatorsDaiAfter).compositeMultiplierCumulative
+            extractAccountIndicators(accountIndicatorsDaiAfter).compositeMultiplierCumulativePrevBlock
         ).to.be.equal(
-            extractAccountIndicators(accountIndicatorsUsdcAfter).compositeMultiplierCumulative
+            extractAccountIndicators(accountIndicatorsUsdcAfter).compositeMultiplierCumulativePrevBlock
         );
         expect(
             extractAccountIndicators(accountIndicatorsDaiAfter).delegatedPowerTokenBalance
