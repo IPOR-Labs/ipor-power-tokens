@@ -96,7 +96,7 @@ describe("One block/Transaction tests", () => {
         //    given
 
         const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
-        const powerIporIporBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
 
         //    when
         await liquidityRewardsTestAction.stakeIporToken(
@@ -125,7 +125,7 @@ describe("One block/Transaction tests", () => {
         const agent2After = extractAccountIndicators(agent2AccountIndicatorsAfter);
 
         const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
-        const powerIporIporBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
 
         expect(agent1After.powerUp).to.be.equal(agent2After.powerUp);
         expect(agent1After.compositeMultiplierCumulative).to.be.equal(
@@ -137,14 +137,16 @@ describe("One block/Transaction tests", () => {
         );
 
         expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore.add(N2__0_18DEC));
-        expect(powerIporIporBalanceAfter).to.be.equal(powerIporIporBalanceBefore.add(N2__0_18DEC));
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore.add(N2__0_18DEC)
+        );
     });
 
     it("Should has the same rewards when 2 user unstake ipTokens in one transaction", async () => {
         //    given
 
         const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
-        const powerIporIporBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
         const expectedRewards = BigNumber.from("101000000000000000000");
 
         await liquidityRewardsTestAction.stakeIporToken(
@@ -183,7 +185,7 @@ describe("One block/Transaction tests", () => {
         const agent2After = extractAccountIndicators(agent2AccountIndicatorsAfter);
 
         const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
-        const powerIporIporBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
 
         expect(agent1After.powerUp).to.be.equal(agent2After.powerUp);
         expect(agent1After.compositeMultiplierCumulative).to.be.equal(
@@ -197,8 +199,8 @@ describe("One block/Transaction tests", () => {
         expect(agent1PwIporBalanceAfter).to.be.equal(N0__1_18DEC.mul(BigNumber.from(515)));
 
         expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore);
-        expect(powerIporIporBalanceAfter).to.be.equal(
-            powerIporIporBalanceBefore.add(N2__0_18DEC).add(expectedRewards)
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore.add(N2__0_18DEC).add(expectedRewards)
         );
     });
 
@@ -209,7 +211,7 @@ describe("One block/Transaction tests", () => {
         const N1000__0_18DEC = N1__0_18DEC.mul(BigNumber.from("1000"));
 
         const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
-        const powerIporIporBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
 
         await agent1.stakeIporToken(N1000__0_18DEC);
         await tokens.ipTokenDai.connect(userOne).approve(john.address, TOTAL_SUPPLY_18_DECIMALS);
@@ -263,18 +265,17 @@ describe("One block/Transaction tests", () => {
 
         const agent1IpTokenBalanceAfter = await tokens.ipTokenDai.balanceOf(agent1.address);
         const agent1IporTokenBalanceAfter = await iporToken.balanceOf(agent1.address);
-		const agent1PwIporBalanceAfter = await powerIpor.balanceOf(agent1.address);
+        const agent1PwIporBalanceAfter = await powerIpor.balanceOf(agent1.address);
         const userOneIpTokenBalanceAfter = await tokens.ipTokenDai.balanceOf(
             await userOne.getAddress()
         );
         const userOneIporTokenBalanceAfter = await iporToken.balanceOf(await userOne.getAddress());
-		
 
         const accruedRewardsAfter = await john.calculateAccruedRewards(ipDai);
         const userOnePwIporBalanceAfter = await powerIpor.balanceOf(await userOne.getAddress());
 
         const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
-        const powerIporIporBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
 
         expect(accruedRewardsBefore).to.be.equal(ZERO);
         expect(accruedRewardsAfter).to.be.equal(N1__0_18DEC.mul(BigNumber.from("404")));
@@ -294,8 +295,8 @@ describe("One block/Transaction tests", () => {
         );
 
         expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore);
-        expect(powerIporIporBalanceAfter).to.be.equal(
-            powerIporIporBalanceBefore
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore
                 .add(N1__0_18DEC.mul(BigNumber.from("504")))
                 .add(N1000__0_18DEC)
         );
@@ -308,7 +309,7 @@ describe("One block/Transaction tests", () => {
         const N1000__0_18DEC = N1__0_18DEC.mul(BigNumber.from("1000"));
 
         const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
-        const powerIporIporBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
 
         await agent1.stakeIporToken(N100__0_18DEC);
         await agent2.stakeIporToken(N100__0_18DEC);
@@ -348,7 +349,7 @@ describe("One block/Transaction tests", () => {
         const agent2Rewards = await agent2.calculateAccountRewards(ipDai);
 
         const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
-        const powerIporIporBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
 
         expect(pendingBlockBeforeMine.transactions.length).to.be.equal(2);
         expect(pendingBlockAfterMine.transactions.length).to.be.equal(0);
@@ -357,8 +358,8 @@ describe("One block/Transaction tests", () => {
         expect(agent2Rewards).to.be.equal(N1__0_18DEC);
 
         expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore.add(N1000__0_18DEC));
-        expect(powerIporIporBalanceAfter).to.be.equal(
-            powerIporIporBalanceBefore
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore
                 .add(N100__0_18DEC) //deposit
                 .add(N100__0_18DEC) //rewards
         );
@@ -372,7 +373,7 @@ describe("One block/Transaction tests", () => {
         const N1000__0_18DEC = N1__0_18DEC.mul(BigNumber.from("1000"));
 
         const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
-        const powerIporIporBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
 
         const agent1PwIporBalanceBefore = await powerIpor.balanceOf(agent1.address);
         const agent2PwIporBalanceBefore = await powerIpor.balanceOf(agent2.address);
@@ -418,7 +419,7 @@ describe("One block/Transaction tests", () => {
         const agent2Rewards = agent2PwIporBalanceAfter.sub(agent2PwIporBalanceBefore);
 
         const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
-        const powerIporIporBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
 
         expect(rewardsPerBlockInitial).to.be.equal(BigNumber.from("100000000"));
         expect(agent2StakeIpTokensInBlock).to.be.equal(agent1StakeIpTokensInBlock + 11);
@@ -433,8 +434,8 @@ describe("One block/Transaction tests", () => {
         expect(rewardsPerBlockAfterBlock21).to.be.equal(BigNumber.from("1000000000"));
 
         expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore);
-        expect(powerIporIporBalanceAfter).to.be.equal(
-            powerIporIporBalanceBefore.add(agent1Rewards).add(agent2Rewards)
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore.add(agent1Rewards).add(agent2Rewards)
         );
 
         await network.provider.send("evm_setAutomine", [true]);

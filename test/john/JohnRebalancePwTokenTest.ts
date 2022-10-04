@@ -87,7 +87,7 @@ describe("John - Rebalance on delegate pwIpor", () => {
             const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
 
             const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
-            const powerIporIporBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+            const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
 
             const initGlobalIndicatorsResponse = await john.getGlobalIndicators(
                 tokens.ipTokenDai.address
@@ -120,7 +120,7 @@ describe("John - Rebalance on delegate pwIpor", () => {
             );
 
             const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
-            const powerIporIporBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+            const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
 
             expectGlobalIndicators(
                 extractGlobalIndicators(initGlobalIndicatorsResponse),
@@ -181,8 +181,8 @@ describe("John - Rebalance on delegate pwIpor", () => {
             expect(rewards).to.be.equal(BigNumber.from("100000000000000000000"));
 
             expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore.add(stakedIpTokens));
-            expect(powerIporIporBalanceAfter).to.be.equal(
-                powerIporIporBalanceBefore.add(delegatedIporToken).add(N1__0_18DEC)
+            expect(powerIporIporTokenBalanceAfter).to.be.equal(
+                powerIporIporTokenBalanceBefore.add(delegatedIporToken).add(N1__0_18DEC)
             );
         });
 
@@ -192,7 +192,7 @@ describe("John - Rebalance on delegate pwIpor", () => {
             const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
 
             const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
-            const powerIporIporBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+            const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
 
             //    when
             // Admin
@@ -220,7 +220,7 @@ describe("John - Rebalance on delegate pwIpor", () => {
             //    then
 
             const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
-            const powerIporIporBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+            const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
 
             const rewardsAdmin = await john.calculateAccountRewards(
                 await admin.getAddress(),
@@ -240,8 +240,8 @@ describe("John - Rebalance on delegate pwIpor", () => {
             expect(johnIpDaiBalanceAfter).to.be.equal(
                 johnIpDaiBalanceBefore.add(stakedIpTokens).add(stakedIpTokens).add(stakedIpTokens)
             );
-            expect(powerIporIporBalanceAfter).to.be.equal(
-                powerIporIporBalanceBefore
+            expect(powerIporIporTokenBalanceAfter).to.be.equal(
+                powerIporIporTokenBalanceBefore
                     .add(delegatedIporToken)
                     .add(delegatedIporToken)
                     .add(delegatedIporToken)

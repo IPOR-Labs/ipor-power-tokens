@@ -119,7 +119,7 @@ describe("John rebalance ", () => {
         const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
         const johnIpUsdcBalanceBefore = await tokens.ipTokenUsdc.balanceOf(john.address);
         const johnIpUsdtBalanceBefore = await tokens.ipTokenUsdt.balanceOf(john.address);
-        const powerIporIporBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
 
         await tokens.ipTokenDai.mint(await admin.getAddress(), N2__0_18DEC);
         await tokens.ipTokenUsdc.mint(await admin.getAddress(), N2__0_18DEC);
@@ -151,7 +151,7 @@ describe("John rebalance ", () => {
         const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
         const johnIpUsdcBalanceAfter = await tokens.ipTokenUsdc.balanceOf(john.address);
         const johnIpUsdtBalanceAfter = await tokens.ipTokenUsdt.balanceOf(john.address);
-        const powerIporIporBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
 
         expectedBalances([ZERO, ZERO, ZERO], balancesBefore);
         expectedBalances(amounts, balancesAfter);
@@ -159,8 +159,8 @@ describe("John rebalance ", () => {
         expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore.add(N1__0_18DEC));
         expect(johnIpUsdcBalanceAfter).to.be.equal(johnIpUsdcBalanceBefore.add(N1__0_18DEC));
         expect(johnIpUsdtBalanceAfter).to.be.equal(johnIpUsdtBalanceBefore.add(N1__0_18DEC));
-        expect(powerIporIporBalanceAfter).to.be.equal(
-            powerIporIporBalanceBefore.add(N1__0_18DEC.mul(BigNumber.from("14")))
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore.add(N1__0_18DEC.mul(BigNumber.from("14")))
         );
     });
 

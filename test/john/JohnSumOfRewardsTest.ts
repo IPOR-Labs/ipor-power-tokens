@@ -170,7 +170,7 @@ describe("John sum of rewards", () => {
         const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
 
         const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
-        const powerIporIporBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
 
         // Admin
         await powerIpor.stake(delegatedIporToken);
@@ -201,7 +201,7 @@ describe("John sum of rewards", () => {
         //    then
         const globalIndicatorsAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
         const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
-        const powerIporIporBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
 
         expectGlobalIndicators(
             extractGlobalIndicators(globalIndicatorsAfter),
@@ -228,8 +228,8 @@ describe("John sum of rewards", () => {
         expect(rewardsAdmin.add(rewardsUserOne).add(rewardsUserTwo)).to.be.equal(ZERO);
 
         expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore);
-        expect(powerIporIporBalanceAfter).to.be.equal(
-            powerIporIporBalanceBefore.add(BigNumber.from("609000000000000000001"))
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore.add(BigNumber.from("609000000000000000001"))
         );
     });
 
@@ -239,7 +239,7 @@ describe("John sum of rewards", () => {
         const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
 
         const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
-        const powerIporIporBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
 
         // Admin
         await powerIpor.stake(delegatedIporToken);
@@ -309,12 +309,12 @@ describe("John sum of rewards", () => {
         //    then
 
         const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
-        const powerIporIporBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
         const globalIndicatorsAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
         expect(extractGlobalIndicators(globalIndicatorsAfter).aggregatedPowerUp).to.be.equal(ZERO);
         expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore);
-        expect(powerIporIporBalanceAfter).to.be.equal(
-            powerIporIporBalanceBefore.add(BigNumber.from("813").mul(N1__0_18DEC))
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore.add(BigNumber.from("813").mul(N1__0_18DEC))
         );
     });
 
@@ -324,7 +324,7 @@ describe("John sum of rewards", () => {
         const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
 
         const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
-        const powerIporIporBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
 
         const accruedRewardsBefore = await john.calculateAccruedRewards(tokens.ipTokenDai.address);
         await powerIpor.connect(userOne).stake(delegatedIporToken);
@@ -367,7 +367,7 @@ describe("John sum of rewards", () => {
         //    then
 
         const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
-        const powerIporIporBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
         const accountRewardsAfter = await john.calculateAccountRewards(
             await admin.getAddress(),
             tokens.ipTokenDai.address
@@ -391,8 +391,8 @@ describe("John sum of rewards", () => {
         expect(pwIporBalanceAfter).to.be.equal(BigNumber.from("302000000000000000000"));
         expect(accountRewardsAfter).to.be.equal(ZERO);
         expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore);
-        expect(powerIporIporBalanceAfter).to.be.equal(
-            powerIporIporBalanceBefore.add(BigNumber.from("302").mul(N1__0_18DEC))
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore.add(BigNumber.from("302").mul(N1__0_18DEC))
         );
     });
 });

@@ -94,7 +94,7 @@ describe("John Stake and balance", () => {
             const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
 
             const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
-            const powerIporIporBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+            const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
 
             const initGlobalParamResponse = await john.getGlobalIndicators(
                 tokens.ipTokenDai.address
@@ -152,7 +152,7 @@ describe("John Stake and balance", () => {
             //    then
 
             const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
-            const powerIporIporBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+            const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
 
             await hre.network.provider.send("hardhat_mine", ["0x64"]);
             const afterStakeIpTokensGPR = await john.getGlobalIndicators(tokens.ipTokenDai.address);
@@ -188,8 +188,8 @@ describe("John Stake and balance", () => {
             expect(johnIpDaiBalanceAfter).to.be.equal(
                 johnIpDaiBalanceBefore.add(delegatedIporToken)
             );
-            expect(powerIporIporBalanceAfter).to.be.equal(
-                powerIporIporBalanceBefore.add(stakedIpTokens)
+            expect(powerIporIporTokenBalanceAfter).to.be.equal(
+                powerIporIporTokenBalanceBefore.add(stakedIpTokens)
             );
         });
 
@@ -199,7 +199,7 @@ describe("John Stake and balance", () => {
             const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
 
             const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
-            const powerIporIporBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+            const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
 
             //    when
             // Admin
@@ -227,7 +227,7 @@ describe("John Stake and balance", () => {
             //    then
 
             const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
-            const powerIporIporBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+            const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
 
             const rewardsAdmin = await john.calculateAccountRewards(
                 adminAddress,
@@ -248,8 +248,8 @@ describe("John Stake and balance", () => {
             expect(johnIpDaiBalanceAfter).to.be.equal(
                 johnIpDaiBalanceBefore.add(stakedIpTokens).add(stakedIpTokens).add(stakedIpTokens)
             );
-            expect(powerIporIporBalanceAfter).to.be.equal(
-                powerIporIporBalanceBefore
+            expect(powerIporIporTokenBalanceAfter).to.be.equal(
+                powerIporIporTokenBalanceBefore
                     .add(delegatedIporToken)
                     .add(delegatedIporToken)
                     .add(delegatedIporToken)
@@ -262,7 +262,7 @@ describe("John Stake and balance", () => {
             const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
 
             const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
-            const powerIporIporBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+            const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
 
             //    when
             await powerIpor.stake(delegatedIporToken);
@@ -284,14 +284,14 @@ describe("John Stake and balance", () => {
             );
             //    then
             const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
-            const powerIporIporBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+            const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
             expect(rewardsAfterFirstStake).to.be.equal(BigNumber.from("100000000000000000000"));
             expect(rewardsAfterSecondStake).to.be.equal(BigNumber.from("100000000000000000000"));
             expect(johnIpDaiBalanceAfter).to.be.equal(
                 johnIpDaiBalanceBefore.add(stakedIpTokens).add(stakedIpTokens)
             );
-            expect(powerIporIporBalanceAfter).to.be.equal(
-                powerIporIporBalanceBefore
+            expect(powerIporIporTokenBalanceAfter).to.be.equal(
+                powerIporIporTokenBalanceBefore
                     .add(delegatedIporToken) // first stake + 100 block
                     .add(delegatedIporToken) // first stake + 100 block
                     .add(N1__0_18DEC) // block with stake second time
