@@ -128,7 +128,7 @@ describe("PowerIpor configuration, deploy tests", () => {
         const [admin, userOne] = accounts;
         const isPausedBefore = await powerIpor.paused();
         // when
-        await expect(powerIpor.connect(userOne).pause()).to.be.revertedWith("IPOR_713");
+        await expect(powerIpor.connect(userOne).pause()).to.be.revertedWith("IPOR_704");
         // then
         const isPausedAfter = await powerIpor.paused();
 
@@ -183,7 +183,7 @@ describe("PowerIpor configuration, deploy tests", () => {
         await powerIpor.pause();
         const isPausedBefore = await powerIpor.paused();
         // when
-        await expect(powerIpor.connect(userOne).unpause()).to.be.revertedWith("IPOR_713");
+        await expect(powerIpor.connect(userOne).unpause()).to.be.revertedWith("IPOR_704");
         // then
         const isPausedAfter = await powerIpor.paused();
 
@@ -203,7 +203,7 @@ describe("PowerIpor configuration, deploy tests", () => {
         await powerIpor.setPauseManager(await userThree.getAddress());
 
         // when
-        await expect(powerIpor.unpause()).to.be.revertedWith("IPOR_713");
+        await expect(powerIpor.unpause()).to.be.revertedWith("IPOR_704");
 
         // then
         const isPausedAfter = await powerIpor.paused();
@@ -213,5 +213,16 @@ describe("PowerIpor configuration, deploy tests", () => {
 
         //clean up
         await powerIpor.setPauseManager(oldPauseManager);
+    });
+
+    it("Should not be able execute receiveRewards because sender is not a John", async () => {
+        //given
+        const PowerIpor = await ethers.getContractFactory("PowerIpor");
+        const powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
+        const [admin, userOne, userThree] = accounts;
+        //when
+        await expect(
+            powerIpor.receiveRewards(await userOne.getAddress(), BigNumber.from("123"))
+        ).to.be.revertedWith("IPOR_703");
     });
 });

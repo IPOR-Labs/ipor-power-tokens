@@ -128,8 +128,8 @@ describe("One block/Transaction tests", () => {
         const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
 
         expect(agent1After.powerUp).to.be.equal(agent2After.powerUp);
-        expect(agent1After.compositeMultiplierCumulative).to.be.equal(
-            agent2After.compositeMultiplierCumulative
+        expect(agent1After.compositeMultiplierCumulativePrevBlock).to.be.equal(
+            agent2After.compositeMultiplierCumulativePrevBlock
         );
         expect(agent1After.ipTokenBalance).to.be.equal(agent2After.ipTokenBalance);
         expect(agent1After.delegatedPowerTokenBalance).to.be.equal(
@@ -188,8 +188,8 @@ describe("One block/Transaction tests", () => {
         const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
 
         expect(agent1After.powerUp).to.be.equal(agent2After.powerUp);
-        expect(agent1After.compositeMultiplierCumulative).to.be.equal(
-            agent2After.compositeMultiplierCumulative
+        expect(agent1After.compositeMultiplierCumulativePrevBlock).to.be.equal(
+            agent2After.compositeMultiplierCumulativePrevBlock
         );
         expect(agent1After.ipTokenBalance).to.be.equal(agent2After.ipTokenBalance);
         expect(agent1After.delegatedPowerTokenBalance).to.be.equal(
@@ -489,7 +489,7 @@ describe("One block/Transaction tests", () => {
                 .sub(N2__0_18DEC);
 
             expect(agent1After.powerUp).to.be.equal(ZERO);
-            expect(agent1After.compositeMultiplierCumulative).to.be.equal(
+            expect(agent1After.compositeMultiplierCumulativePrevBlock).to.be.equal(
                 BigNumber.from("29970993406907413561979852524")
             );
             expect(agent1After.ipTokenBalance).to.be.equal(ZERO);
@@ -499,7 +499,7 @@ describe("One block/Transaction tests", () => {
             );
 
             expect(agent2After.powerUp).to.be.equal(ZERO);
-            expect(agent2After.compositeMultiplierCumulative).to.be.equal(
+            expect(agent2After.compositeMultiplierCumulativePrevBlock).to.be.equal(
                 BigNumber.from("29970993406907413561979852524")
             );
             expect(agent2After.ipTokenBalance).to.be.equal(ZERO);
