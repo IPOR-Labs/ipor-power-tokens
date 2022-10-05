@@ -36,7 +36,6 @@ library JohnTypes {
     /// @title Rewards params specified for one account. Params used in algorithm responsible for rewards distribution.
     struct AccountRewardsIndicators {
         /// @notice composite multiplier cumulative calculated for previous block
-        //TODO: check if blockNumber potrzebny
         /// @dev represented in 27 decimals
         uint128 compositeMultiplierCumulativePrevBlock;
         /// @notice ipToken account's balance

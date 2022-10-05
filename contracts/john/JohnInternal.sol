@@ -253,7 +253,7 @@ abstract contract JohnInternal is
 
             require(
                 accountIndicators.delegatedPwIporBalance >= pwIporAmounts[i],
-                MiningErrors.DELEGATED_BALANCE_TOO_LOW
+                MiningErrors.ACC_DELEGATED_TO_JOHN_BALANCE_IS_TOO_LOW
             );
 
             JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[
@@ -311,7 +311,7 @@ abstract contract JohnInternal is
             accruedRewards = globalIndicators.accruedRewards;
         }
 
-        uint256 compositeMultiplier = MiningCalculation.compositeMultiplier(
+        uint256 compositeMultiplier = MiningCalculation.calculateCompositeMultiplier(
             iporTokenAmount,
             globalIndicators.aggregatedPowerUp
         );
@@ -400,7 +400,7 @@ abstract contract JohnInternal is
             delegatedPwIporBalance.toUint96()
         );
 
-        uint256 aggregatedPowerUp = MiningCalculation.calculateAggregatePowerUp(
+        uint256 aggregatedPowerUp = MiningCalculation.calculateAggregatedPowerUp(
             accountPowerUp,
             ipTokenBalance,
             accountIndicators.powerUp,
@@ -422,7 +422,7 @@ abstract contract JohnInternal is
             );
         }
 
-        uint256 compositeMultiplier = MiningCalculation.compositeMultiplier(
+        uint256 compositeMultiplier = MiningCalculation.calculateCompositeMultiplier(
             globalIndicators.rewardsPerBlock,
             aggregatedPowerUp
         );

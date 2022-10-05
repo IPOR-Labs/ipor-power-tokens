@@ -51,7 +51,7 @@ describe("John Stake and balance", () => {
         );
         expect(accountPowerUp).to.be.equal(BigNumber.from("1400000000000000000"));
 
-        const aggregateBoost = await miningCalculation.calculateAggregatePowerUp(
+        const aggregateBoost = await miningCalculation.calculateAggregatedPowerUp(
             accountPowerUp,
             accountOneIpToken,
             zero,
@@ -61,7 +61,7 @@ describe("John Stake and balance", () => {
 
         expect(aggregateBoost).to.be.equal(BigNumber.from("140000000000000000000"));
 
-        const compositeMultiplier = await miningCalculation.compositeMultiplier(
+        const compositeMultiplier = await miningCalculation.calculateCompositeMultiplier(
             rewardsPerBlock,
             aggregateBoost
         );
@@ -130,7 +130,7 @@ describe("John Stake and balance", () => {
         );
         expect(accountPowerUpAccountTwo).to.be.equal(BigNumber.from("1400000000000000000"));
 
-        const aggregateBoostBlock3 = await miningCalculation.calculateAggregatePowerUp(
+        const aggregateBoostBlock3 = await miningCalculation.calculateAggregatedPowerUp(
             accountPowerUp,
             accountTwoIpToken,
             zero,
@@ -140,7 +140,7 @@ describe("John Stake and balance", () => {
 
         expect(aggregateBoostBlock3).to.be.equal(BigNumber.from("280000000000000000000"));
 
-        const compositeMultiplierBlock3 = await miningCalculation.compositeMultiplier(
+        const compositeMultiplierBlock3 = await miningCalculation.calculateCompositeMultiplier(
             rewardsPerBlock,
             aggregateBoostBlock3
         );
@@ -231,7 +231,7 @@ describe("John Stake and balance", () => {
         );
         expect(accountPowerUpAccountThree).to.be.equal(BigNumber.from("815037499278843819"));
 
-        const aggregateBoostBlock5 = await miningCalculation.calculateAggregatePowerUp(
+        const aggregateBoostBlock5 = await miningCalculation.calculateAggregatedPowerUp(
             accountPowerUpAccountThree,
             accountThreeIpToken,
             zero,
@@ -241,7 +241,7 @@ describe("John Stake and balance", () => {
 
         expect(aggregateBoostBlock5).to.be.equal(BigNumber.from("524511249783653145700"));
 
-        const compositeMultiplierBlock5 = await miningCalculation.compositeMultiplier(
+        const compositeMultiplierBlock5 = await miningCalculation.calculateCompositeMultiplier(
             rewardsPerBlock,
             aggregateBoostBlock5
         );
