@@ -79,7 +79,7 @@ library MiningCalculation {
     ) internal view returns (uint256) {
         require(
             blockNumber >= lastRebalanceBlockNumber,
-            MiningErrors.BLOCK_NUMBER_GREATER_OR_EQUAL_THAN_PREVIOUS_BLOCK_NUMBER
+            MiningErrors.BLOCK_NUMBER_LOWER_THAN_PREVIOUS_BLOCK_NUMBER
         );
         uint256 newRewards = (blockNumber - lastRebalanceBlockNumber) *
             rewardsPerBlock *
@@ -101,25 +101,26 @@ library MiningCalculation {
     }
 
     /// @notice calculates account rewards represented in Ipor Tokens
+    /// @dev Account rewards can be also interpreted as a value in Power Ipor Tokens, because ration between Ipor Tokens and Power Ipor Tokens is 1:1.
     /// @param accountIpTokenAmount amount of ipToken for a given account
     /// @param accountPowerUp value of powerUp indicator for a given account
-    /// @param accountCompositeMultiplierCumulative value of param Composite Multiplier Cumulative global
-    /// @param compositeMultiplierCumulativePrevBlock value of param Composite Multiplier Cumulative for a given account
-    /// @return rewards, amount of Ipor Tokens
+    /// @param accountCompMultiplierCumulativePrevBlock Account Composite Multiplier Cumulative for a Previous Block, value from last Account Indicator update of param Composite Multiplier Cumulative for a given account
+    /// @param accruedCompMultiplierCumulativePrevBlock Accrued Composite Multiplier Cumulative for a Previous Block, accrued value (in a current block) of param Composite Multiplier Cumulative global
+    /// @return rewards, amount of Ipor Tokens (or Power Ipor Tokens because are in 1:1 relation with Ipor Tokens)
     function calculateAccountRewards(
         uint256 accountIpTokenAmount,
         uint256 accountPowerUp,
-        uint256 accountCompositeMultiplierCumulative,
-        uint256 compositeMultiplierCumulativePrevBlock
+        uint256 accountCompMultiplierCumulativePrevBlock,
+        uint256 accruedCompMultiplierCumulativePrevBlock
     ) internal view returns (uint256) {
         require(
-            compositeMultiplierCumulativePrevBlock >= accountCompositeMultiplierCumulative,
-            MiningErrors.COMPOSITE_MULTIPLIER_GTE_ACCOUNT_COMPOSITE_MULTIPLIER
+            accruedCompMultiplierCumulativePrevBlock >= accountCompMultiplierCumulativePrevBlock,
+            MiningErrors.ACCOUNT_COMPOSITE_MULTIPLIER_GT_COMPOSITE_MULTIPLIER
         );
 
         uint256 accountIporTokenRewards = accountIpTokenAmount *
             accountPowerUp *
-            (compositeMultiplierCumulativePrevBlock - accountCompositeMultiplierCumulative);
+            (accruedCompMultiplierCumulativePrevBlock - accountCompMultiplierCumulativePrevBlock);
 
         return IporMath.division(accountIporTokenRewards, Constants.D45);
     }

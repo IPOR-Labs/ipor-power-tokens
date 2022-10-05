@@ -45,7 +45,7 @@ abstract contract JohnInternal is
         internal _accountIndicators;
 
     modifier onlyPowerIpor() {
-        require(_msgSender() == _getPowerIpor(), MiningErrors.CALLER_NOT_PW_IPOR);
+        require(_msgSender() == _getPowerIpor(), MiningErrors.CALLER_NOT_POWER_IPOR);
         _;
     }
 
@@ -149,11 +149,17 @@ abstract contract JohnInternal is
                 continue;
             }
 
-            rewards += _calculateAccountRewards(accountIndicators, globalIndicators);
+            (
+                uint256 rewardsIteration,
+                uint256 accruedCompMultiplierCumulativePrevBlock
+            ) = _calculateAccountRewards(globalIndicators, accountIndicators);
+
+            rewards += rewardsIteration;
 
             _rebalanceIndicators(
                 account,
                 ipTokens[i],
+                accruedCompMultiplierCumulativePrevBlock,
                 globalIndicators,
                 accountIndicators,
                 accountIndicators.ipTokenBalance,
@@ -202,11 +208,17 @@ abstract contract JohnInternal is
                 continue;
             }
 
-            rewards += _calculateAccountRewards(accountIndicators, globalIndicators);
+            (
+                uint256 rewardsIteration,
+                uint256 accruedCompMultiplierCumulativePrevBlock
+            ) = _calculateAccountRewards(globalIndicators, accountIndicators);
+
+            rewards += rewardsIteration;
 
             _rebalanceIndicators(
                 account,
                 ipTokens[i],
+                accruedCompMultiplierCumulativePrevBlock,
                 globalIndicators,
                 accountIndicators,
                 accountIndicators.ipTokenBalance + ipTokenAmounts[i],
@@ -248,11 +260,17 @@ abstract contract JohnInternal is
                 ipTokens[i]
             ];
 
-            rewards += _calculateAccountRewards(accountIndicators, globalIndicators);
+            (
+                uint256 rewardsIteration,
+                uint256 accruedCompMultiplierCumulativePrevBlock
+            ) = _calculateAccountRewards(globalIndicators, accountIndicators);
+
+            rewards += rewardsIteration;
 
             _rebalanceIndicators(
                 account,
                 ipTokens[i],
+                accruedCompMultiplierCumulativePrevBlock,
                 globalIndicators,
                 accountIndicators,
                 accountIndicators.ipTokenBalance,
@@ -277,10 +295,9 @@ abstract contract JohnInternal is
         JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
         uint256 blockNumber = block.number;
 
-        uint256 compositeMultiplierCumulativePrevBlock = globalIndicators
-            .compositeMultiplierCumulativePrevBlock +
-            (blockNumber - globalIndicators.blockNumber) *
-            globalIndicators.compositeMultiplierInTheBlock;
+        uint256 accruedCompositeMultiplierCumulativePrevBlock = _calculateAccruedCompMultiplierCumulativePrevBlock(
+                globalIndicators
+            );
 
         uint256 accruedRewards;
         if (globalIndicators.aggregatedPowerUp != 0) {
@@ -302,7 +319,7 @@ abstract contract JohnInternal is
         _globalIndicators[ipToken] = JohnTypes.GlobalRewardsIndicators(
             globalIndicators.aggregatedPowerUp,
             compositeMultiplier.toUint128(),
-            compositeMultiplierCumulativePrevBlock.toUint128(),
+            accruedCompositeMultiplierCumulativePrevBlock.toUint128(),
             blockNumber.toUint32(),
             iporTokenAmount,
             accruedRewards.toUint88()
@@ -351,9 +368,19 @@ abstract contract JohnInternal is
         _unpause();
     }
 
+    function _calculateAccruedCompMultiplierCumulativePrevBlock(
+        JohnTypes.GlobalRewardsIndicators memory globalIndicators
+    ) internal view returns (uint256) {
+        return
+            globalIndicators.compositeMultiplierCumulativePrevBlock +
+            (block.number - globalIndicators.blockNumber) *
+            globalIndicators.compositeMultiplierInTheBlock;
+    }
+
     function _rebalanceIndicators(
         address account,
         address ipToken,
+        uint256 accruedCompMultiplierCumulativePrevBlock,
         JohnTypes.GlobalRewardsIndicators memory globalIndicators,
         JohnTypes.AccountRewardsIndicators memory accountIndicators,
         uint256 ipTokenBalance,
@@ -366,13 +393,8 @@ abstract contract JohnInternal is
             _horizontalShift()
         );
 
-        uint256 compositeMultiplierCumulativePrevBlock = globalIndicators
-            .compositeMultiplierCumulativePrevBlock +
-            (block.number - globalIndicators.blockNumber) *
-            globalIndicators.compositeMultiplierInTheBlock;
-
         _accountIndicators[account][ipToken] = JohnTypes.AccountRewardsIndicators(
-            compositeMultiplierCumulativePrevBlock.toUint128(),
+            accruedCompMultiplierCumulativePrevBlock.toUint128(),
             ipTokenBalance.toUint128(),
             accountPowerUp.toUint72(),
             delegatedPwIporBalance.toUint96()
@@ -408,41 +430,27 @@ abstract contract JohnInternal is
         _globalIndicators[ipToken] = JohnTypes.GlobalRewardsIndicators(
             aggregatedPowerUp,
             compositeMultiplier.toUint128(),
-            compositeMultiplierCumulativePrevBlock.toUint128(),
+            accruedCompMultiplierCumulativePrevBlock.toUint128(),
             block.number.toUint32(),
             globalIndicators.rewardsPerBlock,
             accruedRewards.toUint88()
         );
     }
 
-    function _claimWhenRewardsExists(
-        address account,
+    function _calculateAccountRewards(
         JohnTypes.GlobalRewardsIndicators memory globalIndicators,
         JohnTypes.AccountRewardsIndicators memory accountIndicators
-    ) internal {
-        uint256 rewards = _calculateAccountRewards(accountIndicators, globalIndicators);
+    ) internal view returns (uint256 rewards, uint256 accruedCompMultiplierCumulativePrevBlock) {
+        accruedCompMultiplierCumulativePrevBlock = _calculateAccruedCompMultiplierCumulativePrevBlock(
+            globalIndicators
+        );
 
-        if (rewards > 0) {
-            _claim(account, rewards);
-        }
-    }
-
-    function _calculateAccountRewards(
-        JohnTypes.AccountRewardsIndicators memory accountIndicators,
-        JohnTypes.GlobalRewardsIndicators memory globalIndicators
-    ) internal view returns (uint256) {
-        uint256 compositeMultiplierCumulativePrevBlock = globalIndicators
-            .compositeMultiplierCumulativePrevBlock +
-            (block.number - globalIndicators.blockNumber) *
-            globalIndicators.compositeMultiplierInTheBlock;
-
-        return
-            MiningCalculation.calculateAccountRewards(
-                accountIndicators.ipTokenBalance,
-                accountIndicators.powerUp,
-                accountIndicators.compositeMultiplierCumulative,
-                compositeMultiplierCumulativePrevBlock
-            );
+        rewards = MiningCalculation.calculateAccountRewards(
+            accountIndicators.ipTokenBalance,
+            accountIndicators.powerUp,
+            accountIndicators.compositeMultiplierCumulativePrevBlock,
+            accruedCompMultiplierCumulativePrevBlock
+        );
     }
 
     function _claim(address account, uint256 rewards) internal {

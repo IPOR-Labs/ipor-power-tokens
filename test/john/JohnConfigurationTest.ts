@@ -244,7 +244,7 @@ describe("John configuration, deploy tests", () => {
         const isPausedBefore = await john.paused();
 
         // when
-        await expect(john.connect(userOne).pause()).to.be.revertedWith("IPOR_713");
+        await expect(john.connect(userOne).pause()).to.be.revertedWith("IPOR_704");
 
         // then
         const isPausedAfter = await john.paused();
@@ -269,7 +269,7 @@ describe("John configuration, deploy tests", () => {
         await john.setPauseManager(await userOne.getAddress());
 
         // when
-        await expect(john.pause()).to.be.revertedWith("IPOR_713");
+        await expect(john.pause()).to.be.revertedWith("IPOR_704");
 
         // then
         const isPausedAfter = await john.paused();
@@ -345,7 +345,7 @@ describe("John configuration, deploy tests", () => {
         const isPausedBefore = await john.paused();
 
         // when
-        await expect(john.connect(userOne).unpause()).to.be.revertedWith("IPOR_713");
+        await expect(john.connect(userOne).unpause()).to.be.revertedWith("IPOR_704");
 
         // then
         const isPausedAfter = await john.paused();
@@ -372,7 +372,7 @@ describe("John configuration, deploy tests", () => {
         await john.setPauseManager(await userThree.getAddress());
 
         // when
-        await expect(john.unpause()).to.be.revertedWith("IPOR_713");
+        await expect(john.unpause()).to.be.revertedWith("IPOR_704");
 
         // then
         const isPausedAfter = await john.paused();

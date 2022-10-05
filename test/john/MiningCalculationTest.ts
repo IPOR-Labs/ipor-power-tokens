@@ -97,6 +97,83 @@ describe("John Stake and balance", () => {
         expect(result).to.be.equal(N1__0_18DEC.mul(BigNumber.from("2")));
     });
 
+    it("Should throw IPOR_711 - aggregate power up is negative", async () => {
+        //given
+        const accountPowerUp = BigNumber.from("900").mul(N1__0_18DEC);
+        const accountIpTokenAmount = BigNumber.from("1").mul(N1__0_18DEC);
+        const previousAccountPowerUp = BigNumber.from("1000").mul(N1__0_18DEC);
+        const previousAccountIpTokenAmount = BigNumber.from("10").mul(N1__0_18DEC);
+        const previousAggregatePowerUp = BigNumber.from("900").mul(N1__0_18DEC);
+
+        //when
+        await expect(
+            miningCalculation.calculateAggregatePowerUp(
+                accountPowerUp,
+                accountIpTokenAmount,
+                previousAccountPowerUp,
+                previousAccountIpTokenAmount,
+                previousAggregatePowerUp
+            )
+        ).to.be.revertedWith("IPOR_711");
+    });
+
+    it("Should throw IPOR_712 - block number lower than previous block number", async () => {
+        //given
+        const blockNumber = BigNumber.from("900").mul(N1__0_18DEC);
+        const lastRebalanceBlockNumber = BigNumber.from("1000").mul(N1__0_18DEC);
+        const rewardsPerBlock = N1__0_18DEC;
+        const previousAccruedRewards = BigNumber.from("900").mul(N1__0_18DEC);
+
+        //when
+        await expect(
+            miningCalculation.calculateAccruedRewards(
+                blockNumber,
+                lastRebalanceBlockNumber,
+                rewardsPerBlock,
+                previousAccruedRewards
+            )
+        ).to.be.revertedWith("IPOR_712");
+    });
+
+    it("Should throw IPOR_713 - composite multiplier lower than account composite multiplier ", async () => {
+        //given
+        const accountIpTokenAmount = BigNumber.from("1000").mul(N1__0_18DEC);
+        const accountPowerUp = BigNumber.from("1000").mul(N1__0_18DEC);
+        const accountCompositeMultiplierCumulativePrevBlock =
+            BigNumber.from("1000").mul(N1__0_18DEC);
+        const compositeMultiplierCumulativePrevBlock = BigNumber.from("900").mul(N1__0_18DEC);
+
+        //when
+        await expect(
+            miningCalculation.calculateAccountRewards(
+                accountIpTokenAmount,
+                accountPowerUp,
+                accountCompositeMultiplierCumulativePrevBlock,
+                compositeMultiplierCumulativePrevBlock
+            )
+        ).to.be.revertedWith("IPOR_713");
+    });
+
+    it("Should not calculate any rewards when IP Token amount = 0", async () => {
+        //given
+        const accountIpTokenAmount = ZERO;
+        const accountPowerUp = BigNumber.from("1000").mul(N1__0_18DEC);
+        const accountCompositeMultiplierCumulativePrevBlock =
+            BigNumber.from("1000").mul(N1__0_18DEC);
+        const compositeMultiplierCumulativePrevBlock = BigNumber.from("2000").mul(N1__0_18DEC);
+
+        //when
+        const result = await miningCalculation.calculateAccountRewards(
+            accountIpTokenAmount,
+            accountPowerUp,
+            accountCompositeMultiplierCumulativePrevBlock,
+            compositeMultiplierCumulativePrevBlock
+        );
+
+        //then
+        expect(result).to.be.equal(ZERO);
+    });
+
     type TestData = { ipTokenAmount: string; pwIporAmount: string; result: string };
     const powerUpTestData: TestData[] = [
         {

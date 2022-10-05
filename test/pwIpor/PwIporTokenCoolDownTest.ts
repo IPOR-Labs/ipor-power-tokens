@@ -83,7 +83,7 @@ describe("PowerIpor unstake", () => {
         const coolDownBefore = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
 
         // when
-        await expect(powerIpor.coolDown(N2__0_18DEC)).to.be.revertedWith("IPOR_707");
+        await expect(powerIpor.coolDown(N2__0_18DEC)).to.be.revertedWith("IPOR_708");
 
         // then
         const coolDownAfter = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
@@ -167,7 +167,7 @@ describe("PowerIpor unstake", () => {
         const balanceBefore = await powerIpor.balanceOf(adminAddress);
         // when
 
-        await expect(powerIpor.unstake(N0__5_18DEC)).to.be.revertedWith("IPOR_707");
+        await expect(powerIpor.unstake(N0__5_18DEC)).to.be.revertedWith("IPOR_708");
 
         // then
         const coolDownAfter = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
@@ -197,7 +197,7 @@ describe("PowerIpor unstake", () => {
 
         await expect(
             powerIpor.delegateToJohn([tokens.ipTokenDai.address], [N0__5_18DEC])
-        ).to.be.revertedWith("IPOR_705");
+        ).to.be.revertedWith("IPOR_706");
 
         // then
         const coolDownAfter = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
@@ -224,7 +224,7 @@ describe("PowerIpor unstake", () => {
         const coolDownBefore = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
         // when
 
-        await expect(powerIpor.redeem()).to.be.revertedWith("IPOR_709");
+        await expect(powerIpor.redeem()).to.be.revertedWith("IPOR_710");
 
         // then
         const coolDownAfter = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
@@ -249,11 +249,14 @@ describe("PowerIpor unstake", () => {
 
         await powerIpor.coolDown(N0__5_18DEC);
         const coolDownBefore = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
+        const exchangeRateBefore = await powerIpor.calculateExchangeRate();
+
         // when
         await hre.network.provider.send("evm_increaseTime", [twoWeekesInSeconds + 1]);
         await powerIpor.redeem();
 
         // then
+        const exchangeRateAfter = await powerIpor.calculateExchangeRate();
 
         const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
         const coolDownAfter = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
@@ -270,6 +273,7 @@ describe("PowerIpor unstake", () => {
         expect(powerIporIporTokenBalanceAfter).to.be.equal(
             powerIporIporTokenBalanceBefore.add(expectedCoolDownPwIporAmount)
         );
+        expect(exchangeRateBefore).to.be.equal(exchangeRateAfter);
     });
 
     it("Should be able to redeem cool down tokens when 2 weeks pass and exchange rate changed", async () => {
@@ -290,12 +294,14 @@ describe("PowerIpor unstake", () => {
 
         const coolDownBefore = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
         const iporTokenBalanceBefore = await iporToken.balanceOf(adminAddress);
+        const exchangeRateBefore = await powerIpor.calculateExchangeRate();
 
         // when
         await hre.network.provider.send("evm_increaseTime", [twoWeekesInSeconds + 1]);
         await powerIpor.redeem();
 
         // then
+        const exchangeRateAfter = await powerIpor.calculateExchangeRate();
         const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
         const coolDownAfter = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
         const pwBalanceAfter = await powerIpor.balanceOf(adminAddress);
@@ -317,5 +323,7 @@ describe("PowerIpor unstake", () => {
                 .add(stakeIporAmount)
                 .sub(cooldownAmount)
         );
+
+        expect(exchangeRateBefore).to.be.equal(exchangeRateAfter);
     });
 });

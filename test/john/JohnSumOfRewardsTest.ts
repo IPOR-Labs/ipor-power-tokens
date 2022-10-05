@@ -84,7 +84,7 @@ describe("John sum of rewards", () => {
     it("Should not claim when no stake ipTokens", async () => {
         //    given
         //    when
-        await expect(john.claim(tokens.ipTokenDai.address)).to.be.revertedWith("IPOR_708");
+        await expect(john.claim(tokens.ipTokenDai.address)).to.be.revertedWith("IPOR_709");
     });
 
     it("Should unstake all ipTokens", async () => {
@@ -110,9 +110,11 @@ describe("John sum of rewards", () => {
             tokens.ipTokenDai.address
         );
         const ipTokenBalanceBefore = await tokens.ipTokenDai.balanceOf(await userOne.getAddress());
+
         //    when
         await john.connect(userOne).unstake(tokens.ipTokenDai.address, stakedIpTokens);
-        //    then
+        
+		//    then
         const globalIndicatorsAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
         const userParamsAfter = await john.getAccountIndicators(
             await userOne.getAddress(),
