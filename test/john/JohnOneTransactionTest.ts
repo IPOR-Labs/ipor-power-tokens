@@ -542,5 +542,120 @@ describe("One block/Transaction tests", () => {
             expect(agent1PwIporBalanceCase1After).to.be.equal(agent1PwIporBalanceCase2After);
             expect(agent2PwIporBalanceCase1After).to.be.equal(agent2PwIporBalanceCase2After);
         });
+
+        it("Should calculate proper rewards, based on excel from documentation", async () => {
+            //    given
+            const rewardsPerBlock = BigNumber.from("300000000");
+            const accountOneIpTokenAmount = BigNumber.from("100").mul(N1__0_18DEC);
+            const accountOnePwIporAmount = BigNumber.from("100").mul(N1__0_18DEC);
+            const accountTwoIpTokenAmount = BigNumber.from("100").mul(N1__0_18DEC);
+            const accountTwoPwIporAmount = BigNumber.from("100").mul(N1__0_18DEC);
+            const accountThreeIpTokenAmount = BigNumber.from("300").mul(N1__0_18DEC);
+            const accountThreePwIporAmount = BigNumber.from("100").mul(N1__0_18DEC);
+
+            await iporToken.transfer(
+                await userOne.getAddress(),
+                N1__0_18DEC.mul(BigNumber.from("10000"))
+            );
+            await iporToken.connect(userOne).approve(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
+            await tokens.ipTokenDai
+                .connect(userOne)
+                .approve(john.address, TOTAL_SUPPLY_18_DECIMALS);
+
+            await iporToken.transfer(
+                await userTwo.getAddress(),
+                N1__0_18DEC.mul(BigNumber.from("10000"))
+            );
+            await iporToken.connect(userTwo).approve(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
+            await tokens.ipTokenDai
+                .connect(userTwo)
+                .approve(john.address, TOTAL_SUPPLY_18_DECIMALS);
+
+            await iporToken.transfer(
+                await userThree.getAddress(),
+                N1__0_18DEC.mul(BigNumber.from("10000"))
+            );
+            await iporToken.connect(userThree).approve(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
+            await tokens.ipTokenDai
+                .connect(userThree)
+                .approve(john.address, TOTAL_SUPPLY_18_DECIMALS);
+
+            await network.provider.send("evm_setAutomine", [false]);
+            await john.setRewardsPerBlock(tokens.ipTokenDai.address, rewardsPerBlock);
+            await hre.network.provider.send("evm_mine");
+
+            const johnIpBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
+            const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+
+            //    when
+
+            await powerIpor.connect(userOne).stake(accountOnePwIporAmount);
+            await powerIpor
+                .connect(userOne)
+                .delegateAndStakeToJohn(
+                    [tokens.ipTokenDai.address],
+                    [accountOnePwIporAmount],
+                    [accountOneIpTokenAmount]
+                );
+            await hre.network.provider.send("evm_mine");
+            await hre.network.provider.send("evm_mine");
+
+            await powerIpor.connect(userTwo).stake(accountTwoPwIporAmount);
+            await powerIpor
+                .connect(userTwo)
+                .delegateAndStakeToJohn(
+                    [tokens.ipTokenDai.address],
+                    [accountTwoPwIporAmount],
+                    [accountTwoIpTokenAmount]
+                );
+            await hre.network.provider.send("evm_mine");
+            await hre.network.provider.send("evm_mine");
+
+            await powerIpor.connect(userThree).stake(accountThreePwIporAmount);
+            await powerIpor
+                .connect(userThree)
+                .delegateAndStakeToJohn(
+                    [tokens.ipTokenDai.address],
+                    [accountThreePwIporAmount],
+                    [accountThreeIpTokenAmount]
+                );
+            await hre.network.provider.send("evm_mine");
+            await hre.network.provider.send("evm_mine");
+
+            //when
+            const accountOneRewards = await john.calculateAccountRewards(
+                await userOne.getAddress(),
+                tokens.ipTokenDai.address
+            );
+            const accountTwoRewards = await john.calculateAccountRewards(
+                await userTwo.getAddress(),
+                tokens.ipTokenDai.address
+            );
+            const accountThreeRewards = await john.calculateAccountRewards(
+                await userThree.getAddress(),
+                tokens.ipTokenDai.address
+            );
+
+            const johnIpBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
+            const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+
+            const sumOfRewards = accountOneRewards.add(accountTwoRewards).add(accountThreeRewards);
+
+            expect(sumOfRewards).to.be.equal(N1__0_18DEC.mul(BigNumber.from("15")));
+            expect(johnIpBalanceAfter).to.be.equal(
+                johnIpBalanceBefore
+                    .add(accountOneIpTokenAmount)
+                    .add(accountTwoIpTokenAmount)
+                    .add(accountThreeIpTokenAmount)
+            );
+            expect(powerIporIporTokenBalanceAfter).to.be.equal(
+                powerIporIporTokenBalanceBefore
+                    .add(accountOnePwIporAmount)
+                    .add(accountTwoPwIporAmount)
+                    .add(accountTwoPwIporAmount)
+            );
+
+            await network.provider.send("evm_setAutomine", [true]);
+        });
     });
 });
