@@ -9,6 +9,10 @@ import "./PowerIporInternal.sol";
 import "hardhat/console.sol";
 
 // TODO: Add tests for events
+///@title Smart contract responsible for managing Power Ipor Token.
+/// @notice Power Ipor Token is retrieved when account stake Ipor Token.
+/// Power Ipor smart contract allow you to stake, unstake Ipor Token, deletage, undelegate to John Power Ipor Token.
+/// Interact with John smart contract.
 contract PowerIpor is PowerIporInternal, IPowerIpor {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
@@ -85,12 +89,15 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
         require(
             availablePwIporAmount >= pwIporAmount,
-            MiningErrors.AVAILABLE_POWER_IPOR_BALANCE_IS_TOO_LOW
+            MiningErrors.ACC_AVAILABLE_POWER_IPOR_BALANCE_IS_TOO_LOW
         );
 
         uint256 baseAmountToUnstake = IporMath.division(pwIporAmount * Constants.D18, exchangeRate);
 
-        require(_baseBalance[msgSender] >= baseAmountToUnstake, MiningErrors.BASE_BALANCE_TOO_LOW);
+        require(
+            _baseBalance[msgSender] >= baseAmountToUnstake,
+            MiningErrors.ACCOUNT_BASE_BALANCE_IS_TOO_LOW
+        );
 
         _baseBalance[msgSender] -= baseAmountToUnstake;
         _baseTotalSupply -= baseAmountToUnstake;
@@ -125,7 +132,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         require(
             _getAvailablePwIporAmount(_msgSender(), _calculateInternalExchangeRate(_iporToken)) >=
                 pwIporToDelegate,
-            MiningErrors.STAKED_BALANCE_TOO_LOW
+            MiningErrors.ACC_AVAILABLE_POWER_IPOR_BALANCE_IS_TOO_LOW
         );
 
         _delegatedToJohnBalance[_msgSender()] += pwIporToDelegate;
@@ -151,7 +158,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         require(
             _getAvailablePwIporAmount(_msgSender(), _calculateInternalExchangeRate(_iporToken)) >=
                 pwIporToDelegate,
-            MiningErrors.STAKED_BALANCE_TOO_LOW
+            MiningErrors.ACC_AVAILABLE_POWER_IPOR_BALANCE_IS_TOO_LOW
         );
 
         _delegatedToJohnBalance[_msgSender()] += pwIporToDelegate;
@@ -180,7 +187,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
         require(
             _delegatedToJohnBalance[_msgSender()] >= pwIporAmountToUndelegate,
-            MiningErrors.DELEGATED_BALANCE_TOO_LOW
+            MiningErrors.ACC_DELEGATED_TO_JOHN_BALANCE_IS_TOO_LOW
         );
 
         IJohnInternal(_john).undelegatePwIpor(_msgSender(), ipTokens, pwIporAmounts);
@@ -201,7 +208,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
         require(
             availablePwIporAmount >= pwIporAmount,
-            MiningErrors.AVAILABLE_POWER_IPOR_BALANCE_IS_TOO_LOW
+            MiningErrors.ACC_AVAILABLE_POWER_IPOR_BALANCE_IS_TOO_LOW
         );
 
         _coolDowns[msgSender] = PowerIporTypes.PwIporCoolDown(
@@ -232,11 +239,14 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
             exchangeRate
         );
 
-		console.log("exchangeRate=",exchangeRate);
-		console.log("baseAmountToUnstake=",baseAmountToUnstake);
-		console.log("_baseBalance[msgSender]=",_baseBalance[msgSender]);
+        console.log("exchangeRate=", exchangeRate);
+        console.log("baseAmountToUnstake=", baseAmountToUnstake);
+        console.log("_baseBalance[msgSender]=", _baseBalance[msgSender]);
 
-        require(_baseBalance[msgSender] >= baseAmountToUnstake, MiningErrors.BASE_BALANCE_TOO_LOW);
+        require(
+            _baseBalance[msgSender] >= baseAmountToUnstake,
+            MiningErrors.ACCOUNT_BASE_BALANCE_IS_TOO_LOW
+        );
 
         _baseBalance[msgSender] -= baseAmountToUnstake;
         _baseTotalSupply -= baseAmountToUnstake;

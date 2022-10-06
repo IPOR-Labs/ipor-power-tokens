@@ -115,15 +115,16 @@ contract John is JohnInternal, IJohn {
 
         address msgSender = _msgSender();
 
-        JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
         JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[msgSender][
             ipToken
         ];
 
         require(
-            ipTokenAmount <= accountIndicators.ipTokenBalance,
-            MiningErrors.STAKED_BALANCE_TOO_LOW
+            accountIndicators.ipTokenBalance >= ipTokenAmount,
+            MiningErrors.ACCOUNT_IP_TOKEN_BALANCE_IS_TOO_LOW
         );
+
+        JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
 
         (
             uint256 rewards,
