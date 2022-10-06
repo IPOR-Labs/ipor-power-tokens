@@ -5,9 +5,6 @@ import "../interfaces/IJohnInternal.sol";
 import "../interfaces/IPowerIpor.sol";
 import "./PowerIporInternal.sol";
 
-//TODO: remove at the end
-import "hardhat/console.sol";
-
 // TODO: Add tests for events
 ///@title Smart contract responsible for managing Power Ipor Token.
 /// @notice Power Ipor Token is retrieved when account stake Ipor Token.

@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import "../errors/MiningErrors.sol";
 import "../Constants.sol";
 import "./IporMath.sol";
-import "hardhat/console.sol";
 
 /// @title Library which contains core logic used in Liquidity Mining module.
 library MiningCalculation {

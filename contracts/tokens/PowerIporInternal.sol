@@ -15,8 +15,6 @@ import "../libraries/math/IporMath.sol";
 import "../interfaces/IPowerIporInternal.sol";
 import "../interfaces/IJohn.sol";
 import "../security/IporOwnableUpgradeable.sol";
-//TODO: remove at the end
-import "hardhat/console.sol";
 
 // TODO: Add tests for events
 abstract contract PowerIporInternal is

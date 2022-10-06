@@ -3,8 +3,6 @@ pragma solidity 0.8.16;
 
 import "../interfaces/IJohn.sol";
 import "./JohnInternal.sol";
-//TODO: remove at the end
-import "hardhat/console.sol";
 
 /// @title Smart contract responsible for distribution IPOR token rewards across accounts contributed in IPOR Protocol
 /// by staking ipTokens and / or delegating Power Ipor Tokens to John. IpTokens can be staked directly to John,
