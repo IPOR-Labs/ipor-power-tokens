@@ -118,7 +118,7 @@ describe("John event tests", () => {
         );
     });
 
-    it("Should emit Claim event", async () => {
+    it("Should emit Claim and ReceiveRewards event", async () => {
         //    given
         const stakeIpTokenAmount = N1__0_18DEC;
         const rewards = N1__0_18DEC.mul(BigNumber.from("101"));
@@ -133,7 +133,9 @@ describe("John event tests", () => {
         //    when
         await expect(john.claim(tokens.ipTokenDai.address))
             .to.emit(john, "Claim")
-            .withArgs(await admin.getAddress(), tokens.ipTokenDai.address, rewards);
+            .withArgs(await admin.getAddress(), tokens.ipTokenDai.address, rewards)
+            .to.be.emit(powerIpor, "ReceiveRewards")
+            .withArgs(await admin.getAddress(), rewards);
 
         //    then
         const accountIpTokenBalanceAfter = (
