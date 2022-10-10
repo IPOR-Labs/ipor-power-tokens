@@ -9,21 +9,28 @@ import "../Constants.sol";
 import "./IporMath.sol";
 import "hardhat/console.sol";
 
+/// @title Library which contains core logic used in Liquidity Mining module.
 library MiningCalculation {
     using SafeCast for uint256;
     using SafeCast for int256;
 
+    /// @notice Calculases Power Up Indicator specific for one account.
+    /// @param accountPwIporAmount account's Power Ipor Tokens amount
+    /// @param accountIpTokenAmount account's IP Tokens Amount
+    /// @param verticalShift preconfigured param, vertical shift used in equation which calculate account power up indicator
+    /// @param horizontalShift preconfigured param, horizontal shift used in equation which calculate account power up indicator
+    /// @return power up indicator for a given account
     function calculateAccountPowerUp(
-        uint256 pwIporAmount,
-        uint256 ipTokenAmount,
+        uint256 accountPwIporAmount,
+        uint256 accountIpTokenAmount,
         uint256 verticalShift,
         uint256 horizontalShift
     ) internal view returns (uint256) {
-        if (ipTokenAmount < Constants.D18) {
+        if (accountIpTokenAmount < Constants.D18) {
             return 0;
         }
-        bytes16 pwIporAmountFP = _toFixedPoint(pwIporAmount, Constants.D18);
-        bytes16 ipTokenAmountFP = _toFixedPoint(ipTokenAmount, Constants.D18);
+        bytes16 pwIporAmountFP = _toFixedPoint(accountPwIporAmount, Constants.D18);
+        bytes16 ipTokenAmountFP = _toFixedPoint(accountIpTokenAmount, Constants.D18);
         bytes16 verticalSwitchFP = _toFixedPoint(verticalShift, Constants.D18);
         bytes16 horizontalSwitchFP = _toFixedPoint(horizontalShift, Constants.D18);
 
@@ -37,12 +44,18 @@ library MiningCalculation {
         return ABDKMathQuad.toUInt(resultD18);
     }
 
-    function calculateAggregatePowerUp(
+    /// @notice Calculates aggreagated power up based on predefined in specification equation.
+    /// @param accountPowerUp power up indicator calculated for a given account
+    /// @param accountIpTokenAmount IP Token amount for a given account
+    /// @param previousAccountPowerUp previous power up indicator for a given account
+    /// @param previousAccountIpTokenAmount previous IP Token amount for a given account
+    /// @param previousAggregatedPowerUp previous aggregated power up indicator
+    function calculateAggregatedPowerUp(
         uint256 accountPowerUp,
         uint256 accountIpTokenAmount,
         uint256 previousAccountPowerUp,
         uint256 previousAccountIpTokenAmount,
-        uint256 previousAggregatePowerUp
+        uint256 previousAggregatedPowerUp
     ) internal view returns (uint256) {
         int256 apu = accountPowerUp.toInt256() *
             accountIpTokenAmount.toInt256() -
@@ -52,17 +65,16 @@ library MiningCalculation {
         if (apu < 0) {
             uint256 absApu = IporMath.division((-apu).toUint256(), Constants.D18);
             //   last unstake ipTokens we can have rounding error
-
-            if (previousAggregatePowerUp < absApu && previousAggregatePowerUp + 10000 >= absApu) {
+            if (previousAggregatedPowerUp < absApu && previousAggregatedPowerUp + 10000 >= absApu) {
                 return 0;
             }
             require(
-                previousAggregatePowerUp >= absApu,
+                previousAggregatedPowerUp >= absApu,
                 MiningErrors.AGGREGATE_POWER_UP_COULD_NOT_BE_NEGATIVE
             );
-            newApu = previousAggregatePowerUp - absApu;
+            newApu = previousAggregatedPowerUp - absApu;
         } else {
-            newApu = previousAggregatePowerUp + IporMath.division(apu.toUint256(), Constants.D18);
+            newApu = previousAggregatedPowerUp + IporMath.division(apu.toUint256(), Constants.D18);
         }
 
         if (newApu < 10000) {
@@ -71,6 +83,12 @@ library MiningCalculation {
         return newApu;
     }
 
+    /// @notice Calculates rewards from last rebalancing including block number given as a param.
+    /// @param blockNumber blok number for which is executed rewards calculation
+    /// @param lastRebalanceBlockNumber blok number when last rewards rebalance was executed
+    /// @param rewardsPerBlock configuration param describes how many Ipor Tokens are rewarded across all participants per one block
+    /// @param previousAccruedRewards number of previous cumulated/accrued rewards
+    /// @return new accrued rewards, number of Ipor Tokens (or Power Ipor Tokens because are in relation 1:1 with Ipor Tokens) accrued for given above params
     function calculateAccruedRewards(
         uint256 blockNumber,
         uint256 lastRebalanceBlockNumber,
@@ -87,8 +105,11 @@ library MiningCalculation {
         return previousAccruedRewards + newRewards;
     }
 
-    // returns value with 27 decimals
-    function compositeMultiplier(uint256 rewardsPerBlock, uint256 aggregatedPowerUp)
+    /// @notice Calculates Composite Multiplier Indicator
+    /// @param rewardsPerBlock config param, number of Ipor Tokens (or Power Ipor Tokens because in 1:1 relation with Ipor Tokens) rewardes across all participants in one block
+    /// @param aggregatedPowerUp Aggregated Power Up indicator
+    /// @return composite multiplier, value represented in 27 decimals
+    function calculateCompositeMultiplier(uint256 rewardsPerBlock, uint256 aggregatedPowerUp)
         internal
         view
         returns (uint256)

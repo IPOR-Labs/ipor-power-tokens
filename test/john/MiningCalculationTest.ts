@@ -103,16 +103,16 @@ describe("John Stake and balance", () => {
         const accountIpTokenAmount = BigNumber.from("1").mul(N1__0_18DEC);
         const previousAccountPowerUp = BigNumber.from("1000").mul(N1__0_18DEC);
         const previousAccountIpTokenAmount = BigNumber.from("10").mul(N1__0_18DEC);
-        const previousAggregatePowerUp = BigNumber.from("900").mul(N1__0_18DEC);
+        const previousAggregatedPowerUp = BigNumber.from("900").mul(N1__0_18DEC);
 
         //when
         await expect(
-            miningCalculation.calculateAggregatePowerUp(
+            miningCalculation.calculateAggregatedPowerUp(
                 accountPowerUp,
                 accountIpTokenAmount,
                 previousAccountPowerUp,
                 previousAccountIpTokenAmount,
-                previousAggregatePowerUp
+                previousAggregatedPowerUp
             )
         ).to.be.revertedWith("IPOR_711");
     });

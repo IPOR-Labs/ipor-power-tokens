@@ -19,20 +19,20 @@ contract MockMiningCalculation {
             );
     }
 
-    function calculateAggregatePowerUp(
+    function calculateAggregatedPowerUp(
         uint256 userPowerUp,
         uint256 userIpTokenAmount,
         uint256 previousUserPowerUp,
         uint256 previousUserIpTokenAmount,
-        uint256 previousAggregatePowerUp
+        uint256 previousAggregatedPowerUp
     ) public view returns (uint256) {
         return
-            MiningCalculation.calculateAggregatePowerUp(
+            MiningCalculation.calculateAggregatedPowerUp(
                 userPowerUp,
                 userIpTokenAmount,
                 previousUserPowerUp,
                 previousUserIpTokenAmount,
-                previousAggregatePowerUp
+                previousAggregatedPowerUp
             );
     }
 
@@ -51,12 +51,12 @@ contract MockMiningCalculation {
             );
     }
 
-    function compositeMultiplier(uint256 rewardsPerBlock, uint256 aggregatedPowerUp)
+    function calculateCompositeMultiplier(uint256 rewardsPerBlock, uint256 aggregatedPowerUp)
         public
         view
         returns (uint256)
     {
-        return MiningCalculation.compositeMultiplier(rewardsPerBlock, aggregatedPowerUp);
+        return MiningCalculation.calculateCompositeMultiplier(rewardsPerBlock, aggregatedPowerUp);
     }
 
     function calculateAccountRewards(

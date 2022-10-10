@@ -197,7 +197,7 @@ describe("PowerIpor unstake", () => {
 
         await expect(
             powerIpor.delegateToJohn([tokens.ipTokenDai.address], [N0__5_18DEC])
-        ).to.be.revertedWith("IPOR_706");
+        ).to.be.revertedWith("IPOR_708");
 
         // then
         const coolDownAfter = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
