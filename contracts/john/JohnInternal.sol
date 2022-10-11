@@ -18,8 +18,6 @@ import "../interfaces/IPowerIporInternal.sol";
 import "../security/IporOwnableUpgradeable.sol";
 import "../libraries/math/MiningCalculation.sol";
 import "../tokens/IporToken.sol";
-//TODO: remove at the end
-import "hardhat/console.sol";
 
 abstract contract JohnInternal is
     Initializable,

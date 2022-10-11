@@ -138,7 +138,7 @@ interface IJohnInternal {
     /// @param ipTokenAmount amount of Power Ipor Token which was undelegated, represented in 18 decimals
     event UndelegatePwIpor(address account, address ipToken, uint256 ipTokenAmount);
 
-    /// @notice Emmited when PauseManager's address is changed by its owner.
+    /// @notice Emitted when PauseManager's address is changed by its owner.
     /// @param changedBy account address that has changed John's address
     /// @param oldPauseManager PauseManager's old address
     /// @param newPauseManager PauseManager's new address

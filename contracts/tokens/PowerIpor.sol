@@ -5,9 +5,6 @@ import "../interfaces/IJohnInternal.sol";
 import "../interfaces/IPowerIpor.sol";
 import "./PowerIporInternal.sol";
 
-//TODO: remove at the end
-import "hardhat/console.sol";
-
 // TODO: Add tests for events
 ///@title Smart contract responsible for managing Power Ipor Token.
 /// @notice Power Ipor Token is retrieved when account stake Ipor Token.
@@ -107,7 +104,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
             exchangeRate
         );
 
-        IERC20Upgradeable(iporTokenAddress).transfer(msgSender, iporTokenAmountToTransfer);
+        IERC20Upgradeable(iporTokenAddress).safeTransfer(msgSender, iporTokenAmountToTransfer);
 
         emit Unstake(
             msgSender,
@@ -226,22 +223,18 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
     function redeem() external override whenNotPaused nonReentrant {
         address msgSender = _msgSender();
 
-        PowerIporTypes.PwIporCoolDown memory coolDown = _coolDowns[msgSender];
+        PowerIporTypes.PwIporCoolDown memory accountCoolDown = _coolDowns[msgSender];
 
-        require(block.timestamp >= coolDown.endTimestamp, MiningErrors.COOL_DOWN_NOT_FINISH);
-        require(coolDown.pwIporAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(block.timestamp >= accountCoolDown.endTimestamp, MiningErrors.COOL_DOWN_NOT_FINISH);
+        require(accountCoolDown.pwIporAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         address iporTokenAddress = _iporToken;
 
         uint256 exchangeRate = _calculateInternalExchangeRate(iporTokenAddress);
         uint256 baseAmountToUnstake = IporMath.division(
-            coolDown.pwIporAmount * Constants.D18,
+            accountCoolDown.pwIporAmount * Constants.D18,
             exchangeRate
         );
-
-        console.log("exchangeRate=", exchangeRate);
-        console.log("baseAmountToUnstake=", baseAmountToUnstake);
-        console.log("_baseBalance[msgSender]=", _baseBalance[msgSender]);
 
         require(
             _baseBalance[msgSender] >= baseAmountToUnstake,
@@ -254,8 +247,8 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         delete _coolDowns[msgSender];
 
         ///@dev We can transfer pwIporAmount because is in relation 1:1 to Ipor Token
-        IERC20Upgradeable(iporTokenAddress).transfer(msgSender, coolDown.pwIporAmount);
+        IERC20Upgradeable(iporTokenAddress).safeTransfer(msgSender, accountCoolDown.pwIporAmount);
 
-        emit Redeem(msgSender, coolDown.pwIporAmount);
+        emit Redeem(msgSender, accountCoolDown.pwIporAmount);
     }
 }

@@ -3,8 +3,6 @@ pragma solidity 0.8.16;
 
 import "../interfaces/IJohn.sol";
 import "./JohnInternal.sol";
-//TODO: remove at the end
-import "hardhat/console.sol";
 
 /// @title Smart contract responsible for distribution IPOR token rewards across accounts contributed in IPOR Protocol
 /// by staking ipTokens and / or delegating Power Ipor Tokens to John. IpTokens can be staked directly to John,
@@ -145,7 +143,7 @@ contract John is JohnInternal, IJohn {
             accountIndicators.delegatedPwIporBalance
         );
 
-        IERC20Upgradeable(ipToken).transfer(msgSender, ipTokenAmount);
+        IERC20Upgradeable(ipToken).safeTransfer(msgSender, ipTokenAmount);
 
         emit UnstakeIpTokens(msgSender, ipToken, ipTokenAmount);
     }
@@ -171,8 +169,6 @@ contract John is JohnInternal, IJohn {
 
         require(iporTokenAmount > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
 
-        _claim(msgSender, iporTokenAmount);
-
         uint256 accountPowerUp = MiningCalculation.calculateAccountPowerUp(
             accountIndicators.delegatedPwIporBalance,
             accountIndicators.ipTokenBalance,
@@ -186,6 +182,8 @@ contract John is JohnInternal, IJohn {
             accountPowerUp.toUint72(),
             accountIndicators.delegatedPwIporBalance
         );
+
+        _claim(msgSender, iporTokenAmount);
 
         emit Claim(msgSender, ipToken, iporTokenAmount);
     }
