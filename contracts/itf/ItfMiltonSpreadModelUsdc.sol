@@ -2,7 +2,6 @@
 pragma solidity 0.8.16;
 
 import "../amm/spread/MiltonSpreadModelUsdc.sol";
-import "hardhat/console.sol";
 
 contract ItfMiltonSpreadModelUsdc is MiltonSpreadModelUsdc {
     int256 internal _payFixedRegionOneBase;
@@ -35,7 +34,6 @@ contract ItfMiltonSpreadModelUsdc is MiltonSpreadModelUsdc {
         int256 receiveFixedRegionTwoSlopeForVolatility,
         int256 receiveFixedRegionTwoSlopeForMeanReversion
     ) external onlyOwner {
-        console.logInt(receiveFixedRegionOneSlopeForMeanReversion);
         _payFixedRegionOneBase = payFixedRegionOneBase;
         _payFixedRegionOneSlopeForVolatility = payFixedRegionOneSlopeForVolatility;
         _payFixedRegionOneSlopeForMeanReversion = payFixedRegionOneSlopeForMeanReversion;
