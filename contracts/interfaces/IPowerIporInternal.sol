@@ -50,6 +50,7 @@ interface IPowerIporInternal {
     function unpause() external;
 
     /// @notice Emitted when user received rewards from john contract
+    /// @dev Receiving rewards not changes Internal Exchange Rate of Power Ipor Tokens in Power Ipor smart contract.
     /// @param account address
     /// @param iporTokenAmount of power token received from john
     event ReceiveRewards(address account, uint256 iporTokenAmount);

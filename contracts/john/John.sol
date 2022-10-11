@@ -85,11 +85,7 @@ contract John is JohnInternal, IJohn {
         (
             uint256 rewards,
             uint256 accruedCompMultiplierCumulativePrevBlock
-        ) = _calculateAccountRewards(globalIndicators, accountIndicators);
-
-        if (rewards > 0) {
-            _claim(msgSender, rewards);
-        }
+        ) = _calculateAccountRewards(globalIndicators, accountIndicators);        
 
         _rebalanceIndicators(
             msgSender,
@@ -100,6 +96,11 @@ contract John is JohnInternal, IJohn {
             accountIndicators.ipTokenBalance + ipTokenAmount,
             accountIndicators.delegatedPwIporBalance
         );
+
+		if (rewards > 0) {
+            _claim(msgSender, rewards);
+        }
+
         emit StakeIpTokens(msgSender, ipToken, ipTokenAmount);
     }
 
@@ -129,11 +130,7 @@ contract John is JohnInternal, IJohn {
             uint256 accruedCompMultiplierCumulativePrevBlock
         ) = _calculateAccountRewards(globalIndicators, accountIndicators);
 
-        if (rewards > 0) {
-            _claim(msgSender, rewards);
-        }
-
-        _rebalanceIndicators(
+         _rebalanceIndicators(
             msgSender,
             ipToken,
             accruedCompMultiplierCumulativePrevBlock,
@@ -142,6 +139,10 @@ contract John is JohnInternal, IJohn {
             accountIndicators.ipTokenBalance - ipTokenAmount,
             accountIndicators.delegatedPwIporBalance
         );
+
+		if (rewards > 0) {
+            _claim(msgSender, rewards);
+        }
 
         IERC20Upgradeable(ipToken).safeTransfer(msgSender, ipTokenAmount);
 

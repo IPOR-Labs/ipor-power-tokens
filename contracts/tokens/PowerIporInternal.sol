@@ -119,7 +119,7 @@ abstract contract PowerIporInternal is
         onlyJohn
     {
         address iporTokenAddress = _iporToken;
-        // We need this value before transfer tokens
+        /// @dev We need this value before transfer tokens
         uint256 exchangeRate = _calculateInternalExchangeRate(iporTokenAddress);
         require(iporTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
@@ -151,13 +151,17 @@ abstract contract PowerIporInternal is
         returns (uint256)
     {
         uint256 baseTotalSupply = _baseTotalSupply;
+
         if (baseTotalSupply == 0) {
             return Constants.D18;
         }
+
         uint256 balanceOfIporToken = IERC20Upgradeable(iporTokenAddress).balanceOf(address(this));
+
         if (balanceOfIporToken == 0) {
             return Constants.D18;
         }
+
         return IporMath.division(balanceOfIporToken * Constants.D18, baseTotalSupply);
     }
 

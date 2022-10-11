@@ -46,6 +46,7 @@ interface IJohnInternal {
     ) external;
 
     /// @notice Delegates Power Ipor Tokens an stake ipTokens to John.
+    /// @dev Power Ipor Token amounts can be equal zeros. IP Token amounts can be equal zeros.
     /// @param account account address who want to delegate its Power Ipor Tokens and stake ipTokens to John
     /// @param ipTokens list of ipToken addresses to which delegated Power Ipor Tokens are transfered
     /// @param pwIporAmounts list of Power Ipor Token amounts which should be assign to ipTokens defined above , represented in 18 decimals
@@ -58,6 +59,7 @@ interface IJohnInternal {
     ) external;
 
     /// @notice Undelegates Power Ipor Tokens from John
+    /// @dev Power Ipor Token amounts can be equal zeros.
     /// @param account address which one undelegate Power Ipor Tokens
     /// @param ipTokens list of ipTokens from which you want to undelegate Power Ipor Tokens
     /// @param pwIporAmounts list of amounts of Power Ipor Tokens which will be undelegated, represented in 18 decimals
@@ -78,7 +80,7 @@ interface IJohnInternal {
     function addIpTokenAsset(address ipToken) external;
 
     /// @notice Remove ipToken asset from list of supported ipTokens in John smart contract
-    /// @dev Can be executed only by the Owner
+    /// @dev Can be executed only by the Owner. Notice! When Ip Token asset removed, then rewards cannot be claimed.
     /// @param ipToken address of ipToken asset
     function removeIpTokenAsset(address ipToken) external;
 

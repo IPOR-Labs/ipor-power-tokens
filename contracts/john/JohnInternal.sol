@@ -139,6 +139,7 @@ abstract contract JohnInternal is
                 ipTokens[i]
             ];
 
+            /// @dev when account not stake any IP Token then calculation rewards and rebalancing is redundant
             if (accountIndicators.ipTokenBalance == 0) {
                 uint256 newBalance = accountIndicators.delegatedPwIporBalance + pwIporAmounts[i];
                 _accountIndicators[account][ipTokens[i]].delegatedPwIporBalance = newBalance
@@ -189,15 +190,17 @@ abstract contract JohnInternal is
                 ipTokens[i]
             ];
 
-            //stake
-            if (ipTokenAmounts[i] != 0) {
+            /// @dev Order is important! First Stake, then Delegate.
+            /// @dev Stake
+            if (ipTokenAmounts[i] > 0) {
                 IERC20Upgradeable(ipTokens[i]).safeTransferFrom(
                     account,
                     address(this),
                     ipTokenAmounts[i]
                 );
             }
-            // delegate
+
+            /// @dev Delegate
             if (accountIndicators.ipTokenBalance == 0 && ipTokenAmounts[i] == 0) {
                 uint256 newBalance = accountIndicators.delegatedPwIporBalance + pwIporAmounts[i];
                 _accountIndicators[account][ipTokens[i]].delegatedPwIporBalance = newBalance
@@ -291,6 +294,7 @@ abstract contract JohnInternal is
         require(_ipTokens[ipToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
 
         JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
+		
         uint256 blockNumber = block.number;
 
         uint256 accruedCompositeMultiplierCumulativePrevBlock = _calculateAccruedCompMultiplierCumulativePrevBlock(
@@ -298,6 +302,7 @@ abstract contract JohnInternal is
             );
 
         uint256 accruedRewards;
+
         if (globalIndicators.aggregatedPowerUp != 0) {
             accruedRewards = MiningCalculation.calculateAccruedRewards(
                 blockNumber.toUint32(),
@@ -375,6 +380,7 @@ abstract contract JohnInternal is
             globalIndicators.compositeMultiplierInTheBlock;
     }
 
+    /// @dev Rebalance makes that rewards for account are reset in current block.
     function _rebalanceIndicators(
         address account,
         address ipToken,
@@ -451,6 +457,7 @@ abstract contract JohnInternal is
         );
     }
 
+    /// @dev Claim not changes Internal Exchange Rate of Power Ipor Tokens in Power Ipor smart contract.
     function _claim(address account, uint256 rewards) internal {
         IPowerIporInternal(_getPowerIpor()).receiveRewards(account, rewards);
     }
