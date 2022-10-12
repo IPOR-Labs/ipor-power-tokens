@@ -193,12 +193,12 @@ describe("John Stake and balance", () => {
         {
             ipTokenAmount: N2__0_18DEC.toString(),
             pwIporAmount: N1__0_18DEC.toString(),
-            result: "984962500721156182",
+            result: "984962500721156183",
         },
         {
             ipTokenAmount: N1__0_18DEC.mul(BigNumber.from("10")).toString(),
             pwIporAmount: N1__0_18DEC.toString(),
-            result: "537503523749934909",
+            result: "537503523749934910",
         },
         {
             ipTokenAmount: N1__0_18DEC.mul(BigNumber.from("10")).toString(),
@@ -208,7 +208,7 @@ describe("John Stake and balance", () => {
         {
             ipTokenAmount: N1__0_18DEC.mul(BigNumber.from("33")).toString(),
             pwIporAmount: N1__0_18DEC.mul(BigNumber.from("44")).toString(),
-            result: "1622392421336447926",
+            result: "1622392421336447927",
         },
     ];
 

@@ -30,15 +30,17 @@ library MiningCalculation {
             return 0;
         }
 
-        bytes16 pwIporAmountQP = _toQuadruplePrecision(accountPwIporAmount, Constants.D18);
-        bytes16 ipTokenAmountQP = _toQuadruplePrecision(accountIpTokenAmount, Constants.D18);
-
-        bytes16 underLog = ABDKMathQuad.add(
-            ABDKMathQuad.div(pwIporAmountQP, ipTokenAmountQP),
-            horizontalShift
+        uint256 underLog = IporMath.division(
+            accountPwIporAmount * Constants.D18,
+            accountIpTokenAmount
         );
 
-        bytes16 result = ABDKMathQuad.add(verticalShift, ABDKMathQuad.log_2(underLog));
+        bytes16 result = ABDKMathQuad.add(
+            verticalShift,
+            ABDKMathQuad.log_2(
+                ABDKMathQuad.add(_toQuadruplePrecision(underLog, Constants.D18), horizontalShift)
+            )
+        );
         bytes16 resultD18 = ABDKMathQuad.mul(result, ABDKMathQuad.fromUInt(Constants.D18));
 
         return ABDKMathQuad.toUInt(resultD18);

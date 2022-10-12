@@ -136,6 +136,7 @@ describe("John claim", () => {
         const stakeIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedIpTokensAmount = N0__1_18DEC;
         const expectedRewards = BigNumber.from("100000000000000000000");
+        const expectedAccountRewards = BigNumber.from("100000000000000000001");
 
         const userOneIporBalanceBefore = await iporToken.balanceOf(await userOne.getAddress());
         const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
@@ -188,7 +189,7 @@ describe("John claim", () => {
         expect(accruedRewardsBefore).to.be.equal(ZERO);
         expect(accountRewardsMiddle).to.be.equal(ZERO);
         expect(accruedRewardsMiddle).to.be.equal(ZERO);
-        expect(accountRewardsAfter).to.be.equal(expectedRewards);
+        expect(accountRewardsAfter).to.be.equal(expectedAccountRewards);
         expect(accruedRewardsAfter).to.be.equal(expectedRewards);
         expect(userOneIporBalanceAfter).to.be.equal(userOneIporBalanceBefore.sub(stakeIporAmount));
 
@@ -421,13 +422,6 @@ describe("John claim", () => {
                 .add(N2__0_18DEC)
         );
         expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore.add(stakedIpTokensAmount));
-
-        console.table({
-            rewardsAfterFirstStake: rewardsAfterFirstStake.toString(),
-            rewardsAfterRemoveIpToken: rewardsAfterRemoveIpToken.toString(),
-            rewardsAfterAddIpToken: rewardsAfterAddIpToken.toString(),
-            rewardsAfterSecondStake: rewardsAfterSecondStake.toString(),
-        });
 
         expect(rewardsAfterFirstStake).to.be.equal(N1__0_18DEC.mul(BigNumber.from("100")));
         expect(rewardsAfterRemoveIpToken).to.be.equal(N1__0_18DEC.mul(BigNumber.from("101")));
