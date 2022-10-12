@@ -7,8 +7,8 @@ contract MockMiningCalculation {
     function calculateAccountPowerUp(
         uint256 pwIporAmount,
         uint256 ipTokenAmount,
-        uint256 verticalShift,
-        uint256 horizontalShift
+        bytes16 verticalShift,
+        bytes16 horizontalShift
     ) public view returns (uint256) {
         return
             MiningCalculation.calculateAccountPowerUp(

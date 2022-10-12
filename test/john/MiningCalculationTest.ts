@@ -26,8 +26,8 @@ describe("John Stake and balance", () => {
         const { pwIporAmount, ipTokenAmount, verticalShift, horizontalShift } = getValues(
             "2",
             "0",
-            "2",
-            "2"
+            "0x3ffd99999999999999e36310e0e2a848",
+            "0x3fff0000000000000000000000000000"
         );
         //    when
         const result = await miningCalculation.calculateAccountPowerUp(
@@ -45,18 +45,21 @@ describe("John Stake and balance", () => {
         const { pwIporAmount, ipTokenAmount, verticalShift, horizontalShift } = getValues(
             "0",
             N1__0_18DEC.toString(),
-            "4000000000000000000",
-            N1__0_18DEC.toString()
+            "0x3ffd99999999999999e36310e0e2a848",
+            "0x3fff0000000000000000000000000000"
         );
+        const expectedResult = "400000000000000000";
+
         //    when
-        const result = await miningCalculation.calculateAccountPowerUp(
+        const actualResult = await miningCalculation.calculateAccountPowerUp(
             pwIporAmount,
             ipTokenAmount,
             verticalShift,
             horizontalShift
         );
+
         //    then
-        expect(result).to.be.equal(verticalShift);
+        expect(actualResult).to.be.equal(expectedResult);
     });
 
     it("Should return 0 when ipToken < 1", async () => {
@@ -64,8 +67,8 @@ describe("John Stake and balance", () => {
         const { pwIporAmount, ipTokenAmount, verticalShift, horizontalShift } = getValues(
             "0",
             "999999999999999999",
-            "400000000000000000",
-            N1__0_18DEC.toString()
+            "0x3ffd99999999999999e36310e0e2a848",
+            "0x3fff0000000000000000000000000000"
         );
         //    when
         const result = await miningCalculation.calculateAccountPowerUp(
@@ -83,8 +86,8 @@ describe("John Stake and balance", () => {
         const { pwIporAmount, ipTokenAmount, verticalShift, horizontalShift } = getValues(
             N1__0_18DEC.toString(),
             N1__0_18DEC.toString(),
-            N1__0_18DEC.toString(),
-            N1__0_18DEC.toString()
+            "0x3ffd99999999999999e36310e0e2a848",
+            "0x3fff0000000000000000000000000000"
         );
         //    when
         const result = await miningCalculation.calculateAccountPowerUp(
@@ -94,7 +97,7 @@ describe("John Stake and balance", () => {
             horizontalShift
         );
         //    then
-        expect(result).to.be.equal(N1__0_18DEC.mul(BigNumber.from("2")));
+        expect(result).to.be.equal(BigNumber.from("1400000000000000000"));
     });
 
     it("Should throw IPOR_711 - aggregate power up is negative", async () => {
@@ -175,6 +178,7 @@ describe("John Stake and balance", () => {
     });
 
     type TestData = { ipTokenAmount: string; pwIporAmount: string; result: string };
+
     const powerUpTestData: TestData[] = [
         {
             ipTokenAmount: N1__0_18DEC.toString(),
@@ -213,18 +217,19 @@ describe("John Stake and balance", () => {
         const { pwIporAmount, ipTokenAmount, verticalShift, horizontalShift } = getValues(
             item.pwIporAmount,
             item.ipTokenAmount,
-            "400000000000000000",
-            N1__0_18DEC.toString()
+            "0x3ffd99999999999999e36310e0e2a848",
+            "0x3fff0000000000000000000000000000"
         );
+
         //    when
-        const result = await miningCalculation.calculateAccountPowerUp(
+        const actualResult = await miningCalculation.calculateAccountPowerUp(
             pwIporAmount,
             ipTokenAmount,
             verticalShift,
             horizontalShift
         );
         //    then
-        expect(result).to.be.equal(BigNumber.from(item.result));
+        expect(actualResult).to.be.equal(BigNumber.from(item.result));
     });
 });
 
@@ -236,13 +241,13 @@ const getValues = (
 ): {
     pwIporAmount: BigNumber;
     ipTokenAmount: BigNumber;
-    verticalShift: BigNumber;
-    horizontalShift: BigNumber;
+    verticalShift: string;
+    horizontalShift: string;
 } => {
     return {
         pwIporAmount: BigNumber.from(pwIporAmount),
         ipTokenAmount: BigNumber.from(ipTokenAmount),
-        verticalShift: BigNumber.from(verticalShift),
-        horizontalShift: BigNumber.from(horizontalShift),
+        verticalShift: verticalShift,
+        horizontalShift: horizontalShift,
     };
 };

@@ -139,6 +139,7 @@ abstract contract JohnInternal is
                 ipTokens[i]
             ];
 
+            /// @dev when account not stake any IP Token then calculation rewards and rebalancing is redundant
             if (accountIndicators.ipTokenBalance == 0) {
                 uint256 newBalance = accountIndicators.delegatedPwIporBalance + pwIporAmounts[i];
                 _accountIndicators[account][ipTokens[i]].delegatedPwIporBalance = newBalance
@@ -167,7 +168,7 @@ abstract contract JohnInternal is
         }
 
         if (rewards > 0) {
-            _claim(account, rewards);
+            _transferRewardsToPowerIpor(account, rewards);
         }
     }
 
@@ -189,15 +190,17 @@ abstract contract JohnInternal is
                 ipTokens[i]
             ];
 
-            //stake
-            if (ipTokenAmounts[i] != 0) {
+            /// @dev Order is important! First Stake, then Delegate.
+            /// @dev Stake
+            if (ipTokenAmounts[i] > 0) {
                 IERC20Upgradeable(ipTokens[i]).safeTransferFrom(
                     account,
                     address(this),
                     ipTokenAmounts[i]
                 );
             }
-            // delegate
+
+            /// @dev Delegate
             if (accountIndicators.ipTokenBalance == 0 && ipTokenAmounts[i] == 0) {
                 uint256 newBalance = accountIndicators.delegatedPwIporBalance + pwIporAmounts[i];
                 _accountIndicators[account][ipTokens[i]].delegatedPwIporBalance = newBalance
@@ -231,7 +234,7 @@ abstract contract JohnInternal is
         }
 
         if (rewards > 0) {
-            _claim(account, rewards);
+            _transferRewardsToPowerIpor(account, rewards);
         }
     }
 
@@ -279,7 +282,7 @@ abstract contract JohnInternal is
         }
 
         if (rewards > 0) {
-            _claim(account, rewards);
+            _transferRewardsToPowerIpor(account, rewards);
         }
     }
 
@@ -320,15 +323,7 @@ abstract contract JohnInternal is
         _unpause();
     }
 
-    function _calculateAccruedCompMultiplierCumulativePrevBlock(
-        JohnTypes.GlobalRewardsIndicators memory globalIndicators
-    ) internal view returns (uint256) {
-        return
-            globalIndicators.compositeMultiplierCumulativePrevBlock +
-            (block.number - globalIndicators.blockNumber) *
-            globalIndicators.compositeMultiplierInTheBlock;
-    }
-
+    /// @dev Rebalance makes that rewards for account are reset in current block.
     function _rebalanceIndicators(
         address account,
         address ipToken,
@@ -341,8 +336,8 @@ abstract contract JohnInternal is
         uint256 accountPowerUp = MiningCalculation.calculateAccountPowerUp(
             delegatedPwIporBalance,
             ipTokenBalance,
-            _verticalShift(),
-            _horizontalShift()
+            _getVerticalShift(),
+            _getHorizontalShift()
         );
 
         _accountIndicators[account][ipToken] = JohnTypes.AccountRewardsIndicators(
@@ -362,7 +357,7 @@ abstract contract JohnInternal is
 
         uint256 accruedRewards;
 
-        /// @dev check if we should update rewards, it should happened when at least one account stake ipTokens
+        /// @dev check if we should update rewards, it should happened when at least one account stakes ipTokens
         if (globalIndicators.aggregatedPowerUp == 0) {
             accruedRewards = globalIndicators.accruedRewards;
         } else {
@@ -393,9 +388,13 @@ abstract contract JohnInternal is
         JohnTypes.GlobalRewardsIndicators memory globalIndicators,
         JohnTypes.AccountRewardsIndicators memory accountIndicators
     ) internal view returns (uint256 rewards, uint256 accruedCompMultiplierCumulativePrevBlock) {
-        accruedCompMultiplierCumulativePrevBlock = _calculateAccruedCompMultiplierCumulativePrevBlock(
-            globalIndicators
-        );
+        accruedCompMultiplierCumulativePrevBlock = MiningCalculation
+            .calculateAccruedCompMultiplierCumulativePrevBlock(
+                block.number,
+                globalIndicators.blockNumber,
+                globalIndicators.compositeMultiplierInTheBlock,
+                globalIndicators.compositeMultiplierCumulativePrevBlock
+            );
 
         rewards = MiningCalculation.calculateAccountRewards(
             accountIndicators.ipTokenBalance,
@@ -411,8 +410,12 @@ abstract contract JohnInternal is
         JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
         uint256 blockNumber = block.number;
 
-        uint256 accruedCompositeMultiplierCumulativePrevBlock = _calculateAccruedCompMultiplierCumulativePrevBlock(
-                globalIndicators
+        uint256 accruedCompositeMultiplierCumulativePrevBlock = MiningCalculation
+            .calculateAccruedCompMultiplierCumulativePrevBlock(
+                blockNumber,
+                globalIndicators.blockNumber,
+                globalIndicators.compositeMultiplierInTheBlock,
+                globalIndicators.compositeMultiplierCumulativePrevBlock
             );
 
         uint256 accruedRewards;
@@ -448,16 +451,25 @@ abstract contract JohnInternal is
         );
     }
 
-    function _claim(address account, uint256 rewards) internal {
-        IPowerIporInternal(_getPowerIpor()).receiveRewards(account, rewards);
+    /// @dev Claim not changes Internal Exchange Rate of Power Ipor Tokens in Power Ipor smart contract.
+    function _transferRewardsToPowerIpor(address account, uint256 rewards) internal {
+        IPowerIporInternal(_getPowerIpor()).receiveRewardsFromJohn(account, rewards);
     }
 
-    function _horizontalShift() internal pure returns (uint256) {
-        return 1000000000000000000;
+    /// @notice Gets Horizontal shift param used in Liquidity Mining equastions.
+    /// @dev To pre-calculate this value from uint256, use {MiningCalculation._toQuadruplePrecision()} method.
+    /// @dev Notice! uint256 value before calculation has following constraints: 1 <= Horizontal Shift <= 10^3
+    /// @return horizontal shift - value represented in bytes16, quadrupe precision, 128 bits, takes into consideration 18 decimals
+    function _getHorizontalShift() internal pure returns (bytes16) {
+        return 0x3fff0000000000000000000000000000;
     }
 
-    function _verticalShift() internal pure returns (uint256) {
-        return 400000000000000000;
+    /// @notice Gets vertical shift param used in Liquidity Mining equastions.
+    /// @dev To pre-calculate this value from uint256, use {MiningCalculation._toQuadruplePrecision()} method.
+    /// @dev Notice! uint256 value before calculation has following constraints: 10^(-4) <= Vertival Shift <= 3
+    /// @return vertical shift - value represented in bytes16, quadrupe precision, 128 bits, takes into consideration 18 decimals
+    function _getVerticalShift() internal pure returns (bytes16) {
+        return 0x3ffd99999999999999e36310e0e2a848;
     }
 
     function _getPowerIpor() internal view returns (address) {

@@ -34,6 +34,7 @@ library JohnTypes {
     }
 
     /// @title Rewards params specified for one account. Params used in algorithm responsible for rewards distribution.
+    /// @dev Structure in storage is updated in moment when account interacts with John smart contract (stake, unstake, delegate, undelegate, claim)
     struct AccountRewardsIndicators {
         /// @notice composite multiplier cumulative calculated for previous block
         /// @dev represented in 27 decimals
