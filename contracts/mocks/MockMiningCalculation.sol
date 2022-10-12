@@ -9,7 +9,7 @@ contract MockMiningCalculation {
         uint256 ipTokenAmount,
         bytes16 verticalShift,
         bytes16 horizontalShift
-    ) public view returns (uint256) {
+    ) public pure returns (uint256) {
         return
             MiningCalculation.calculateAccountPowerUp(
                 pwIporAmount,
@@ -25,7 +25,7 @@ contract MockMiningCalculation {
         uint256 previousUserPowerUp,
         uint256 previousUserIpTokenAmount,
         uint256 previousAggregatedPowerUp
-    ) public view returns (uint256) {
+    ) public pure returns (uint256) {
         return
             MiningCalculation.calculateAggregatedPowerUp(
                 userPowerUp,
@@ -41,7 +41,7 @@ contract MockMiningCalculation {
         uint256 lastRebalanceBlockNumber,
         uint256 rewardsPerBlock,
         uint256 previousAccruedRewards
-    ) public view returns (uint256) {
+    ) public pure returns (uint256) {
         return
             MiningCalculation.calculateAccruedRewards(
                 blocNumber,
@@ -53,7 +53,7 @@ contract MockMiningCalculation {
 
     function calculateCompositeMultiplier(uint256 rewardsPerBlock, uint256 aggregatedPowerUp)
         public
-        view
+        pure
         returns (uint256)
     {
         return MiningCalculation.calculateCompositeMultiplier(rewardsPerBlock, aggregatedPowerUp);
@@ -64,7 +64,7 @@ contract MockMiningCalculation {
         uint256 accountPowerUp,
         uint256 accountCompositeMultiplier,
         uint256 compositeMultiplier
-    ) public view returns (uint256) {
+    ) public pure returns (uint256) {
         return
             MiningCalculation.calculateAccountRewards(
                 accountIpTokenAmount,
