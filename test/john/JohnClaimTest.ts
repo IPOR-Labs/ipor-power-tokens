@@ -338,4 +338,100 @@ describe("John claim", () => {
         );
         expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore.add(stakedIpTokensAmount));
     });
+
+    it("Should count proper rewards when one user stake Power Ipor Tokens (pwIpor) twice and ipAsset was removed", async () => {
+        //    given
+        const delegatedPwIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
+        const stakeIporAmount = N1__0_18DEC.mul(BigNumber.from("200"));
+        const stakedIpTokensAmount = N1__0_18DEC.mul(BigNumber.from("100"));
+
+        const expectedRewards = BigNumber.from("100000000000000000000");
+
+        const userOneIporBalanceBefore = await iporToken.balanceOf(await userOne.getAddress());
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+        const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
+
+        //    when
+        await powerIpor.connect(userOne).stake(stakeIporAmount);
+
+        const powerIporBalanceBefore = await powerIpor
+            .connect(userOne)
+            .balanceOf(await userOne.getAddress());
+
+        await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokensAmount);
+        await powerIpor
+            .connect(userOne)
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedPwIporAmount]);
+        await hre.network.provider.send("hardhat_mine", ["0x64"]);
+
+        const powerIporBalanceAfter1Stake = await powerIpor
+            .connect(userOne)
+            .balanceOf(await userOne.getAddress());
+        const rewardsAfterFirstStake = await john.calculateAccountRewards(
+            await userOne.getAddress(),
+            tokens.ipTokenDai.address
+        );
+
+        await john.removeIpTokenAsset(tokens.ipTokenDai.address);
+        await hre.network.provider.send("hardhat_mine", ["0x64"]);
+        const rewardsAfterRemoveIpToken = await john.calculateAccountRewards(
+            await userOne.getAddress(),
+            tokens.ipTokenDai.address
+        );
+        await john.addIpTokenAsset(tokens.ipTokenDai.address);
+        const rewardsAfterAddIpToken = await john.calculateAccountRewards(
+            await userOne.getAddress(),
+            tokens.ipTokenDai.address
+        );
+
+        await powerIpor
+            .connect(userOne)
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedPwIporAmount]);
+
+        await hre.network.provider.send("hardhat_mine", ["0x64"]);
+
+        const rewardsAfterSecondStake = await john.calculateAccountRewards(
+            await userOne.getAddress(),
+            tokens.ipTokenDai.address
+        );
+
+        //    then
+        const powerIporBalanceAfter2Stake = await powerIpor
+            .connect(userOne)
+            .balanceOf(await userOne.getAddress());
+
+        const userOneIporBalanceAfter = await iporToken.balanceOf(await userOne.getAddress());
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+        const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
+
+        expect(rewardsAfterFirstStake).to.be.equal(BigNumber.from("100000000000000000000"));
+        expect(rewardsAfterSecondStake).to.be.equal(ZERO);
+
+        expect(powerIporBalanceBefore).to.be.equal(BigNumber.from("200000000000000000000"));
+        // 1 transfer when first delegateToJohn
+        expect(powerIporBalanceAfter1Stake).to.be.equal(BigNumber.from("201000000000000000000"));
+        // 100 transfer after second delegateToJohn
+        expect(powerIporBalanceAfter2Stake).to.be.equal(BigNumber.from("302000000000000000000"));
+
+        expect(userOneIporBalanceAfter).to.be.equal(userOneIporBalanceBefore.sub(stakeIporAmount));
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore
+                .add(stakeIporAmount)
+                .add(expectedRewards)
+                .add(N2__0_18DEC)
+        );
+        expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore.add(stakedIpTokensAmount));
+
+        console.table({
+            rewardsAfterFirstStake: rewardsAfterFirstStake.toString(),
+            rewardsAfterRemoveIpToken: rewardsAfterRemoveIpToken.toString(),
+            rewardsAfterAddIpToken: rewardsAfterAddIpToken.toString(),
+            rewardsAfterSecondStake: rewardsAfterSecondStake.toString(),
+        });
+
+        expect(rewardsAfterFirstStake).to.be.equal(N1__0_18DEC.mul(BigNumber.from("100")));
+        expect(rewardsAfterRemoveIpToken).to.be.equal(N1__0_18DEC.mul(BigNumber.from("101")));
+        expect(rewardsAfterAddIpToken).to.be.equal(N1__0_18DEC.mul(BigNumber.from("101")));
+        expect(rewardsAfterSecondStake).to.be.equal(ZERO);
+    });
 });
