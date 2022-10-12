@@ -13,7 +13,7 @@ const { expect } = chai;
 
 const itParam = require("mocha-param");
 
-describe.only("John Stake and balance", () => {
+describe("John Stake and balance", () => {
     let miningCalculation: MockMiningCalculation;
 
     before(async () => {
