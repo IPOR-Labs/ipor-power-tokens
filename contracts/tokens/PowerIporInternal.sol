@@ -16,7 +16,6 @@ import "../interfaces/IPowerIporInternal.sol";
 import "../interfaces/IJohn.sol";
 import "../security/IporOwnableUpgradeable.sol";
 
-// TODO: Add tests for events
 abstract contract PowerIporInternal is
     PausableUpgradeable,
     UUPSUpgradeable,
@@ -112,7 +111,7 @@ abstract contract PowerIporInternal is
         emit PauseManagerChanged(_msgSender(), oldPauseManagerAddr, newPauseManagerAddr);
     }
 
-    function receiveRewards(address account, uint256 iporTokenAmount)
+    function receiveRewardsFromJohn(address account, uint256 iporTokenAmount)
         external
         override
         whenNotPaused

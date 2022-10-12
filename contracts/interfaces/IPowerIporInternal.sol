@@ -24,7 +24,7 @@ interface IPowerIporInternal {
     /// @notice method allowed to transfer rewards from John contracts to balance of specific account
     /// @param account - address of user who received rewards
     /// @param iporTokenAmount - amount of rewards, represented in 18 decimals.
-    function receiveRewards(address account, uint256 iporTokenAmount) external;
+    function receiveRewardsFromJohn(address account, uint256 iporTokenAmount) external;
 
     /// @notice method return actual address of liquidity rewards contract - the John
     function getJohn() external view returns (address);

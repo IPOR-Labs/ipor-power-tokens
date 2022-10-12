@@ -5,7 +5,6 @@ import "../interfaces/IJohnInternal.sol";
 import "../interfaces/IPowerIpor.sol";
 import "./PowerIporInternal.sol";
 
-// TODO: Add tests for events
 ///@title Smart contract responsible for managing Power Ipor Token.
 /// @notice Power Ipor Token is retrieved when account stake Ipor Token.
 /// Power Ipor smart contract allow you to stake, unstake Ipor Token, deletage, undelegate to John Power Ipor Token.

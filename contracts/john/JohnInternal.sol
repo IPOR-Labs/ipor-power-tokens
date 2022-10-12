@@ -168,7 +168,7 @@ abstract contract JohnInternal is
         }
 
         if (rewards > 0) {
-            _claim(account, rewards);
+            _transferRewardsToPowerIpor(account, rewards);
         }
     }
 
@@ -234,7 +234,7 @@ abstract contract JohnInternal is
         }
 
         if (rewards > 0) {
-            _claim(account, rewards);
+            _transferRewardsToPowerIpor(account, rewards);
         }
     }
 
@@ -282,7 +282,7 @@ abstract contract JohnInternal is
         }
 
         if (rewards > 0) {
-            _claim(account, rewards);
+            _transferRewardsToPowerIpor(account, rewards);
         }
     }
 
@@ -323,15 +323,6 @@ abstract contract JohnInternal is
         _unpause();
     }
 
-    function _calculateAccruedCompMultiplierCumulativePrevBlock(
-        JohnTypes.GlobalRewardsIndicators memory globalIndicators
-    ) internal view returns (uint256) {
-        return
-            globalIndicators.compositeMultiplierCumulativePrevBlock +
-            (block.number - globalIndicators.blockNumber) *
-            globalIndicators.compositeMultiplierInTheBlock;
-    }
-
     /// @dev Rebalance makes that rewards for account are reset in current block.
     function _rebalanceIndicators(
         address account,
@@ -366,7 +357,7 @@ abstract contract JohnInternal is
 
         uint256 accruedRewards;
 
-        /// @dev check if we should update rewards, it should happened when at least one account stake ipTokens
+        /// @dev check if we should update rewards, it should happened when at least one account stakes ipTokens
         if (globalIndicators.aggregatedPowerUp == 0) {
             accruedRewards = globalIndicators.accruedRewards;
         } else {
@@ -397,9 +388,13 @@ abstract contract JohnInternal is
         JohnTypes.GlobalRewardsIndicators memory globalIndicators,
         JohnTypes.AccountRewardsIndicators memory accountIndicators
     ) internal view returns (uint256 rewards, uint256 accruedCompMultiplierCumulativePrevBlock) {
-        accruedCompMultiplierCumulativePrevBlock = _calculateAccruedCompMultiplierCumulativePrevBlock(
-            globalIndicators
-        );
+        accruedCompMultiplierCumulativePrevBlock = MiningCalculation
+            .calculateAccruedCompMultiplierCumulativePrevBlock(
+                block.number,
+                globalIndicators.blockNumber,
+                globalIndicators.compositeMultiplierInTheBlock,
+                globalIndicators.compositeMultiplierCumulativePrevBlock
+            );
 
         rewards = MiningCalculation.calculateAccountRewards(
             accountIndicators.ipTokenBalance,
@@ -415,8 +410,12 @@ abstract contract JohnInternal is
         JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
         uint256 blockNumber = block.number;
 
-        uint256 accruedCompositeMultiplierCumulativePrevBlock = _calculateAccruedCompMultiplierCumulativePrevBlock(
-                globalIndicators
+        uint256 accruedCompositeMultiplierCumulativePrevBlock = MiningCalculation
+            .calculateAccruedCompMultiplierCumulativePrevBlock(
+                blockNumber,
+                globalIndicators.blockNumber,
+                globalIndicators.compositeMultiplierInTheBlock,
+                globalIndicators.compositeMultiplierCumulativePrevBlock
             );
 
         uint256 accruedRewards;
@@ -453,8 +452,8 @@ abstract contract JohnInternal is
     }
 
     /// @dev Claim not changes Internal Exchange Rate of Power Ipor Tokens in Power Ipor smart contract.
-    function _claim(address account, uint256 rewards) internal {
-        IPowerIporInternal(_getPowerIpor()).receiveRewards(account, rewards);
+    function _transferRewardsToPowerIpor(address account, uint256 rewards) internal {
+        IPowerIporInternal(_getPowerIpor()).receiveRewardsFromJohn(account, rewards);
     }
 
     function _horizontalShift() internal pure returns (uint256) {
