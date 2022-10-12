@@ -28,10 +28,10 @@ library MiningCalculation {
         if (accountIpTokenAmount < Constants.D18) {
             return 0;
         }
-        bytes16 pwIporAmountFP = _toFixedPoint(accountPwIporAmount, Constants.D18);
-        bytes16 ipTokenAmountFP = _toFixedPoint(accountIpTokenAmount, Constants.D18);
-        bytes16 verticalSwitchFP = _toFixedPoint(verticalShift, Constants.D18);
-        bytes16 horizontalSwitchFP = _toFixedPoint(horizontalShift, Constants.D18);
+        bytes16 pwIporAmountFP = _toQuadruplePrecision(accountPwIporAmount, Constants.D18);
+        bytes16 ipTokenAmountFP = _toQuadruplePrecision(accountIpTokenAmount, Constants.D18);
+        bytes16 verticalSwitchFP = _toQuadruplePrecision(verticalShift, Constants.D18);
+        bytes16 horizontalSwitchFP = _toQuadruplePrecision(horizontalShift, Constants.D18);
 
         bytes16 underLog = ABDKMathQuad.add(
             ABDKMathQuad.div(pwIporAmountFP, ipTokenAmountFP),
@@ -91,7 +91,7 @@ library MiningCalculation {
     /// @notice Calculates rewards from last rebalancing including block number given as a param.
     /// @param blockNumber blok number for which is executed rewards calculation
     /// @param lastRebalanceBlockNumber blok number when last rewards rebalance was executed
-    /// @param rewardsPerBlock configuration param describes how many Ipor Tokens are rewarded across all participants per one block
+    /// @param rewardsPerBlock configuration param describes how many Ipor Tokens are rewarded across all participants per one block, represendet in 8 decimals
     /// @param previousAccruedRewards number of previous cumulated/accrued rewards
     /// @return new accrued rewards, number of Ipor Tokens (or Power Ipor Tokens because are in relation 1:1 with Ipor Tokens) accrued for given above params
     function calculateAccruedRewards(
@@ -140,6 +140,8 @@ library MiningCalculation {
         uint256 accountCompMultiplierCumulativePrevBlock,
         uint256 accruedCompMultiplierCumulativePrevBlock
     ) internal view returns (uint256) {
+        /// @dev Composit Multiplier Cumulative for Prev Block stored in Account structure cannot be greater than the newest accrued global
+        /// Composite Multiplier Cumulative for Prev Block
         require(
             accruedCompMultiplierCumulativePrevBlock >= accountCompMultiplierCumulativePrevBlock,
             MiningErrors.ACCOUNT_COMPOSITE_MULTIPLIER_GT_COMPOSITE_MULTIPLIER
@@ -171,7 +173,11 @@ library MiningCalculation {
     }
 
     /// @dev Quadruple precision, 128 bits
-    function _toFixedPoint(uint256 number, uint256 decimals) private view returns (bytes16) {
+    function _toQuadruplePrecision(uint256 number, uint256 decimals)
+        private
+        view
+        returns (bytes16)
+    {
         if (number % decimals > 0) {
             /// @dev when we calculate we lost this value in conversion
             number += 1;
