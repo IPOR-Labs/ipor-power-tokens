@@ -24,7 +24,7 @@ library MiningCalculation {
         uint256 accountIpTokenAmount,
         bytes16 verticalShift,
         bytes16 horizontalShift
-    ) internal view returns (uint256) {
+    ) internal pure returns (uint256) {
         /// @dev Account's staked IP Tokens have to be >= 1
         if (accountIpTokenAmount < Constants.D18) {
             return 0;
@@ -56,7 +56,7 @@ library MiningCalculation {
         uint256 previousAccountPowerUp,
         uint256 previousAccountIpTokenAmount,
         uint256 previousAggregatedPowerUp
-    ) internal view returns (uint256) {
+    ) internal pure returns (uint256) {
         int256 apu = accountPowerUp.toInt256() *
             accountIpTokenAmount.toInt256() -
             previousAccountPowerUp.toInt256() *
@@ -99,7 +99,7 @@ library MiningCalculation {
         uint256 lastRebalanceBlockNumber,
         uint256 rewardsPerBlock,
         uint256 previousAccruedRewards
-    ) internal view returns (uint256) {
+    ) internal pure returns (uint256) {
         require(
             blockNumber >= lastRebalanceBlockNumber,
             MiningErrors.BLOCK_NUMBER_LOWER_THAN_PREVIOUS_BLOCK_NUMBER
@@ -116,7 +116,7 @@ library MiningCalculation {
     /// @return composite multiplier, value represented in 27 decimals
     function calculateCompositeMultiplier(uint256 rewardsPerBlock, uint256 aggregatedPowerUp)
         internal
-        view
+        pure
         returns (uint256)
     {
         if (aggregatedPowerUp == 0) {
@@ -139,7 +139,7 @@ library MiningCalculation {
         uint256 accountPowerUp,
         uint256 accountCompMultiplierCumulativePrevBlock,
         uint256 accruedCompMultiplierCumulativePrevBlock
-    ) internal view returns (uint256) {
+    ) internal pure returns (uint256) {
         /// @dev Composit Multiplier Cumulative for Prev Block stored in Account structure cannot be greater than the newest accrued global
         /// Composite Multiplier Cumulative for Prev Block
         require(
@@ -165,7 +165,7 @@ library MiningCalculation {
         uint256 globalIndBlockNumber,
         uint256 globalIndCompositeMultiplierInTheBlock,
         uint256 globalIndCompositeMultiplierCumulativePrevBlock
-    ) internal view returns (uint256) {
+    ) internal pure returns (uint256) {
         return
             globalIndCompositeMultiplierCumulativePrevBlock +
             (currentBlockNumber - globalIndBlockNumber) *
@@ -175,7 +175,7 @@ library MiningCalculation {
     /// @dev Quadruple precision, 128 bits
     function _toQuadruplePrecision(uint256 number, uint256 decimals)
         private
-        view
+        pure
         returns (bytes16)
     {
         if (number % decimals > 0) {
