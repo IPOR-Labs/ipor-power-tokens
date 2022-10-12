@@ -1,7 +1,7 @@
 import hre from "hardhat";
 import chai from "chai";
 
-import { BigNumber, Bytes, utils } from "ethers";
+import { BigNumber } from "ethers";
 
 import { solidity } from "ethereum-waffle";
 import { MockMiningCalculation } from "../../types";

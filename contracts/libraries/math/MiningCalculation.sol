@@ -7,7 +7,6 @@ import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import "../errors/MiningErrors.sol";
 import "../Constants.sol";
 import "./IporMath.sol";
-import "hardhat/console.sol";
 
 /// @title Library which contains core logic used in Liquidity Mining module.
 library MiningCalculation {
@@ -30,12 +29,9 @@ library MiningCalculation {
         if (accountIpTokenAmount < Constants.D18) {
             return 0;
         }
+
         bytes16 pwIporAmountQP = _toQuadruplePrecision(accountPwIporAmount, Constants.D18);
         bytes16 ipTokenAmountQP = _toQuadruplePrecision(accountIpTokenAmount, Constants.D18);
-        // bytes16 verticalSwitchQP = _toQuadruplePrecision(verticalShift, Constants.D18);
-        // bytes16 horizontalSwitchQP = _toQuadruplePrecision(horizontalShift, Constants.D18);
-        // console.logBytes16(verticalSwitchQP);
-        // console.logBytes16(horizontalSwitchQP);
 
         bytes16 underLog = ABDKMathQuad.add(
             ABDKMathQuad.div(pwIporAmountQP, ipTokenAmountQP),

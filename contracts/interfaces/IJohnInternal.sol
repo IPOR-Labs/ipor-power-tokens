@@ -80,7 +80,7 @@ interface IJohnInternal {
     function addIpTokenAsset(address ipToken) external;
 
     /// @notice Remove ipToken asset from list of supported ipTokens in John smart contract
-    /// @dev Can be executed only by the Owner. Notice! When Ip Token asset removed, then rewards cannot be claimed.
+    /// @dev Can be executed only by the Owner. Notice! When Ip Token asset removed, then rewards cannot be claimed. To recover claiming execute method {addIpTokenAsset()} and {setRewardsPerBlock()}
     /// @param ipToken address of ipToken asset
     function removeIpTokenAsset(address ipToken) external;
 
