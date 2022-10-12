@@ -85,7 +85,7 @@ contract John is JohnInternal, IJohn {
         (
             uint256 rewards,
             uint256 accruedCompMultiplierCumulativePrevBlock
-        ) = _calculateAccountRewards(globalIndicators, accountIndicators);        
+        ) = _calculateAccountRewards(globalIndicators, accountIndicators);
 
         _rebalanceIndicators(
             msgSender,
@@ -97,7 +97,7 @@ contract John is JohnInternal, IJohn {
             accountIndicators.delegatedPwIporBalance
         );
 
-		if (rewards > 0) {
+        if (rewards > 0) {
             _claim(msgSender, rewards);
         }
 
@@ -130,7 +130,7 @@ contract John is JohnInternal, IJohn {
             uint256 accruedCompMultiplierCumulativePrevBlock
         ) = _calculateAccountRewards(globalIndicators, accountIndicators);
 
-         _rebalanceIndicators(
+        _rebalanceIndicators(
             msgSender,
             ipToken,
             accruedCompMultiplierCumulativePrevBlock,
@@ -140,7 +140,7 @@ contract John is JohnInternal, IJohn {
             accountIndicators.delegatedPwIporBalance
         );
 
-		if (rewards > 0) {
+        if (rewards > 0) {
             _claim(msgSender, rewards);
         }
 
