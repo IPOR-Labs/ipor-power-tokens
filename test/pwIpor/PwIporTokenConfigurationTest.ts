@@ -222,7 +222,7 @@ describe("PowerIpor configuration, deploy tests", () => {
         const [admin, userOne, userThree] = accounts;
         //when
         await expect(
-            powerIpor.receiveRewards(await userOne.getAddress(), BigNumber.from("123"))
+            powerIpor.receiveRewardsFromJohn(await userOne.getAddress(), BigNumber.from("123"))
         ).to.be.revertedWith("IPOR_703");
     });
 });

@@ -5,7 +5,6 @@ import "../interfaces/IJohnInternal.sol";
 import "../interfaces/IPowerIpor.sol";
 import "./PowerIporInternal.sol";
 
-// TODO: Add tests for events
 ///@title Smart contract responsible for managing Power Ipor Token.
 /// @notice Power Ipor Token is retrieved when account stake Ipor Token.
 /// Power Ipor smart contract allow you to stake, unstake Ipor Token, deletage, undelegate to John Power Ipor Token.
@@ -122,6 +121,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
     {
         require(ipTokens.length == pwIporAmounts.length, IporErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
         uint256 pwIporToDelegate;
+
         for (uint256 i = 0; i != pwIporAmounts.length; i++) {
             pwIporToDelegate += pwIporAmounts[i];
         }
@@ -133,6 +133,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         );
 
         _delegatedToJohnBalance[_msgSender()] += pwIporToDelegate;
+
         IJohnInternal(_john).delegatePwIpor(_msgSender(), ipTokens, pwIporAmounts);
 
         emit DelegateToJohn(_msgSender(), ipTokens, pwIporAmounts);
@@ -147,7 +148,9 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
             ipTokens.length == pwIporAmounts.length && ipTokens.length == ipTokenAmounts.length,
             IporErrors.INPUT_ARRAYS_LENGTH_MISMATCH
         );
+
         uint256 pwIporToDelegate;
+
         for (uint256 i = 0; i != pwIporAmounts.length; i++) {
             pwIporToDelegate += pwIporAmounts[i];
         }
@@ -159,6 +162,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         );
 
         _delegatedToJohnBalance[_msgSender()] += pwIporToDelegate;
+
         IJohnInternal(_john).delegatePwIporAndStakeIpToken(
             _msgSender(),
             ipTokens,
@@ -176,24 +180,29 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         nonReentrant
     {
         require(ipTokens.length == pwIporAmounts.length, IporErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
+
         uint256 pwIporAmountToUndelegate;
+
         for (uint256 i; i != ipTokens.length; i++) {
-            require(pwIporAmounts[i] != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+            require(pwIporAmounts[i] > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
             pwIporAmountToUndelegate += pwIporAmounts[i];
         }
 
+        address msgSender = _msgSender();
+
         require(
-            _delegatedToJohnBalance[_msgSender()] >= pwIporAmountToUndelegate,
+            _delegatedToJohnBalance[msgSender] >= pwIporAmountToUndelegate,
             MiningErrors.ACC_DELEGATED_TO_JOHN_BALANCE_IS_TOO_LOW
         );
 
-        IJohnInternal(_john).undelegatePwIpor(_msgSender(), ipTokens, pwIporAmounts);
-        _delegatedToJohnBalance[_msgSender()] -= pwIporAmountToUndelegate;
+        IJohnInternal(_john).undelegatePwIpor(msgSender, ipTokens, pwIporAmounts);
 
-        emit UndelegateFromJohn(_msgSender(), ipTokens, pwIporAmounts);
+        _delegatedToJohnBalance[msgSender] -= pwIporAmountToUndelegate;
+
+        emit UndelegateFromJohn(msgSender, ipTokens, pwIporAmounts);
     }
 
-    function coolDown(uint256 pwIporAmount) external override whenNotPaused {
+    function coolDown(uint256 pwIporAmount) external override whenNotPaused nonReentrant {
         require(pwIporAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         address msgSender = _msgSender();

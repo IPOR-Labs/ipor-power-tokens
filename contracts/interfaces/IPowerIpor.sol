@@ -65,6 +65,7 @@ interface IPowerIpor {
     function delegateToJohn(address[] memory ipTokens, uint256[] memory pwIporAmounts) external;
 
     /// @notice Delegates Power Ipor Tokens and stakes ipTokens
+    /// @dev Power Ipor Token amounts can be equal zeros. IP Token amounts can be equal zeros.
     /// @param ipTokens - list of ipTokens to which sender delegates Power Ipor Tokens and stakes ipTokens
     /// @param pwIporAmounts - list of Power Ipor Token amount which sender delegates for a given ipToken
     /// @param ipTokenAmounts - list of ipToken amount which sender stakes in John for a given ipToken
@@ -75,6 +76,7 @@ interface IPowerIpor {
     ) external;
 
     /// @notice Undelegates Power Ipor Token from John
+    /// @dev Power Ipor amounts have to be higher than zero, in other case transaction is rejected.
     /// @param ipTokens - list of ipToken from which sender will undelegate Power Ipor Tokens
     /// @param pwIporAmounts - list of amounts of Power Ipor Tokens taken to undelegate from John
     function undelegateFromJohn(address[] memory ipTokens, uint256[] memory pwIporAmounts) external;
