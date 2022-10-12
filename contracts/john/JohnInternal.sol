@@ -458,6 +458,7 @@ abstract contract JohnInternal is
 
     /// @notice Gets Horizontal shift param used in Liquidity Mining equastions.
     /// @dev To pre-calculate this value from uint256, use {MiningCalculation._toQuadruplePrecision()} method.
+    /// @dev Notice! uint256 value before calculation has following constraints: 1 <= Horizontal Shift <= 10^3
     /// @return horizontal shift - value represented in bytes16, quadrupe precision, 128 bits, takes into consideration 18 decimals
     function _getHorizontalShift() internal pure returns (bytes16) {
         return 0x3fff0000000000000000000000000000;
@@ -465,6 +466,7 @@ abstract contract JohnInternal is
 
     /// @notice Gets vertical shift param used in Liquidity Mining equastions.
     /// @dev To pre-calculate this value from uint256, use {MiningCalculation._toQuadruplePrecision()} method.
+    /// @dev Notice! uint256 value before calculation has following constraints: 10^(-4) <= Vertival Shift <= 3
     /// @return vertical shift - value represented in bytes16, quadrupe precision, 128 bits, takes into consideration 18 decimals
     function _getVerticalShift() internal pure returns (bytes16) {
         return 0x3ffd99999999999999e36310e0e2a848;
