@@ -291,67 +291,19 @@ abstract contract JohnInternal is
         override
         onlyOwner
     {
-        require(_ipTokens[ipToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
-
-        JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
-		
-        uint256 blockNumber = block.number;
-
-        uint256 accruedCompositeMultiplierCumulativePrevBlock = _calculateAccruedCompMultiplierCumulativePrevBlock(
-                globalIndicators
-            );
-
-        uint256 accruedRewards;
-
-        if (globalIndicators.aggregatedPowerUp != 0) {
-            accruedRewards = MiningCalculation.calculateAccruedRewards(
-                blockNumber.toUint32(),
-                globalIndicators.blockNumber,
-                globalIndicators.rewardsPerBlock,
-                globalIndicators.accruedRewards
-            );
-        } else {
-            accruedRewards = globalIndicators.accruedRewards;
-        }
-
-        uint256 compositeMultiplier = MiningCalculation.calculateCompositeMultiplier(
-            iporTokenAmount,
-            globalIndicators.aggregatedPowerUp
-        );
-
-        _globalIndicators[ipToken] = JohnTypes.GlobalRewardsIndicators(
-            globalIndicators.aggregatedPowerUp,
-            compositeMultiplier.toUint128(),
-            accruedCompositeMultiplierCumulativePrevBlock.toUint128(),
-            blockNumber.toUint32(),
-            iporTokenAmount,
-            accruedRewards.toUint88()
-        );
-
-        emit RewardsPerBlockChanged(
-            _msgSender(),
-            globalIndicators.rewardsPerBlock,
-            iporTokenAmount
-        );
+        _setRewardsPerBlock(ipToken, iporTokenAmount);
     }
 
     function addIpTokenAsset(address ipToken) external onlyOwner {
         require(ipToken != address(0), IporErrors.WRONG_ADDRESS);
         _ipTokens[ipToken] = true;
-        _globalIndicators[ipToken] = JohnTypes.GlobalRewardsIndicators(
-            0,
-            0,
-            0,
-            0,
-            uint32(Constants.D8),
-            0
-        );
 
         emit IpTokenAdded(_msgSender(), ipToken);
     }
 
     function removeIpTokenAsset(address ipToken) external override onlyOwner {
         require(ipToken != address(0), IporErrors.WRONG_ADDRESS);
+        _setRewardsPerBlock(ipToken, 0);
         _ipTokens[ipToken] = false;
         emit IpTokenRemoved(_msgSender(), ipToken);
     }
@@ -454,6 +406,49 @@ abstract contract JohnInternal is
             accountIndicators.powerUp,
             accountIndicators.compositeMultiplierCumulativePrevBlock,
             accruedCompMultiplierCumulativePrevBlock
+        );
+    }
+
+    function _setRewardsPerBlock(address ipToken, uint32 iporTokenAmount) internal {
+        require(_ipTokens[ipToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
+
+        JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
+        uint256 blockNumber = block.number;
+
+        uint256 accruedCompositeMultiplierCumulativePrevBlock = _calculateAccruedCompMultiplierCumulativePrevBlock(
+                globalIndicators
+            );
+
+        uint256 accruedRewards;
+        if (globalIndicators.aggregatedPowerUp != 0) {
+            accruedRewards = MiningCalculation.calculateAccruedRewards(
+                blockNumber.toUint32(),
+                globalIndicators.blockNumber,
+                globalIndicators.rewardsPerBlock,
+                globalIndicators.accruedRewards
+            );
+        } else {
+            accruedRewards = globalIndicators.accruedRewards;
+        }
+
+        uint256 compositeMultiplier = MiningCalculation.calculateCompositeMultiplier(
+            iporTokenAmount,
+            globalIndicators.aggregatedPowerUp
+        );
+
+        _globalIndicators[ipToken] = JohnTypes.GlobalRewardsIndicators(
+            globalIndicators.aggregatedPowerUp,
+            compositeMultiplier.toUint128(),
+            accruedCompositeMultiplierCumulativePrevBlock.toUint128(),
+            blockNumber.toUint32(),
+            iporTokenAmount,
+            accruedRewards.toUint88()
+        );
+
+        emit RewardsPerBlockChanged(
+            _msgSender(),
+            globalIndicators.rewardsPerBlock,
+            iporTokenAmount
         );
     }
 
