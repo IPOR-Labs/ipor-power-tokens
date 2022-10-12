@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import "../errors/MiningErrors.sol";
 import "../Constants.sol";
 import "./IporMath.sol";
+import "hardhat/console.sol";
 
 /// @title Library which contains core logic used in Liquidity Mining module.
 library MiningCalculation {
@@ -22,23 +23,26 @@ library MiningCalculation {
     function calculateAccountPowerUp(
         uint256 accountPwIporAmount,
         uint256 accountIpTokenAmount,
-        uint256 verticalShift,
-        uint256 horizontalShift
+        bytes16 verticalShift,
+        bytes16 horizontalShift
     ) internal view returns (uint256) {
+        /// @dev Account's staked IP Tokens have to be >= 1
         if (accountIpTokenAmount < Constants.D18) {
             return 0;
         }
-        bytes16 pwIporAmountFP = _toQuadruplePrecision(accountPwIporAmount, Constants.D18);
-        bytes16 ipTokenAmountFP = _toQuadruplePrecision(accountIpTokenAmount, Constants.D18);
-        bytes16 verticalSwitchFP = _toQuadruplePrecision(verticalShift, Constants.D18);
-        bytes16 horizontalSwitchFP = _toQuadruplePrecision(horizontalShift, Constants.D18);
+        bytes16 pwIporAmountQP = _toQuadruplePrecision(accountPwIporAmount, Constants.D18);
+        bytes16 ipTokenAmountQP = _toQuadruplePrecision(accountIpTokenAmount, Constants.D18);
+        // bytes16 verticalSwitchQP = _toQuadruplePrecision(verticalShift, Constants.D18);
+        // bytes16 horizontalSwitchQP = _toQuadruplePrecision(horizontalShift, Constants.D18);
+        // console.logBytes16(verticalSwitchQP);
+        // console.logBytes16(horizontalSwitchQP);
 
         bytes16 underLog = ABDKMathQuad.add(
-            ABDKMathQuad.div(pwIporAmountFP, ipTokenAmountFP),
-            horizontalSwitchFP
+            ABDKMathQuad.div(pwIporAmountQP, ipTokenAmountQP),
+            horizontalShift
         );
 
-        bytes16 result = ABDKMathQuad.add(verticalSwitchFP, ABDKMathQuad.log_2(underLog));
+        bytes16 result = ABDKMathQuad.add(verticalShift, ABDKMathQuad.log_2(underLog));
         bytes16 resultD18 = ABDKMathQuad.mul(result, ABDKMathQuad.fromUInt(Constants.D18));
 
         return ABDKMathQuad.toUInt(resultD18);
@@ -67,7 +71,7 @@ library MiningCalculation {
         if (apu < 0) {
             uint256 absApu = IporMath.division((-apu).toUint256(), Constants.D18);
 
-            //   last unstake ipTokens we can have rounding error
+            /// @dev last unstake ipTokens we can have rounding error
             if (previousAggregatedPowerUp < absApu && previousAggregatedPowerUp + 10000 >= absApu) {
                 return 0;
             }

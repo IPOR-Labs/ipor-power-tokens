@@ -177,8 +177,8 @@ contract John is JohnInternal, IJohn {
         uint256 accountPowerUp = MiningCalculation.calculateAccountPowerUp(
             accountIndicators.delegatedPwIporBalance,
             accountIndicators.ipTokenBalance,
-            _verticalShift(),
-            _horizontalShift()
+            _getVerticalShift(),
+            _getHorizontalShift()
         );
 
         _accountIndicators[msgSender][ipToken] = JohnTypes.AccountRewardsIndicators(

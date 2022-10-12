@@ -336,8 +336,8 @@ abstract contract JohnInternal is
         uint256 accountPowerUp = MiningCalculation.calculateAccountPowerUp(
             delegatedPwIporBalance,
             ipTokenBalance,
-            _verticalShift(),
-            _horizontalShift()
+            _getVerticalShift(),
+            _getHorizontalShift()
         );
 
         _accountIndicators[account][ipToken] = JohnTypes.AccountRewardsIndicators(
@@ -456,12 +456,18 @@ abstract contract JohnInternal is
         IPowerIporInternal(_getPowerIpor()).receiveRewardsFromJohn(account, rewards);
     }
 
-    function _horizontalShift() internal pure returns (uint256) {
-        return 1000000000000000000;
+    /// @notice Gets Horizontal shift param used in Liquidity Mining equastions.
+    /// @dev To pre-calculate this value from uint256, use {MiningCalculation._toQuadruplePrecision()} method.
+    /// @return horizontal shift - value represented in bytes16, quadrupe precision, 128 bits, takes into consideration 18 decimals
+    function _getHorizontalShift() internal pure returns (bytes16) {
+        return 0x3fff0000000000000000000000000000;
     }
 
-    function _verticalShift() internal pure returns (uint256) {
-        return 400000000000000000;
+    /// @notice Gets vertical shift param used in Liquidity Mining equastions.
+    /// @dev To pre-calculate this value from uint256, use {MiningCalculation._toQuadruplePrecision()} method.
+    /// @return vertical shift - value represented in bytes16, quadrupe precision, 128 bits, takes into consideration 18 decimals
+    function _getVerticalShift() internal pure returns (bytes16) {
+        return 0x3ffd99999999999999e36310e0e2a848;
     }
 
     function _getPowerIpor() internal view returns (address) {
