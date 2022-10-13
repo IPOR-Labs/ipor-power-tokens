@@ -4,90 +4,73 @@ pragma solidity 0.8.16;
 import "../libraries/math/MiningCalculation.sol";
 
 contract MockMiningCalculation {
-    function calculateUserPowerUp(
-        uint256 pwToken,
-        uint256 ipToken,
-        uint256 verticalShift,
-        uint256 horizontalShift
-    ) public view returns (uint256) {
+    function calculateAccountPowerUp(
+        uint256 pwIporAmount,
+        uint256 ipTokenAmount,
+        bytes16 verticalShift,
+        bytes16 horizontalShift
+    ) public pure returns (uint256) {
         return
             MiningCalculation.calculateAccountPowerUp(
-                pwToken,
-                ipToken,
+                pwIporAmount,
+                ipTokenAmount,
                 verticalShift,
                 horizontalShift
             );
     }
 
-    function calculateAggregatePowerUp(
+    function calculateAggregatedPowerUp(
         uint256 userPowerUp,
-        uint256 userIpToken,
+        uint256 userIpTokenAmount,
         uint256 previousUserPowerUp,
-        uint256 previousUserIpToken,
-        uint256 previousAggregatePowerUp
-    ) public view returns (uint256) {
+        uint256 previousUserIpTokenAmount,
+        uint256 previousAggregatedPowerUp
+    ) public pure returns (uint256) {
         return
-            MiningCalculation.calculateAggregatePowerUp(
+            MiningCalculation.calculateAggregatedPowerUp(
                 userPowerUp,
-                userIpToken,
+                userIpTokenAmount,
                 previousUserPowerUp,
-                previousUserIpToken,
-                previousAggregatePowerUp
+                previousUserIpTokenAmount,
+                previousAggregatedPowerUp
             );
     }
 
     function calculateAccruedRewards(
         uint256 blocNumber,
         uint256 lastRebalanceBlockNumber,
-        uint256 blockRewards,
+        uint256 rewardsPerBlock,
         uint256 previousAccruedRewards
-    ) public view returns (uint256) {
+    ) public pure returns (uint256) {
         return
             MiningCalculation.calculateAccruedRewards(
                 blocNumber,
                 lastRebalanceBlockNumber,
-                blockRewards,
+                rewardsPerBlock,
                 previousAccruedRewards
             );
     }
 
-    function compositeMultiplier(uint256 blockRewards, uint256 aggregatePowerUp)
+    function calculateCompositeMultiplier(uint256 rewardsPerBlock, uint256 aggregatedPowerUp)
         public
-        view
+        pure
         returns (uint256)
     {
-        return MiningCalculation.compositeMultiplier(blockRewards, aggregatePowerUp);
+        return MiningCalculation.calculateCompositeMultiplier(rewardsPerBlock, aggregatedPowerUp);
     }
 
-    function compositeMultiplierCumulative(
-        uint256 lastRebalanseBlockNumber,
-        uint256 blockNumber,
-        uint256 previousCompositeMultiplierCumulative,
-        uint256 previousCompositeMultiplier,
+    function calculateAccountRewards(
+        uint256 accountIpTokenAmount,
+        uint256 accountPowerUp,
+        uint256 accountCompositeMultiplier,
         uint256 compositeMultiplier
-    ) public view returns (uint256) {
-        return
-            MiningCalculation.compositeMultiplierCumulative(
-                lastRebalanseBlockNumber,
-                blockNumber,
-                previousCompositeMultiplierCumulative,
-                previousCompositeMultiplier,
-                compositeMultiplier
-            );
-    }
-
-    function calculateUserRewards(
-        uint256 userIpTokens,
-        uint256 userPowerUp,
-        uint256 compositeMultiplier,
-        uint256 userCompositeMultiplier
-    ) public view returns (uint256) {
+    ) public pure returns (uint256) {
         return
             MiningCalculation.calculateAccountRewards(
-                userIpTokens,
-                userPowerUp,
-                compositeMultiplier,
-                userCompositeMultiplier
+                accountIpTokenAmount,
+                accountPowerUp,
+                accountCompositeMultiplier,
+                compositeMultiplier
             );
     }
 }

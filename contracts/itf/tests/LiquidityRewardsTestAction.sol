@@ -26,16 +26,23 @@ contract LiquidityRewardsTestAction {
         }
     }
 
-    function accountRewards(address account, address ipToken) external view returns (uint256) {
-        return LiquidityRewardsAgent(account).accountRewards(ipToken);
+    function calculateAccountRewards(address account, address ipToken)
+        external
+        view
+        returns (uint256)
+    {
+        return LiquidityRewardsAgent(account).calculateAccountRewards(ipToken);
     }
 
     function balanceOfDelegatedPwIpor(address account, address[] memory requestIpTokens)
         external
         view
-        returns (JohnTypes.BalanceOfDelegatedPwIpor memory)
+        returns (JohnTypes.DelegatedPwIporBalance[] memory balances)
     {
-        return LiquidityRewardsAgent(account).balanceOfDelegatedPwIpor(account, requestIpTokens);
+        balances = LiquidityRewardsAgent(account).balanceOfDelegatedPwIpor(
+            account,
+            requestIpTokens
+        );
     }
 
     function balanceOf(address account, address ipToken) external view returns (uint256) {
@@ -48,10 +55,8 @@ contract LiquidityRewardsTestAction {
         }
     }
 
-    //    interact with pwToken
-
-    function delegatedBalanceOf(address account) external view returns (uint256) {
-        return LiquidityRewardsAgent(account).delegatedBalanceOf(account);
+    function delegatedToJohnBalanceOf(address account) external view returns (uint256) {
+        return LiquidityRewardsAgent(account).delegatedToJohnBalanceOf(account);
     }
 
     function stakeIporToken(address[] memory accounts, uint256[] memory iporTokenAmounts) external {
@@ -60,32 +65,29 @@ contract LiquidityRewardsTestAction {
         }
     }
 
-    function unstakePwToken(address[] memory accounts, uint256[] memory iporTokenAmounts) external {
+    function unstakePwIpor(address[] memory accounts, uint256[] memory iporTokenAmounts) external {
         for (uint256 i = 0; i != accounts.length; i++) {
-            LiquidityRewardsAgent(accounts[i]).unstakePwToken(iporTokenAmounts[i]);
+            LiquidityRewardsAgent(accounts[i]).unstakePwIpor(iporTokenAmounts[i]);
         }
     }
 
-    function delegateToRewards(
+    function delegatePwIpor(
         address[] memory accounts,
         address[][] memory ipTokens,
         uint256[][] memory pwIporAmounts
     ) external {
         for (uint256 i = 0; i != accounts.length; i++) {
-            LiquidityRewardsAgent(accounts[i]).delegateToRewards(ipTokens[i], pwIporAmounts[i]);
+            LiquidityRewardsAgent(accounts[i]).delegatePwIpor(ipTokens[i], pwIporAmounts[i]);
         }
     }
 
-    function withdrawFromDelegation(
+    function undelegatePwIpor(
         address[] memory accounts,
-        address[] memory ipTokens,
-        uint256[] memory pwIporAmounts
+        address[][] memory ipTokens,
+        uint256[][] memory pwIporAmounts
     ) external {
         for (uint256 i = 0; i != accounts.length; i++) {
-            LiquidityRewardsAgent(accounts[i]).withdrawFromDelegation(
-                ipTokens[i],
-                pwIporAmounts[i]
-            );
+            LiquidityRewardsAgent(accounts[i]).undelegatePwIpor(ipTokens[i], pwIporAmounts[i]);
         }
     }
 
@@ -94,22 +96,22 @@ contract LiquidityRewardsTestAction {
     function depositAndWithdrawIporTokensAndIpToken(
         address account,
         address[] memory ipTokens,
-        uint256[] memory iporAmounts,
+        uint256[] memory iporTokenAmounts,
         uint256[] memory ipTokenAmounts
     ) external {
-        LiquidityRewardsAgent(account).delegateToRewards(ipTokens, iporAmounts);
+        LiquidityRewardsAgent(account).delegatePwIpor(ipTokens, iporTokenAmounts);
         LiquidityRewardsAgent(account).stakeIpToken(ipTokens[0], ipTokenAmounts[0]);
-        LiquidityRewardsAgent(account).withdrawFromDelegation(ipTokens[0], iporAmounts[0]);
+        LiquidityRewardsAgent(account).undelegatePwIpor(ipTokens, iporTokenAmounts);
         LiquidityRewardsAgent(account).unstakeIpToken(ipTokens[0], ipTokenAmounts[0]);
     }
 
     function depositIporTokensAndIpToken(
         address account,
         address[] memory ipTokens,
-        uint256[] memory iporAmounts,
+        uint256[] memory iporTokenAmounts,
         uint256[] memory ipTokenAmounts
     ) external {
-        LiquidityRewardsAgent(account).delegateToRewards(ipTokens, iporAmounts);
+        LiquidityRewardsAgent(account).delegatePwIpor(ipTokens, iporTokenAmounts);
         LiquidityRewardsAgent(account).stakeIpToken(ipTokens[0], ipTokenAmounts[0]);
     }
 }

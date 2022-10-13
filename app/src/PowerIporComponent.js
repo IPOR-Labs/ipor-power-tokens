@@ -1,20 +1,21 @@
 import React, { useState } from "react";
 import { newContextComponents } from "@drizzle/react-components";
-import { Button } from "react-bootstrap";
+import { BigNumber } from "ethers";
 
 const { ContractData, ContractForm } = newContextComponents;
 
 export default ({ drizzle, drizzleState }) => {
-    const [assets, setAssets] = useState([""]);
-    const [amounts, setAmounts] = useState(["0"]);
+    const [ipTokens, setIpTokens] = useState([""]);
+    const [pwIporAmounts, setPwIporAmounts] = useState(["0"]);
 
     return (
         <div>
             <br />
-            <h3>
+
+            <h4>
                 Ipor Token <small>{drizzle.contracts.IporToken.address}</small>
-            </h3>
-            {assets}
+            </h4>
+            {ipTokens}
             <br />
             <div className="row">
                 <table className="table" align="center">
@@ -43,7 +44,7 @@ export default ({ drizzle, drizzleState }) => {
                         <td>
                             <strong>My allowances</strong>
                             <br />
-                            <small>To PwToken</small>
+                            <small>Allowance to Power Ipor Token (pwIpor)</small>
                         </td>
                         <td>
                             <ContractData
@@ -53,7 +54,7 @@ export default ({ drizzle, drizzleState }) => {
                                 method="allowance"
                                 methodArgs={[
                                     drizzleState.accounts[0],
-                                    drizzle.contracts.PwIporToken.address,
+                                    drizzle.contracts.PowerIpor.address,
                                 ]}
                                 render={(value) => (
                                     <div>
@@ -68,7 +69,7 @@ export default ({ drizzle, drizzleState }) => {
                     <tr>
                         <td>
                             <strong>Set allowances</strong> <br />
-                            <small>PwToken: {drizzle.contracts.PwIporToken.address}</small>
+                            <small>PowerToken: {drizzle.contracts.PowerIpor.address}</small>
                         </td>
                         <td>
                             <ContractForm drizzle={drizzle} contract="IporToken" method="approve" />
@@ -76,11 +77,11 @@ export default ({ drizzle, drizzleState }) => {
                     </tr>
                     <tr>
                         <td>
-                            <strong>Transfer TOKENS to</strong>
+                            <strong>Transfer Ipor Tokens to</strong>
                             <br />
                             <small>
                                 for setup need to transfer 1000000000000000000000 ipor tokens to{" "}
-                                <br /> Liquidity Rewards {drizzle.contracts.John.address}
+                                <br /> John {drizzle.contracts.John.address}
                             </small>
                         </td>
                         <td>
@@ -95,52 +96,21 @@ export default ({ drizzle, drizzleState }) => {
                 <br />
             </div>
             <br />
-            <br />
-            <h3>
-                Power Ipor <small>{drizzle.contracts.PwIporToken.address}</small>
-            </h3>
-            <br />
+            <h4>
+                Power Ipor <small>{drizzle.contracts.PowerIpor.address}</small>
+            </h4>
             <br />
             <div className="row">
                 <table className="table" align="center">
                     <tr>
                         <td>
-                            <strong>Set John address</strong>
-                            <br />
-                            <small>John address: {drizzle.contracts.John.address}</small>
+                            <strong>Total Supply - Base Tokens</strong> <br />
                         </td>
                         <td>
                             <ContractData
                                 drizzle={drizzle}
                                 drizzleState={drizzleState}
-                                contract="PwIporToken"
-                                method="john"
-                                render={(value) =>
-                                    value !== "0x0000000000000000000000000000000000000000" ? (
-                                        value
-                                    ) : (
-                                        <b>Not setup</b>
-                                    )
-                                }
-                            />
-                            <br />
-                            <ContractForm
-                                drizzle={drizzle}
-                                contract="PwIporToken"
-                                method="setJohn"
-                            />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong>Total Supply</strong> <br />
-                            <small>(base tokens)</small>
-                        </td>
-                        <td>
-                            <ContractData
-                                drizzle={drizzle}
-                                drizzleState={drizzleState}
-                                contract="PwIporToken"
+                                contract="PowerIpor"
                                 method="totalSupplyBase"
                                 render={(value) => (
                                     <div>
@@ -154,14 +124,13 @@ export default ({ drizzle, drizzleState }) => {
                     </tr>
                     <tr>
                         <td>
-                            <strong>Total Supply</strong> <br />
-                            <small>(power tokens)</small>
+                            <strong>Total Supply - Power Ipor Tokens</strong> <br />
                         </td>
                         <td>
                             <ContractData
                                 drizzle={drizzle}
                                 drizzleState={drizzleState}
-                                contract="PwIporToken"
+                                contract="PowerIpor"
                                 method="totalSupply"
                                 render={(value) => (
                                     <div>
@@ -175,14 +144,13 @@ export default ({ drizzle, drizzleState }) => {
                     </tr>
                     <tr>
                         <td>
-                            <strong>My Balance</strong> <br />
-                            <small>(power tokens)</small>
+                            <strong>My Balance - Power Ipor Tokens</strong>
                         </td>
                         <td>
                             <ContractData
                                 drizzle={drizzle}
                                 drizzleState={drizzleState}
-                                contract="PwIporToken"
+                                contract="PowerIpor"
                                 method="balanceOf"
                                 methodArgs={[drizzleState.accounts[0]]}
                                 render={(value) => (
@@ -198,14 +166,14 @@ export default ({ drizzle, drizzleState }) => {
                     <tr>
                         <td>
                             <strong>Delegated balance</strong> <br />
-                            <small>power tokens delegated to liquidity rewards</small>
+                            <small>Power Ipor Tokens delegated to John</small>
                         </td>
                         <td>
                             <ContractData
                                 drizzle={drizzle}
                                 drizzleState={drizzleState}
-                                contract="PwIporToken"
-                                method="delegatedBalanceOf"
+                                contract="PowerIpor"
+                                method="delegatedToJohnBalanceOf"
                                 methodArgs={[drizzleState.accounts[0]]}
                                 render={(value) => (
                                     <div>
@@ -219,15 +187,15 @@ export default ({ drizzle, drizzleState }) => {
                     </tr>
                     <tr>
                         <td>
-                            <strong>Exchange Rate</strong> <br />
-                            <small>between base token and pwToken</small>
+                            <strong>Internal Exchange Rate</strong> <br />
+                            <small>between base token and Power Ipor Token (pwIpor)</small>
                         </td>
                         <td>
                             <ContractData
                                 drizzle={drizzle}
                                 drizzleState={drizzleState}
-                                contract="PwIporToken"
-                                method="exchangeRate"
+                                contract="PowerIpor"
+                                method="calculateExchangeRate"
                                 render={(value) => (
                                     <div>
                                         {value / 1000000000000000000}
@@ -240,15 +208,83 @@ export default ({ drizzle, drizzleState }) => {
                     </tr>
                     <tr>
                         <td>
-                            <strong>Withdrawal fee</strong> <br />
+                            <strong>Stake</strong>
+                            <br />
+                            <small>
+                                Stake IPOR Token into PowerIpor contract, <br />
+                                represented in 18 decimals
+                            </small>
+                        </td>
+                        <td>
+                            <ContractForm drizzle={drizzle} contract="PowerIpor" method="stake" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Unstake</strong>
+                            <br />
+                            <small>
+                                Unstake Power Ipor Token (pwIpor) from PowerIpor contract, <br />
+                                represented in 18 decimals
+                            </small>
+                        </td>
+                        <td>
+                            <ContractForm drizzle={drizzle} contract="PowerIpor" method="unstake" />
+                        </td>
+                    </tr>
+                </table>
+                <hr />
+                <h4>Power Ipor Smart Contract Configuration</h4>
+                <table className="table" align="center">
+                    <tr>
+                        <td>
+                            <strong>Set Pause Manager address</strong>
+                        </td>
+                        <td>
+                            Current Pause Manager:{" "}
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="PowerIpor"
+                                method="getPauseManager"
+                            />
+                            <br />
+                            <ContractForm
+                                drizzle={drizzle}
+                                contract="PowerIpor"
+                                method="setPauseManager"
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Set John address</strong>
+                            <br />
+                            <small>John address: {drizzle.contracts.John.address}</small>
+                        </td>
+                        <td>
+                            Current John address:{" "}
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="PowerIpor"
+                                method="getJohn"
+                            />
+                            <br />
+                            <ContractForm drizzle={drizzle} contract="PowerIpor" method="setJohn" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Unstake without cool down fee</strong> <br />
                             <small>this fee is charged during unstake</small>
                         </td>
                         <td>
                             <ContractData
                                 drizzle={drizzle}
                                 drizzleState={drizzleState}
-                                contract="PwIporToken"
-                                method="withdrawalFee"
+                                contract="PowerIpor"
+                                method="getUnstakeWithoutCooldownFee"
                                 render={(value) => (
                                     <div>
                                         {value / 10000000000000000} %
@@ -261,74 +297,134 @@ export default ({ drizzle, drizzleState }) => {
                     </tr>
                     <tr>
                         <td>
-                            <strong>Set withdrawal fee</strong> <br />
+                            <strong>Set unstake without cool down fee</strong> <br />
                             <small>represented in 18 decimals</small>
                         </td>
                         <td>
                             <ContractForm
                                 drizzle={drizzle}
-                                contract="PwIporToken"
-                                method="setWithdrawalFee"
+                                contract="PowerIpor"
+                                method="setUnstakeWithoutCooldownFee"
                             />
                         </td>
                     </tr>
+                </table>
+                <hr />
+                <h4>Delegate / undelegate Power Ipor Tokens</h4>
+
+                <table className="table" align="center">
                     <tr>
-                        <td>
-                            <strong>Stake</strong>
+                        <th scope="col"></th>
+                        <th scope="col">
+                            ipUSDT
                             <br />
-                            <small>
-                                Stake iporToken into PwIporToken contract, <br />
-                                represented in 18 decimals
-                            </small>
-                        </td>
-                        <td>
-                            <ContractForm drizzle={drizzle} contract="PwIporToken" method="stake" />
-                        </td>
+                            {drizzle.contracts.IpTokenUsdt.address}
+                        </th>
+                        <th scope="col">
+                            ipUSDC
+                            <br />
+                            {drizzle.contracts.IpTokenUsdc.address}
+                        </th>
+                        <th scope="col">
+                            ipDAI
+                            <br />
+                            {drizzle.contracts.IpTokenDai.address}
+                        </th>
                     </tr>
                     <tr>
+                        <td>Delegated balance</td>
                         <td>
-                            <strong>Unstake</strong>
-                            <br />
-                            <small>
-                                unStake pwToken into PwIporToken contract, <br />
-                                represented in 18 decimals
-                            </small>
-                        </td>
-                        <td>
-                            <ContractForm
+                            <ContractData
                                 drizzle={drizzle}
-                                contract="PwIporToken"
-                                method="unstake"
+                                drizzleState={drizzleState}
+                                contract="John"
+                                method="getAccountIndicators"
+                                methodArgs={[
+                                    drizzleState.accounts[0],
+                                    drizzle.contracts.IpTokenUsdt.address,
+                                ]}
+                                render={(value) => {
+                                    return (
+                                        <span>
+                                            {value.delegatedPwIporBalance / 1000000000000000000}
+                                            <br />
+                                            {value.delegatedPwIporBalance}
+                                        </span>
+                                    );
+                                }}
+                            />
+                        </td>
+                        <td>
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="John"
+                                method="getAccountIndicators"
+                                methodArgs={[
+                                    drizzleState.accounts[0],
+                                    drizzle.contracts.IpTokenUsdc.address,
+                                ]}
+                                render={(value) => {
+                                    return (
+                                        <span>
+                                            {value.delegatedPwIporBalance / 1000000000000000000}
+                                            <br />
+                                            {value.delegatedPwIporBalance}
+                                        </span>
+                                    );
+                                }}
+                            />
+                        </td>
+                        <td>
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="John"
+                                method="getAccountIndicators"
+                                methodArgs={[
+                                    drizzleState.accounts[0],
+                                    drizzle.contracts.IpTokenDai.address,
+                                ]}
+                                render={(value) => {
+                                    return (
+                                        <span>
+                                            {value.delegatedPwIporBalance / 1000000000000000000}
+                                            <br />
+                                            {value.delegatedPwIporBalance}
+                                        </span>
+                                    );
+                                }}
                             />
                         </td>
                     </tr>
+                </table>
+                <table className="table" align="center">
                     <tr style={{ padding: "1em" }}>
                         <td>
-                            <strong>Delegate power ipor to John</strong> <br />
-                            Assets: <br />
+                            <strong>Delegate Power Ipor Token (pwIpor) to John</strong> <br />
                             <small>
-                                ipUsdt: {drizzle.contracts.IpTokenUsdt.address}, <br />
-                                ipUsdc: {drizzle.contracts.IpTokenUsdc.address}, <br />
-                                ipDai: {drizzle.contracts.IpTokenDai.address}, <br />
-                                amounts represented in 18 decimals, <br />
-                                example for two assets: <br />
-                                assets:
-                                {drizzle.contracts.IpTokenUsdt.address},
-                                {drizzle.contracts.IpTokenUsdc.address}
-                                <br />
-                                amounts: 10000000000000000000,20000000000000000000
+                                Amounts represented in 18 decimals. <br />
                             </small>
+                            <div align="left">
+                                <small>
+                                    Example for two IP Tokens: <br />
+                                    IpTokens: {drizzle.contracts.IpTokenUsdt.address},
+                                    {drizzle.contracts.IpTokenUsdc.address}
+                                    <br />
+                                    Amounts: 10000000000000000000,20000000000000000000
+                                </small>
+                            </div>
                         </td>
                         <td>
                             <tr style={{ border: "none" }}>
                                 <td>
-                                    <label htmlFor="Assets"> Assets: </label>
+                                    <label htmlFor="IpTokens"> IpTokens: </label>
                                 </td>
                                 <td style={{ border: "none", padding: "1em" }}>
                                     <input
-                                        id="assets"
-                                        value={assets.join(",")}
-                                        onChange={(e) => setAssets(e.target.value.split(","))}
+                                        id="IpTokens"
+                                        value={ipTokens.join(",")}
+                                        onChange={(e) => setIpTokens(e.target.value.split(","))}
                                     />
                                 </td>
                             </tr>
@@ -339,13 +435,14 @@ export default ({ drizzle, drizzleState }) => {
                                 <td style={{ border: "none", padding: "1em" }}>
                                     <input
                                         id="amounts"
-                                        value={amounts.map((e) => e.toString()).join(",")}
-                                        onChange={(e) =>
-                                            setAmounts(
-                                                e.target.value.split(",")
-                                                // .map((a) => (a != "" ? BigNumber.from(a) : ""))
-                                            )
-                                        }
+                                        value={pwIporAmounts.map((e) => e.toString()).join(",")}
+                                        onChange={(e) => {
+                                            setPwIporAmounts(
+                                                e.target.value
+                                                    .split(",")
+                                                    .map((a) => (a != "" ? BigNumber.from(a) : ""))
+                                            );
+                                        }}
                                     />
                                 </td>
                             </tr>
@@ -353,11 +450,11 @@ export default ({ drizzle, drizzleState }) => {
                         <td>
                             <ContractForm
                                 drizzle={drizzle}
-                                contract="PwIporToken"
-                                method="delegateToRewards"
+                                contract="PowerIpor"
+                                method="delegateToJohn"
                                 render={({ handleSubmit, inputs, state, handleInputChange }) => {
-                                    state["assets"] = assets;
-                                    state["amounts"] = amounts;
+                                    state["ipTokens"] = ipTokens;
+                                    state["pwIporAmounts"] = pwIporAmounts;
                                     return (
                                         <div>
                                             <form
@@ -381,81 +478,21 @@ export default ({ drizzle, drizzleState }) => {
                     </tr>
                     <tr>
                         <td>
-                            <strong>Withdraw power ipor from John</strong> <br />
-                            Assets: <br />
-                            <small>
-                                ipUsdt: {drizzle.contracts.IpTokenUsdt.address}, delegated balance{" "}
-                                <br />
-                                <ContractData
-                                    drizzle={drizzle}
-                                    drizzleState={drizzleState}
-                                    contract="John"
-                                    method="userParams"
-                                    methodArgs={[drizzle.contracts.IpTokenUsdt.address]}
-                                    render={(value) => {
-                                        return (
-                                            <span>
-                                                {value[3] / 1000000000000000000} - {value[3]}{" "}
-                                            </span>
-                                        );
-                                    }}
-                                />
-                                <br />
-                                ipUsdc: {drizzle.contracts.IpTokenUsdc.address}, delegated balance{" "}
-                                <br />
-                                <ContractData
-                                    drizzle={drizzle}
-                                    drizzleState={drizzleState}
-                                    contract="John"
-                                    method="userParams"
-                                    methodArgs={[drizzle.contracts.IpTokenUsdc.address]}
-                                    render={(value) => {
-                                        return (
-                                            <span>
-                                                {value[3] / 1000000000000000000} - {value[3]}{" "}
-                                            </span>
-                                        );
-                                    }}
-                                />
-                                <br />
-                                ipDai: {drizzle.contracts.IpTokenDai.address}, delegated balance{" "}
-                                <br />
-                                <ContractData
-                                    drizzle={drizzle}
-                                    drizzleState={drizzleState}
-                                    contract="John"
-                                    method="userParams"
-                                    methodArgs={[drizzle.contracts.IpTokenDai.address]}
-                                    render={(value) => {
-                                        return (
-                                            <span>
-                                                {value[3] / 1000000000000000000} - {value[3]}{" "}
-                                            </span>
-                                        );
-                                    }}
-                                />
-                                <br />
-                                amounts represented in 18 decimals
-                            </small>
+                            <strong>Undelegate Power Ipor Token (pwIpor) from John</strong>
                         </td>
                         <td>
                             <ContractForm
                                 drizzle={drizzle}
-                                contract="PwIporToken"
-                                method="withdrawFromDelegation"
+                                contract="PowerIpor"
+                                method="undelegateFromJohn"
                             />
                         </td>
                     </tr>
                 </table>
             </div>
+            <hr />
+            <h4>Cool down</h4>
 
-            <br />
-            <br />
-            <h3>
-                <small>Cool down</small>
-            </h3>
-            <br />
-            <br />
             <div className="row">
                 <table className="table" align="center">
                     <tr>
@@ -466,8 +503,9 @@ export default ({ drizzle, drizzleState }) => {
                             <ContractData
                                 drizzle={drizzle}
                                 drizzleState={drizzleState}
-                                contract="PwIporToken"
-                                method="activeCoolDown"
+                                contract="PowerIpor"
+                                method="getActiveCoolDown"
+                                methodArgs={[drizzleState.accounts[0]]}
                                 render={(value) => (
                                     <div>
                                         <table>
@@ -503,14 +541,14 @@ export default ({ drizzle, drizzleState }) => {
                         <td>
                             <strong>Set cool down</strong> <br />
                             <small>
-                                Amount of pwTokens to cool down, <brr />
+                                Amount of Power Ipor Tokens (pwIpor) to cool down, <brr />
                                 represented in 18 decimals
                             </small>
                         </td>
                         <td>
                             <ContractForm
                                 drizzle={drizzle}
-                                contract="PwIporToken"
+                                contract="PowerIpor"
                                 method="coolDown"
                             />
                         </td>
@@ -522,7 +560,7 @@ export default ({ drizzle, drizzleState }) => {
                         <td>
                             <ContractForm
                                 drizzle={drizzle}
-                                contract="PwIporToken"
+                                contract="PowerIpor"
                                 method="cancelCoolDown"
                             />
                         </td>
@@ -534,11 +572,7 @@ export default ({ drizzle, drizzleState }) => {
                             <small>Could be execute when cool down finish</small>
                         </td>
                         <td>
-                            <ContractForm
-                                drizzle={drizzle}
-                                contract="PwIporToken"
-                                method="redeem"
-                            />
+                            <ContractForm drizzle={drizzle} contract="PowerIpor" method="redeem" />
                         </td>
                     </tr>
                 </table>

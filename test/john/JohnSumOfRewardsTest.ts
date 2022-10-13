@@ -4,14 +4,14 @@ import chai from "chai";
 import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { John, IporToken, PwIporToken } from "../../types";
+import { John, IporToken, PowerIpor } from "../../types";
 import {
     Tokens,
     getDeployedTokens,
-    extractGlobalParam,
-    expectGlobalParam,
-    expectUserParam,
-    extractMyParam,
+    extractGlobalIndicators,
+    expectGlobalIndicators,
+    expectAccountIndicators,
+    extractAccountIndicators,
 } from "../utils/JohnUtils";
 import {
     N1__0_18DEC,
@@ -23,12 +23,12 @@ import {
 chai.use(solidity);
 const { expect } = chai;
 
-describe("John claim", () => {
+describe("John sum of rewards", () => {
     let tokens: Tokens;
     let john: John;
     let admin: Signer, userOne: Signer, userTwo: Signer, userThree: Signer;
     let iporToken: IporToken;
-    let pwIporToken: PwIporToken;
+    let powerIpor: PowerIpor;
 
     before(async () => {
         [admin, userOne, userTwo, userThree] = await hre.ethers.getSigners();
@@ -43,13 +43,13 @@ describe("John claim", () => {
             "IPOR",
             await admin.getAddress()
         )) as IporToken;
-        const PwIporToken = await hre.ethers.getContractFactory("PwIporToken");
-        pwIporToken = (await upgrades.deployProxy(PwIporToken, [iporToken.address])) as PwIporToken;
+        const PowerIpor = await hre.ethers.getContractFactory("PowerIpor");
+        powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
 
         const John = await hre.ethers.getContractFactory("John");
         john = (await upgrades.deployProxy(John, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
-            pwIporToken.address,
+            powerIpor.address,
             iporToken.address,
         ])) as John;
 
@@ -65,10 +65,10 @@ describe("John claim", () => {
         await tokens.ipTokenUsdt.connect(userOne).approve(john.address, TOTAL_SUPPLY_6_DECIMALS);
         await tokens.ipTokenUsdt.connect(userTwo).approve(john.address, TOTAL_SUPPLY_6_DECIMALS);
 
-        await iporToken.approve(pwIporToken.address, TOTAL_SUPPLY_18_DECIMALS);
-        await iporToken.connect(userOne).approve(pwIporToken.address, TOTAL_SUPPLY_18_DECIMALS);
+        await iporToken.approve(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
+        await iporToken.connect(userOne).approve(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
 
-        await iporToken.connect(userTwo).approve(pwIporToken.address, TOTAL_SUPPLY_18_DECIMALS);
+        await iporToken.connect(userTwo).approve(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
         await iporToken.transfer(
             await userOne.getAddress(),
             N1__0_18DEC.mul(BigNumber.from("10000"))
@@ -78,13 +78,13 @@ describe("John claim", () => {
             N1__0_18DEC.mul(BigNumber.from("10000"))
         );
         await iporToken.transfer(john.address, N1__0_18DEC.mul(BigNumber.from("100000")));
-        await pwIporToken.setJohn(john.address);
+        await powerIpor.setJohn(john.address);
     });
 
     it("Should not claim when no stake ipTokens", async () => {
         //    given
         //    when
-        await expect(john.claim(tokens.ipTokenDai.address)).to.be.revertedWith("IPOR_708");
+        await expect(john.claim(tokens.ipTokenDai.address)).to.be.revertedWith("IPOR_709");
     });
 
     it("Should unstake all ipTokens", async () => {
@@ -92,38 +92,42 @@ describe("John claim", () => {
         const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
 
-        await pwIporToken.connect(userOne).stake(delegatedIporToken);
+        await powerIpor.connect(userOne).stake(delegatedIporToken);
 
-        await pwIporToken
+        await powerIpor
             .connect(userOne)
-            .delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
 
-        const pwIporTokenBalanceBefore = await pwIporToken
+        const pwIporBalanceBefore = await powerIpor
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
         await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokens);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
-        const globalParamsBefore = await john.globalParams(tokens.ipTokenDai.address);
-        const userParamsBefore = await john
-            .connect(userOne)
-            .accountParams(tokens.ipTokenDai.address);
+        const globalIndicatorsBefore = await john.getGlobalIndicators(tokens.ipTokenDai.address);
+        const userParamsBefore = await john.getAccountIndicators(
+            await userOne.getAddress(),
+            tokens.ipTokenDai.address
+        );
         const ipTokenBalanceBefore = await tokens.ipTokenDai.balanceOf(await userOne.getAddress());
+
         //    when
         await john.connect(userOne).unstake(tokens.ipTokenDai.address, stakedIpTokens);
-        //    then
-        const globalParamsAfter = await john.globalParams(tokens.ipTokenDai.address);
-        const userParamsAfter = await john
-            .connect(userOne)
-            .accountParams(tokens.ipTokenDai.address);
+        
+		//    then
+        const globalIndicatorsAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
+        const userParamsAfter = await john.getAccountIndicators(
+            await userOne.getAddress(),
+            tokens.ipTokenDai.address
+        );
         const ipTokenBalanceAfter = await tokens.ipTokenDai.balanceOf(await userOne.getAddress());
 
-        const pwIporTokenBalanceAfter = await pwIporToken
+        const pwIporBalanceAfter = await powerIpor
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
-        expectGlobalParam(
-            extractGlobalParam(globalParamsBefore),
+        expectGlobalIndicators(
+            extractGlobalIndicators(globalIndicatorsBefore),
             BigNumber.from("140000000000000000000"),
             ZERO,
             BigNumber.from("7142857142857142857142857"),
@@ -131,8 +135,8 @@ describe("John claim", () => {
             -1,
             100000000
         );
-        expectGlobalParam(
-            extractGlobalParam(globalParamsAfter),
+        expectGlobalIndicators(
+            extractGlobalIndicators(globalIndicatorsAfter),
             ZERO,
             BigNumber.from("101000000000000000000"),
             ZERO,
@@ -141,25 +145,25 @@ describe("John claim", () => {
             100000000
         );
 
-        expectUserParam(
-            extractMyParam(userParamsBefore),
+        expectAccountIndicators(
+            extractAccountIndicators(userParamsBefore),
             BigNumber.from("1400000000000000000"),
             ZERO,
             BigNumber.from("100000000000000000000"),
             BigNumber.from("100000000000000000000")
         );
 
-        expectUserParam(
-            extractMyParam(userParamsAfter),
+        expectAccountIndicators(
+            extractAccountIndicators(userParamsAfter),
             ZERO, //powerUp
             BigNumber.from("721428571428571428571428557"), //Cumulative
             ZERO, // ipToken
-            BigNumber.from("100000000000000000000") //pwToken
+            BigNumber.from("100000000000000000000") //pwIpor
         );
         expect(ipTokenBalanceBefore).to.be.eq(BigNumber.from("999900000000000000000000"));
         expect(ipTokenBalanceAfter).to.be.eq(BigNumber.from("1000000000000000000000000"));
-        expect(pwIporTokenBalanceBefore).to.be.equal(BigNumber.from("100000000000000000000"));
-        expect(pwIporTokenBalanceAfter).to.be.equal(BigNumber.from("201000000000000000000"));
+        expect(pwIporBalanceBefore).to.be.equal(BigNumber.from("100000000000000000000"));
+        expect(pwIporBalanceAfter).to.be.equal(BigNumber.from("201000000000000000000"));
     });
 
     it("Should unstake 3 users", async () => {
@@ -167,25 +171,28 @@ describe("John claim", () => {
         const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
 
+        const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+
         // Admin
-        await pwIporToken.stake(delegatedIporToken);
-        await pwIporToken.delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
+        await powerIpor.stake(delegatedIporToken);
+        await powerIpor.delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
         await john.stake(tokens.ipTokenDai.address, stakedIpTokens);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
         // UserOne
-        await pwIporToken.connect(userOne).stake(delegatedIporToken);
-        await pwIporToken
+        await powerIpor.connect(userOne).stake(delegatedIporToken);
+        await powerIpor
             .connect(userOne)
-            .delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
         await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokens);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
         // UserTwo
-        await pwIporToken.connect(userTwo).stake(delegatedIporToken);
-        await pwIporToken
+        await powerIpor.connect(userTwo).stake(delegatedIporToken);
+        await powerIpor
             .connect(userTwo)
-            .delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
         await john.connect(userTwo).stake(tokens.ipTokenDai.address, stakedIpTokens);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
@@ -194,9 +201,12 @@ describe("John claim", () => {
         await john.connect(userOne).unstake(tokens.ipTokenDai.address, stakedIpTokens);
         await john.connect(userTwo).unstake(tokens.ipTokenDai.address, stakedIpTokens);
         //    then
-        const globalParamsAfter = await john.globalParams(tokens.ipTokenDai.address);
-        expectGlobalParam(
-            extractGlobalParam(globalParamsAfter),
+        const globalIndicatorsAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
+        const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+
+        expectGlobalIndicators(
+            extractGlobalIndicators(globalIndicatorsAfter),
             ZERO,
             BigNumber.from("309000000000000000000"),
             ZERO,
@@ -205,24 +215,37 @@ describe("John claim", () => {
             100000000
         );
 
-        const rewardsAdmin = await john.accountRewards(tokens.ipTokenDai.address);
-        const rewardsUserOne = await john
-            .connect(userOne)
-            .accountRewards(tokens.ipTokenDai.address);
-        const rewardsUserTwo = await john
-            .connect(userTwo)
-            .accountRewards(tokens.ipTokenDai.address);
+        const rewardsAdmin = await john.calculateAccountRewards(
+            await admin.getAddress(),
+            tokens.ipTokenDai.address
+        );
+        const rewardsUserOne = await john.calculateAccountRewards(
+            await userOne.getAddress(),
+            tokens.ipTokenDai.address
+        );
+        const rewardsUserTwo = await john.calculateAccountRewards(
+            await userTwo.getAddress(),
+            tokens.ipTokenDai.address
+        );
         expect(rewardsAdmin.add(rewardsUserOne).add(rewardsUserTwo)).to.be.equal(ZERO);
+
+        expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore);
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore.add(BigNumber.from("609000000000000000001"))
+        );
     });
 
-    it("Should aggregate powerUp should be zero", async () => {
+    it("Should aggregate powerUp be equal zero", async () => {
         //    given
         const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
 
+        const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+
         // Admin
-        await pwIporToken.stake(delegatedIporToken);
-        await pwIporToken.delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
+        await powerIpor.stake(delegatedIporToken);
+        await powerIpor.delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
         await john.stake(tokens.ipTokenDai.address, N1__0_18DEC.mul(BigNumber.from("100")));
         await hre.network.provider.send("hardhat_mine", ["0x20"]);
         await john.stake(tokens.ipTokenDai.address, N1__0_18DEC.mul(BigNumber.from("20")));
@@ -231,10 +254,10 @@ describe("John claim", () => {
         await hre.network.provider.send("hardhat_mine", ["0x20"]);
 
         // UserOne
-        await pwIporToken.connect(userOne).stake(delegatedIporToken);
-        await pwIporToken
+        await powerIpor.connect(userOne).stake(delegatedIporToken);
+        await powerIpor
             .connect(userOne)
-            .delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
         await john
             .connect(userOne)
             .stake(tokens.ipTokenDai.address, N1__0_18DEC.mul(BigNumber.from("100")));
@@ -250,10 +273,10 @@ describe("John claim", () => {
         await hre.network.provider.send("hardhat_mine", ["0x20"]);
 
         // UserTwo
-        await pwIporToken.connect(userTwo).stake(delegatedIporToken);
-        await pwIporToken
+        await powerIpor.connect(userTwo).stake(delegatedIporToken);
+        await powerIpor
             .connect(userTwo)
-            .delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
         await john
             .connect(userTwo)
             .stake(tokens.ipTokenDai.address, N1__0_18DEC.mul(BigNumber.from("60")));
@@ -286,8 +309,15 @@ describe("John claim", () => {
             .connect(userTwo)
             .unstake(tokens.ipTokenDai.address, N1__0_18DEC.mul(BigNumber.from("20")));
         //    then
-        const globalParamsAfter = await john.globalParams(tokens.ipTokenDai.address);
-        expect(extractGlobalParam(globalParamsAfter).aggregatePowerUp).to.be.equal(ZERO);
+
+        const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+        const globalIndicatorsAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
+        expect(extractGlobalIndicators(globalIndicatorsAfter).aggregatedPowerUp).to.be.equal(ZERO);
+        expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore);
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore.add(BigNumber.from("813").mul(N1__0_18DEC))
+        );
     });
 
     it("Should not add rewards when no ipToken was stake", async () => {
@@ -295,13 +325,16 @@ describe("John claim", () => {
         const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
 
-        const accruedRewardsBefore = await john.accruedRewards(tokens.ipTokenDai.address);
-        await pwIporToken.connect(userOne).stake(delegatedIporToken);
-        await pwIporToken
-            .connect(userOne)
-            .delegateToRewards([tokens.ipTokenDai.address], [delegatedIporToken]);
+        const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
 
-        const pwIporTokenBalanceBefore = await pwIporToken
+        const accruedRewardsBefore = await john.calculateAccruedRewards(tokens.ipTokenDai.address);
+        await powerIpor.connect(userOne).stake(delegatedIporToken);
+        await powerIpor
+            .connect(userOne)
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedIporToken]);
+
+        const pwIporBalanceBefore = await powerIpor
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
@@ -309,30 +342,39 @@ describe("John claim", () => {
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
         await john.connect(userOne).unstake(tokens.ipTokenDai.address, stakedIpTokens);
 
-        const accruedRewardsAfter1Unstake = await john.accruedRewards(tokens.ipTokenDai.address);
-        const pwIporTokenBalanceAfter1Unstake = await pwIporToken
+        const accruedRewardsAfter1Unstake = await john.calculateAccruedRewards(
+            tokens.ipTokenDai.address
+        );
+        const pwIporBalanceAfter1Unstake = await powerIpor
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
-        const accruedRewardsAfter1UnstakePlus100Mine = await john.accruedRewards(
+        const accruedRewardsAfter1UnstakePlus100Mine = await john.calculateAccruedRewards(
             tokens.ipTokenDai.address
         );
         await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokens);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
         await john.connect(userOne).unstake(tokens.ipTokenDai.address, stakedIpTokens);
-        const accruedRewardsAfter2Unstake = await john.accruedRewards(tokens.ipTokenDai.address);
+        const accruedRewardsAfter2Unstake = await john.calculateAccruedRewards(
+            tokens.ipTokenDai.address
+        );
 
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
-        const accruedRewardsAfter2UnstakePlus100Mine = await john.accruedRewards(
+        const accruedRewardsAfter2UnstakePlus100Mine = await john.calculateAccruedRewards(
             tokens.ipTokenDai.address
         );
 
         //    then
 
-        const accountRewardsAfter = await john.accountRewards(tokens.ipTokenDai.address);
-        const pwIporTokenBalanceAfter = await pwIporToken
+        const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+        const accountRewardsAfter = await john.calculateAccountRewards(
+            await admin.getAddress(),
+            tokens.ipTokenDai.address
+        );
+        const pwIporBalanceAfter = await powerIpor
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
@@ -346,11 +388,13 @@ describe("John claim", () => {
             BigNumber.from("202000000000000000000")
         );
 
-        expect(pwIporTokenBalanceBefore).to.be.equal(BigNumber.from("100000000000000000000"));
-        expect(pwIporTokenBalanceAfter1Unstake).to.be.equal(
-            BigNumber.from("201000000000000000000")
-        );
-        expect(pwIporTokenBalanceAfter).to.be.equal(BigNumber.from("302000000000000000000"));
+        expect(pwIporBalanceBefore).to.be.equal(BigNumber.from("100000000000000000000"));
+        expect(pwIporBalanceAfter1Unstake).to.be.equal(BigNumber.from("201000000000000000000"));
+        expect(pwIporBalanceAfter).to.be.equal(BigNumber.from("302000000000000000000"));
         expect(accountRewardsAfter).to.be.equal(ZERO);
+        expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore);
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore.add(BigNumber.from("302").mul(N1__0_18DEC))
+        );
     });
 });

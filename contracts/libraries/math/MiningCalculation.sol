@@ -7,126 +7,179 @@ import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import "../errors/MiningErrors.sol";
 import "../Constants.sol";
 import "./IporMath.sol";
-import "hardhat/console.sol";
 
+/// @title Library which contains core logic used in Liquidity Mining module.
 library MiningCalculation {
     using SafeCast for uint256;
     using SafeCast for int256;
 
+    /// @notice Calculases Power Up Indicator specific for one account.
+    /// @param accountPwIporAmount account's Power Ipor Tokens amount
+    /// @param accountIpTokenAmount account's IP Tokens Amount
+    /// @param verticalShift preconfigured param, vertical shift used in equation which calculate account power up indicator
+    /// @param horizontalShift preconfigured param, horizontal shift used in equation which calculate account power up indicator
+    /// @return power up indicator for a given account
     function calculateAccountPowerUp(
-        uint256 pwToken,
-        uint256 ipToken,
-        uint256 verticalShift,
-        uint256 horizontalShift
-    ) internal view returns (uint256) {
-        if (ipToken == 0) {
+        uint256 accountPwIporAmount,
+        uint256 accountIpTokenAmount,
+        bytes16 verticalShift,
+        bytes16 horizontalShift
+    ) internal pure returns (uint256) {
+        /// @dev Account's staked IP Tokens have to be >= 1
+        if (accountIpTokenAmount < Constants.D18) {
             return 0;
         }
-        bytes16 pwTokenFP = _toFixedPoint(pwToken, Constants.D18);
-        bytes16 ipTokenFP = _toFixedPoint(ipToken, Constants.D18);
-        bytes16 verticalSwitchFP = _toFixedPoint(verticalShift, Constants.D18);
-        bytes16 horizontalSwitchFP = _toFixedPoint(horizontalShift, Constants.D18);
+
+        bytes16 pwIporAmountQP = _toQuadruplePrecision(accountPwIporAmount, Constants.D18);
+        bytes16 ipTokenAmountQP = _toQuadruplePrecision(accountIpTokenAmount, Constants.D18);
 
         bytes16 underLog = ABDKMathQuad.add(
-            ABDKMathQuad.div(pwTokenFP, ipTokenFP),
-            horizontalSwitchFP
+            ABDKMathQuad.div(pwIporAmountQP, ipTokenAmountQP),
+            horizontalShift
         );
 
-        bytes16 result = ABDKMathQuad.add(verticalSwitchFP, ABDKMathQuad.log_2(underLog));
+        bytes16 result = ABDKMathQuad.add(verticalShift, ABDKMathQuad.log_2(underLog));
         bytes16 resultD18 = ABDKMathQuad.mul(result, ABDKMathQuad.fromUInt(Constants.D18));
+
         return ABDKMathQuad.toUInt(resultD18);
     }
 
-    function calculateAggregatePowerUp(
+    /// @notice Calculates aggreagated power up based on predefined in specification equation.
+    /// @param accountPowerUp power up indicator calculated for a given account
+    /// @param accountIpTokenAmount IP Token amount for a given account
+    /// @param previousAccountPowerUp previous power up indicator for a given account
+    /// @param previousAccountIpTokenAmount previous IP Token amount for a given account
+    /// @param previousAggregatedPowerUp previous aggregated power up indicator
+    function calculateAggregatedPowerUp(
         uint256 accountPowerUp,
-        uint256 accountIpToken,
+        uint256 accountIpTokenAmount,
         uint256 previousAccountPowerUp,
-        uint256 previousAccountIpToken,
-        uint256 previousAggregatePowerUp
-    ) internal view returns (uint256) {
+        uint256 previousAccountIpTokenAmount,
+        uint256 previousAggregatedPowerUp
+    ) internal pure returns (uint256) {
         int256 apu = accountPowerUp.toInt256() *
-            accountIpToken.toInt256() -
+            accountIpTokenAmount.toInt256() -
             previousAccountPowerUp.toInt256() *
-            previousAccountIpToken.toInt256();
+            previousAccountIpTokenAmount.toInt256();
+
+        uint256 newApu;
 
         if (apu < 0) {
             uint256 absApu = IporMath.division((-apu).toUint256(), Constants.D18);
-            //   last unstake ipTokens we can have rounding error
-            if (previousAggregatePowerUp < absApu && previousAggregatePowerUp + 100 >= absApu) {
+
+            /// @dev last unstake ipTokens we can have rounding error
+            if (previousAggregatedPowerUp < absApu && previousAggregatedPowerUp + 10000 >= absApu) {
                 return 0;
             }
+
             require(
-                previousAggregatePowerUp >= absApu,
+                previousAggregatedPowerUp >= absApu,
                 MiningErrors.AGGREGATE_POWER_UP_COULD_NOT_BE_NEGATIVE
             );
-            return previousAggregatePowerUp - absApu;
+
+            newApu = previousAggregatedPowerUp - absApu;
+        } else {
+            newApu = previousAggregatedPowerUp + IporMath.division(apu.toUint256(), Constants.D18);
         }
-        return previousAggregatePowerUp + IporMath.division(apu.toUint256(), Constants.D18);
+
+        if (newApu < 10000) {
+            return 0;
+        }
+        return newApu;
     }
 
+    /// @notice Calculates rewards from last rebalancing including block number given as a param.
+    /// @param blockNumber blok number for which is executed rewards calculation
+    /// @param lastRebalanceBlockNumber blok number when last rewards rebalance was executed
+    /// @param rewardsPerBlock configuration param describes how many Ipor Tokens are rewarded across all participants per one block, represendet in 8 decimals
+    /// @param previousAccruedRewards number of previous cumulated/accrued rewards
+    /// @return new accrued rewards, number of Ipor Tokens (or Power Ipor Tokens because are in relation 1:1 with Ipor Tokens) accrued for given above params
     function calculateAccruedRewards(
-        uint256 blocNumber,
+        uint256 blockNumber,
         uint256 lastRebalanceBlockNumber,
-        uint256 blockRewards,
+        uint256 rewardsPerBlock,
         uint256 previousAccruedRewards
-    ) internal view returns (uint256) {
+    ) internal pure returns (uint256) {
         require(
-            blocNumber >= lastRebalanceBlockNumber,
-            MiningErrors.BLOCK_NUMBER_GREATER_OR_EQUAL_THAN_PREVIOUS_BLOCK_NUMBER
+            blockNumber >= lastRebalanceBlockNumber,
+            MiningErrors.BLOCK_NUMBER_LOWER_THAN_PREVIOUS_BLOCK_NUMBER
         );
-        uint256 newRewards = (blocNumber - lastRebalanceBlockNumber) * blockRewards * Constants.D10;
+        uint256 newRewards = (blockNumber - lastRebalanceBlockNumber) *
+            rewardsPerBlock *
+            Constants.D10;
         return previousAccruedRewards + newRewards;
     }
 
-    // returns value with 27 decimals
-    function compositeMultiplierCumulative(
-        uint256 lastRebalanseBlockNumber,
-        uint256 blockNumber,
-        uint256 previousCompositeMultiplierCumulative,
-        uint256 previousCompositeMultiplier,
-        uint256 compositeMultiplier
-    ) internal view returns (uint256) {
-        if (blockNumber == lastRebalanseBlockNumber) {
-            return previousCompositeMultiplierCumulative;
-        }
-        return
-            (blockNumber - lastRebalanseBlockNumber - 1) *
-            previousCompositeMultiplier +
-            previousCompositeMultiplierCumulative +
-            compositeMultiplier;
-    }
-
-    // returns value with 27 decimals
-    function compositeMultiplier(uint256 blockRewards, uint256 aggregatePowerUp)
+    /// @notice Calculates Composite Multiplier Indicator
+    /// @param rewardsPerBlock config param, number of Ipor Tokens (or Power Ipor Tokens because in 1:1 relation with Ipor Tokens) rewardes across all participants in one block, represented in 8 decimals
+    /// @param aggregatedPowerUp Aggregated Power Up indicator, represented in 18 decimals
+    /// @return composite multiplier, value represented in 27 decimals
+    function calculateCompositeMultiplier(uint256 rewardsPerBlock, uint256 aggregatedPowerUp)
         internal
-        view
+        pure
         returns (uint256)
     {
-        if (aggregatePowerUp == 0) {
+        if (aggregatedPowerUp == 0) {
             return 0;
         }
-        return IporMath.division(blockRewards * Constants.D18 * Constants.D19, aggregatePowerUp);
+        /// @dev decimals: 8 + 18 + 19 - 18 = 27
+        return
+            IporMath.division(rewardsPerBlock * Constants.D18 * Constants.D19, aggregatedPowerUp);
     }
 
+    /// @notice calculates account rewards represented in Ipor Tokens
+    /// @dev Account rewards can be also interpreted as a value in Power Ipor Tokens, because ration between Ipor Tokens and Power Ipor Tokens is 1:1.
+    /// @param accountIpTokenAmount amount of ipToken for a given account
+    /// @param accountPowerUp value of powerUp indicator for a given account
+    /// @param accountCompMultiplierCumulativePrevBlock Account Composite Multiplier Cumulative for a Previous Block, value from last Account Indicator update of param Composite Multiplier Cumulative for a given account
+    /// @param accruedCompMultiplierCumulativePrevBlock Accrued Composite Multiplier Cumulative for a Previous Block, accrued value (in a current block) of param Composite Multiplier Cumulative global
+    /// @return rewards, amount of Ipor Tokens (or Power Ipor Tokens because are in 1:1 relation with Ipor Tokens), represented in 18 decimals
     function calculateAccountRewards(
-        uint256 accountIpTokens,
+        uint256 accountIpTokenAmount,
         uint256 accountPowerUp,
-        uint256 compositeMultiplierCumulative,
-        uint256 accountCompositeMultiplierCumulative
-    ) internal view returns (uint256) {
+        uint256 accountCompMultiplierCumulativePrevBlock,
+        uint256 accruedCompMultiplierCumulativePrevBlock
+    ) internal pure returns (uint256) {
+        /// @dev Composit Multiplier Cumulative for Prev Block stored in Account structure cannot be greater than the newest accrued global
+        /// Composite Multiplier Cumulative for Prev Block
         require(
-            compositeMultiplierCumulative >= accountCompositeMultiplierCumulative,
-            MiningErrors.COMPOSITE_MULTIPLIER_GREATER_OR_EQUAL_THAN_ACCOUNT_COMPOSITE_MULTIPLIER
+            accruedCompMultiplierCumulativePrevBlock >= accountCompMultiplierCumulativePrevBlock,
+            MiningErrors.ACCOUNT_COMPOSITE_MULTIPLIER_GT_COMPOSITE_MULTIPLIER
         );
-        uint256 accountRewards = accountIpTokens *
+
+        uint256 accountIporTokenRewards = accountIpTokenAmount *
             accountPowerUp *
-            (compositeMultiplierCumulative - accountCompositeMultiplierCumulative);
-        return IporMath.division(accountRewards, Constants.D45);
+            (accruedCompMultiplierCumulativePrevBlock - accountCompMultiplierCumulativePrevBlock);
+
+        /// @dev decimals: 18 + 18 + 27 - 45 =  18
+        return IporMath.division(accountIporTokenRewards, Constants.D45);
     }
 
-    function _toFixedPoint(uint256 number, uint256 decimals) internal view returns (bytes16) {
+    /// @notice Calculates accrued Composite Multiplier Cumulative for a previous block
+    /// @param currentBlockNumber Current block number
+    /// @param globalIndBlockNumber Block number of last update of Global Indicators
+    /// @param globalIndCompositeMultiplierInTheBlock Configuration param = Composite Multiplier for one block defined in Global Indicators
+    /// @param globalIndCompositeMultiplierCumulativePrevBlock Compositne Multiplier Comulative for a previous block defined in Global Indicators structure.
+    function calculateAccruedCompMultiplierCumulativePrevBlock(
+        uint256 currentBlockNumber,
+        uint256 globalIndBlockNumber,
+        uint256 globalIndCompositeMultiplierInTheBlock,
+        uint256 globalIndCompositeMultiplierCumulativePrevBlock
+    ) internal pure returns (uint256) {
+        return
+            globalIndCompositeMultiplierCumulativePrevBlock +
+            (currentBlockNumber - globalIndBlockNumber) *
+            globalIndCompositeMultiplierInTheBlock;
+    }
+
+    /// @dev Quadruple precision, 128 bits
+    function _toQuadruplePrecision(uint256 number, uint256 decimals)
+        private
+        pure
+        returns (bytes16)
+    {
         if (number % decimals > 0) {
-            //            when we calculate we lost this value in conversion
+            /// @dev when we calculate we lost this value in conversion
             number += 1;
         }
         bytes16 nominator = ABDKMathQuad.fromUInt(number);

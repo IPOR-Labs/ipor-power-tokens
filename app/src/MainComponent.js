@@ -16,7 +16,7 @@ import GlobalConfigurationComponent from "./GlobalConfigurationComponent";
 import FaucetComponent from "./FaucetComponent";
 import FrontendComponent from "./FrontendComponent";
 import JohnComponent from "./JohnComponent";
-import PwIporTokenComponent from "./PwIporTokenComponent";
+import PowerIporComponent from "./PowerIporComponent";
 
 require("dotenv").config({ path: "../../.env" });
 const { AccountData, ContractData, ContractForm } = newContextComponents;
@@ -80,27 +80,42 @@ export default ({ drizzle, drizzleState }) => {
                 <Tab eventKey="joseph" title="Joseph">
                     <JosephComponent drizzle={drizzle} drizzleState={drizzleState} />
                 </Tab>
+
                 <Tab eventKey="stanley" title="Stanley">
                     <StanleyComponent drizzle={drizzle} drizzleState={drizzleState} />
                 </Tab>
+
+                <Tab eventKey="John" title="John">
+                    <JohnComponent drizzle={drizzle} drizzleState={drizzleState} />
+                </Tab>
+
+                <Tab eventKey="PowerIpor" title="Power Ipor">
+                    <PowerIporComponent drizzle={drizzle} drizzleState={drizzleState} />
+                </Tab>
+
                 <Tab eventKey="globalConfig" title="Global Config">
                     <GlobalConfigurationComponent drizzle={drizzle} drizzleState={drizzleState} />
                 </Tab>
+
                 <Tab eventKey="josephConfig" title="Joseph Config">
                     <JosephConfigurationComponent drizzle={drizzle} drizzleState={drizzleState} />
                 </Tab>
+
                 <Tab eventKey="miltonConfig" title="Milton Config">
                     <MiltonConfigurationComponent drizzle={drizzle} drizzleState={drizzleState} />
                 </Tab>
+
                 <Tab eventKey="spreadConfig" title="Spread Config">
                     <MiltonSpreadConfigurationComponent
                         drizzle={drizzle}
                         drizzleState={drizzleState}
                     />
                 </Tab>
+
                 <Tab eventKey="stanleyConfig" title="Stanley Config">
                     <StanleyConfigurationComponent drizzle={drizzle} drizzleState={drizzleState} />
                 </Tab>
+
                 <Tab eventKey="myPositions" title="My positions">
                     <MyPositions drizzle={drizzle} drizzleState={drizzleState} />
                 </Tab>
@@ -115,14 +130,6 @@ export default ({ drizzle, drizzleState }) => {
 
                 <Tab eventKey="frontend" title="Frontend Data Provider">
                     <FrontendComponent drizzle={drizzle} drizzleState={drizzleState} />
-                </Tab>
-
-                <Tab eventKey="John" title="Liquidity Rewards">
-                    <JohnComponent drizzle={drizzle} drizzleState={drizzleState} />
-                </Tab>
-
-                <Tab eventKey="PwIporToken" title="Power Ipor">
-                    <PwIporTokenComponent drizzle={drizzle} drizzleState={drizzleState} />
                 </Tab>
             </Tabs>
         </div>

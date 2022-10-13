@@ -8,6 +8,7 @@ import "../libraries/errors/MiltonErrors.sol";
 import "../libraries/errors/JosephErrors.sol";
 import "../security/IporOwnable.sol";
 
+/// @title IPOR Token in standard ERC20.
 contract IporToken is IporOwnable, ERC20 {
     using SafeERC20 for IERC20;
 

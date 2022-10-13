@@ -36,9 +36,10 @@ describe("John configuration, deploy tests", () => {
         expect(john.address).to.be.not.equal("");
     });
 
-    it("Should not be able to deploy contract when pwIpor address is zero", async () => {
+    it("Should not be able to deploy contract when Power Ipor Token address is zero", async () => {
         // given
         const John = await hre.ethers.getContractFactory("John");
+
         // when
         await expect(
             upgrades.deployProxy(John, [
@@ -52,12 +53,14 @@ describe("John configuration, deploy tests", () => {
     it("Should deploy contract with 3 assets", async () => {
         // given
         const John = await hre.ethers.getContractFactory("John");
+
         // when
         const john = (await upgrades.deployProxy(John, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
             randomAddress,
             tokens.ipTokenUsdt.address,
         ])) as John;
+
         // then
         const isDaiActive = await john.isIpTokenSupported(tokens.ipTokenDai.address);
         const isUsdcActive = await john.isIpTokenSupported(tokens.ipTokenUsdc.address);
@@ -71,12 +74,14 @@ describe("John configuration, deploy tests", () => {
     it("Should deploy contract with 1 assets", async () => {
         // given
         const John = await hre.ethers.getContractFactory("John");
+
         // when
         const john = (await upgrades.deployProxy(John, [
             [tokens.ipTokenDai.address],
             randomAddress,
             tokens.ipTokenUsdt.address,
         ])) as John;
+
         // then
         const isDaiActive = await john.isIpTokenSupported(tokens.ipTokenDai.address);
         const isUsdcActive = await john.isIpTokenSupported(tokens.ipTokenUsdc.address);
@@ -98,9 +103,11 @@ describe("John configuration, deploy tests", () => {
         const isDaiActiveBefore = await john.isIpTokenSupported(tokens.ipTokenDai.address);
         const isUsdcActiveBefore = await john.isIpTokenSupported(tokens.ipTokenUsdc.address);
         const isUsdtActiveBefore = await john.isIpTokenSupported(tokens.ipTokenUsdt.address);
+
         // when
-        await john.addIpToken(tokens.ipTokenUsdc.address);
-        await john.addIpToken(tokens.ipTokenUsdt.address);
+        await john.addIpTokenAsset(tokens.ipTokenUsdc.address);
+        await john.addIpTokenAsset(tokens.ipTokenUsdt.address);
+
         // then
         const isDaiActiveAfter = await john.isIpTokenSupported(tokens.ipTokenDai.address);
         const isUsdcActiveAfter = await john.isIpTokenSupported(tokens.ipTokenUsdc.address);
@@ -123,12 +130,12 @@ describe("John configuration, deploy tests", () => {
             randomAddress,
             tokens.ipTokenUsdt.address,
         ])) as John;
-        const isUsdcActiveBefore = await john.isIpTokenSupported(tokens.ipTokenUsdc.address);
-        const [admin, userOne] = accounts;
+        const [_, userOne] = accounts;
+
         // when
         await expect(
             //when
-            john.connect(userOne).addIpToken(tokens.ipTokenUsdc.address)
+            john.connect(userOne).addIpTokenAsset(tokens.ipTokenUsdc.address)
             //then
         ).to.be.revertedWith("Ownable: caller is not the owner");
     });
@@ -144,9 +151,11 @@ describe("John configuration, deploy tests", () => {
 
         const [admin, userOne] = accounts;
         const ownerAddressBefore = await john.owner();
+
         // when
         await john.transferOwnership(await userOne.getAddress());
         await john.connect(userOne).confirmTransferOwnership();
+
         // then
         const ownerAddressAfter = await john.owner();
 
@@ -163,8 +172,8 @@ describe("John configuration, deploy tests", () => {
             tokens.ipTokenUsdt.address,
         ])) as John;
 
-        const [admin, userOne] = accounts;
-        const ownerAddressBefore = await john.owner();
+        const [_, userOne] = accounts;
+
         // when
         await expect(
             //when
@@ -173,7 +182,7 @@ describe("John configuration, deploy tests", () => {
         ).to.be.revertedWith("Ownable: caller is not the owner");
     });
 
-    it("Should be able to pause contract when owner", async () => {
+    it("Should be able to pause contract when owner (initial deployment)", async () => {
         // given
         const John = await hre.ethers.getContractFactory("John");
         const john = (await upgrades.deployProxy(John, [
@@ -183,13 +192,43 @@ describe("John configuration, deploy tests", () => {
         ])) as John;
 
         const isPausedBefore = await john.paused();
+
         // when
         await john.pause();
+
         // then
         const isPausedAfter = await john.paused();
 
         expect(isPausedBefore).to.be.false;
         expect(isPausedAfter).to.be.true;
+    });
+
+    it("Should be able to pause contract when Pause Manager", async () => {
+        // given
+        const [_, userOne, userThree] = accounts;
+        const John = await hre.ethers.getContractFactory("John");
+        const john = (await upgrades.deployProxy(John, [
+            [],
+            randomAddress,
+            tokens.ipTokenUsdt.address,
+        ])) as John;
+
+        const isPausedBefore = await john.paused();
+        const oldPauseManager = await john.getPauseManager();
+
+        await john.setPauseManager(await userThree.getAddress());
+
+        // when
+        await john.connect(userThree).pause();
+
+        // then
+        const isPausedAfter = await john.paused();
+
+        expect(isPausedBefore).to.be.false;
+        expect(isPausedAfter).to.be.true;
+
+        //clean up
+        await john.setPauseManager(oldPauseManager);
     });
 
     it("Should not be able to pause contract when no owner", async () => {
@@ -201,12 +240,12 @@ describe("John configuration, deploy tests", () => {
             tokens.ipTokenUsdt.address,
         ])) as John;
 
-        const [admin, userOne] = accounts;
+        const [_, userOne] = accounts;
         const isPausedBefore = await john.paused();
+
         // when
-        await expect(john.connect(userOne).pause()).to.be.revertedWith(
-            "Ownable: caller is not the owner"
-        );
+        await expect(john.connect(userOne).pause()).to.be.revertedWith("IPOR_704");
+
         // then
         const isPausedAfter = await john.paused();
 
@@ -214,7 +253,35 @@ describe("John configuration, deploy tests", () => {
         expect(isPausedAfter).to.be.false;
     });
 
-    it("Should be able to unpause contract when owner", async () => {
+    it("Should not be able to pause contract when initial Pause Manager changed", async () => {
+        // given
+        const John = await hre.ethers.getContractFactory("John");
+        const john = (await upgrades.deployProxy(John, [
+            [],
+            randomAddress,
+            tokens.ipTokenUsdt.address,
+        ])) as John;
+
+        const [_, userOne] = accounts;
+        const isPausedBefore = await john.paused();
+        const oldPauseManager = await john.getPauseManager();
+
+        await john.setPauseManager(await userOne.getAddress());
+
+        // when
+        await expect(john.pause()).to.be.revertedWith("IPOR_704");
+
+        // then
+        const isPausedAfter = await john.paused();
+
+        expect(isPausedBefore).to.be.false;
+        expect(isPausedAfter).to.be.false;
+
+        //clean up
+        await john.setPauseManager(oldPauseManager);
+    });
+
+    it("Should be able to unpause contract when owner (initial deployment)", async () => {
         // given
         const John = await hre.ethers.getContractFactory("John");
         const john = (await upgrades.deployProxy(John, [
@@ -224,13 +291,44 @@ describe("John configuration, deploy tests", () => {
         ])) as John;
         await john.pause();
         const isPausedBefore = await john.paused();
+
         // when
         await john.unpause();
+
         // then
         const isPausedAfter = await john.paused();
 
         expect(isPausedBefore).to.be.true;
         expect(isPausedAfter).to.be.false;
+    });
+
+    it("Should be able to unpause contract when Pause Manager", async () => {
+        // given
+        const [_, userOne, userThree] = accounts;
+        const John = await hre.ethers.getContractFactory("John");
+        const john = (await upgrades.deployProxy(John, [
+            [],
+            randomAddress,
+            tokens.ipTokenUsdt.address,
+        ])) as John;
+        await john.pause();
+        const isPausedBefore = await john.paused();
+
+        const oldPauseManager = await john.getPauseManager();
+
+        await john.setPauseManager(await userThree.getAddress());
+
+        // when
+        await john.connect(userThree).unpause();
+
+        // then
+        const isPausedAfter = await john.paused();
+
+        expect(isPausedBefore).to.be.true;
+        expect(isPausedAfter).to.be.false;
+
+        //clean up
+        await john.setPauseManager(oldPauseManager);
     });
 
     it("Should not be able to unpause contract when no owner", async () => {
@@ -242,17 +340,47 @@ describe("John configuration, deploy tests", () => {
             tokens.ipTokenUsdt.address,
         ])) as John;
 
-        const [admin, userOne] = accounts;
+        const [_, userOne] = accounts;
         await john.pause();
         const isPausedBefore = await john.paused();
+
         // when
-        await expect(john.connect(userOne).unpause()).to.be.revertedWith(
-            "Ownable: caller is not the owner"
-        );
+        await expect(john.connect(userOne).unpause()).to.be.revertedWith("IPOR_704");
+
         // then
         const isPausedAfter = await john.paused();
 
         expect(isPausedBefore).to.be.true;
         expect(isPausedAfter).to.be.true;
+    });
+
+    it("Should not be able to unpause contract when initial Pause Manager changed", async () => {
+        // given
+        const John = await hre.ethers.getContractFactory("John");
+        const john = (await upgrades.deployProxy(John, [
+            [],
+            randomAddress,
+            tokens.ipTokenUsdt.address,
+        ])) as John;
+
+        const [_, userOne, userThree] = accounts;
+        await john.pause();
+        const isPausedBefore = await john.paused();
+
+        const oldPauseManager = await john.getPauseManager();
+
+        await john.setPauseManager(await userThree.getAddress());
+
+        // when
+        await expect(john.unpause()).to.be.revertedWith("IPOR_704");
+
+        // then
+        const isPausedAfter = await john.paused();
+
+        expect(isPausedBefore).to.be.true;
+        expect(isPausedAfter).to.be.true;
+
+        //clean up
+        await john.setPauseManager(oldPauseManager);
     });
 });

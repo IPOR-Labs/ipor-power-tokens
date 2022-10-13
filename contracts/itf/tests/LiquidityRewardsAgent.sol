@@ -1,23 +1,23 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.16;
 
-import "../../rewards/John.sol";
-import "../../tokens/PwIporToken.sol";
+import "../../john/John.sol";
+import "../../tokens/PowerIpor.sol";
 
 contract LiquidityRewardsAgent {
     John private _john;
-    PwIporToken private _pwToken;
+    PowerIpor private _powerIpor;
 
     constructor(
-        address pwToken,
+        address powerIpor,
         address john,
         address ipToken,
         address iporToken
     ) {
         _john = John(john);
-        _pwToken = PwIporToken(pwToken);
+        _powerIpor = PowerIpor(powerIpor);
         IERC20(ipToken).approve(john, Constants.MAX_VALUE);
-        IERC20(iporToken).approve(pwToken, Constants.MAX_VALUE);
+        IERC20(iporToken).approve(powerIpor, Constants.MAX_VALUE);
     }
 
     //    interact with John
@@ -30,53 +30,51 @@ contract LiquidityRewardsAgent {
         _john.unstake(ipToken, ipTokenAmount);
     }
 
-    function accountRewards(address ipToken) external view returns (uint256) {
-        return _john.accountRewards(ipToken);
+    function calculateAccountRewards(address ipToken) external view returns (uint256) {
+        return _john.calculateAccountRewards(address(this), ipToken);
     }
 
-    function accountParams(address ipToken)
+    function getAccountIndicators(address ipToken)
         external
         view
-        returns (JohnTypes.AccountRewardsParams memory)
+        returns (JohnTypes.AccountRewardsIndicators memory)
     {
-        return _john.accountParams(ipToken);
+        return _john.getAccountIndicators(address(this), ipToken);
     }
 
     function balanceOfDelegatedPwIpor(address account, address[] memory requestIpTokens)
         external
         view
-        returns (JohnTypes.BalanceOfDelegatedPwIpor memory)
+        returns (JohnTypes.DelegatedPwIporBalance[] memory balances)
     {
-        return _john.balanceOfDelegatedPwIpor(account, requestIpTokens);
+        balances = _john.balanceOfDelegatedPwIpor(account, requestIpTokens);
     }
 
     function balanceOf(address ipToken) external view returns (uint256) {
-        return _john.balanceOf(ipToken);
+        return _john.balanceOf(address(this), ipToken);
     }
 
     function claim(address ipToken) external {
         _john.claim(ipToken);
     }
 
-    //    interact with pwToken
-
-    function delegatedBalanceOf(address account) external view returns (uint256) {
-        return _pwToken.delegatedBalanceOf(account);
+    function delegatedToJohnBalanceOf(address account) external view returns (uint256) {
+        return _powerIpor.delegatedToJohnBalanceOf(account);
     }
 
     function stakeIporToken(uint256 iporTokenAmount) external {
-        _pwToken.stake(iporTokenAmount);
+        _powerIpor.stake(iporTokenAmount);
     }
 
-    function unstakePwToken(uint256 pwTokenAmount) external {
-        _pwToken.unstake(pwTokenAmount);
+    function unstakePwIpor(uint256 pwIporAmount) external {
+        _powerIpor.unstake(pwIporAmount);
     }
 
-    function delegateToRewards(address[] memory ipTokens, uint256[] memory pwIporAmounts) external {
-        _pwToken.delegateToRewards(ipTokens, pwIporAmounts);
+    function delegatePwIpor(address[] memory ipTokens, uint256[] memory pwIporAmounts) external {
+        _powerIpor.delegateToJohn(ipTokens, pwIporAmounts);
     }
 
-    function withdrawFromDelegation(address ipToken, uint256 pwIporAmount) external {
-        _pwToken.withdrawFromDelegation(ipToken, pwIporAmount);
+    function undelegatePwIpor(address[] memory ipTokens, uint256[] memory pwIporAmounts) external {
+        _powerIpor.undelegateFromJohn(ipTokens, pwIporAmounts);
     }
 }

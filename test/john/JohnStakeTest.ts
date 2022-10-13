@@ -5,7 +5,7 @@ import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
 import { John } from "../../types";
-import { Tokens, getDeployedTokens, extractGlobalParam } from "../utils/JohnUtils";
+import { Tokens, getDeployedTokens, extractGlobalIndicators } from "../utils/JohnUtils";
 import {
     N1__0_18DEC,
     N1__0_6DEC,
@@ -19,13 +19,16 @@ const { expect } = chai;
 
 const randomAddress = "0x0B54FA10558caBBdd0D6df5b8667913C43567Bc5";
 
-describe("John Stake and balance", () => {
+describe("John Stake", () => {
     let tokens: Tokens;
     let john: John;
     let admin: Signer, userOne: Signer, userTwo: Signer, userThree: Signer;
+    let adminAddress: string, userOneAddress: string;
 
     before(async () => {
         [admin, userOne, userTwo, userThree] = await hre.ethers.getSigners();
+        adminAddress = await admin.getAddress();
+        userOneAddress = await userOne.getAddress();
 
         tokens = await getDeployedTokens([admin, userOne, userTwo, userThree]);
     });
@@ -52,13 +55,14 @@ describe("John Stake and balance", () => {
 
     it("Should not be able to stake when insufficient allowance on ipToken(Dai) ", async () => {
         // given
-        const balanceBefore = await john.balanceOf(tokens.ipTokenDai.address);
+        const balanceBefore = await john.balanceOf(adminAddress, tokens.ipTokenDai.address);
         // when
         await expect(
             john.connect(userThree).stake(tokens.ipTokenDai.address, N1__0_18DEC)
         ).to.be.revertedWith("ERC20: insufficient allowance");
+
         // then
-        const balanceAfter = await john.balanceOf(tokens.ipTokenDai.address);
+        const balanceAfter = await john.balanceOf(adminAddress, tokens.ipTokenDai.address);
         // we dont
         expect(balanceBefore).to.be.equal(ZERO);
         expect(balanceAfter).to.be.equal(ZERO);
@@ -66,11 +70,14 @@ describe("John Stake and balance", () => {
 
     it("Should be able to stake ipToken(Dai)", async () => {
         // given
-        const balanceBefore = await john.connect(userOne).balanceOf(tokens.ipTokenDai.address);
+        const balanceBefore = await john
+            .balanceOf(userOneAddress, tokens.ipTokenDai.address);
         // when
         await john.connect(userOne).stake(tokens.ipTokenDai.address, N1__0_18DEC);
+
         // then
-        const balanceAfter = await john.connect(userOne).balanceOf(tokens.ipTokenDai.address);
+        const balanceAfter = await john
+            .balanceOf(userOneAddress, tokens.ipTokenDai.address);
 
         expect(balanceBefore).to.be.equal(ZERO);
         expect(balanceAfter).to.be.equal(N1__0_18DEC);
@@ -78,14 +85,16 @@ describe("John Stake and balance", () => {
 
     it("Should not be able to stake when IpToken(usdt) is deactivated", async () => {
         // given
-        const balanceBefore = await john.connect(userOne).balanceOf(tokens.ipTokenUsdc.address);
-        await john.removeIpToken(tokens.ipTokenUsdt.address);
+        const balanceBefore = await john.balanceOf(userOneAddress, tokens.ipTokenUsdc.address);
+        await john.removeIpTokenAsset(tokens.ipTokenUsdt.address);
+
         // when
         await expect(
             john.connect(userOne).stake(tokens.ipTokenUsdt.address, N1__0_6DEC)
         ).to.be.revertedWith("IPOR_701");
+
         // then
-        const balanceAfter = await john.connect(userOne).balanceOf(tokens.ipTokenUsdc.address);
+        const balanceAfter = await john.balanceOf(userOneAddress, tokens.ipTokenUsdc.address);
 
         expect(balanceBefore).to.be.equal(ZERO);
         expect(balanceAfter).to.be.equal(ZERO);
@@ -93,14 +102,15 @@ describe("John Stake and balance", () => {
 
     it("Should not be able to stake when contract is pause", async () => {
         // given
-        const balanceBefore = await john.connect(userOne).balanceOf(tokens.ipTokenUsdc.address);
+        const balanceBefore = await john.balanceOf(userOneAddress, tokens.ipTokenUsdc.address);
         await john.pause();
+
         // when
         await expect(
             john.connect(userOne).stake(tokens.ipTokenUsdt.address, N1__0_6DEC)
         ).to.be.revertedWith("Pausable: paused");
         // then
-        const balanceAfter = await john.connect(userOne).balanceOf(tokens.ipTokenUsdc.address);
+        const balanceAfter = await john.balanceOf(userOneAddress, tokens.ipTokenUsdc.address);
 
         expect(balanceBefore).to.be.equal(ZERO);
         expect(balanceAfter).to.be.equal(ZERO);
@@ -108,13 +118,14 @@ describe("John Stake and balance", () => {
 
     it("Should not be able to stake when amount is zero", async () => {
         // given
-        const balanceBefore = await john.connect(userOne).balanceOf(tokens.ipTokenUsdc.address);
+        const balanceBefore = await john.balanceOf(userOneAddress, tokens.ipTokenUsdc.address);
         // when
         await expect(
             john.connect(userOne).stake(tokens.ipTokenUsdt.address, ZERO)
         ).to.be.revertedWith("IPOR_004");
+
         // then
-        const balanceAfter = await john.connect(userOne).balanceOf(tokens.ipTokenUsdc.address);
+        const balanceAfter = await john.balanceOf(userOneAddress, tokens.ipTokenUsdc.address);
 
         expect(balanceBefore).to.be.equal(ZERO);
         expect(balanceAfter).to.be.equal(ZERO);

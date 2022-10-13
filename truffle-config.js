@@ -21,9 +21,9 @@ module.exports = {
             network_id: process.env.ETH_BC_NETWORK_ID,
             skipDryRun: true,
             networkCheckTimeout: 600000, //10 min
-            gas: 10000000,
             gasPrice: 100000000000,
             confirmations: process.env.SC_MIGRATION_CONFIRMATION,
+            gasLimit: 12500000,
         },
         develop: {
             host: "127.0.0.1",
