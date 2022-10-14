@@ -790,12 +790,11 @@ export default ({ drizzle, drizzleState }) => (
                                 [drizzle.contracts.IpTokenUsdt.address],
                             ]}
                             render={(value) => {
-                                console.error(value);
                                 return (
                                     <div>
-                                        {value[0][0]["amount"] / 1000000000000000000}
+                                        {value[0]["pwIporAmount"] / 1000000000000000000}
                                         <br />
-                                        <small>{value[0][0]["amount"]}</small>
+                                        <small>{value[0]["pwIporAmount"]}</small>
                                     </div>
                                 );
                             }}
@@ -812,12 +811,11 @@ export default ({ drizzle, drizzleState }) => (
                                 [drizzle.contracts.IpTokenUsdc.address],
                             ]}
                             render={(value) => {
-                                console.error(value);
                                 return (
                                     <div>
-                                        {value[0][0]["amount"] / 1000000000000000000}
+                                        {value[0]["pwIporAmount"] / 1000000000000000000}
                                         <br />
-                                        <small>{value[0][0]["amount"]}</small>
+                                        <small>{value[0]["pwIporAmount"]}</small>
                                     </div>
                                 );
                             }}
@@ -834,12 +832,11 @@ export default ({ drizzle, drizzleState }) => (
                                 [drizzle.contracts.IpTokenDai.address],
                             ]}
                             render={(value) => {
-                                console.error(value);
                                 return (
                                     <div>
-                                        {value[0][0]["amount"] / 1000000000000000000}
+                                        {value[0]["pwIporAmount"] / 1000000000000000000}
                                         <br />
-                                        <small>{value[0][0]["amount"]}</small>
+                                        <small>{value[0]["pwIporAmount"]}</small>
                                     </div>
                                 );
                             }}
@@ -867,7 +864,6 @@ export default ({ drizzle, drizzleState }) => (
                                 drizzle.contracts.IpTokenUsdt.address,
                             ]}
                             render={(value) => {
-                                console.error(value);
                                 return (
                                     <div>
                                         {value / 1000000000000000000}
@@ -889,7 +885,6 @@ export default ({ drizzle, drizzleState }) => (
                                 drizzle.contracts.IpTokenUsdc.address,
                             ]}
                             render={(value) => {
-                                console.error(value);
                                 return (
                                     <div>
                                         {value / 1000000000000000000}
@@ -911,7 +906,6 @@ export default ({ drizzle, drizzleState }) => (
                                 drizzle.contracts.IpTokenDai.address,
                             ]}
                             render={(value) => {
-                                console.error(value);
                                 return (
                                     <div>
                                         {value / 1000000000000000000}
