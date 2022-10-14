@@ -7,6 +7,8 @@ const { ContractData, ContractForm } = newContextComponents;
 export default ({ drizzle, drizzleState }) => {
     const [ipTokens, setIpTokens] = useState([""]);
     const [pwIporAmounts, setPwIporAmounts] = useState(["0"]);
+    const [undelegateIpTokens, setUndelegateIpTokens] = useState([""]);
+    const [undelegatePwIporAmounts, setUndelegatePwIporAmounts] = useState(["0"]);
 
     return (
         <div>
@@ -481,10 +483,67 @@ export default ({ drizzle, drizzleState }) => {
                             <strong>Undelegate Power Ipor Token (pwIpor) from John</strong>
                         </td>
                         <td>
+                            <tr style={{ border: "none" }}>
+                                <td>
+                                    <label htmlFor="UndelegateIpTokens"> IpTokens: </label>
+                                </td>
+                                <td style={{ border: "none", padding: "1em" }}>
+                                    <input
+                                        id="UndelegateIpTokens"
+                                        value={undelegateIpTokens.join(",")}
+                                        onChange={(e) =>
+                                            setUndelegateIpTokens(e.target.value.split(","))
+                                        }
+                                    />
+                                </td>
+                            </tr>
+                            <tr style={{ border: "none" }}>
+                                <td>
+                                    <label> Amounts: </label>
+                                </td>
+                                <td style={{ border: "none", padding: "1em" }}>
+                                    <input
+                                        id="UndelegateAmounts"
+                                        value={undelegatePwIporAmounts
+                                            .map((e) => e.toString())
+                                            .join(",")}
+                                        onChange={(e) => {
+                                            setUndelegatePwIporAmounts(
+                                                e.target.value
+                                                    .split(",")
+                                                    .map((a) => (a != "" ? BigNumber.from(a) : ""))
+                                            );
+                                        }}
+                                    />
+                                </td>
+                            </tr>
+                        </td>
+                        <td>
                             <ContractForm
                                 drizzle={drizzle}
                                 contract="PowerIpor"
                                 method="undelegateFromJohn"
+                                render={({ handleSubmit, inputs, state, handleInputChange }) => {
+                                    state["ipTokens"] = undelegateIpTokens;
+                                    state["pwIporAmounts"] = undelegatePwIporAmounts;
+                                    return (
+                                        <div>
+                                            <form
+                                                className="pure-form pure-form-stacked"
+                                                onSubmit={handleSubmit}
+                                            >
+                                                <button
+                                                    key="submit"
+                                                    className="pure-button"
+                                                    type="button"
+                                                    onClick={handleSubmit}
+                                                >
+                                                    Submit
+                                                </button>
+                                            </form>
+                                        </div>
+                                    );
+                                }}
                             />
                         </td>
                     </tr>
