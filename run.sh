@@ -512,7 +512,7 @@ function clean_migration_files(){
   cd "${DIR}"
 
   echo -e "Remove migration files:"
-  rm -f -v "$(get_path_with_env "${GEN_IPOR_ADDRESSES_FILE_PATH}" "${ENV_NAME}")"
+#  rm -f -v "$(get_path_with_env "${GEN_IPOR_ADDRESSES_FILE_PATH}" "${ENV_NAME}")"
   rm -f -v "$(get_path_with_env "${GEN_MIGRATION_COMMIT_FILE_PATH}" "${ENV_NAME}")"
   rm -f -v "$(get_path_with_env "${GEN_LAST_COMPLETED_MIGRATION_FILE_PATH}" "${ENV_NAME}")"
 }
