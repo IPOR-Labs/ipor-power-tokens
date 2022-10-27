@@ -18,6 +18,7 @@ import {
     ZERO,
     TOTAL_SUPPLY_18_DECIMALS,
     TOTAL_SUPPLY_6_DECIMALS,
+    N1__0_8DEC,
 } from "../utils/Constants";
 
 chai.use(solidity);
@@ -58,6 +59,10 @@ describe("John Stake and balance", () => {
             powerIpor.address,
             iporToken.address,
         ])) as John;
+
+        await john.setRewardsPerBlock(tokens.ipTokenDai.address, N1__0_8DEC);
+        await john.setRewardsPerBlock(tokens.ipTokenUsdc.address, N1__0_8DEC);
+        await john.setRewardsPerBlock(tokens.ipTokenUsdt.address, N1__0_8DEC);
 
         await tokens.ipTokenDai.approve(john.address, TOTAL_SUPPLY_18_DECIMALS);
         await tokens.ipTokenDai.connect(userOne).approve(john.address, TOTAL_SUPPLY_18_DECIMALS);
@@ -109,7 +114,7 @@ describe("John Stake and balance", () => {
                 ZERO,
                 ZERO,
                 ZERO,
-                0,
+                -1,
                 100000000
             );
             expectAccountIndicators(
@@ -137,7 +142,7 @@ describe("John Stake and balance", () => {
                 ZERO,
                 ZERO,
                 ZERO,
-                0,
+                -1,
                 100000000
             );
             expectAccountIndicators(

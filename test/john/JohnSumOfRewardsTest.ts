@@ -18,6 +18,7 @@ import {
     ZERO,
     TOTAL_SUPPLY_18_DECIMALS,
     TOTAL_SUPPLY_6_DECIMALS,
+    N1__0_8DEC,
 } from "../utils/Constants";
 
 chai.use(solidity);
@@ -52,6 +53,10 @@ describe("John sum of rewards", () => {
             powerIpor.address,
             iporToken.address,
         ])) as John;
+
+        await john.setRewardsPerBlock(tokens.ipTokenDai.address, N1__0_8DEC);
+        await john.setRewardsPerBlock(tokens.ipTokenUsdc.address, N1__0_8DEC);
+        await john.setRewardsPerBlock(tokens.ipTokenUsdt.address, N1__0_8DEC);
 
         await tokens.ipTokenDai.approve(john.address, TOTAL_SUPPLY_18_DECIMALS);
         await tokens.ipTokenDai.connect(userOne).approve(john.address, TOTAL_SUPPLY_18_DECIMALS);
@@ -113,8 +118,8 @@ describe("John sum of rewards", () => {
 
         //    when
         await john.connect(userOne).unstake(tokens.ipTokenDai.address, stakedIpTokens);
-        
-		//    then
+
+        //    then
         const globalIndicatorsAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
         const userParamsAfter = await john.getAccountIndicators(
             await userOne.getAddress(),

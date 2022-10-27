@@ -8,6 +8,7 @@ import { John, IporToken, PowerIpor } from "../../types";
 import { Tokens, getDeployedTokens, extractGlobalIndicators } from "../utils/JohnUtils";
 import {
     N1__0_18DEC,
+    N1__0_8DEC,
     ZERO,
     TOTAL_SUPPLY_18_DECIMALS,
     TOTAL_SUPPLY_6_DECIMALS,
@@ -47,6 +48,10 @@ describe("John claim", () => {
             powerIpor.address,
             iporToken.address,
         ])) as John;
+
+        await john.setRewardsPerBlock(tokens.ipTokenDai.address, N1__0_8DEC);
+        await john.setRewardsPerBlock(tokens.ipTokenUsdc.address, N1__0_8DEC);
+        await john.setRewardsPerBlock(tokens.ipTokenUsdt.address, N1__0_8DEC);
 
         await tokens.ipTokenDai.approve(john.address, TOTAL_SUPPLY_18_DECIMALS);
         await tokens.ipTokenDai.connect(userOne).approve(john.address, TOTAL_SUPPLY_18_DECIMALS);
@@ -421,13 +426,6 @@ describe("John claim", () => {
                 .add(N2__0_18DEC)
         );
         expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore.add(stakedIpTokensAmount));
-
-        console.table({
-            rewardsAfterFirstStake: rewardsAfterFirstStake.toString(),
-            rewardsAfterRemoveIpToken: rewardsAfterRemoveIpToken.toString(),
-            rewardsAfterAddIpToken: rewardsAfterAddIpToken.toString(),
-            rewardsAfterSecondStake: rewardsAfterSecondStake.toString(),
-        });
 
         expect(rewardsAfterFirstStake).to.be.equal(N1__0_18DEC.mul(BigNumber.from("100")));
         expect(rewardsAfterRemoveIpToken).to.be.equal(N1__0_18DEC.mul(BigNumber.from("101")));

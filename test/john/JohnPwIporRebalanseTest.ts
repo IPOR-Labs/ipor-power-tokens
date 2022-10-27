@@ -6,7 +6,14 @@ import { BigNumber, Signer } from "ethers";
 import { solidity } from "ethereum-waffle";
 import { John, IporToken, PowerIpor } from "../../types";
 import { Tokens, getDeployedTokens } from "../utils/JohnUtils";
-import { N1__0_18DEC, ZERO, N0__1_18DEC, N0__01_18DEC, N2__0_18DEC } from "../utils/Constants";
+import {
+    N1__0_18DEC,
+    ZERO,
+    N0__1_18DEC,
+    N0__01_18DEC,
+    N2__0_18DEC,
+    N1__0_8DEC,
+} from "../utils/Constants";
 import { JohnTypes } from "../../types/John";
 
 chai.use(solidity);
@@ -115,6 +122,10 @@ describe("John rebalance ", () => {
             tokens.ipTokenUsdc.address,
             tokens.ipTokenUsdt.address,
         ]);
+
+        await john.setRewardsPerBlock(tokens.ipTokenDai.address, N1__0_8DEC);
+        await john.setRewardsPerBlock(tokens.ipTokenUsdc.address, N1__0_8DEC);
+        await john.setRewardsPerBlock(tokens.ipTokenUsdt.address, N1__0_8DEC);
 
         const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
         const johnIpUsdcBalanceBefore = await tokens.ipTokenUsdc.balanceOf(john.address);

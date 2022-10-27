@@ -11,6 +11,7 @@ import {
     TOTAL_SUPPLY_18_DECIMALS,
     TOTAL_SUPPLY_6_DECIMALS,
     N0__5_18DEC,
+    N1__0_8DEC,
 } from "../utils/Constants";
 
 chai.use(solidity);
@@ -45,6 +46,8 @@ describe("John event tests", () => {
             powerIpor.address,
             iporToken.address,
         ])) as John;
+
+        await john.setRewardsPerBlock(tokens.ipTokenDai.address, N1__0_8DEC);
 
         await tokens.ipTokenDai.approve(john.address, TOTAL_SUPPLY_18_DECIMALS);
         await tokens.ipTokenDai.connect(userOne).approve(john.address, TOTAL_SUPPLY_18_DECIMALS);
