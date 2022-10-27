@@ -1,4 +1,4 @@
-name: Deploy dev cockpit
+name: Deploy mining cockpit
 
 on:
   workflow_dispatch:
@@ -6,10 +6,10 @@ on:
       cockpit-app-name:
         description: 'IPOR cockpit Amplify application name'
         required: true
-        default: 'ipor-dev-cockpit'
+        default: 'ipor-mining-cockpit'
         type: choice
         options:
-          - ipor-dev-cockpit
+          - ipor-mining-cockpit
 
 jobs:
   notify:
