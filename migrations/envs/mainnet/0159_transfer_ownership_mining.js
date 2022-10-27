@@ -1,13 +1,11 @@
 require("dotenv").config({ path: "../../../.env" });
 const func = require("../../libs/json_func.js");
 const keys = require("../../libs/json_keys.js");
-const script = require("../../libs/contracts/setup/stanley_strategies/0001_initial_setup.js");
 
 const John = artifacts.require("John");
 const PowerIpor = artifacts.require("PowerIpor");
 
 module.exports = async function (deployer, _network, addresses) {
-    await script(deployer, _network, addresses);
 
     if (!process.env.SC_MIGRATION_IPOR_PROTOCOL_OWNER_ADDRESS) {
         throw new Error(
