@@ -24,4 +24,9 @@ contract IporOwnableUpgradeable is OwnableUpgradeable {
         require(_appointedOwner == _msgSender(), IporErrors.SENDER_NOT_APPOINTED_OWNER);
         _;
     }
+
+    function renounceOwnership() public override onlyOwner {
+        _transferOwnership(address(0));
+        _appointedOwner = address(0);
+    }
 }
