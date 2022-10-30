@@ -113,7 +113,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         );
     }
 
-    function delegateToJohn(address[] memory ipTokens, uint256[] memory pwIporAmounts)
+    function delegateToJohn(address[] calldata ipTokens, uint256[] calldata pwIporAmounts)
         external
         override
         whenNotPaused
@@ -122,7 +122,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         require(ipTokens.length == pwIporAmounts.length, IporErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
         uint256 pwIporToDelegate;
 
-        for (uint256 i = 0; i != pwIporAmounts.length; i++) {
+        for (uint256 i; i != pwIporAmounts.length; ++i) {
             pwIporToDelegate += pwIporAmounts[i];
         }
 
@@ -140,9 +140,9 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
     }
 
     function delegateAndStakeToJohn(
-        address[] memory ipTokens,
-        uint256[] memory pwIporAmounts,
-        uint256[] memory ipTokenAmounts
+        address[] calldata ipTokens,
+        uint256[] calldata pwIporAmounts,
+        uint256[] calldata ipTokenAmounts
     ) external override whenNotPaused nonReentrant {
         require(
             ipTokens.length == pwIporAmounts.length && ipTokens.length == ipTokenAmounts.length,
@@ -151,7 +151,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
         uint256 pwIporToDelegate;
 
-        for (uint256 i = 0; i != pwIporAmounts.length; i++) {
+        for (uint256 i; i != pwIporAmounts.length; ++i) {
             pwIporToDelegate += pwIporAmounts[i];
         }
 
@@ -173,7 +173,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         emit DelegateToJohn(_msgSender(), ipTokens, pwIporAmounts);
     }
 
-    function undelegateFromJohn(address[] memory ipTokens, uint256[] memory pwIporAmounts)
+    function undelegateFromJohn(address[] calldata ipTokens, uint256[] calldata pwIporAmounts)
         external
         override
         whenNotPaused
@@ -183,7 +183,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
         uint256 pwIporAmountToUndelegate;
 
-        for (uint256 i; i != ipTokens.length; i++) {
+        for (uint256 i; i != ipTokens.length; ++i) {
             require(pwIporAmounts[i] > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
             pwIporAmountToUndelegate += pwIporAmounts[i];
         }
