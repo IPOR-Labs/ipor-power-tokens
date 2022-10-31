@@ -58,7 +58,7 @@ abstract contract JohnInternal is
     }
 
     function initialize(
-        address[] memory ipTokens,
+        address[] calldata ipTokens,
         address powerIpor,
         address iporToken
     ) public initializer {
@@ -76,7 +76,7 @@ abstract contract JohnInternal is
 
         IporToken(iporToken).approve(powerIpor, Constants.MAX_VALUE);
 
-        for (uint256 i = 0; i != ipTokensLength; i++) {
+        for (uint256 i; i != ipTokensLength; ++i) {
             require(ipTokens[i] != address(0), IporErrors.WRONG_ADDRESS);
 
             _ipTokens[ipTokens[i]] = true;
@@ -124,20 +124,20 @@ abstract contract JohnInternal is
 
     function delegatePwIpor(
         address account,
-        address[] memory ipTokens,
-        uint256[] memory pwIporAmounts
+        address[] calldata ipTokens,
+        uint256[] calldata pwIporAmounts
     ) external override onlyPowerIpor whenNotPaused {
         uint256 rewards;
-
-        for (uint256 i = 0; i != ipTokens.length; i++) {
+        uint256 ipTokensLength = ipTokens.length;
+        uint256 rewardsIteration;
+        uint256 accruedCompMultiplierCumulativePrevBlock;
+        JohnTypes.AccountRewardsIndicators memory accountIndicators;
+        JohnTypes.GlobalRewardsIndicators memory globalIndicators;
+        for (uint256 i; i != ipTokensLength; ++i) {
             require(_ipTokens[ipTokens[i]], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
 
-            JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[
-                account
-            ][ipTokens[i]];
-            JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[
-                ipTokens[i]
-            ];
+            accountIndicators = _accountIndicators[account][ipTokens[i]];
+            globalIndicators = _globalIndicators[ipTokens[i]];
 
             /// @dev when account not stake any IP Token then calculation rewards and rebalancing is redundant
             if (accountIndicators.ipTokenBalance == 0) {
@@ -148,10 +148,10 @@ abstract contract JohnInternal is
                 continue;
             }
 
-            (
-                uint256 rewardsIteration,
-                uint256 accruedCompMultiplierCumulativePrevBlock
-            ) = _calculateAccountRewards(globalIndicators, accountIndicators);
+            (rewardsIteration, accruedCompMultiplierCumulativePrevBlock) = _calculateAccountRewards(
+                globalIndicators,
+                accountIndicators
+            );
 
             rewards += rewardsIteration;
 
@@ -172,23 +172,26 @@ abstract contract JohnInternal is
         }
     }
 
+    //todo remove memory??
     function delegatePwIporAndStakeIpToken(
         address account,
-        address[] memory ipTokens,
+        address[] calldata ipTokens,
         uint256[] memory pwIporAmounts,
         uint256[] memory ipTokenAmounts
     ) external override onlyPowerIpor whenNotPaused {
         uint256 rewards;
 
-        for (uint256 i = 0; i != ipTokens.length; i++) {
+        uint256 ipTokensLength = ipTokens.length;
+        uint256 rewardsIteration;
+        uint256 accruedCompMultiplierCumulativePrevBlock;
+        JohnTypes.AccountRewardsIndicators memory accountIndicators;
+        JohnTypes.GlobalRewardsIndicators memory globalIndicators;
+
+        for (uint256 i; i != ipTokensLength; ++i) {
             require(_ipTokens[ipTokens[i]], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
 
-            JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[
-                account
-            ][ipTokens[i]];
-            JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[
-                ipTokens[i]
-            ];
+            accountIndicators = _accountIndicators[account][ipTokens[i]];
+            globalIndicators = _globalIndicators[ipTokens[i]];
 
             /// @dev Order is important! First Stake, then Delegate.
             /// @dev Stake
@@ -202,17 +205,16 @@ abstract contract JohnInternal is
 
             /// @dev Delegate
             if (accountIndicators.ipTokenBalance == 0 && ipTokenAmounts[i] == 0) {
-                uint256 newBalance = accountIndicators.delegatedPwIporBalance + pwIporAmounts[i];
-                _accountIndicators[account][ipTokens[i]].delegatedPwIporBalance = newBalance
-                    .toUint96();
+                _accountIndicators[account][ipTokens[i]].delegatedPwIporBalance = (accountIndicators
+                    .delegatedPwIporBalance + pwIporAmounts[i]).toUint96();
                 emit DelegatePwIpor(account, ipTokens[i], pwIporAmounts[i]);
                 continue;
             }
 
-            (
-                uint256 rewardsIteration,
-                uint256 accruedCompMultiplierCumulativePrevBlock
-            ) = _calculateAccountRewards(globalIndicators, accountIndicators);
+            (rewardsIteration, accruedCompMultiplierCumulativePrevBlock) = _calculateAccountRewards(
+                globalIndicators,
+                accountIndicators
+            );
 
             rewards += rewardsIteration;
 
@@ -240,31 +242,32 @@ abstract contract JohnInternal is
 
     function undelegatePwIpor(
         address account,
-        address[] memory ipTokens,
-        uint256[] memory pwIporAmounts
+        address[] calldata ipTokens,
+        uint256[] calldata pwIporAmounts
     ) external onlyPowerIpor whenNotPaused {
         uint256 rewards;
+        uint256 ipTokensLength = ipTokens.length;
+        uint256 rewardsIteration;
+        uint256 accruedCompMultiplierCumulativePrevBlock;
+        JohnTypes.AccountRewardsIndicators memory accountIndicators;
+        JohnTypes.GlobalRewardsIndicators memory globalIndicators;
 
-        for (uint256 i; i != ipTokens.length; i++) {
+        for (uint256 i; i != ipTokensLength; ++i) {
             require(_ipTokens[ipTokens[i]], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
 
-            JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[
-                account
-            ][ipTokens[i]];
+            accountIndicators = _accountIndicators[account][ipTokens[i]];
 
             require(
                 accountIndicators.delegatedPwIporBalance >= pwIporAmounts[i],
                 MiningErrors.ACC_DELEGATED_TO_JOHN_BALANCE_IS_TOO_LOW
             );
 
-            JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[
-                ipTokens[i]
-            ];
+            globalIndicators = _globalIndicators[ipTokens[i]];
 
-            (
-                uint256 rewardsIteration,
-                uint256 accruedCompMultiplierCumulativePrevBlock
-            ) = _calculateAccountRewards(globalIndicators, accountIndicators);
+            (rewardsIteration, accruedCompMultiplierCumulativePrevBlock) = _calculateAccountRewards(
+                globalIndicators,
+                accountIndicators
+            );
 
             rewards += rewardsIteration;
 

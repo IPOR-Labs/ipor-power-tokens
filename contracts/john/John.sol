@@ -16,16 +16,18 @@ contract John is JohnInternal, IJohn {
         return _accountIndicators[account][ipToken].ipTokenBalance;
     }
 
-    function balanceOfDelegatedPwIpor(address account, address[] memory requestIpTokens)
+    function balanceOfDelegatedPwIpor(address account, address[] calldata requestIpTokens)
         external
         view
         override
         returns (JohnTypes.DelegatedPwIporBalance[] memory balances)
     {
-        balances = new JohnTypes.DelegatedPwIporBalance[](requestIpTokens.length);
+        uint256 ipTokensLength = requestIpTokens.length;
+        balances = new JohnTypes.DelegatedPwIporBalance[](ipTokensLength);
+        address ipToken;
 
-        for (uint256 i = 0; i != requestIpTokens.length; i++) {
-            address ipToken = requestIpTokens[i];
+        for (uint256 i; i != ipTokensLength; ++i) {
+            ipToken = requestIpTokens[i];
             require(_ipTokens[ipToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
             balances[i] = JohnTypes.DelegatedPwIporBalance(
                 ipToken,

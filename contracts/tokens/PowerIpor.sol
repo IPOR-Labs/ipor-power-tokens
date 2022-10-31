@@ -113,16 +113,17 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         );
     }
 
-    function delegateToJohn(address[] memory ipTokens, uint256[] memory pwIporAmounts)
+    function delegateToJohn(address[] calldata ipTokens, uint256[] calldata pwIporAmounts)
         external
         override
         whenNotPaused
         nonReentrant
     {
-        require(ipTokens.length == pwIporAmounts.length, IporErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
+        uint256 pwIporAmountsLength = pwIporAmounts.length;
+        require(ipTokens.length == pwIporAmountsLength, IporErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
         uint256 pwIporToDelegate;
 
-        for (uint256 i = 0; i != pwIporAmounts.length; i++) {
+        for (uint256 i; i != pwIporAmountsLength; ++i) {
             pwIporToDelegate += pwIporAmounts[i];
         }
 
@@ -140,9 +141,9 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
     }
 
     function delegateAndStakeToJohn(
-        address[] memory ipTokens,
-        uint256[] memory pwIporAmounts,
-        uint256[] memory ipTokenAmounts
+        address[] calldata ipTokens,
+        uint256[] calldata pwIporAmounts,
+        uint256[] calldata ipTokenAmounts
     ) external override whenNotPaused nonReentrant {
         require(
             ipTokens.length == pwIporAmounts.length && ipTokens.length == ipTokenAmounts.length,
@@ -151,7 +152,8 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
         uint256 pwIporToDelegate;
 
-        for (uint256 i = 0; i != pwIporAmounts.length; i++) {
+        uint256 pwIporAmountsLength = pwIporAmounts.length;
+        for (uint256 i; i != pwIporAmountsLength; ++i) {
             pwIporToDelegate += pwIporAmounts[i];
         }
 
@@ -173,17 +175,18 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         emit DelegateToJohn(_msgSender(), ipTokens, pwIporAmounts);
     }
 
-    function undelegateFromJohn(address[] memory ipTokens, uint256[] memory pwIporAmounts)
+    function undelegateFromJohn(address[] calldata ipTokens, uint256[] calldata pwIporAmounts)
         external
         override
         whenNotPaused
         nonReentrant
     {
-        require(ipTokens.length == pwIporAmounts.length, IporErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
+        uint256 ipTokensLength = ipTokens.length;
+        require(ipTokensLength == pwIporAmounts.length, IporErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
 
         uint256 pwIporAmountToUndelegate;
 
-        for (uint256 i; i != ipTokens.length; i++) {
+        for (uint256 i; i != ipTokensLength; ++i) {
             require(pwIporAmounts[i] > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
             pwIporAmountToUndelegate += pwIporAmounts[i];
         }
