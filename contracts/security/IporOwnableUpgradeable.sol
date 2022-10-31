@@ -25,7 +25,7 @@ contract IporOwnableUpgradeable is OwnableUpgradeable {
         _;
     }
 
-    function renounceOwnership() public override onlyOwner {
+    function renounceOwnership() public virtual override onlyOwner {
         _transferOwnership(address(0));
         _appointedOwner = address(0);
     }
