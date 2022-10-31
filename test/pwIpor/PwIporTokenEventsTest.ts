@@ -8,7 +8,7 @@ import { IporToken, PowerIpor, John } from "../../types";
 import { N1__0_18DEC, ZERO, TOTAL_SUPPLY_18_DECIMALS, N0__5_18DEC } from "../utils/Constants";
 import { it } from "mocha";
 import { getDeployedTokens, Tokens } from "../utils/JohnUtils";
-import { randomAddress } from "hardhat/internal/hardhat-network/provider/fork/random";
+import { randomAddress } from "hardhat/internal/hardhat-network/provider/utils/random";
 
 chai.use(solidity);
 const { expect } = chai;
