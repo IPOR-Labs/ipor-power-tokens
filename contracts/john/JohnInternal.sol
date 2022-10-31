@@ -62,9 +62,9 @@ abstract contract JohnInternal is
         address powerIpor,
         address iporToken
     ) public initializer {
-        __Pausable_init();
-        __Ownable_init();
-        __UUPSUpgradeable_init();
+        __Pausable_init_unchained();
+        __Ownable_init_unchained();
+        __UUPSUpgradeable_init_unchained();
 
         require(powerIpor != address(0), IporErrors.WRONG_ADDRESS);
         require(iporToken != address(0), IporErrors.WRONG_ADDRESS);
