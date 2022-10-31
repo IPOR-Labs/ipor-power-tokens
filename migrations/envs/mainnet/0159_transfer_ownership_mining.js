@@ -6,7 +6,6 @@ const John = artifacts.require("John");
 const PowerIpor = artifacts.require("PowerIpor");
 
 module.exports = async function (deployer, _network, addresses) {
-
     if (!process.env.SC_MIGRATION_IPOR_PROTOCOL_OWNER_ADDRESS) {
         throw new Error(
             "Transfer ownership failed! Environment parameter SC_MIGRATION_IPOR_PROTOCOL_OWNER_ADDRESS is not set!"
@@ -15,7 +14,6 @@ module.exports = async function (deployer, _network, addresses) {
 
     const iporOwnerAddress = process.env.SC_MIGRATION_IPOR_PROTOCOL_OWNER_ADDRESS;
 
-    // IV Token
     const johnAddress = await func.getValue(keys.JohnProxy);
     const powerIporAddress = await func.getValue(keys.PowerIporProxy);
 

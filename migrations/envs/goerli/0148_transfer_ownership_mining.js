@@ -14,7 +14,6 @@ module.exports = async function (deployer, _network, addresses) {
 
     const iporOwnerAddress = process.env.SC_MIGRATION_IPOR_PROTOCOL_OWNER_ADDRESS;
 
-    // IV Token
     const johnAddress = await func.getValue(keys.JohnProxy);
     const powerIporAddress = await func.getValue(keys.PowerIporProxy);
 
