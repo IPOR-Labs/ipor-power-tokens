@@ -58,9 +58,9 @@ abstract contract PowerIporInternal is
     }
 
     function initialize(address iporToken) public initializer {
-        __Pausable_init();
-        __Ownable_init();
-        __UUPSUpgradeable_init();
+        __Pausable_init_unchained();
+        __Ownable_init_unchained();
+        __UUPSUpgradeable_init_unchained();
         require(iporToken != address(0), IporErrors.WRONG_ADDRESS);
         _iporToken = iporToken;
         _pauseManager = _msgSender();
