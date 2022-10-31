@@ -2,7 +2,6 @@
 pragma solidity 0.8.16;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -27,7 +26,6 @@ abstract contract JohnInternal is
     ReentrancyGuardUpgradeable,
     IJohnInternal
 {
-    using SafeERC20Upgradeable for IERC20Upgradeable;
     using SafeCast for uint256;
     using SafeCast for int256;
 
@@ -196,7 +194,7 @@ abstract contract JohnInternal is
             /// @dev Order is important! First Stake, then Delegate.
             /// @dev Stake
             if (ipTokenAmounts[i] > 0) {
-                IERC20Upgradeable(ipTokens[i]).safeTransferFrom(
+                IERC20Upgradeable(ipTokens[i]).transferFrom(
                     account,
                     address(this),
                     ipTokenAmounts[i]

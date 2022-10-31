@@ -8,7 +8,6 @@ import "./JohnInternal.sol";
 /// by staking ipTokens and / or delegating Power Ipor Tokens to John. IpTokens can be staked directly to John,
 /// Power Ipor Tokens account can get stake IPOR Tokens in PowerIpor smart contract.
 contract John is JohnInternal, IJohn {
-    using SafeERC20Upgradeable for IERC20Upgradeable;
     using SafeCast for uint256;
     using SafeCast for int256;
 
@@ -77,7 +76,7 @@ contract John is JohnInternal, IJohn {
 
         address msgSender = _msgSender();
 
-        IERC20Upgradeable(ipToken).safeTransferFrom(msgSender, address(this), ipTokenAmount);
+        IERC20Upgradeable(ipToken).transferFrom(msgSender, address(this), ipTokenAmount);
 
         JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[msgSender][
             ipToken
@@ -147,7 +146,7 @@ contract John is JohnInternal, IJohn {
             _transferRewardsToPowerIpor(msgSender, rewards);
         }
 
-        IERC20Upgradeable(ipToken).safeTransfer(msgSender, ipTokenAmount);
+        IERC20Upgradeable(ipToken).transfer(msgSender, ipTokenAmount);
 
         emit UnstakeIpTokens(msgSender, ipToken, ipTokenAmount);
     }

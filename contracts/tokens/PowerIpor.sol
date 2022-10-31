@@ -10,8 +10,6 @@ import "./PowerIporInternal.sol";
 /// Power Ipor smart contract allow you to stake, unstake Ipor Token, deletage, undelegate to John Power Ipor Token.
 /// Interact with John smart contract.
 contract PowerIpor is PowerIporInternal, IPowerIpor {
-    using SafeERC20Upgradeable for IERC20Upgradeable;
-
     function name() external pure override returns (string memory) {
         return "Power IPOR";
     }
@@ -60,11 +58,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
         uint256 exchangeRate = _calculateInternalExchangeRate(iporTokenAddress);
 
-        IERC20Upgradeable(iporTokenAddress).safeTransferFrom(
-            msgSender,
-            address(this),
-            iporTokenAmount
-        );
+        IERC20Upgradeable(iporTokenAddress).transferFrom(msgSender, address(this), iporTokenAmount);
 
         uint256 baseAmount = IporMath.division(iporTokenAmount * Constants.D18, exchangeRate);
 
@@ -103,7 +97,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
             exchangeRate
         );
 
-        IERC20Upgradeable(iporTokenAddress).safeTransfer(msgSender, iporTokenAmountToTransfer);
+        IERC20Upgradeable(iporTokenAddress).transfer(msgSender, iporTokenAmountToTransfer);
 
         emit Unstake(
             msgSender,
@@ -259,7 +253,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         delete _coolDowns[msgSender];
 
         ///@dev We can transfer pwIporAmount because is in relation 1:1 to Ipor Token
-        IERC20Upgradeable(iporTokenAddress).safeTransfer(msgSender, accountCoolDown.pwIporAmount);
+        IERC20Upgradeable(iporTokenAddress).transfer(msgSender, accountCoolDown.pwIporAmount);
 
         emit Redeem(msgSender, accountCoolDown.pwIporAmount);
     }
