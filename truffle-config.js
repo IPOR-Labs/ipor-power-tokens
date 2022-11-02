@@ -43,12 +43,14 @@ module.exports = {
     compilers: {
         solc: {
             version: "0.8.16",
-            docker: true,
+            docker: false,
             settings: {
+                viaIR: true,
                 // See the solidity docs for advice about optimization and evmVersion
                 optimizer: {
                     enabled: true,
                     runs: 800,
+                    details: { yul: true },
                 },
                 evmVersion: "london",
             },
