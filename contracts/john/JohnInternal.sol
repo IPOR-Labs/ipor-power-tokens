@@ -79,14 +79,7 @@ abstract contract JohnInternal is
 
             _ipTokens[ipTokens[i]] = true;
 
-            _globalIndicators[ipTokens[i]] = JohnTypes.GlobalRewardsIndicators(
-                0,
-                0,
-                0,
-                0,
-                uint32(Constants.D8),
-                0
-            );
+            _globalIndicators[ipTokens[i]] = JohnTypes.GlobalRewardsIndicators(0, 0, 0, 0, 0, 0);
         }
     }
 

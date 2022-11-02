@@ -24,6 +24,7 @@ import {
     USD_1_000_000,
     N0__1_18DEC,
     N2__0_18DEC,
+    N1__0_8DEC,
 } from "../utils/Constants";
 
 chai.use(solidity);
@@ -61,6 +62,10 @@ describe("One block/Transaction tests", () => {
             powerIpor.address,
             iporToken.address,
         ])) as John;
+
+        await john.setRewardsPerBlock(tokens.ipTokenDai.address, N1__0_8DEC);
+        await john.setRewardsPerBlock(tokens.ipTokenUsdc.address, N1__0_8DEC);
+        await john.setRewardsPerBlock(tokens.ipTokenUsdt.address, N1__0_8DEC);
 
         const LiquidityRewardsTestAction = await hre.ethers.getContractFactory(
             "LiquidityRewardsTestAction"
