@@ -2,7 +2,6 @@
 pragma solidity 0.8.16;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -23,8 +22,6 @@ abstract contract PowerIporInternal is
     IporOwnableUpgradeable,
     IPowerIporInternal
 {
-    using SafeERC20Upgradeable for IERC20Upgradeable;
-
     /// @dev 2 weeks
     uint256 public constant COOL_DOWN_IN_SECONDS = 2 * 7 * 24 * 60 * 60;
 
@@ -122,7 +119,7 @@ abstract contract PowerIporInternal is
         uint256 exchangeRate = _calculateInternalExchangeRate(iporTokenAddress);
         require(iporTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
-        IERC20Upgradeable(iporTokenAddress).safeTransferFrom(
+        IERC20Upgradeable(iporTokenAddress).transferFrom(
             _msgSender(),
             address(this),
             iporTokenAmount
