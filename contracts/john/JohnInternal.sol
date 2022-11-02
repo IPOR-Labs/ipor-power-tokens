@@ -163,12 +163,11 @@ abstract contract JohnInternal is
         }
     }
 
-    //todo remove memory??
     function delegatePwIporAndStakeIpToken(
         address account,
         address[] calldata ipTokens,
-        uint256[] memory pwIporAmounts,
-        uint256[] memory ipTokenAmounts
+        uint256[] calldata pwIporAmounts,
+        uint256[] calldata ipTokenAmounts
     ) external override onlyPowerIpor whenNotPaused {
         uint256 rewards;
 
