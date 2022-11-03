@@ -69,9 +69,9 @@ abstract contract JohnInternal is
         __UUPSUpgradeable_init_unchained();
 
         require(powerIpor != address(0), IporErrors.WRONG_ADDRESS);
-        require(IPowerIpor(powerIpor).contractId() == _POWER_IPOR_ID, IporErrors.WRONG_CONTRACT);
+        require(IPowerIpor(powerIpor).getContractId() == _POWER_IPOR_ID, IporErrors.WRONG_CONTRACT);
         require(iporToken != address(0), IporErrors.WRONG_ADDRESS);
-        require(IporToken(iporToken).contractId() == _IPOR_TOKEN_ID, IporErrors.WRONG_CONTRACT);
+        require(IporToken(iporToken).getContractId() == _IPOR_TOKEN_ID, IporErrors.WRONG_CONTRACT);
 
         uint256 ipTokensLength = ipTokens.length;
 

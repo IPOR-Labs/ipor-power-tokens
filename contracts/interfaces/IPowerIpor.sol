@@ -13,7 +13,7 @@ interface IPowerIpor {
 
     /// @notice Contract id. This is the keccak-256 hash of "io.ipor.power.ipor" subtracted by 1
     /// @return Returns id of contract
-    function contractId() external pure returns (bytes32);
+    function getContractId() external pure returns (bytes32);
 
     /// @notice Gets symbol of the Power Ipor token.
     /// @return Returns the symbol of the Power Ipor token.

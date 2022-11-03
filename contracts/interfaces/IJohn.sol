@@ -10,7 +10,7 @@ import "./types/JohnTypes.sol";
 interface IJohn {
     /// @notice Contract id. This is the keccak-256 hash of "io.ipor.john" subtracted by 1
     /// @return Returns id of contract
-    function contractId() external pure returns (bytes32);
+    function getContractId() external pure returns (bytes32);
 
     /// @notice Returns balance of staked ipTokens
     /// @param account account address

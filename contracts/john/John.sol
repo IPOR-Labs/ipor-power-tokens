@@ -11,8 +11,9 @@ contract John is JohnInternal, IJohn {
     using SafeCast for uint256;
     using SafeCast for int256;
 
-    bytes32 public constant contractId =
-        0xa93ed28ba51624c3ccbf684cac0148c79cb9ca9719ef9f44335ff76641461b13;
+    function getContractId() external pure returns (bytes32) {
+        return 0xa93ed28ba51624c3ccbf684cac0148c79cb9ca9719ef9f44335ff76641461b13;
+    }
 
     function balanceOf(address account, address ipToken) external view override returns (uint256) {
         return _accountIndicators[account][ipToken].ipTokenBalance;
