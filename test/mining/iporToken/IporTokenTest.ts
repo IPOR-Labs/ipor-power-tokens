@@ -44,31 +44,6 @@ describe("IporToken", () => {
         }
     };
 
-    // it("Should ", async () => {
-    //     //    given
-    //     const name = "io.ipor.ipor.token";
-    //     //    when
-    //     const x = keccak256("eip1967.proxy.implementation").toString("hex");
-    //     console.table({
-    //         result: x,
-    //         powinno: "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc",
-    //         0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbd
-    //     });
-    //     //    then
-    // });
-    // io.ipor.ipor.token
-    // 0x1381a7188760c470320204bcfd7e56fb198c5c4148f74567e6369a65320a6d7d
-    //-1
-    // 0x1381a7188760c470320204bcfd7e56fb198c5c4148f74567e6369a65320a6d7c
-    // io.ipor.power.token
-    // 0x47fdc87a43122e85126f7506d5be29962db3a4c77842c5853eec80d72b414528
-    // -1
-    // 0x47fdc87a43122e85126f7506d5be29962db3a4c77842c5853eec80d72b414527
-    // io.ipor.john
-    //  0xa93ed28ba51624c3ccbf684cac0148c79cb9ca9719ef9f44335ff76641461b14
-    // -1
-    //  0xa93ed28ba51624c3ccbf684cac0148c79cb9ca9719ef9f44335ff76641461b13
-
     it("should contain 18 decimals", async () => {
         //given
         const { iporToken } = await preperateTestDataCase01();
