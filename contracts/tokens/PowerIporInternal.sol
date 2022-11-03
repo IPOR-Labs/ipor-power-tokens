@@ -65,7 +65,10 @@ abstract contract PowerIporInternal is
         __Ownable_init_unchained();
         __UUPSUpgradeable_init_unchained();
         require(iporToken != address(0), IporErrors.WRONG_ADDRESS);
-        require(IporToken(iporToken).getContractId() == _IPOR_TOKEN_ID, IporErrors.WRONG_CONTRACT);
+        require(
+            IporToken(iporToken).getContractId() == _IPOR_TOKEN_ID,
+            IporErrors.WRONG_CONTRACT_ID
+        );
         _iporToken = iporToken;
         _pauseManager = _msgSender();
         _unstakeWithoutCooldownFee = Constants.D17 * 5;
@@ -103,7 +106,7 @@ abstract contract PowerIporInternal is
 
     function setJohn(address newJohnAddr) external override onlyOwner {
         require(newJohnAddr != address(0), IporErrors.WRONG_ADDRESS);
-        require(IJohn(newJohnAddr).getContractId() == _JOHN_ID, IporErrors.WRONG_CONTRACT);
+        require(IJohn(newJohnAddr).getContractId() == _JOHN_ID, IporErrors.WRONG_CONTRACT_ID);
         address oldJohnAddr = _john;
         _john = newJohnAddr;
         emit JohnChanged(_msgSender(), oldJohnAddr, newJohnAddr);
