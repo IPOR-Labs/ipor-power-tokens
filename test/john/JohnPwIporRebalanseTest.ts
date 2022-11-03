@@ -4,7 +4,7 @@ import chai from "chai";
 import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { John, IporToken, PowerIpor } from "../../types";
+import { John, IporToken, PowerIpor, ItfJohn } from "../../types";
 import { Tokens, getDeployedTokens } from "../utils/JohnUtils";
 import {
     N1__0_18DEC,
@@ -98,12 +98,14 @@ describe("John rebalance ", () => {
 
     it("Should not be able to stake power token when ipToken is not supported", async () => {
         //    given
-        const John = await hre.ethers.getContractFactory("John");
+        const John = await hre.ethers.getContractFactory("ItfJohn");
         const johnInternal = (await upgrades.deployProxy(John, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
-            await admin.getAddress(),
+            powerIpor.address,
             iporToken.address,
-        ])) as John;
+        ])) as ItfJohn;
+        await johnInternal.setPowerIpor(await admin.getAddress());
+
         //    when
         await expect(
             johnInternal.delegatePwIpor(
@@ -177,12 +179,14 @@ describe("John rebalance ", () => {
 
     it("Should not be able to delegate pwIpor when contract is pause", async () => {
         //    given
-        const John = await hre.ethers.getContractFactory("John");
+        const John = await hre.ethers.getContractFactory("ItfJohn");
         const johnInternal = (await upgrades.deployProxy(John, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
-            await admin.getAddress(),
+            powerIpor.address,
             iporToken.address,
-        ])) as John;
+        ])) as ItfJohn;
+
+        await johnInternal.setPowerIpor(await admin.getAddress());
 
         const amounts = [N1__0_18DEC, N0__1_18DEC, N0__01_18DEC];
         await johnInternal.pause();

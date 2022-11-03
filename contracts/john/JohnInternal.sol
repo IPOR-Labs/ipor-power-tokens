@@ -31,6 +31,10 @@ abstract contract JohnInternal is
 
     address internal _powerIpor;
     address internal _pauseManager;
+    bytes32 internal constant _IPOR_TOKEN_ID =
+        0x1381a7188760c470320204bcfd7e56fb198c5c4148f74567e6369a65320a6d7c;
+    bytes32 internal constant _POWER_IPOR_ID =
+        0x47fdc87a43122e85126f7506d5be29962db3a4c77842c5853eec80d72b414527;
 
     mapping(address => bool) internal _ipTokens;
 
@@ -65,7 +69,9 @@ abstract contract JohnInternal is
         __UUPSUpgradeable_init_unchained();
 
         require(powerIpor != address(0), IporErrors.WRONG_ADDRESS);
+        require(IPowerIpor(powerIpor).contractId() == _POWER_IPOR_ID, IporErrors.WRONG_CONTRACT);
         require(iporToken != address(0), IporErrors.WRONG_ADDRESS);
+        require(IporToken(iporToken).contractId() == _IPOR_TOKEN_ID, IporErrors.WRONG_CONTRACT);
 
         uint256 ipTokensLength = ipTokens.length;
 

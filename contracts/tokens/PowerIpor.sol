@@ -22,6 +22,9 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         return 18;
     }
 
+    bytes32 public constant contractId =
+        0x47fdc87a43122e85126f7506d5be29962db3a4c77842c5853eec80d72b414527;
+
     function totalSupply() external view override returns (uint256) {
         return
             IporMath.division(

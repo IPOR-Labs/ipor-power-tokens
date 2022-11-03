@@ -34,12 +34,24 @@ describe("John Stake", () => {
     });
 
     beforeEach(async () => {
-        const John = await hre.ethers.getContractFactory("John");
+        const IporToken = await ethers.getContractFactory("IporToken");
+        const iporToken = (await IporToken.deploy(
+            "IPOR Token",
+            "IPOR",
+            await admin.getAddress()
+        )) as IporToken;
+        const PowerIpor = await ethers.getContractFactory("PowerIpor");
+        const powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
+
+        const John = await hre.ethers.getContractFactory("ItfJohn");
         john = (await upgrades.deployProxy(John, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
-            await admin.getAddress(),
-            tokens.ipTokenUsdt.address,
-        ])) as John;
+            powerIpor.address,
+            iporToken.address,
+        ])) as ItfJohn;
+
+        await john.setPowerIpor(await admin.getAddress());
+
         tokens.ipTokenDai.approve(john.address, TOTAL_SUPPLY_18_DECIMALS);
         tokens.ipTokenDai.connect(userOne).approve(john.address, TOTAL_SUPPLY_18_DECIMALS);
         tokens.ipTokenDai.connect(userTwo).approve(john.address, TOTAL_SUPPLY_18_DECIMALS);
@@ -70,14 +82,12 @@ describe("John Stake", () => {
 
     it("Should be able to stake ipToken(Dai)", async () => {
         // given
-        const balanceBefore = await john
-            .balanceOf(userOneAddress, tokens.ipTokenDai.address);
+        const balanceBefore = await john.balanceOf(userOneAddress, tokens.ipTokenDai.address);
         // when
         await john.connect(userOne).stake(tokens.ipTokenDai.address, N1__0_18DEC);
 
         // then
-        const balanceAfter = await john
-            .balanceOf(userOneAddress, tokens.ipTokenDai.address);
+        const balanceAfter = await john.balanceOf(userOneAddress, tokens.ipTokenDai.address);
 
         expect(balanceBefore).to.be.equal(ZERO);
         expect(balanceAfter).to.be.equal(N1__0_18DEC);

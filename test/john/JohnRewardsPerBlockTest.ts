@@ -32,12 +32,23 @@ describe("John Rewards per block", () => {
     });
 
     beforeEach(async () => {
-        const John = await hre.ethers.getContractFactory("John");
+        const IporToken = await ethers.getContractFactory("IporToken");
+        const iporToken = (await IporToken.deploy(
+            "IPOR Token",
+            "IPOR",
+            await admin.getAddress()
+        )) as IporToken;
+        const PowerIpor = await ethers.getContractFactory("PowerIpor");
+        const powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
+
+        const John = await hre.ethers.getContractFactory("ItfJohn");
         john = (await upgrades.deployProxy(John, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
-            await admin.getAddress(),
-            tokens.ipTokenUsdt.address,
-        ])) as John;
+            powerIpor.address,
+            iporToken.address,
+        ])) as ItfJohn;
+
+        await john.setPowerIpor(await admin.getAddress());
     });
 
     it("Should set up block rewards for ipToken", async () => {

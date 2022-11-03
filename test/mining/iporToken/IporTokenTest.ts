@@ -7,6 +7,7 @@ import { assertError } from "../../utils/AssertUtils";
 import { prepareTestDataForMining } from "../../utils/DataUtils";
 import { N1__0_18DEC } from "../../utils/Constants";
 
+const keccak256 = require("keccak256");
 const { expect } = chai;
 
 describe("IporToken", () => {
@@ -43,92 +44,30 @@ describe("IporToken", () => {
         }
     };
 
-    it("should transfer ownership - simple case 1", async () => {
-        //given
-        const expectedNewOwner = userTwo;
-        const { iporToken } = await preperateTestDataCase01();
-
-        //when
-        await iporToken.connect(admin).transferOwnership(await expectedNewOwner.getAddress());
-        await iporToken.connect(expectedNewOwner).confirmTransferOwnership();
-
-        //then
-        const actualNewOwner = await iporToken.connect(userOne).owner();
-        expect(await expectedNewOwner.getAddress()).to.be.equal(actualNewOwner);
-    });
-
-    it("should NOT transfer ownership - sender not current owner", async () => {
-        //given
-        const expectedNewOwner = userTwo;
-        const { iporToken } = await preperateTestDataCase01();
-
-        //when
-        await assertError(
-            iporToken.connect(userThree).transferOwnership(await expectedNewOwner.getAddress()),
-            //then
-            "Ownable: caller is not the owner"
-        );
-    });
-
-    it("should NOT confirm transfer ownership - sender not appointed owner", async () => {
-        //given
-        const expectedNewOwner = userTwo;
-        const { iporToken } = await preperateTestDataCase01();
-
-        //when
-        await iporToken.connect(admin).transferOwnership(await expectedNewOwner.getAddress());
-        await assertError(
-            iporToken.connect(userThree).confirmTransferOwnership(),
-            //then
-            "IPOR_007"
-        );
-    });
-
-    it("should NOT confirm transfer ownership twice - sender not appointed owner", async () => {
-        //given
-        const expectedNewOwner = userTwo;
-        const { iporToken } = await preperateTestDataCase01();
-
-        //when
-        await iporToken.connect(admin).transferOwnership(await expectedNewOwner.getAddress());
-        await iporToken.connect(expectedNewOwner).confirmTransferOwnership();
-        await assertError(
-            iporToken.connect(expectedNewOwner).confirmTransferOwnership(),
-            "IPOR_007"
-        );
-    });
-
-    it("should NOT transfer ownership - sender already lost ownership", async () => {
-        //given
-        const expectedNewOwner = userTwo;
-        const { iporToken } = await preperateTestDataCase01();
-
-        await iporToken.connect(admin).transferOwnership(await expectedNewOwner.getAddress());
-        await iporToken.connect(expectedNewOwner).confirmTransferOwnership();
-
-        //when
-        await assertError(
-            iporToken.connect(admin).transferOwnership(await expectedNewOwner.getAddress()),
-            //then
-            "Ownable: caller is not the owner"
-        );
-    });
-
-    it("should have rights to transfer ownership - sender still have rights", async () => {
-        //given
-        const expectedNewOwner = userTwo;
-        const { iporToken } = await preperateTestDataCase01();
-
-        await iporToken.connect(admin).transferOwnership(await expectedNewOwner.getAddress());
-
-        //when
-        await iporToken.connect(admin).transferOwnership(await expectedNewOwner.getAddress());
-
-        //then
-        const actualNewOwner = await iporToken.connect(userOne).owner();
-
-        expect(await admin.getAddress()).to.be.equal(actualNewOwner);
-    });
+    // it("Should ", async () => {
+    //     //    given
+    //     const name = "io.ipor.ipor.token";
+    //     //    when
+    //     const x = keccak256("eip1967.proxy.implementation").toString("hex");
+    //     console.table({
+    //         result: x,
+    //         powinno: "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc",
+    //         0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbd
+    //     });
+    //     //    then
+    // });
+    // io.ipor.ipor.token
+    // 0x1381a7188760c470320204bcfd7e56fb198c5c4148f74567e6369a65320a6d7d
+    //-1
+    // 0x1381a7188760c470320204bcfd7e56fb198c5c4148f74567e6369a65320a6d7c
+    // io.ipor.power.token
+    // 0x47fdc87a43122e85126f7506d5be29962db3a4c77842c5853eec80d72b414528
+    // -1
+    // 0x47fdc87a43122e85126f7506d5be29962db3a4c77842c5853eec80d72b414527
+    // io.ipor.john
+    //  0xa93ed28ba51624c3ccbf684cac0148c79cb9ca9719ef9f44335ff76641461b14
+    // -1
+    //  0xa93ed28ba51624c3ccbf684cac0148c79cb9ca9719ef9f44335ff76641461b13
 
     it("should contain 18 decimals", async () => {
         //given

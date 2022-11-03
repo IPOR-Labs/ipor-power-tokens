@@ -11,6 +11,10 @@ interface IPowerIpor {
     /// @return Returns the name of the Power Ipor token.
     function name() external pure returns (string memory);
 
+    /// @notice Contract id. This is the keccak-256 hash of "io.ipor.power.ipor" subtracted by 1
+    /// @return Returns id of contract
+    function contractId() external pure returns (bytes32);
+
     /// @notice Gets symbol of the Power Ipor token.
     /// @return Returns the symbol of the Power Ipor token.
     function symbol() external pure returns (string memory);
