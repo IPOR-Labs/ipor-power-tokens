@@ -89,6 +89,7 @@ abstract contract PowerIporInternal is
         override
         onlyOwner
     {
+        require(unstakeWithoutCooldownFee <= Constants.D18, MiningErrors.FEE_PERCENT_TO_HEIGHT);
         uint256 oldValue = _unstakeWithoutCooldownFee;
         _unstakeWithoutCooldownFee = unstakeWithoutCooldownFee;
         emit UnstakeWithoutCooldownFeeChanged(_msgSender(), oldValue, unstakeWithoutCooldownFee);
