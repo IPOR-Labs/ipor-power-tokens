@@ -521,32 +521,6 @@ export default ({ drizzle, drizzleState }) => (
                 </td>
             </tr>
             <tr>
-                <td>IporToken</td>
-                <td>{drizzle.contracts.IporToken.address}</td>
-                <td>
-                    <ContractData
-                        drizzle={drizzle}
-                        drizzleState={drizzleState}
-                        contract="IporToken"
-                        method="owner"
-                    />
-                </td>
-                <td>
-                    <ContractForm
-                        drizzle={drizzle}
-                        contract="IporToken"
-                        method="transferOwnership"
-                    />
-                </td>
-                <td>
-                    <ContractForm
-                        drizzle={drizzle}
-                        contract="IporToken"
-                        method="confirmTransferOwnership"
-                    />
-                </td>
-            </tr>
-            <tr>
                 <td>Ipor Oracle</td>
                 <td>{drizzle.contracts.DrizzleIporOracle.address}</td>
                 <td>
