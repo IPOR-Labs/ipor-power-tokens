@@ -54,7 +54,7 @@
         "test:mainnet": "export FORK_ENABLED=true; hardhat test test/endToEnd/*.ts",
         "test": "npm-run-all test:*",
         "solhint": "./node_modules/.bin/solhint -f table contracts/**/*.sol",
-        "export-abi": "hardhat --via-ir export-abi",
+        "export-abi": "hardhat export-abi",
         "export-errorCodes": "node utiles/ExtractErrorCodeToJson.js"
     },
     "dependencies": {

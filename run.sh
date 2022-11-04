@@ -483,7 +483,7 @@ function run_smart_contract_migrations() {
   prepare_migration_state_files_structure
 
   npm run compile:truffle 2>&1| tee ".logs/${ENV_PROFILE}/compile/${LAST_MIGRATION_DATE}_compile.log"
-#  npm run export-abi
+  npm run export-abi
   export ETH_BC_NETWORK_NAME
   npm run migrate:truffle 2>&1| tee ".logs/${ENV_PROFILE}/migrate/${LAST_MIGRATION_DATE}_migrate.log"
 
@@ -528,7 +528,7 @@ function run_clean_smart_contract_migrations() {
   prepare_migration_state_files_structure
 
   npm run compile:truffle 2>&1| tee ".logs/${ENV_PROFILE}/compile/${LAST_MIGRATION_DATE}_compile.log"
-#  npm run export-abi
+  npm run export-abi
   export ETH_BC_NETWORK_NAME
   npm run migrate:truffle-reset 2>&1| tee ".logs/${ENV_PROFILE}/migrate/${LAST_MIGRATION_DATE}_migrate.log"
 

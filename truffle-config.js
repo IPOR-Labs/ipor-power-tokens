@@ -49,7 +49,7 @@ module.exports = {
                 // See the solidity docs for advice about optimization and evmVersion
                 optimizer: {
                     enabled: true,
-                    runs: 800,
+                    runs: 200,
                     details: { yul: true },
                 },
                 evmVersion: "london",
