@@ -30,6 +30,6 @@ library MiningErrors {
     string public constant BLOCK_NUMBER_LOWER_THAN_PREVIOUS_BLOCK_NUMBER = "IPOR_712";
     /// @notice Account Composite Multiplier indicator greater or equal than Composit Multiplier indicator, but should be less or equal
     string public constant ACCOUNT_COMPOSITE_MULTIPLIER_GT_COMPOSITE_MULTIPLIER = "IPOR_713";
-    /// @notice The feeee for unstacked iporTokens should be number between (0, 1e18)
-    string public constant FEE_PERCENT_TO_HEIGHT = "IPOR_714";
+    /// @notice The fee for unstacked iporTokens should be number between (0, 1e18)
+    string public constant UNSTAKE_WITHOUT_COOLDOWN_FEE_IS_TO_HIGH = "IPOR_714";
 }
