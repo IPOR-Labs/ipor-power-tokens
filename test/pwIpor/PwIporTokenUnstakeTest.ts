@@ -11,6 +11,7 @@ import {
     TOTAL_SUPPLY_18_DECIMALS,
     N0__01_18DEC,
     N0__1_18DEC,
+    N2__0_18DEC,
 } from "../utils/Constants";
 import { it } from "mocha";
 import { getDeployedTokens, Tokens } from "../utils/JohnUtils";
@@ -55,6 +56,12 @@ describe("PowerIpor unstake", () => {
         ])) as John;
 
         await powerIpor.setJohn(john.address);
+    });
+
+    it("Should not be able set _unstakeWithoutCooldownFee to value highter than 1e18", async () => {
+        await expect(powerIpor.setUnstakeWithoutCooldownFee(N2__0_18DEC)).to.be.revertedWith(
+            "IPOR_714"
+        );
     });
 
     it("Should not be able unstake when amount is zero", async () => {
