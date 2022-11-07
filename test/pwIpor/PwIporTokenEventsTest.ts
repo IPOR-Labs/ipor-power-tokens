@@ -190,13 +190,15 @@ describe("PowerIpor token delegate", () => {
 
     it("Should emit JohnChanged event", async () => {
         // given
-        const randomAddressString = randomAddress();
+        const John = await hre.ethers.getContractFactory("ItfJohn");
+        const itfJohn = (await upgrades.deployProxy(John, [
+            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
+            powerIpor.address,
+            iporToken.address,
+        ])) as ItfJohn;
 
         // when
-        await expect(powerIpor.setJohn(randomAddressString.toString())).to.be.emit(
-            powerIpor,
-            "JohnChanged"
-        );
+        await expect(powerIpor.setJohn(itfJohn.address)).to.be.emit(powerIpor, "JohnChanged");
     });
 
     it("Should emit PauseManagerChanged event ", async () => {

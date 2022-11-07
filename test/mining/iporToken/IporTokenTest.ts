@@ -7,6 +7,7 @@ import { assertError } from "../../utils/AssertUtils";
 import { prepareTestDataForMining } from "../../utils/DataUtils";
 import { N1__0_18DEC } from "../../utils/Constants";
 
+const keccak256 = require("keccak256");
 const { expect } = chai;
 
 describe("IporToken", () => {
@@ -42,93 +43,6 @@ describe("IporToken", () => {
             return { ipToken: ipTokenDai, iporToken };
         }
     };
-
-    it("should transfer ownership - simple case 1", async () => {
-        //given
-        const expectedNewOwner = userTwo;
-        const { iporToken } = await preperateTestDataCase01();
-
-        //when
-        await iporToken.connect(admin).transferOwnership(await expectedNewOwner.getAddress());
-        await iporToken.connect(expectedNewOwner).confirmTransferOwnership();
-
-        //then
-        const actualNewOwner = await iporToken.connect(userOne).owner();
-        expect(await expectedNewOwner.getAddress()).to.be.equal(actualNewOwner);
-    });
-
-    it("should NOT transfer ownership - sender not current owner", async () => {
-        //given
-        const expectedNewOwner = userTwo;
-        const { iporToken } = await preperateTestDataCase01();
-
-        //when
-        await assertError(
-            iporToken.connect(userThree).transferOwnership(await expectedNewOwner.getAddress()),
-            //then
-            "Ownable: caller is not the owner"
-        );
-    });
-
-    it("should NOT confirm transfer ownership - sender not appointed owner", async () => {
-        //given
-        const expectedNewOwner = userTwo;
-        const { iporToken } = await preperateTestDataCase01();
-
-        //when
-        await iporToken.connect(admin).transferOwnership(await expectedNewOwner.getAddress());
-        await assertError(
-            iporToken.connect(userThree).confirmTransferOwnership(),
-            //then
-            "IPOR_007"
-        );
-    });
-
-    it("should NOT confirm transfer ownership twice - sender not appointed owner", async () => {
-        //given
-        const expectedNewOwner = userTwo;
-        const { iporToken } = await preperateTestDataCase01();
-
-        //when
-        await iporToken.connect(admin).transferOwnership(await expectedNewOwner.getAddress());
-        await iporToken.connect(expectedNewOwner).confirmTransferOwnership();
-        await assertError(
-            iporToken.connect(expectedNewOwner).confirmTransferOwnership(),
-            "IPOR_007"
-        );
-    });
-
-    it("should NOT transfer ownership - sender already lost ownership", async () => {
-        //given
-        const expectedNewOwner = userTwo;
-        const { iporToken } = await preperateTestDataCase01();
-
-        await iporToken.connect(admin).transferOwnership(await expectedNewOwner.getAddress());
-        await iporToken.connect(expectedNewOwner).confirmTransferOwnership();
-
-        //when
-        await assertError(
-            iporToken.connect(admin).transferOwnership(await expectedNewOwner.getAddress()),
-            //then
-            "Ownable: caller is not the owner"
-        );
-    });
-
-    it("should have rights to transfer ownership - sender still have rights", async () => {
-        //given
-        const expectedNewOwner = userTwo;
-        const { iporToken } = await preperateTestDataCase01();
-
-        await iporToken.connect(admin).transferOwnership(await expectedNewOwner.getAddress());
-
-        //when
-        await iporToken.connect(admin).transferOwnership(await expectedNewOwner.getAddress());
-
-        //then
-        const actualNewOwner = await iporToken.connect(userOne).owner();
-
-        expect(await admin.getAddress()).to.be.equal(actualNewOwner);
-    });
 
     it("should contain 18 decimals", async () => {
         //given

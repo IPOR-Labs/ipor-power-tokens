@@ -14,6 +14,7 @@ import "../libraries/math/IporMath.sol";
 import "../interfaces/IPowerIporInternal.sol";
 import "../interfaces/IJohn.sol";
 import "../security/IporOwnableUpgradeable.sol";
+import "./IporToken.sol";
 
 abstract contract PowerIporInternal is
     PausableUpgradeable,
@@ -24,6 +25,11 @@ abstract contract PowerIporInternal is
 {
     /// @dev 2 weeks
     uint256 public constant COOL_DOWN_IN_SECONDS = 2 * 7 * 24 * 60 * 60;
+
+    bytes32 internal constant _IPOR_TOKEN_ID =
+        0xdba05ed67d0251facfcab8345f27ccd3e72b5a1da8cebfabbcccf4316e6d053c;
+    bytes32 internal constant _JOHN_ID =
+        0x9b1f3aa590476fc9aa58d44ad1419ab53d34c344bd5ed46b12e4af7d27c38e06;
 
     address internal _john;
     address internal _iporToken;
@@ -59,6 +65,10 @@ abstract contract PowerIporInternal is
         __Ownable_init_unchained();
         __UUPSUpgradeable_init_unchained();
         require(iporToken != address(0), IporErrors.WRONG_ADDRESS);
+        require(
+            IporToken(iporToken).getContractId() == _IPOR_TOKEN_ID,
+            IporErrors.WRONG_CONTRACT_ID
+        );
         _iporToken = iporToken;
         _pauseManager = _msgSender();
         _unstakeWithoutCooldownFee = Constants.D17 * 5;
@@ -100,6 +110,7 @@ abstract contract PowerIporInternal is
 
     function setJohn(address newJohnAddr) external override onlyOwner {
         require(newJohnAddr != address(0), IporErrors.WRONG_ADDRESS);
+        require(IJohn(newJohnAddr).getContractId() == _JOHN_ID, IporErrors.WRONG_CONTRACT_ID);
         address oldJohnAddr = _john;
         _john = newJohnAddr;
         emit JohnChanged(_msgSender(), oldJohnAddr, newJohnAddr);

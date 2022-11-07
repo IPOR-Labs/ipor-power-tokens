@@ -29,6 +29,11 @@ abstract contract JohnInternal is
     using SafeCast for uint256;
     using SafeCast for int256;
 
+    bytes32 internal constant _IPOR_TOKEN_ID =
+        0xdba05ed67d0251facfcab8345f27ccd3e72b5a1da8cebfabbcccf4316e6d053c;
+    bytes32 internal constant _POWER_IPOR_ID =
+        0xbd22bf01cb7daed462db61de31bb111aabcdae27adc748450fb9a9ea1c419cce;
+
     address internal _powerIpor;
     address internal _pauseManager;
 
@@ -65,7 +70,15 @@ abstract contract JohnInternal is
         __UUPSUpgradeable_init_unchained();
 
         require(powerIpor != address(0), IporErrors.WRONG_ADDRESS);
+        require(
+            IPowerIpor(powerIpor).getContractId() == _POWER_IPOR_ID,
+            IporErrors.WRONG_CONTRACT_ID
+        );
         require(iporToken != address(0), IporErrors.WRONG_ADDRESS);
+        require(
+            IporToken(iporToken).getContractId() == _IPOR_TOKEN_ID,
+            IporErrors.WRONG_CONTRACT_ID
+        );
 
         uint256 ipTokensLength = ipTokens.length;
 
