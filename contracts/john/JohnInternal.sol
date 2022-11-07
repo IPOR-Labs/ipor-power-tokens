@@ -166,8 +166,8 @@ abstract contract JohnInternal is
     function delegatePwIporAndStakeIpToken(
         address account,
         address[] calldata ipTokens,
-        uint256[] calldata pwIporAmounts,
-        uint256[] calldata ipTokenAmounts
+        uint256[] memory pwIporAmounts,
+        uint256[] memory ipTokenAmounts
     ) external override onlyPowerIpor whenNotPaused {
         uint256 rewards;
 
