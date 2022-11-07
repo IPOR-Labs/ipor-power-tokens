@@ -119,8 +119,8 @@ interface IJohnInternal {
     /// @notice Emitted when account delegates Power Ipor Tokens to John
     /// @param account account address in the context of which activities of delegation are performed
     /// @param ipToken address of ipToken for which Power Ipor Token are delegated
-    /// @param ipTokenAmount amount of ipTokens delegated to John, represented in 18 decimals
-    event DelegatePwIpor(address account, address ipToken, uint256 ipTokenAmount);
+    /// @param pwIporAmount amount of Power Ipor Tokens delegated to John, represented in 18 decimals
+    event DelegatePwIpor(address account, address ipToken, uint256 pwIporAmount);
 
     /// @notice Emitted when account delegates Power Ipor Tokens and stake ipTokens to the John
     /// @param account account address in the context of which activities of delegation and staking are performed
@@ -137,8 +137,8 @@ interface IJohnInternal {
     /// @notice Emitted when account undelegate Power Ipor Tokens from John contract
     /// @param account account address in the context of which activities of undelegation are performed
     /// @param ipToken address of ipToken
-    /// @param ipTokenAmount amount of Power Ipor Token which was undelegated, represented in 18 decimals
-    event UndelegatePwIpor(address account, address ipToken, uint256 ipTokenAmount);
+    /// @param pwIporAmount amount of Power Ipor Token which was undelegated, represented in 18 decimals
+    event UndelegatePwIpor(address account, address ipToken, uint256 pwIporAmount);
 
     /// @notice Emitted when PauseManager's address is changed by its owner.
     /// @param changedBy account address that has changed John's address

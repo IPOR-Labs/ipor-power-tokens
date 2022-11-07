@@ -163,7 +163,6 @@ abstract contract JohnInternal is
         }
     }
 
-    //todo remove memory??
     function delegatePwIporAndStakeIpToken(
         address account,
         address[] calldata ipTokens,
