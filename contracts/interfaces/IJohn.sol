@@ -8,7 +8,7 @@ import "./types/JohnTypes.sol";
 /// by staking ipTokens and / or delegating Power Ipor Tokens to John. IpTokens can be staked directly to John,
 /// Power Ipor Tokens account can get stake IPOR Tokens in PowerIpor smart contract.
 interface IJohn {
-    /// @notice Contract id. This is the keccak-256 hash of "io.ipor.john" subtracted by 1
+    /// @notice Contract id. This is the keccak-256 hash of "io.ipor.John" subtracted by 1
     /// @return Returns id of contract
     function getContractId() external pure returns (bytes32);
 

@@ -6,10 +6,10 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 contract IporToken is ERC20 {
     /**
      * @dev Contract id.
-     * This is the keccak-256 hash of "io.ipor.ipor.token" subtracted by 1
+     * This is the keccak-256 hash of "io.ipor.IporToken" subtracted by 1
      */
     function getContractId() external pure returns (bytes32) {
-        return 0x1381a7188760c470320204bcfd7e56fb198c5c4148f74567e6369a65320a6d7c;
+        return 0xdba05ed67d0251facfcab8345f27ccd3e72b5a1da8cebfabbcccf4316e6d053c;
     }
 
     uint8 private immutable _decimals;
