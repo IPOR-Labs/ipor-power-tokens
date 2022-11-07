@@ -27,9 +27,9 @@ abstract contract PowerIporInternal is
     uint256 public constant COOL_DOWN_IN_SECONDS = 2 * 7 * 24 * 60 * 60;
 
     bytes32 internal constant _IPOR_TOKEN_ID =
-        0x1381a7188760c470320204bcfd7e56fb198c5c4148f74567e6369a65320a6d7c;
+        0xdba05ed67d0251facfcab8345f27ccd3e72b5a1da8cebfabbcccf4316e6d053c;
     bytes32 internal constant _JOHN_ID =
-        0xa93ed28ba51624c3ccbf684cac0148c79cb9ca9719ef9f44335ff76641461b13;
+        0x9b1f3aa590476fc9aa58d44ad1419ab53d34c344bd5ed46b12e4af7d27c38e06;
 
     address internal _john;
     address internal _iporToken;
