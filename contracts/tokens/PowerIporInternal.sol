@@ -90,6 +90,10 @@ abstract contract PowerIporInternal is
         return _john;
     }
 
+    function getIporToken() external view override returns (address) {
+        return _iporToken;
+    }
+
     function getPauseManager() external view override returns (address) {
         return _pauseManager;
     }
