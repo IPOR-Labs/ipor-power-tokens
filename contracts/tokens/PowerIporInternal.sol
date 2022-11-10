@@ -176,7 +176,11 @@ abstract contract PowerIporInternal is
         return IporMath.division(balanceOfIporToken * Constants.D18, baseTotalSupply);
     }
 
-    function _calculateAmountWithoutFee(uint256 baseAmount) internal view returns (uint256) {
+    function _calculateAmountWithCooldownFeeSubtracted(uint256 baseAmount)
+        internal
+        view
+        returns (uint256)
+    {
         return
             IporMath.division(
                 (Constants.D18 - _unstakeWithoutCooldownFee) * baseAmount,

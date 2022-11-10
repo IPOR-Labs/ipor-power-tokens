@@ -137,6 +137,7 @@ abstract contract JohnInternal is
         uint256 accruedCompMultiplierCumulativePrevBlock;
         JohnTypes.AccountRewardsIndicators memory accountIndicators;
         JohnTypes.GlobalRewardsIndicators memory globalIndicators;
+
         for (uint256 i; i != ipTokensLength; ++i) {
             require(_ipTokens[ipTokens[i]], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
 
@@ -183,7 +184,6 @@ abstract contract JohnInternal is
         uint256[] memory ipTokenAmounts
     ) external override onlyPowerIpor whenNotPaused {
         uint256 rewards;
-
         uint256 ipTokensLength = ipTokens.length;
         uint256 rewardsIteration;
         uint256 accruedCompMultiplierCumulativePrevBlock;
@@ -466,7 +466,7 @@ abstract contract JohnInternal is
     /// @dev To pre-calculate this value from uint256, use {MiningCalculation._toQuadruplePrecision()} method.
     /// @dev Notice! uint256 value before calculation has following constraints: 1 <= Horizontal Shift <= 10^3
     /// @return horizontal shift - value represented in bytes16, quadrupe precision, 128 bits, takes into consideration 18 decimals
-    function _getHorizontalShift() internal pure returns (bytes16) {
+    function _getHorizontalShift() internal pure virtual returns (bytes16) {
         return 0x3fff0000000000000000000000000000;
     }
 
@@ -474,7 +474,7 @@ abstract contract JohnInternal is
     /// @dev To pre-calculate this value from uint256, use {MiningCalculation._toQuadruplePrecision()} method.
     /// @dev Notice! uint256 value before calculation has following constraints: 10^(-4) <= Vertival Shift <= 3
     /// @return vertical shift - value represented in bytes16, quadrupe precision, 128 bits, takes into consideration 18 decimals
-    function _getVerticalShift() internal pure returns (bytes16) {
+    function _getVerticalShift() internal pure virtual returns (bytes16) {
         return 0x3ffd99999999999999e36310e0e2a848;
     }
 
