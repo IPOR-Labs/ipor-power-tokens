@@ -240,7 +240,7 @@ describe("John sum of rewards", () => {
         );
     });
 
-    it.only("Should unstake 3 users - DAI is not supported before unstake", async () => {
+    it("Should unstake 3 users - DAI is not supported before unstake", async () => {
         //    given
         const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedIpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
