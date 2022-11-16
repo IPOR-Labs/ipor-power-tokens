@@ -26,11 +26,8 @@ interface IPowerIporInternal {
     /// @param iporTokenAmount - amount of rewards, represented in 18 decimals.
     function receiveRewardsFromJohn(address account, uint256 iporTokenAmount) external;
 
-    /// @notice method returns actual address of liquidity rewards contract - the John
+    /// @notice method return actual address of liquidity rewards contract - the John
     function getJohn() external view returns (address);
-
-    /// @notice method returns actual address of IPOR Token
-    function getIporToken() external view returns (address);
 
     /// @notice Gets Pause Manager address
     /// @return Pause Manager's address

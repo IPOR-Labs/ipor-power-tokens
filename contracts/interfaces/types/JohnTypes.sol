@@ -41,7 +41,7 @@ library JohnTypes {
         uint128 compositeMultiplierCumulativePrevBlock;
         /// @notice ipToken account's balance
         uint128 ipTokenBalance;
-        /// @notive PowerUp is a result of logarithmic equastion defined in documentation,
+        /// @notive PowerUp is a result of logarythmic equastion defined in documentation,
         /// parameter used to recalculate composite multiplier.
         /// @dev  powerUp < 100 *10^18
         uint72 powerUp;

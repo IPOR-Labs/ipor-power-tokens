@@ -66,7 +66,7 @@ interface IPowerIpor {
     /// @notice Delegates Power Ipor Tokens to John
     /// @param ipTokens - list of ipTokens to which are associated in delegation Power Ipor Tokens
     /// @param pwIporAmounts - list of Power Ipor Token amount which are delegated in relation to given ipToken
-    function delegateToJohn(address[] calldata ipTokens, uint256[] calldata pwIporAmounts) external;
+    function delegateToJohn(address[] memory ipTokens, uint256[] memory pwIporAmounts) external;
 
     /// @notice Delegates Power Ipor Tokens and stakes ipTokens
     /// @dev Power Ipor Token amounts can be equal zeros. IP Token amounts can be equal zeros.
@@ -74,17 +74,16 @@ interface IPowerIpor {
     /// @param pwIporAmounts - list of Power Ipor Token amount which sender delegates for a given ipToken
     /// @param ipTokenAmounts - list of ipToken amount which sender stakes in John for a given ipToken
     function delegateAndStakeToJohn(
-        address[] calldata ipTokens,
-        uint256[] calldata pwIporAmounts,
-        uint256[] calldata ipTokenAmounts
+        address[] memory ipTokens,
+        uint256[] memory pwIporAmounts,
+        uint256[] memory ipTokenAmounts
     ) external;
 
     /// @notice Undelegates Power Ipor Token from John
     /// @dev Power Ipor amounts have to be higher than zero, in other case transaction is rejected.
     /// @param ipTokens - list of ipToken from which sender will undelegate Power Ipor Tokens
     /// @param pwIporAmounts - list of amounts of Power Ipor Tokens taken to undelegate from John
-    function undelegateFromJohn(address[] calldata ipTokens, uint256[] calldata pwIporAmounts)
-        external;
+    function undelegateFromJohn(address[] memory ipTokens, uint256[] memory pwIporAmounts) external;
 
     /// @notice Resets freeze of a given Power Ipor Token amount in the next 2 weeks.
     /// @dev Power Ipor Tokens in cool down state cannot be unstaked without fee,

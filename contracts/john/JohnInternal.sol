@@ -137,7 +137,6 @@ abstract contract JohnInternal is
         uint256 accruedCompMultiplierCumulativePrevBlock;
         JohnTypes.AccountRewardsIndicators memory accountIndicators;
         JohnTypes.GlobalRewardsIndicators memory globalIndicators;
-
         for (uint256 i; i != ipTokensLength; ++i) {
             require(_ipTokens[ipTokens[i]], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
 
@@ -180,43 +179,45 @@ abstract contract JohnInternal is
     function delegatePwIporAndStakeIpToken(
         address account,
         address[] calldata ipTokens,
-        uint256[] calldata pwIporAmounts,
-        uint256[] calldata ipTokenAmounts
+        uint256[] memory pwIporAmounts,
+        uint256[] memory ipTokenAmounts
     ) external override onlyPowerIpor whenNotPaused {
         uint256 rewards;
-        uint256 ipTokenAmount;
-        uint256 pwIporAmount;
 
-        for (uint256 i; i != ipTokens.length; ++i) {
+        uint256 ipTokensLength = ipTokens.length;
+        uint256 rewardsIteration;
+        uint256 accruedCompMultiplierCumulativePrevBlock;
+        JohnTypes.AccountRewardsIndicators memory accountIndicators;
+        JohnTypes.GlobalRewardsIndicators memory globalIndicators;
+
+        for (uint256 i; i != ipTokensLength; ++i) {
             require(_ipTokens[ipTokens[i]], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
-            ipTokenAmount = ipTokenAmounts[i];
-            pwIporAmount = pwIporAmounts[i];
 
-            JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[
-                account
-            ][ipTokens[i]];
-            JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[
-                ipTokens[i]
-            ];
+            accountIndicators = _accountIndicators[account][ipTokens[i]];
+            globalIndicators = _globalIndicators[ipTokens[i]];
 
             /// @dev Order is important! First Stake, then Delegate.
             /// @dev Stake
-            if (ipTokenAmount > 0) {
-                IERC20Upgradeable(ipTokens[i]).transferFrom(account, address(this), ipTokenAmount);
+            if (ipTokenAmounts[i] > 0) {
+                IERC20Upgradeable(ipTokens[i]).transferFrom(
+                    account,
+                    address(this),
+                    ipTokenAmounts[i]
+                );
             }
 
             /// @dev Delegate
-            if (accountIndicators.ipTokenBalance == 0 && ipTokenAmount == 0) {
+            if (accountIndicators.ipTokenBalance == 0 && ipTokenAmounts[i] == 0) {
                 _accountIndicators[account][ipTokens[i]].delegatedPwIporBalance = (accountIndicators
-                    .delegatedPwIporBalance + pwIporAmount).toUint96();
-                emit DelegatePwIpor(account, ipTokens[i], pwIporAmount);
+                    .delegatedPwIporBalance + pwIporAmounts[i]).toUint96();
+                emit DelegatePwIpor(account, ipTokens[i], pwIporAmounts[i]);
                 continue;
             }
 
-            (
-                uint256 rewardsIteration,
-                uint256 accruedCompMultiplierCumulativePrevBlock
-            ) = _calculateAccountRewards(globalIndicators, accountIndicators);
+            (rewardsIteration, accruedCompMultiplierCumulativePrevBlock) = _calculateAccountRewards(
+                globalIndicators,
+                accountIndicators
+            );
 
             rewards += rewardsIteration;
 
@@ -226,10 +227,15 @@ abstract contract JohnInternal is
                 accruedCompMultiplierCumulativePrevBlock,
                 globalIndicators,
                 accountIndicators,
-                accountIndicators.ipTokenBalance + ipTokenAmount,
-                accountIndicators.delegatedPwIporBalance + pwIporAmount
+                accountIndicators.ipTokenBalance + ipTokenAmounts[i],
+                accountIndicators.delegatedPwIporBalance + pwIporAmounts[i]
             );
-            emit DelegatePwIporAndStakeIpToken(account, ipTokens[i], pwIporAmount, ipTokenAmount);
+            emit DelegatePwIporAndStakeIpToken(
+                account,
+                ipTokens[i],
+                pwIporAmounts[i],
+                ipTokenAmounts[i]
+            );
         }
 
         if (rewards > 0) {
@@ -460,7 +466,7 @@ abstract contract JohnInternal is
     /// @dev To pre-calculate this value from uint256, use {MiningCalculation._toQuadruplePrecision()} method.
     /// @dev Notice! uint256 value before calculation has following constraints: 1 <= Horizontal Shift <= 10^3
     /// @return horizontal shift - value represented in bytes16, quadrupe precision, 128 bits, takes into consideration 18 decimals
-    function _getHorizontalShift() internal pure virtual returns (bytes16) {
+    function _getHorizontalShift() internal pure returns (bytes16) {
         return 0x3fff0000000000000000000000000000;
     }
 
@@ -468,7 +474,7 @@ abstract contract JohnInternal is
     /// @dev To pre-calculate this value from uint256, use {MiningCalculation._toQuadruplePrecision()} method.
     /// @dev Notice! uint256 value before calculation has following constraints: 10^(-4) <= Vertival Shift <= 3
     /// @return vertical shift - value represented in bytes16, quadrupe precision, 128 bits, takes into consideration 18 decimals
-    function _getVerticalShift() internal pure virtual returns (bytes16) {
+    function _getVerticalShift() internal pure returns (bytes16) {
         return 0x3ffd99999999999999e36310e0e2a848;
     }
 
