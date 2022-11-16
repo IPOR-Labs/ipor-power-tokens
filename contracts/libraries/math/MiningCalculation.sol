@@ -140,8 +140,6 @@ library MiningCalculation {
         uint256 accountCompMultiplierCumulativePrevBlock,
         uint256 accruedCompMultiplierCumulativePrevBlock
     ) internal pure returns (uint256) {
-        /// @dev Composite Multiplier Cumulative for Prev Block stored in Account structure cannot be greater than the newest accrued global
-        /// Composite Multiplier Cumulative for Prev Block
         require(
             accruedCompMultiplierCumulativePrevBlock >= accountCompMultiplierCumulativePrevBlock,
             MiningErrors.ACCOUNT_COMPOSITE_MULTIPLIER_GT_COMPOSITE_MULTIPLIER
