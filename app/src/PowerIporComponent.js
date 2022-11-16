@@ -238,6 +238,19 @@ export default ({ drizzle, drizzleState }) => {
                 <hr />
                 <h4>Power Ipor Smart Contract Configuration</h4>
                 <table className="table" align="center">
+                    <tr style={{ padding: "2em" }}>
+                        <td>
+                            <strong>Ipor Token Address in Power Token</strong>
+                        </td>
+                        <td>
+                            <ContractData
+                                drizzle={drizzle}
+                                drizzleState={drizzleState}
+                                contract="PowerIpor"
+                                method="getIporToken"
+                            />
+                        </td>
+                    </tr>
                     <tr>
                         <td>
                             <strong>Set Pause Manager address</strong>
