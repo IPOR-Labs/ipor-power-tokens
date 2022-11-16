@@ -115,7 +115,6 @@ contract John is JohnInternal, IJohn {
         nonReentrant
         whenNotPaused
     {
-        require(_ipTokens[ipToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
         require(ipTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         address msgSender = _msgSender();
@@ -163,20 +162,10 @@ contract John is JohnInternal, IJohn {
         ];
         JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
 
-        uint256 accruedCompMultiplierCumulativePrevBlock = MiningCalculation
-            .calculateAccruedCompMultiplierCumulativePrevBlock(
-                block.number,
-                globalIndicators.blockNumber,
-                globalIndicators.compositeMultiplierInTheBlock,
-                globalIndicators.compositeMultiplierCumulativePrevBlock
-            );
-
-        uint256 iporTokenAmount = MiningCalculation.calculateAccountRewards(
-            accountIndicators.ipTokenBalance,
-            accountIndicators.powerUp,
-            accountIndicators.compositeMultiplierCumulativePrevBlock,
-            accruedCompMultiplierCumulativePrevBlock
-        );
+        (
+            uint256 iporTokenAmount,
+            uint256 accruedCompMultiplierCumulativePrevBlock
+        ) = _calculateAccountRewards(globalIndicators, accountIndicators);
 
         require(iporTokenAmount > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
 

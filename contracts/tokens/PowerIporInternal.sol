@@ -90,6 +90,10 @@ abstract contract PowerIporInternal is
         return _john;
     }
 
+    function getIporToken() external view override returns (address) {
+        return _iporToken;
+    }
+
     function getPauseManager() external view override returns (address) {
         return _pauseManager;
     }
@@ -176,7 +180,11 @@ abstract contract PowerIporInternal is
         return IporMath.division(balanceOfIporToken * Constants.D18, baseTotalSupply);
     }
 
-    function _calculateAmountWithoutFee(uint256 baseAmount) internal view returns (uint256) {
+    function _calculateAmountWithCooldownFeeSubtracted(uint256 baseAmount)
+        internal
+        view
+        returns (uint256)
+    {
         return
             IporMath.division(
                 (Constants.D18 - _unstakeWithoutCooldownFee) * baseAmount,

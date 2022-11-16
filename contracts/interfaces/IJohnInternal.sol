@@ -41,8 +41,8 @@ interface IJohnInternal {
     /// @param pwIporAmount list of Power Ipor amounts for which should be assigns to given ipTokens defined above, represented in 18 decimals
     function delegatePwIpor(
         address account,
-        address[] memory ipTokens,
-        uint256[] memory pwIporAmount
+        address[] calldata ipTokens,
+        uint256[] calldata pwIporAmount
     ) external;
 
     /// @notice Delegates Power Ipor Tokens an stake ipTokens to John.
@@ -53,9 +53,9 @@ interface IJohnInternal {
     /// @param ipTokenAmounts list of ipToken amounts which should be stake to john, represented in 18 decimals
     function delegatePwIporAndStakeIpToken(
         address account,
-        address[] memory ipTokens,
-        uint256[] memory pwIporAmounts,
-        uint256[] memory ipTokenAmounts
+        address[] calldata ipTokens,
+        uint256[] calldata pwIporAmounts,
+        uint256[] calldata ipTokenAmounts
     ) external;
 
     /// @notice Undelegates Power Ipor Tokens from John
@@ -65,8 +65,8 @@ interface IJohnInternal {
     /// @param pwIporAmounts list of amounts of Power Ipor Tokens which will be undelegated, represented in 18 decimals
     function undelegatePwIpor(
         address account,
-        address[] memory ipTokens,
-        uint256[] memory pwIporAmounts
+        address[] calldata ipTokens,
+        uint256[] calldata pwIporAmounts
     ) external;
 
     /// @notice Sets global configuration indicator rewardsPerBlock for a given ipToken
