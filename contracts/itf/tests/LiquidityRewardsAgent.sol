@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.16;
 
-import "../../john/John.sol";
+import "../../mining/John.sol";
 import "../../tokens/PowerIpor.sol";
 
 contract LiquidityRewardsAgent {
