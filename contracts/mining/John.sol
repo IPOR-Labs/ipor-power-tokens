@@ -8,24 +8,29 @@ import "./JohnInternal.sol";
 /// by staking ipTokens and / or delegating Power Ipor Tokens to John. IpTokens can be staked directly to John,
 /// Power Ipor Tokens account can get stake IPOR Tokens in PowerIpor smart contract.
 contract John is JohnInternal, IJohn {
-    using SafeERC20Upgradeable for IERC20Upgradeable;
     using SafeCast for uint256;
     using SafeCast for int256;
+
+    function getContractId() external pure returns (bytes32) {
+        return 0x9b1f3aa590476fc9aa58d44ad1419ab53d34c344bd5ed46b12e4af7d27c38e06;
+    }
 
     function balanceOf(address account, address ipToken) external view override returns (uint256) {
         return _accountIndicators[account][ipToken].ipTokenBalance;
     }
 
-    function balanceOfDelegatedPwIpor(address account, address[] memory requestIpTokens)
+    function balanceOfDelegatedPwIpor(address account, address[] calldata requestIpTokens)
         external
         view
         override
         returns (JohnTypes.DelegatedPwIporBalance[] memory balances)
     {
-        balances = new JohnTypes.DelegatedPwIporBalance[](requestIpTokens.length);
+        uint256 ipTokensLength = requestIpTokens.length;
+        balances = new JohnTypes.DelegatedPwIporBalance[](ipTokensLength);
+        address ipToken;
 
-        for (uint256 i = 0; i != requestIpTokens.length; i++) {
-            address ipToken = requestIpTokens[i];
+        for (uint256 i; i != ipTokensLength; ++i) {
+            ipToken = requestIpTokens[i];
             require(_ipTokens[ipToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
             balances[i] = JohnTypes.DelegatedPwIporBalance(
                 ipToken,
@@ -75,7 +80,7 @@ contract John is JohnInternal, IJohn {
 
         address msgSender = _msgSender();
 
-        IERC20Upgradeable(ipToken).safeTransferFrom(msgSender, address(this), ipTokenAmount);
+        IERC20Upgradeable(ipToken).transferFrom(msgSender, address(this), ipTokenAmount);
 
         JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[msgSender][
             ipToken
@@ -110,7 +115,7 @@ contract John is JohnInternal, IJohn {
         nonReentrant
         whenNotPaused
     {
-        require(_ipTokens[ipToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
+        require(ipTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         address msgSender = _msgSender();
 
@@ -144,7 +149,7 @@ contract John is JohnInternal, IJohn {
             _transferRewardsToPowerIpor(msgSender, rewards);
         }
 
-        IERC20Upgradeable(ipToken).safeTransfer(msgSender, ipTokenAmount);
+        IERC20Upgradeable(ipToken).transfer(msgSender, ipTokenAmount);
 
         emit UnstakeIpTokens(msgSender, ipToken, ipTokenAmount);
     }
@@ -157,20 +162,10 @@ contract John is JohnInternal, IJohn {
         ];
         JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
 
-        uint256 accruedCompMultiplierCumulativePrevBlock = MiningCalculation
-            .calculateAccruedCompMultiplierCumulativePrevBlock(
-                block.number,
-                globalIndicators.blockNumber,
-                globalIndicators.compositeMultiplierInTheBlock,
-                globalIndicators.compositeMultiplierCumulativePrevBlock
-            );
-
-        uint256 iporTokenAmount = MiningCalculation.calculateAccountRewards(
-            accountIndicators.ipTokenBalance,
-            accountIndicators.powerUp,
-            accountIndicators.compositeMultiplierCumulativePrevBlock,
-            accruedCompMultiplierCumulativePrevBlock
-        );
+        (
+            uint256 iporTokenAmount,
+            uint256 accruedCompMultiplierCumulativePrevBlock
+        ) = _calculateAccountRewards(globalIndicators, accountIndicators);
 
         require(iporTokenAmount > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
 

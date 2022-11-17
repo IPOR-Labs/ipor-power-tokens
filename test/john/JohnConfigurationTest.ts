@@ -4,7 +4,7 @@ import chai from "chai";
 import { Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { John } from "../../types";
+import { John, IporToken, PowerIpor } from "../../types";
 import { Tokens, getDeployedTokens } from "../utils/JohnUtils";
 
 chai.use(solidity);
@@ -15,10 +15,20 @@ const randomAddress = "0x0B54FA10558caBBdd0D6df5b8667913C43567Bc5";
 describe("John configuration, deploy tests", () => {
     let tokens: Tokens;
     let accounts: Signer[];
+    let iporToken: IporToken;
+    let powerIpor: PowerIpor;
 
     before(async () => {
         accounts = await hre.ethers.getSigners();
         tokens = await getDeployedTokens(accounts);
+        const IporToken = await ethers.getContractFactory("IporToken");
+        iporToken = (await IporToken.deploy(
+            "IPOR Token",
+            "IPOR",
+            await accounts[0].getAddress()
+        )) as IporToken;
+        const PowerIpor = await ethers.getContractFactory("PowerIpor");
+        powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
     });
 
     it("Should deploy contract without assets", async () => {
@@ -27,8 +37,8 @@ describe("John configuration, deploy tests", () => {
         // when
         const john = (await upgrades.deployProxy(John, [
             [],
-            randomAddress,
-            tokens.ipTokenUsdt.address,
+            powerIpor.address,
+            iporToken.address,
         ])) as John;
         // then
         expect(john.address).to.be.not.undefined;
@@ -45,9 +55,29 @@ describe("John configuration, deploy tests", () => {
             upgrades.deployProxy(John, [
                 [],
                 "0x0000000000000000000000000000000000000000",
-                tokens.ipTokenUsdt.address,
+                iporToken.address,
             ])
         ).to.be.revertedWith("IPOR_000");
+    });
+
+    it("Should not be able to deploy contract when address is not powerIpor", async () => {
+        // given
+        const John = await hre.ethers.getContractFactory("John");
+
+        // when
+        await expect(
+            upgrades.deployProxy(John, [[], iporToken.address, iporToken.address])
+        ).to.be.revertedWith("IPOR_011");
+    });
+
+    it("Should not be able to deploy contract when address is not iporToken", async () => {
+        // given
+        const John = await hre.ethers.getContractFactory("John");
+
+        // when
+        await expect(
+            upgrades.deployProxy(John, [[], powerIpor.address, powerIpor.address])
+        ).to.be.revertedWith("IPOR_011");
     });
 
     it("Should deploy contract with 3 assets", async () => {
@@ -57,8 +87,8 @@ describe("John configuration, deploy tests", () => {
         // when
         const john = (await upgrades.deployProxy(John, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
-            randomAddress,
-            tokens.ipTokenUsdt.address,
+            powerIpor.address,
+            iporToken.address,
         ])) as John;
 
         // then
@@ -78,8 +108,8 @@ describe("John configuration, deploy tests", () => {
         // when
         const john = (await upgrades.deployProxy(John, [
             [tokens.ipTokenDai.address],
-            randomAddress,
-            tokens.ipTokenUsdt.address,
+            powerIpor.address,
+            iporToken.address,
         ])) as John;
 
         // then
@@ -97,8 +127,8 @@ describe("John configuration, deploy tests", () => {
         const John = await hre.ethers.getContractFactory("John");
         const john = (await upgrades.deployProxy(John, [
             [],
-            randomAddress,
-            tokens.ipTokenUsdt.address,
+            powerIpor.address,
+            iporToken.address,
         ])) as John;
         const isDaiActiveBefore = await john.isIpTokenSupported(tokens.ipTokenDai.address);
         const isUsdcActiveBefore = await john.isIpTokenSupported(tokens.ipTokenUsdc.address);
@@ -127,8 +157,8 @@ describe("John configuration, deploy tests", () => {
         const John = await hre.ethers.getContractFactory("John");
         const john = (await upgrades.deployProxy(John, [
             [],
-            randomAddress,
-            tokens.ipTokenUsdt.address,
+            powerIpor.address,
+            iporToken.address,
         ])) as John;
         const [_, userOne] = accounts;
 
@@ -145,8 +175,8 @@ describe("John configuration, deploy tests", () => {
         const John = await hre.ethers.getContractFactory("John");
         const john = (await upgrades.deployProxy(John, [
             [],
-            randomAddress,
-            tokens.ipTokenUsdt.address,
+            powerIpor.address,
+            iporToken.address,
         ])) as John;
 
         const [admin, userOne] = accounts;
@@ -168,8 +198,8 @@ describe("John configuration, deploy tests", () => {
         const John = await hre.ethers.getContractFactory("John");
         const john = (await upgrades.deployProxy(John, [
             [],
-            randomAddress,
-            tokens.ipTokenUsdt.address,
+            powerIpor.address,
+            iporToken.address,
         ])) as John;
 
         const [_, userOne] = accounts;
@@ -187,8 +217,8 @@ describe("John configuration, deploy tests", () => {
         const John = await hre.ethers.getContractFactory("John");
         const john = (await upgrades.deployProxy(John, [
             [],
-            randomAddress,
-            tokens.ipTokenUsdt.address,
+            powerIpor.address,
+            iporToken.address,
         ])) as John;
 
         const isPausedBefore = await john.paused();
@@ -209,8 +239,8 @@ describe("John configuration, deploy tests", () => {
         const John = await hre.ethers.getContractFactory("John");
         const john = (await upgrades.deployProxy(John, [
             [],
-            randomAddress,
-            tokens.ipTokenUsdt.address,
+            powerIpor.address,
+            iporToken.address,
         ])) as John;
 
         const isPausedBefore = await john.paused();
@@ -236,8 +266,8 @@ describe("John configuration, deploy tests", () => {
         const John = await hre.ethers.getContractFactory("John");
         const john = (await upgrades.deployProxy(John, [
             [],
-            randomAddress,
-            tokens.ipTokenUsdt.address,
+            powerIpor.address,
+            iporToken.address,
         ])) as John;
 
         const [_, userOne] = accounts;
@@ -258,8 +288,8 @@ describe("John configuration, deploy tests", () => {
         const John = await hre.ethers.getContractFactory("John");
         const john = (await upgrades.deployProxy(John, [
             [],
-            randomAddress,
-            tokens.ipTokenUsdt.address,
+            powerIpor.address,
+            iporToken.address,
         ])) as John;
 
         const [_, userOne] = accounts;
@@ -286,8 +316,8 @@ describe("John configuration, deploy tests", () => {
         const John = await hre.ethers.getContractFactory("John");
         const john = (await upgrades.deployProxy(John, [
             [],
-            randomAddress,
-            tokens.ipTokenUsdt.address,
+            powerIpor.address,
+            iporToken.address,
         ])) as John;
         await john.pause();
         const isPausedBefore = await john.paused();
@@ -308,8 +338,8 @@ describe("John configuration, deploy tests", () => {
         const John = await hre.ethers.getContractFactory("John");
         const john = (await upgrades.deployProxy(John, [
             [],
-            randomAddress,
-            tokens.ipTokenUsdt.address,
+            powerIpor.address,
+            iporToken.address,
         ])) as John;
         await john.pause();
         const isPausedBefore = await john.paused();
@@ -336,8 +366,8 @@ describe("John configuration, deploy tests", () => {
         const John = await hre.ethers.getContractFactory("John");
         const john = (await upgrades.deployProxy(John, [
             [],
-            randomAddress,
-            tokens.ipTokenUsdt.address,
+            powerIpor.address,
+            iporToken.address,
         ])) as John;
 
         const [_, userOne] = accounts;
@@ -359,8 +389,8 @@ describe("John configuration, deploy tests", () => {
         const John = await hre.ethers.getContractFactory("John");
         const john = (await upgrades.deployProxy(John, [
             [],
-            randomAddress,
-            tokens.ipTokenUsdt.address,
+            powerIpor.address,
+            iporToken.address,
         ])) as John;
 
         const [_, userOne, userThree] = accounts;

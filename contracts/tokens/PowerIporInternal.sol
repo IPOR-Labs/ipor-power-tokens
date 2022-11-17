@@ -2,7 +2,6 @@
 pragma solidity 0.8.16;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -15,6 +14,7 @@ import "../libraries/math/IporMath.sol";
 import "../interfaces/IPowerIporInternal.sol";
 import "../interfaces/IJohn.sol";
 import "../security/IporOwnableUpgradeable.sol";
+import "./IporToken.sol";
 
 abstract contract PowerIporInternal is
     PausableUpgradeable,
@@ -23,10 +23,13 @@ abstract contract PowerIporInternal is
     IporOwnableUpgradeable,
     IPowerIporInternal
 {
-    using SafeERC20Upgradeable for IERC20Upgradeable;
-
     /// @dev 2 weeks
     uint256 public constant COOL_DOWN_IN_SECONDS = 2 * 7 * 24 * 60 * 60;
+
+    bytes32 internal constant _IPOR_TOKEN_ID =
+        0xdba05ed67d0251facfcab8345f27ccd3e72b5a1da8cebfabbcccf4316e6d053c;
+    bytes32 internal constant _JOHN_ID =
+        0x9b1f3aa590476fc9aa58d44ad1419ab53d34c344bd5ed46b12e4af7d27c38e06;
 
     address internal _john;
     address internal _iporToken;
@@ -58,10 +61,14 @@ abstract contract PowerIporInternal is
     }
 
     function initialize(address iporToken) public initializer {
-        __Pausable_init();
-        __Ownable_init();
-        __UUPSUpgradeable_init();
+        __Pausable_init_unchained();
+        __Ownable_init_unchained();
+        __UUPSUpgradeable_init_unchained();
         require(iporToken != address(0), IporErrors.WRONG_ADDRESS);
+        require(
+            IporToken(iporToken).getContractId() == _IPOR_TOKEN_ID,
+            IporErrors.WRONG_CONTRACT_ID
+        );
         _iporToken = iporToken;
         _pauseManager = _msgSender();
         _unstakeWithoutCooldownFee = Constants.D17 * 5;
@@ -83,6 +90,10 @@ abstract contract PowerIporInternal is
         return _john;
     }
 
+    function getIporToken() external view override returns (address) {
+        return _iporToken;
+    }
+
     function getPauseManager() external view override returns (address) {
         return _pauseManager;
     }
@@ -92,6 +103,10 @@ abstract contract PowerIporInternal is
         override
         onlyOwner
     {
+        require(
+            unstakeWithoutCooldownFee <= Constants.D18,
+            MiningErrors.UNSTAKE_WITHOUT_COOLDOWN_FEE_IS_TO_HIGH
+        );
         uint256 oldValue = _unstakeWithoutCooldownFee;
         _unstakeWithoutCooldownFee = unstakeWithoutCooldownFee;
         emit UnstakeWithoutCooldownFeeChanged(_msgSender(), oldValue, unstakeWithoutCooldownFee);
@@ -99,6 +114,7 @@ abstract contract PowerIporInternal is
 
     function setJohn(address newJohnAddr) external override onlyOwner {
         require(newJohnAddr != address(0), IporErrors.WRONG_ADDRESS);
+        require(IJohn(newJohnAddr).getContractId() == _JOHN_ID, IporErrors.WRONG_CONTRACT_ID);
         address oldJohnAddr = _john;
         _john = newJohnAddr;
         emit JohnChanged(_msgSender(), oldJohnAddr, newJohnAddr);
@@ -122,7 +138,7 @@ abstract contract PowerIporInternal is
         uint256 exchangeRate = _calculateInternalExchangeRate(iporTokenAddress);
         require(iporTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
-        IERC20Upgradeable(iporTokenAddress).safeTransferFrom(
+        IERC20Upgradeable(iporTokenAddress).transferFrom(
             _msgSender(),
             address(this),
             iporTokenAmount
@@ -164,7 +180,11 @@ abstract contract PowerIporInternal is
         return IporMath.division(balanceOfIporToken * Constants.D18, baseTotalSupply);
     }
 
-    function _calculateAmountWithoutFee(uint256 baseAmount) internal view returns (uint256) {
+    function _calculateAmountWithCooldownFeeSubtracted(uint256 baseAmount)
+        internal
+        view
+        returns (uint256)
+    {
         return
             IporMath.division(
                 (Constants.D18 - _unstakeWithoutCooldownFee) * baseAmount,

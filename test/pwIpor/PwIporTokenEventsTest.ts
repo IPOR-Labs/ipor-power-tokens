@@ -8,7 +8,7 @@ import { IporToken, PowerIpor, John } from "../../types";
 import { N1__0_18DEC, ZERO, TOTAL_SUPPLY_18_DECIMALS, N0__5_18DEC } from "../utils/Constants";
 import { it } from "mocha";
 import { getDeployedTokens, Tokens } from "../utils/JohnUtils";
-import { randomAddress } from "hardhat/internal/hardhat-network/provider/fork/random";
+import { randomAddress } from "hardhat/internal/hardhat-network/provider/utils/random";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -190,13 +190,15 @@ describe("PowerIpor token delegate", () => {
 
     it("Should emit JohnChanged event", async () => {
         // given
-        const randomAddressString = randomAddress();
+        const John = await hre.ethers.getContractFactory("ItfJohn");
+        const itfJohn = (await upgrades.deployProxy(John, [
+            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
+            powerIpor.address,
+            iporToken.address,
+        ])) as ItfJohn;
 
         // when
-        await expect(powerIpor.setJohn(randomAddressString.toString())).to.be.emit(
-            powerIpor,
-            "JohnChanged"
-        );
+        await expect(powerIpor.setJohn(itfJohn.address)).to.be.emit(powerIpor, "JohnChanged");
     });
 
     it("Should emit PauseManagerChanged event ", async () => {

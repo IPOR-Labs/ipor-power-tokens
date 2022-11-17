@@ -11,6 +11,7 @@ import {
     TOTAL_SUPPLY_18_DECIMALS,
     N0__1_18DEC,
     N2__0_18DEC,
+    N1__0_8DEC,
 } from "../utils/Constants";
 import { it } from "mocha";
 import {
@@ -54,6 +55,10 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
             powerIpor.address,
             iporToken.address,
         ])) as John;
+
+        await john.setRewardsPerBlock(tokens.ipTokenDai.address, N1__0_8DEC);
+        await john.setRewardsPerBlock(tokens.ipTokenUsdc.address, N1__0_8DEC);
+        await john.setRewardsPerBlock(tokens.ipTokenUsdt.address, N1__0_8DEC);
 
         await powerIpor.setJohn(john.address);
     });
@@ -452,9 +457,11 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
             extractAccountIndicators(accountIndicatorsUsdcBefore).powerUp
         );
         expect(
-            extractAccountIndicators(accountIndicatorsDaiBefore).compositeMultiplierCumulativePrevBlock
+            extractAccountIndicators(accountIndicatorsDaiBefore)
+                .compositeMultiplierCumulativePrevBlock
         ).to.be.equal(
-            extractAccountIndicators(accountIndicatorsUsdcBefore).compositeMultiplierCumulativePrevBlock
+            extractAccountIndicators(accountIndicatorsUsdcBefore)
+                .compositeMultiplierCumulativePrevBlock
         );
         expect(
             extractAccountIndicators(accountIndicatorsDaiBefore).delegatedPowerTokenBalance
@@ -469,9 +476,11 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
             extractAccountIndicators(accountIndicatorsUsdcAfter).powerUp
         );
         expect(
-            extractAccountIndicators(accountIndicatorsDaiAfter).compositeMultiplierCumulativePrevBlock
+            extractAccountIndicators(accountIndicatorsDaiAfter)
+                .compositeMultiplierCumulativePrevBlock
         ).to.be.equal(
-            extractAccountIndicators(accountIndicatorsUsdcAfter).compositeMultiplierCumulativePrevBlock
+            extractAccountIndicators(accountIndicatorsUsdcAfter)
+                .compositeMultiplierCumulativePrevBlock
         );
         expect(
             extractAccountIndicators(accountIndicatorsDaiAfter).delegatedPowerTokenBalance

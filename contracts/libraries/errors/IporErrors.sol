@@ -31,4 +31,7 @@ library IporErrors {
     string public constant CHUNK_SIZE_EQUAL_ZERO = "IPOR_009";
 
     string public constant CHUNK_SIZE_TOO_BIG = "IPOR_010";
+
+    /// @notice General problem, contract is wrong
+    string public constant WRONG_CONTRACT_ID = "IPOR_011";
 }

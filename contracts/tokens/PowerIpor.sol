@@ -7,11 +7,9 @@ import "./PowerIporInternal.sol";
 
 ///@title Smart contract responsible for managing Power Ipor Token.
 /// @notice Power Ipor Token is retrieved when account stake Ipor Token.
-/// Power Ipor smart contract allow you to stake, unstake Ipor Token, deletage, undelegate to John Power Ipor Token.
+/// Power Ipor smart contract allows you to stake, unstake Ipor Token, deletage, undelegate to John Power Ipor Token.
 /// Interact with John smart contract.
 contract PowerIpor is PowerIporInternal, IPowerIpor {
-    using SafeERC20Upgradeable for IERC20Upgradeable;
-
     function name() external pure override returns (string memory) {
         return "Power IPOR";
     }
@@ -22,6 +20,10 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
     function decimals() external pure override returns (uint8) {
         return 18;
+    }
+
+    function getContractId() external pure returns (bytes32) {
+        return 0xbd22bf01cb7daed462db61de31bb111aabcdae27adc748450fb9a9ea1c419cce;
     }
 
     function totalSupply() external view override returns (uint256) {
@@ -60,11 +62,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
         uint256 exchangeRate = _calculateInternalExchangeRate(iporTokenAddress);
 
-        IERC20Upgradeable(iporTokenAddress).safeTransferFrom(
-            msgSender,
-            address(this),
-            iporTokenAmount
-        );
+        IERC20Upgradeable(iporTokenAddress).transferFrom(msgSender, address(this), iporTokenAmount);
 
         uint256 baseAmount = IporMath.division(iporTokenAmount * Constants.D18, exchangeRate);
 
@@ -99,11 +97,11 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         _baseTotalSupply -= baseAmountToUnstake;
 
         uint256 iporTokenAmountToTransfer = _calculateBaseAmountToPwIpor(
-            _calculateAmountWithoutFee(baseAmountToUnstake),
+            _calculateAmountWithCooldownFeeSubtracted(baseAmountToUnstake),
             exchangeRate
         );
 
-        IERC20Upgradeable(iporTokenAddress).safeTransfer(msgSender, iporTokenAmountToTransfer);
+        IERC20Upgradeable(iporTokenAddress).transfer(msgSender, iporTokenAmountToTransfer);
 
         emit Unstake(
             msgSender,
@@ -113,16 +111,17 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         );
     }
 
-    function delegateToJohn(address[] memory ipTokens, uint256[] memory pwIporAmounts)
+    function delegateToJohn(address[] calldata ipTokens, uint256[] calldata pwIporAmounts)
         external
         override
         whenNotPaused
         nonReentrant
     {
-        require(ipTokens.length == pwIporAmounts.length, IporErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
+        uint256 pwIporAmountsLength = pwIporAmounts.length;
+        require(ipTokens.length == pwIporAmountsLength, IporErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
         uint256 pwIporToDelegate;
 
-        for (uint256 i = 0; i != pwIporAmounts.length; i++) {
+        for (uint256 i; i != pwIporAmountsLength; ++i) {
             pwIporToDelegate += pwIporAmounts[i];
         }
 
@@ -140,9 +139,9 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
     }
 
     function delegateAndStakeToJohn(
-        address[] memory ipTokens,
-        uint256[] memory pwIporAmounts,
-        uint256[] memory ipTokenAmounts
+        address[] calldata ipTokens,
+        uint256[] calldata pwIporAmounts,
+        uint256[] calldata ipTokenAmounts
     ) external override whenNotPaused nonReentrant {
         require(
             ipTokens.length == pwIporAmounts.length && ipTokens.length == ipTokenAmounts.length,
@@ -151,7 +150,8 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
         uint256 pwIporToDelegate;
 
-        for (uint256 i = 0; i != pwIporAmounts.length; i++) {
+        uint256 pwIporAmountsLength = pwIporAmounts.length;
+        for (uint256 i; i != pwIporAmountsLength; ++i) {
             pwIporToDelegate += pwIporAmounts[i];
         }
 
@@ -173,17 +173,18 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         emit DelegateToJohn(_msgSender(), ipTokens, pwIporAmounts);
     }
 
-    function undelegateFromJohn(address[] memory ipTokens, uint256[] memory pwIporAmounts)
+    function undelegateFromJohn(address[] calldata ipTokens, uint256[] calldata pwIporAmounts)
         external
         override
         whenNotPaused
         nonReentrant
     {
-        require(ipTokens.length == pwIporAmounts.length, IporErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
+        uint256 ipTokensLength = ipTokens.length;
+        require(ipTokensLength == pwIporAmounts.length, IporErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
 
         uint256 pwIporAmountToUndelegate;
 
-        for (uint256 i; i != ipTokens.length; i++) {
+        for (uint256 i; i != ipTokensLength; ++i) {
             require(pwIporAmounts[i] > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
             pwIporAmountToUndelegate += pwIporAmounts[i];
         }
@@ -255,8 +256,8 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
         delete _coolDowns[msgSender];
 
-        ///@dev We can transfer pwIporAmount because is in relation 1:1 to Ipor Token
-        IERC20Upgradeable(iporTokenAddress).safeTransfer(msgSender, accountCoolDown.pwIporAmount);
+        ///@dev We can transfer pwIporAmount because it is in relation 1:1 to Ipor Token
+        IERC20Upgradeable(iporTokenAddress).transfer(msgSender, accountCoolDown.pwIporAmount);
 
         emit Redeem(msgSender, accountCoolDown.pwIporAmount);
     }

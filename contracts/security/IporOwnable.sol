@@ -9,6 +9,11 @@ contract IporOwnable is Ownable {
 
     event AppointedToTransferOwnership(address indexed appointedOwner);
 
+    modifier onlyAppointedOwner() {
+        require(_appointedOwner == _msgSender(), IporErrors.SENDER_NOT_APPOINTED_OWNER);
+        _;
+    }
+
     function transferOwnership(address appointedOwner) public override onlyOwner {
         require(appointedOwner != address(0), IporErrors.WRONG_ADDRESS);
         _appointedOwner = appointedOwner;
@@ -20,8 +25,8 @@ contract IporOwnable is Ownable {
         _transferOwnership(_msgSender());
     }
 
-    modifier onlyAppointedOwner() {
-        require(_appointedOwner == _msgSender(), IporErrors.SENDER_NOT_APPOINTED_OWNER);
-        _;
+    function renounceOwnership() public virtual override onlyOwner {
+        _transferOwnership(address(0));
+        _appointedOwner = address(0);
     }
 }

@@ -30,6 +30,41 @@ export default ({ drizzle, drizzleState }) => (
                 </tr>
                 <tr>
                     <td>
+                        <strong>John supported ipTokens</strong>
+                    </td>
+                    <td>
+                        <ContractData
+                            drizzle={drizzle}
+                            drizzleState={drizzleState}
+                            contract="John"
+                            method="isIpTokenSupported"
+                            methodArgs={[drizzle.contracts.IpTokenUsdt.address]}
+                            render={(value) => <div>{value ? "Yes" : "No"}</div>}
+                        />
+                    </td>
+                    <td>
+                        <ContractData
+                            drizzle={drizzle}
+                            drizzleState={drizzleState}
+                            contract="John"
+                            method="isIpTokenSupported"
+                            methodArgs={[drizzle.contracts.IpTokenUsdc.address]}
+                            render={(value) => <div>{value ? "Yes" : "No"}</div>}
+                        />
+                    </td>
+                    <td>
+                        <ContractData
+                            drizzle={drizzle}
+                            drizzleState={drizzleState}
+                            contract="John"
+                            method="isIpTokenSupported"
+                            methodArgs={[drizzle.contracts.IpTokenDai.address]}
+                            render={(value) => <div>{value ? "Yes" : "No"}</div>}
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
                         <strong>John's balance of ipTokens</strong>
                         <br />
                         <small>represented in 18 decimals</small>

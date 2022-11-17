@@ -25,7 +25,6 @@ library MiningCalculation {
         bytes16 verticalShift,
         bytes16 horizontalShift
     ) internal pure returns (uint256) {
-        /// @dev Account's staked IP Tokens have to be >= 1
         if (accountIpTokenAmount < Constants.D18) {
             return 0;
         }
@@ -44,7 +43,8 @@ library MiningCalculation {
         return ABDKMathQuad.toUInt(resultD18);
     }
 
-    /// @notice Calculates aggreagated power up based on predefined in specification equation.
+    /// @notice Calculates aggreagated power up. Aggregate Power-up is a synthetic summary of all power-ups across all users.
+    /// It's used to calculate individual rewards in relation to the rest of the pool.
     /// @param accountPowerUp power up indicator calculated for a given account
     /// @param accountIpTokenAmount IP Token amount for a given account
     /// @param previousAccountPowerUp previous power up indicator for a given account
@@ -140,8 +140,6 @@ library MiningCalculation {
         uint256 accountCompMultiplierCumulativePrevBlock,
         uint256 accruedCompMultiplierCumulativePrevBlock
     ) internal pure returns (uint256) {
-        /// @dev Composit Multiplier Cumulative for Prev Block stored in Account structure cannot be greater than the newest accrued global
-        /// Composite Multiplier Cumulative for Prev Block
         require(
             accruedCompMultiplierCumulativePrevBlock >= accountCompMultiplierCumulativePrevBlock,
             MiningErrors.ACCOUNT_COMPOSITE_MULTIPLIER_GT_COMPOSITE_MULTIPLIER

@@ -6,7 +6,13 @@ import { BigNumber, Signer } from "ethers";
 import { solidity } from "ethereum-waffle";
 import { John } from "../../types";
 import { Tokens, getDeployedTokens, extractGlobalIndicators } from "../utils/JohnUtils";
-import { N1__0_18DEC, N2__0_18DEC, USD_1_000_000_18DEC, ZERO } from "../utils/Constants";
+import {
+    N1__0_18DEC,
+    N1__0_8DEC,
+    N2__0_18DEC,
+    USD_1_000_000_18DEC,
+    ZERO,
+} from "../utils/Constants";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -26,12 +32,23 @@ describe("John Rewards per block", () => {
     });
 
     beforeEach(async () => {
-        const John = await hre.ethers.getContractFactory("John");
+        const IporToken = await ethers.getContractFactory("IporToken");
+        const iporToken = (await IporToken.deploy(
+            "IPOR Token",
+            "IPOR",
+            await admin.getAddress()
+        )) as IporToken;
+        const PowerIpor = await ethers.getContractFactory("PowerIpor");
+        const powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
+
+        const John = await hre.ethers.getContractFactory("ItfJohn");
         john = (await upgrades.deployProxy(John, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
-            await admin.getAddress(),
-            tokens.ipTokenUsdt.address,
-        ])) as John;
+            powerIpor.address,
+            iporToken.address,
+        ])) as ItfJohn;
+
+        await john.setPowerIpor(await admin.getAddress());
     });
 
     it("Should set up block rewards for ipToken", async () => {
@@ -50,7 +67,7 @@ describe("John Rewards per block", () => {
         );
         const rewardsAfter = globalIndicatorsUsdcAfter.rewardsPerBlock;
 
-        expect(rewardsBefore).to.be.equal(N1_0_8D);
+        expect(rewardsBefore).to.be.equal(ZERO);
         expect(rewardsAfter).to.be.equal(N2_0_8D);
     });
 
@@ -71,7 +88,7 @@ describe("John Rewards per block", () => {
         );
         const rewardsAfter = globalIndicatorsUsdcAfter.rewardsPerBlock;
 
-        expect(rewardsBefore).to.be.equal(N1_0_8D);
+        expect(rewardsBefore).to.be.equal(ZERO);
         expect(rewardsAfter).to.be.equal(N2_0_8D);
         expect(extractGlobalIndicators(globalIndicatorsBefore).accruedRewards).to.be.equal(ZERO);
         expect(extractGlobalIndicators(globalIndicatorsUsdcAfter).accruedRewards).to.be.equal(ZERO);
@@ -111,9 +128,9 @@ describe("John Rewards per block", () => {
         );
         const rewardsUsdtAfter = globalIndicatorsUsdtAfter.rewardsPerBlock;
 
-        expect(rewardsDaiBefore).to.be.equal(N1_0_8D);
-        expect(rewardsUsdcBefore).to.be.equal(N1_0_8D);
-        expect(rewardsUsdtBefore).to.be.equal(N1_0_8D);
+        expect(rewardsDaiBefore).to.be.equal(ZERO);
+        expect(rewardsUsdcBefore).to.be.equal(ZERO);
+        expect(rewardsUsdtBefore).to.be.equal(ZERO);
 
         expect(rewardsDaiAfter).to.be.equal(N1_0_8D);
         expect(rewardsUsdcAfter).to.be.equal(N2_0_8D);
@@ -134,8 +151,8 @@ describe("John Rewards per block", () => {
         const globalIndicatorsAfter = await john.getGlobalIndicators(tokens.ipTokenDai.address);
         const rewardsDaiAfter = globalIndicatorsAfter.rewardsPerBlock;
 
-        expect(rewardsDaiBefore).to.be.equal(N1_0_8D);
-        expect(rewardsDaiAfter).to.be.equal(N1_0_8D);
+        expect(rewardsDaiBefore).to.be.equal(ZERO);
+        expect(rewardsDaiAfter).to.be.equal(ZERO);
     });
 
     it("Should stop adding new rewards when rewards per block setup to zero", async () => {
@@ -143,6 +160,8 @@ describe("John Rewards per block", () => {
         const ipDai = tokens.ipTokenDai.address;
         await tokens.ipTokenDai.mint(await admin.getAddress(), USD_1_000_000_18DEC);
         await tokens.ipTokenDai.approve(john.address, USD_1_000_000_18DEC);
+
+        await john.setRewardsPerBlock(tokens.ipTokenDai.address, N1__0_8DEC);
 
         await network.provider.send("evm_setAutomine", [false]);
         await john.stake(ipDai, N2__0_18DEC);
@@ -219,10 +238,10 @@ describe("John Rewards per block", () => {
         const globalIndicatorsAfterExtract = extractGlobalIndicators(globalIndicatorsAfter);
 
         await network.provider.send("evm_setAutomine", [true]);
-        expect(accountRewardsBefore).to.be.equal(N1__0_18DEC.mul(BigNumber.from("100")));
-        expect(accountRewardsAfter).to.be.equal(BigNumber.from("199000000000000000000"));
-        expect(accruedRewardsBefore).to.be.equal(N1__0_18DEC.mul(BigNumber.from("100")));
-        expect(accruedRewardsAfter).to.be.equal(BigNumber.from("199000000000000000000"));
+        expect(accountRewardsBefore).to.be.equal(ZERO);
+        expect(accountRewardsAfter).to.be.equal(BigNumber.from("99000000000000000000"));
+        expect(accruedRewardsBefore).to.be.equal(ZERO);
+        expect(accruedRewardsAfter).to.be.equal(BigNumber.from("99000000000000000000"));
 
         expect(globalIndicatorsBeforeExtract.rewardsPerBlock).to.be.equal(ZERO);
         expect(globalIndicatorsAfterExtract.rewardsPerBlock).to.be.equal(

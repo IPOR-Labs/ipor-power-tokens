@@ -3,6 +3,7 @@ const func = require("../../../json_func.js");
 const { deployProxy, erc1967 } = require("@openzeppelin/truffle-upgrades");
 
 module.exports = async function (deployer, _network, addresses, PowerIpor, initialParams) {
+    console.log(initialParams.iporToken);
     const powerIporProxy = await deployProxy(PowerIpor, [initialParams.iporToken], {
         deployer: deployer,
         initializer: "initialize",

@@ -15,6 +15,7 @@ import {
     N0__1_18DEC,
     N0__01_18DEC,
     USD_1_000_000_18DEC,
+    N1__0_8DEC,
 } from "../utils/Constants";
 
 chai.use(solidity);
@@ -128,6 +129,10 @@ describe("John unstake ipToken", () => {
             powerIpor.address,
             iporToken.address,
         ])) as John;
+
+        await john.setRewardsPerBlock(tokens.ipTokenDai.address, N1__0_8DEC);
+        await john.setRewardsPerBlock(tokens.ipTokenUsdc.address, N1__0_8DEC);
+        await john.setRewardsPerBlock(tokens.ipTokenUsdt.address, N1__0_8DEC);
 
         await tokens.ipTokenDai.approve(john.address, TOTAL_SUPPLY_18_DECIMALS);
         await tokens.ipTokenDai.connect(userOne).approve(john.address, TOTAL_SUPPLY_18_DECIMALS);
