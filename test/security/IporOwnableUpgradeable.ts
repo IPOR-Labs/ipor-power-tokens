@@ -7,7 +7,7 @@ chai.use(solidity);
 const { expect } = chai;
 
 import { IporOwnableUpgradeable } from "../../types";
-describe.only("IporOwnableUpgradeable", () => {
+describe("IporOwnableUpgradeable", () => {
     let admin: Signer, userOne: Signer, userTwo: Signer;
     let iporOwnable: IporOwnableUpgradeable;
 
