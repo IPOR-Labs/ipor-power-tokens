@@ -31,7 +31,7 @@ describe("IporOwnableUpgradeable", () => {
     it("Should deployer be owner of contract", async () => {
         // given
         // @ts-ignore
-        iporOwnable.initialize();
+        await iporOwnable.initialize();
         // when
         // then
         const owner = await iporOwnable.owner();
@@ -41,7 +41,7 @@ describe("IporOwnableUpgradeable", () => {
     it("Should not be possible to transfer 0x00 address", async () => {
         // given
         // @ts-ignore
-        iporOwnable.initialize();
+        await iporOwnable.initialize();
         // when
         await expect(
             iporOwnable.transferOwnership(constants.AddressZero),
@@ -52,7 +52,7 @@ describe("IporOwnableUpgradeable", () => {
     it("should not be possible to confirm the transfer ownership for different address", async () => {
         // given
         // @ts-ignore
-        iporOwnable.initialize();
+        await iporOwnable.initialize();
         await iporOwnable.transferOwnership(await userOne.getAddress());
         await expect(
             iporOwnable.connect(userTwo).confirmTransferOwnership(),
@@ -63,12 +63,65 @@ describe("IporOwnableUpgradeable", () => {
     it("Should be able to transfer ownership to userOne", async () => {
         // when
         // @ts-ignore
-        iporOwnable.initialize();
+        await iporOwnable.initialize();
         await iporOwnable.transferOwnership(await userOne.getAddress());
         await iporOwnable.connect(userOne).confirmTransferOwnership();
         // then
         const owner = await iporOwnable.owner();
 
         expect(owner, "userOne should be owner").to.be.equal(await userOne.getAddress());
+    });
+
+    it("Should zero address is the owner when renounceOwnership was execute ", async () => {
+        //    given
+        // @ts-ignore
+        await iporOwnable.initialize();
+        const ownerBefore = await iporOwnable.owner();
+
+        //    when
+        await iporOwnable.renounceOwnership();
+
+        //    then
+        const ownerAfter = await iporOwnable.owner();
+
+        expect(ownerBefore).to.be.equal(await admin.getAddress());
+        expect(ownerAfter).to.be.equal(constants.AddressZero);
+    });
+
+    it("Should not be able to renounceOwnership when user is not owner", async () => {
+        //    given
+        // @ts-ignore
+        await iporOwnable.initialize();
+        const ownerBefore = await iporOwnable.owner();
+
+        //    when
+        await expect(iporOwnable.connect(userTwo).renounceOwnership()).revertedWith(
+            "Ownable: caller is not the owner"
+        );
+
+        //    then
+        const ownerAfter = await iporOwnable.owner();
+
+        expect(ownerBefore).to.be.equal(await admin.getAddress());
+        expect(ownerAfter).to.be.equal(await admin.getAddress());
+    });
+
+    it("Should not be able to confirm transfer ownership when renounce ownership", async () => {
+        //    given
+        // @ts-ignore
+        await iporOwnable.initialize();
+        const ownerBefore = await iporOwnable.owner();
+        await iporOwnable.transferOwnership(await userOne.getAddress());
+        await iporOwnable.renounceOwnership();
+        //    when
+        await expect(iporOwnable.connect(userOne).confirmTransferOwnership()).revertedWith(
+            "IPOR_007"
+        );
+
+        //    then
+        const ownerAfter = await iporOwnable.owner();
+
+        expect(ownerBefore).to.be.equal(await admin.getAddress());
+        expect(ownerAfter).to.be.equal(constants.AddressZero);
     });
 });
