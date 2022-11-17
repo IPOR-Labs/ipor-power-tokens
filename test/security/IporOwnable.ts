@@ -7,7 +7,7 @@ const { expect } = chai;
 
 import { IporOwnable } from "../../types";
 
-describe("IporOwnable", () => {
+describe.only("IporOwnable", () => {
     let admin: Signer, userOne: Signer, userTwo: Signer;
     let iporOwnable: IporOwnable;
 
@@ -53,5 +53,52 @@ describe("IporOwnable", () => {
         const owner = await iporOwnable.owner();
 
         expect(owner, "userOne should be owner").to.be.equal(await userOne.getAddress());
+    });
+
+    it("Should zero address is the owner when renounceOwnership was execute ", async () => {
+        //    given
+        const ownerBefore = await iporOwnable.owner();
+
+        //    when
+        await iporOwnable.renounceOwnership();
+
+        //    then
+        const ownerAfter = await iporOwnable.owner();
+
+        expect(ownerBefore).to.be.equal(await admin.getAddress());
+        expect(ownerAfter).to.be.equal(constants.AddressZero);
+    });
+
+    it("Should not be able to renounceOwnership when user is not owner", async () => {
+        //    given
+        const ownerBefore = await iporOwnable.owner();
+
+        //    when
+        await expect(iporOwnable.connect(userTwo).renounceOwnership()).revertedWith(
+            "Ownable: caller is not the owner"
+        );
+
+        //    then
+        const ownerAfter = await iporOwnable.owner();
+
+        expect(ownerBefore).to.be.equal(await admin.getAddress());
+        expect(ownerAfter).to.be.equal(await admin.getAddress());
+    });
+
+    it("Should not be able to confirm transfer ownership when renounce ownership", async () => {
+        //    given
+        const ownerBefore = await iporOwnable.owner();
+        await iporOwnable.transferOwnership(await userOne.getAddress());
+        await iporOwnable.renounceOwnership();
+        //    when
+        await expect(iporOwnable.connect(userOne).confirmTransferOwnership()).revertedWith(
+            "IPOR_007"
+        );
+
+        //    then
+        const ownerAfter = await iporOwnable.owner();
+
+        expect(ownerBefore).to.be.equal(await admin.getAddress());
+        expect(ownerAfter).to.be.equal(constants.AddressZero);
     });
 });
