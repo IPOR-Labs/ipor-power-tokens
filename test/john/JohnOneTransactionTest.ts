@@ -495,22 +495,22 @@ describe("One block/Transaction tests", () => {
 
             expect(agent1After.powerUp).to.be.equal(ZERO);
             expect(agent1After.compositeMultiplierCumulativePrevBlock).to.be.equal(
-                BigNumber.from("29970993406907413561979852524")
+                BigNumber.from("21107793422577080666411279078")
             );
             expect(agent1After.ipTokenBalance).to.be.equal(ZERO);
             expect(agent1After.delegatedPowerTokenBalance).to.be.equal(N1__0_18DEC);
             expect(agent1PwIporBalanceCase1After).to.be.equal(
-                BigNumber.from("42959390769670378987")
+                BigNumber.from("42898178416784174176")
             );
 
             expect(agent2After.powerUp).to.be.equal(ZERO);
             expect(agent2After.compositeMultiplierCumulativePrevBlock).to.be.equal(
-                BigNumber.from("29970993406907413561979852524")
+                BigNumber.from("21107793422577080666411279078")
             );
             expect(agent2After.ipTokenBalance).to.be.equal(ZERO);
             expect(agent2After.delegatedPowerTokenBalance).to.be.equal(N1__0_18DEC);
             expect(agent2PwIporBalanceCase1After).to.be.equal(
-                BigNumber.from("60040609230329621013")
+                BigNumber.from("60101821583215825824")
             );
 
             expect(differencesBetweenRewords.lte(BigNumber.from("100"))).to.be.true;
@@ -646,7 +646,9 @@ describe("One block/Transaction tests", () => {
 
             const sumOfRewards = accountOneRewards.add(accountTwoRewards).add(accountThreeRewards);
 
-            expect(sumOfRewards).to.be.equal(N1__0_18DEC.mul(BigNumber.from("15")));
+            expect(sumOfRewards).to.be.equal(
+                N1__0_18DEC.mul(BigNumber.from("15")).add(BigNumber.from(1))
+            );
             expect(johnIpBalanceAfter).to.be.equal(
                 johnIpBalanceBefore
                     .add(accountOneIpTokenAmount)

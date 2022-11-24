@@ -193,7 +193,7 @@ describe("John claim", () => {
         expect(accruedRewardsBefore).to.be.equal(ZERO);
         expect(accountRewardsMiddle).to.be.equal(ZERO);
         expect(accruedRewardsMiddle).to.be.equal(ZERO);
-        expect(accountRewardsAfter).to.be.equal(expectedRewards);
+        expect(accountRewardsAfter).to.be.equal(expectedRewards.sub(BigNumber.from(1)));
         expect(accruedRewardsAfter).to.be.equal(expectedRewards);
         expect(userOneIporBalanceAfter).to.be.equal(userOneIporBalanceBefore.sub(stakeIporAmount));
 

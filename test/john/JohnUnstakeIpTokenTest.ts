@@ -508,11 +508,11 @@ describe("John unstake ipToken", () => {
         expect(accruedRewardsAfter).to.be.equal(accruedRewardsBefore.add(N1__0_18DEC));
 
         expect(globalIndicatorsBeforeExtract.aggregatedPowerUp).to.be.equal(
-            BigNumber.from("800000000000000000")
+            BigNumber.from("799999999999999998")
         );
         expect(globalIndicatorsAfterExtract.aggregatedPowerUp).to.be.equal(ZERO);
         expect(globalIndicatorsBeforeExtract.compositeMultiplierInTheBlock).to.be.equal(
-            BigNumber.from("1250000000").mul(N1__0_18DEC)
+            BigNumber.from("1250000000000000003125000000")
         );
         expect(globalIndicatorsAfterExtract.compositeMultiplierInTheBlock).to.be.equal(ZERO);
     });
