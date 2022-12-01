@@ -200,7 +200,7 @@ describe("John Rewards per block", () => {
             globalIndicatorsAfterExtract.aggregatedPowerUp
         );
         expect(globalIndicatorsBeforeExtract.compositeMultiplierInTheBlock).to.be.equal(
-            BigNumber.from("1250000000").mul(N1__0_18DEC)
+            BigNumber.from("1250000000000000003125000000")
         );
         expect(globalIndicatorsAfterExtract.compositeMultiplierInTheBlock).to.be.equal(ZERO);
     });
@@ -251,7 +251,7 @@ describe("John Rewards per block", () => {
             globalIndicatorsAfterExtract.aggregatedPowerUp
         );
         expect(globalIndicatorsAfterExtract.compositeMultiplierInTheBlock).to.be.equal(
-            BigNumber.from("1250000000").mul(N1__0_18DEC)
+            BigNumber.from("1250000000000000003125000000")
         );
         expect(globalIndicatorsBeforeExtract.compositeMultiplierInTheBlock).to.be.equal(ZERO);
     });

@@ -168,9 +168,9 @@ describe("John Stake and balance", () => {
 
             expectGlobalIndicators(
                 extractGlobalIndicators(afterStakeIpTokensGPR),
-                BigNumber.from("140000000000000000000"),
+                BigNumber.from("198496250072115618100"),
                 ZERO,
-                BigNumber.from("7142857142857142857142857"),
+                BigNumber.from("5037878547512561444528052"),
                 ZERO,
                 -1,
                 100000000
@@ -178,7 +178,7 @@ describe("John Stake and balance", () => {
 
             expectAccountIndicators(
                 extractAccountIndicators(afterStakeIpTokensUPR),
-                BigNumber.from("1400000000000000000"),
+                BigNumber.from("1984962500721156181"),
                 ZERO,
                 stakedIpTokens,
                 delegatedIporToken
@@ -329,19 +329,19 @@ describe("John Stake and balance", () => {
 
             expectGlobalIndicators(
                 globalIndicatorsBefore,
-                BigNumber.from("140000000000000000000"),
+                BigNumber.from("198496250072115618100"),
                 ZERO,
-                BigNumber.from("7142857142857142857142857"),
+                BigNumber.from("5037878547512561444528052"),
                 ZERO,
                 -1,
                 100000000
             );
             expectGlobalIndicators(
                 globalIndicatorsAfter,
-                BigNumber.from("140000000000000000000"),
+                BigNumber.from("198496250072115618100"),
                 BigNumber.from("101000000000000000000"),
                 ZERO,
-                BigNumber.from("721428571428571428571428557"),
+                BigNumber.from("508825733298768705897333252"),
                 -1,
                 0
             );

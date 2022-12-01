@@ -222,9 +222,9 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
         );
         expectGlobalIndicators(
             extractGlobalIndicators(globalIndicatorsAfter),
-            BigNumber.from("1400000000000000000"),
+            BigNumber.from("1984962500721156181"),
             ZERO,
-            BigNumber.from("714285714285714285714285714"),
+            BigNumber.from("503787854751256144452805236"),
             ZERO,
             -1,
             100000000
@@ -239,7 +239,7 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
         );
         expectAccountIndicators(
             extractAccountIndicators(accountIndicatorsAfter),
-            BigNumber.from("1400000000000000000"),
+            BigNumber.from("1984962500721156181"),
             ZERO,
             N1__0_18DEC,
             N1__0_18DEC
@@ -312,9 +312,9 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
         );
         expectGlobalIndicators(
             extractGlobalIndicators(globalIndicatorsDaiAfter),
-            BigNumber.from("1400000000000000000"),
+            BigNumber.from("1984962500721156181"),
             ZERO,
-            BigNumber.from("714285714285714285714285714"),
+            BigNumber.from("503787854751256144452805236"),
             ZERO,
             -1,
             100000000
@@ -331,9 +331,9 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
         );
         expectGlobalIndicators(
             extractGlobalIndicators(globalIndicatorsUsdcAfter),
-            BigNumber.from("1400000000000000000"),
+            BigNumber.from("1984962500721156181"),
             ZERO,
-            BigNumber.from("714285714285714285714285714"),
+            BigNumber.from("503787854751256144452805236"),
             ZERO,
             -1,
             100000000
@@ -347,7 +347,7 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
         );
         expectAccountIndicators(
             extractAccountIndicators(accountIndicatorsDaiAfter),
-            BigNumber.from("1400000000000000000"),
+            BigNumber.from("1984962500721156181"),
             ZERO,
             N1__0_18DEC,
             N1__0_18DEC
@@ -361,7 +361,7 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
         );
         expectAccountIndicators(
             extractAccountIndicators(accountIndicatorsUsdcAfter),
-            BigNumber.from("1400000000000000000"),
+            BigNumber.from("1984962500721156181"),
             ZERO,
             N1__0_18DEC,
             N1__0_18DEC

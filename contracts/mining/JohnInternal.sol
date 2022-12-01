@@ -458,18 +458,20 @@ abstract contract JohnInternal is
 
     /// @notice Gets Horizontal shift param used in Liquidity Mining equastions.
     /// @dev To pre-calculate this value from uint256, use {MiningCalculation._toQuadruplePrecision()} method.
-    /// @dev Notice! uint256 value before calculation has following constraints: 1 <= Horizontal Shift <= 10^3
+    /// @dev 0.5 = ABDKMathQuad.div(ABDKMathQuad.fromUInt(5), ABDKMathQuad.fromUInt(10))
+    /// @dev Notice! uint256 value before calculation has following constraints: 0.5 <= Horizontal Shift <= 10^3
     /// @return horizontal shift - value represented in bytes16, quadrupe precision, 128 bits, takes into consideration 18 decimals
     function _getHorizontalShift() internal pure virtual returns (bytes16) {
-        return 0x3fff0000000000000000000000000000;
+        return 0x3ffe0000000000000000000000000000;
     }
 
     /// @notice Gets vertical shift param used in Liquidity Mining equastions.
     /// @dev To pre-calculate this value from uint256, use {MiningCalculation._toQuadruplePrecision()} method.
+    /// @dev 1.4 = ABDKMathQuad.div(ABDKMathQuad.fromUInt(14), ABDKMathQuad.fromUInt(10))
     /// @dev Notice! uint256 value before calculation has following constraints: 10^(-4) <= Vertival Shift <= 3
     /// @return vertical shift - value represented in bytes16, quadrupe precision, 128 bits, takes into consideration 18 decimals
     function _getVerticalShift() internal pure virtual returns (bytes16) {
-        return 0x3ffd99999999999999e36310e0e2a848;
+        return 0x3fff6666666666666666666666666666;
     }
 
     function _getPowerIpor() internal view returns (address) {
