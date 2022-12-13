@@ -38,6 +38,7 @@ abstract contract JohnInternal is
     address internal _pauseManager;
 
     mapping(address => bool) internal _ipTokens;
+    mapping(address => uint256) internal _allocatedPwTokens;
 
     //  ipToken (ipUSDT, ipUSDC, ipDAI, etc) address -> global parameters for ipToken
     mapping(address => JohnTypes.GlobalRewardsIndicators) internal _globalIndicators;

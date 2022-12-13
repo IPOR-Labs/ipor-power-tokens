@@ -27,6 +27,14 @@ interface IJohn {
         view
         returns (JohnTypes.DelegatedPwIporBalance[] memory balances);
 
+    /// @notice Gets account allocated rewards
+    /// @param account account address who want to get account indicators
+    /// @return allocatedPwTokens - amount of allocated rewards.
+    function balanceOfAllocatedPwTokens(address account)
+        external
+        view
+        returns (uint256 allocatedPwTokens);
+
     /// @notice Calculate accrued rewards from last rebalance saved in storage
     /// @param ipToken ipToken address
     /// @return accrued rewards from last rebalance saved in storage, represented in 18 decimals.
@@ -52,9 +60,17 @@ interface IJohn {
     /// @param ipTokenAmount ipToken amount being unstaked, represented in 18 decimals
     function unstake(address ipToken, uint256 ipTokenAmount) external;
 
+    /// @notice Unstakes ipToken amount from John and allocate rewards into storage.
+    /// @param ipToken address for a specific underlying asset (ipUSDT, ipUSDC, ipDAI, etc.)
+    /// @param ipTokenAmount ipToken amount being unstaked, represented in 18 decimals
+    function unstakeAndAllocatePwTokens(address ipToken, uint256 ipTokenAmount) external;
+
     /// @notice method allowed to claim rewards per asset
     /// @param ipToken from which you want claim rewards
     function claim(address ipToken) external;
+
+    /// @notice method allowed to claim rewards allocated into John
+    function claimAllocatedPwTokens() external;
 
     /// @notice Emitted when account stake ipToken
     /// @param account account address in the context of which activities of staking ipTokens are performed
@@ -73,4 +89,9 @@ interface IJohn {
     /// @param ipToken address of ipToken
     /// @param iporTokenAmount reward amount in Ipor Token, represented in 18 decimals
     event Claim(address account, address ipToken, uint256 iporTokenAmount);
+
+    /// @notice Emitted when account claim rewards allocated into John
+    /// @param account account address in the context of which activities of claiming are performed
+    /// @param iporTokenAmount reward amount in Ipor Token, represented in 18 decimals
+    event ClaimAllocatedTokens(address account, uint256 iporTokenAmount);
 }

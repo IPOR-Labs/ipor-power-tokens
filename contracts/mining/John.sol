@@ -39,6 +39,14 @@ contract John is JohnInternal, IJohn {
         }
     }
 
+    function balanceOfAllocatedPwTokens(address account)
+        external
+        view
+        returns (uint256 allocatedPwTokens)
+    {
+        allocatedPwTokens = _allocatedPwTokens[account];
+    }
+
     function calculateAccruedRewards(address ipToken) external view override returns (uint256) {
         JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
         if (globalIndicators.aggregatedPowerUp == 0) {
@@ -115,43 +123,16 @@ contract John is JohnInternal, IJohn {
         nonReentrant
         whenNotPaused
     {
-        require(ipTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        _unstake(ipToken, ipTokenAmount, true);
+    }
 
-        address msgSender = _msgSender();
-
-        JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[msgSender][
-            ipToken
-        ];
-
-        require(
-            accountIndicators.ipTokenBalance >= ipTokenAmount,
-            MiningErrors.ACCOUNT_IP_TOKEN_BALANCE_IS_TOO_LOW
-        );
-
-        JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
-
-        (
-            uint256 rewards,
-            uint256 accruedCompMultiplierCumulativePrevBlock
-        ) = _calculateAccountRewards(globalIndicators, accountIndicators);
-
-        _rebalanceIndicators(
-            msgSender,
-            ipToken,
-            accruedCompMultiplierCumulativePrevBlock,
-            globalIndicators,
-            accountIndicators,
-            accountIndicators.ipTokenBalance - ipTokenAmount,
-            accountIndicators.delegatedPwIporBalance
-        );
-
-        if (rewards > 0) {
-            _transferRewardsToPowerIpor(msgSender, rewards);
-        }
-
-        IERC20Upgradeable(ipToken).transfer(msgSender, ipTokenAmount);
-
-        emit UnstakeIpTokens(msgSender, ipToken, ipTokenAmount);
+    function unstakeAndAllocatePwTokens(address ipToken, uint256 ipTokenAmount)
+        external
+        override
+        nonReentrant
+        whenNotPaused
+    {
+        _unstake(ipToken, ipTokenAmount, false);
     }
 
     function claim(address ipToken) external override whenNotPaused nonReentrant {
@@ -186,5 +167,62 @@ contract John is JohnInternal, IJohn {
         _transferRewardsToPowerIpor(msgSender, iporTokenAmount);
 
         emit Claim(msgSender, ipToken, iporTokenAmount);
+    }
+
+    function claimAllocatedPwTokens() external override whenNotPaused nonReentrant {
+        address msgSender = _msgSender();
+        uint256 iporTokenAmount = _allocatedPwTokens[msgSender];
+        require(iporTokenAmount > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
+        _allocatedPwTokens[msgSender] = 0;
+        _transferRewardsToPowerIpor(msgSender, iporTokenAmount);
+        emit ClaimAllocatedTokens(msgSender, iporTokenAmount);
+    }
+
+    function _unstake(
+        address ipToken,
+        uint256 ipTokenAmount,
+        bool claimRewards
+    ) internal {
+        require(ipTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+
+        address msgSender = _msgSender();
+
+        JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[msgSender][
+            ipToken
+        ];
+
+        require(
+            accountIndicators.ipTokenBalance >= ipTokenAmount,
+            MiningErrors.ACCOUNT_IP_TOKEN_BALANCE_IS_TOO_LOW
+        );
+
+        JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
+
+        (
+            uint256 rewards,
+            uint256 accruedCompMultiplierCumulativePrevBlock
+        ) = _calculateAccountRewards(globalIndicators, accountIndicators);
+
+        _rebalanceIndicators(
+            msgSender,
+            ipToken,
+            accruedCompMultiplierCumulativePrevBlock,
+            globalIndicators,
+            accountIndicators,
+            accountIndicators.ipTokenBalance - ipTokenAmount,
+            accountIndicators.delegatedPwIporBalance
+        );
+
+        if (rewards > 0) {
+            if (claimRewards) {
+                _transferRewardsToPowerIpor(msgSender, rewards);
+            } else {
+                _allocatedPwTokens[msgSender] += rewards;
+            }
+        }
+
+        IERC20Upgradeable(ipToken).transfer(msgSender, ipTokenAmount);
+
+        emit UnstakeIpTokens(msgSender, ipToken, ipTokenAmount);
     }
 }
