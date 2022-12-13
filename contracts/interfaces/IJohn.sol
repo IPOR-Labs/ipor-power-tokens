@@ -28,7 +28,7 @@ interface IJohn {
         returns (JohnTypes.DelegatedPwIporBalance[] memory balances);
 
     /// @notice Gets account allocated rewards
-    /// @param account account address who want to get account indicators
+    /// @param account address for which we want get information about balance of allocated power tokens
     /// @return allocatedPwTokens - amount of allocated rewards.
     function balanceOfAllocatedPwTokens(address account)
         external
@@ -69,7 +69,7 @@ interface IJohn {
     /// @param ipToken from which you want claim rewards
     function claim(address ipToken) external;
 
-    /// @notice method allowed to claim rewards allocated into John
+    /// @notice method allowed to claim allocated rewards
     function claimAllocatedPwTokens() external;
 
     /// @notice Emitted when account stake ipToken
@@ -90,7 +90,7 @@ interface IJohn {
     /// @param iporTokenAmount reward amount in Ipor Token, represented in 18 decimals
     event Claim(address account, address ipToken, uint256 iporTokenAmount);
 
-    /// @notice Emitted when account claim rewards allocated into John
+    /// @notice Emitted when account claim allocated rewards
     /// @param account account address in the context of which activities of claiming are performed
     /// @param iporTokenAmount reward amount in Ipor Token, represented in 18 decimals
     event ClaimAllocatedTokens(address account, uint256 iporTokenAmount);
