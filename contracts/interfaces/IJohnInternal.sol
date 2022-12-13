@@ -96,6 +96,12 @@ interface IJohnInternal {
     /// @dev Emits {Unpaused}.
     function unpause() external;
 
+    /// @notice Emitted when account unstake ipTokens
+    /// @param account account address in the context of which activities of unstaking ipTokens are performed
+    /// @param ipToken address of ipToken which should be stake
+    /// @param ipTokenAmount of ipTokens to stake, represented in 18 decimals
+    event UnstakeIpTokens(address account, address ipToken, uint256 ipTokenAmount);
+
     /// @notice Emitted when John's Owner change rewards per block, the number of Ipor tokens per block.
     /// @param changedBy address of account who execute changes
     /// @param oldIporTokenAmount old value of rewards per block, Ipor token amount, represented in 8 decimals
