@@ -38,6 +38,7 @@ abstract contract JohnInternal is
     address internal _pauseManager;
 
     mapping(address => bool) internal _ipTokens;
+    mapping(address => uint256) internal _allocatedPwTokens;
 
     //  ipToken (ipUSDT, ipUSDC, ipDAI, etc) address -> global parameters for ipToken
     mapping(address => JohnTypes.GlobalRewardsIndicators) internal _globalIndicators;
@@ -321,6 +322,54 @@ abstract contract JohnInternal is
 
     function unpause() external override onlyPauseManager {
         _unpause();
+    }
+
+    function _unstake(
+        address ipToken,
+        uint256 ipTokenAmount,
+        bool claimRewards
+    ) internal {
+        require(ipTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+
+        address msgSender = _msgSender();
+
+        JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[msgSender][
+            ipToken
+        ];
+
+        require(
+            accountIndicators.ipTokenBalance >= ipTokenAmount,
+            MiningErrors.ACCOUNT_IP_TOKEN_BALANCE_IS_TOO_LOW
+        );
+
+        JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
+
+        (
+            uint256 rewards,
+            uint256 accruedCompMultiplierCumulativePrevBlock
+        ) = _calculateAccountRewards(globalIndicators, accountIndicators);
+
+        _rebalanceIndicators(
+            msgSender,
+            ipToken,
+            accruedCompMultiplierCumulativePrevBlock,
+            globalIndicators,
+            accountIndicators,
+            accountIndicators.ipTokenBalance - ipTokenAmount,
+            accountIndicators.delegatedPwIporBalance
+        );
+
+        if (rewards > 0) {
+            if (claimRewards) {
+                _transferRewardsToPowerIpor(msgSender, rewards);
+            } else {
+                _allocatedPwTokens[msgSender] += rewards;
+            }
+        }
+
+        IERC20Upgradeable(ipToken).transfer(msgSender, ipTokenAmount);
+
+        emit UnstakeIpTokens(msgSender, ipToken, ipTokenAmount);
     }
 
     /// @dev Rebalance makes that rewards for account are reset in current block.
