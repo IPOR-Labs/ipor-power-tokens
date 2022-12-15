@@ -952,7 +952,34 @@ export default ({ drizzle, drizzleState }) => (
                         />
                     </td>
                 </tr>
-
+                <tr>
+                    <td>
+                        <strong>My allocated Rewards</strong>
+                        <br />
+                        <small>
+                            Amount of allocated rewards which user can claim from John
+                            <br /> represented in 18 decimals
+                        </small>
+                    </td>
+                    <td>
+                        <ContractData
+                            drizzle={drizzle}
+                            drizzleState={drizzleState}
+                            contract="John"
+                            method="balanceOfAllocatedPwTokens"
+                            methodArgs={[drizzleState.accounts[0]]}
+                            render={(value) => {
+                                return (
+                                    <div>
+                                        {value / 1000000000000000000}
+                                        <br />
+                                        <small>{value}</small>
+                                    </div>
+                                );
+                            }}
+                        />
+                    </td>
+                </tr>
                 <tr>
                     <td>
                         <strong>Claim</strong> <br />
@@ -963,6 +990,22 @@ export default ({ drizzle, drizzleState }) => (
                     </td>
                     <td colspan="2">
                         <ContractForm drizzle={drizzle} contract="John" method="claim" />
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Claim allocated PwTokens</strong>
+                    </td>
+                    <td colspan="2">
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="John"
+                            method="claimAllocatedPwTokens"
+                        />
                     </td>
                 </tr>
                 <tr>
@@ -992,6 +1035,23 @@ export default ({ drizzle, drizzleState }) => (
                     </td>
                     <td colspan="2">
                         <ContractForm drizzle={drizzle} contract="John" method="unstake" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Unstake and allocate pwTokens</strong>
+                        <br />
+                        <small>
+                            unstakeAndAllocatePwTokens ipToken from John contract <br /> Assets:
+                            ipUsdt, ipUsdc, ipDai
+                        </small>
+                    </td>
+                    <td colspan="2">
+                        <ContractForm
+                            drizzle={drizzle}
+                            contract="John"
+                            method="unstakeAndAllocatePwTokens"
+                        />
                     </td>
                 </tr>
 

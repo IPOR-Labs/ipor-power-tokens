@@ -86,6 +86,11 @@ describe("John claim", () => {
         //    when
         await expect(john.claim(tokens.ipTokenDai.address)).to.be.revertedWith("IPOR_709");
     });
+    it("Should not claimAllocatedPwTokens when no allocated pwTokens", async () => {
+        //    given
+        //    when
+        await expect(john.connect(userOne).claimAllocatedPwTokens()).to.be.revertedWith("IPOR_709");
+    });
 
     it("Should claim rewards when 100 blocks were mint", async () => {
         //    given
@@ -133,6 +138,64 @@ describe("John claim", () => {
         );
         expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore.add(stakedIpTokensAmount));
         expect(exchangeRateBefore).to.be.equal(exchangeRateAfter);
+    });
+
+    it("Should claimAllocatedPwTokens rewards when 100 blocks were mint", async () => {
+        //    given
+        const delegatedPwIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
+        const stakeIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
+        const stakedIpTokensAmount = N1__0_18DEC.mul(BigNumber.from("100"));
+        const expectedRewards = BigNumber.from("101000000000000000000");
+
+        const userOneIporBalanceBefore = await iporToken.balanceOf(await userOne.getAddress());
+        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+        const johnIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(john.address);
+        await powerIpor.connect(userOne).stake(stakeIporAmount);
+
+        await powerIpor
+            .connect(userOne)
+            .delegateToJohn([tokens.ipTokenDai.address], [delegatedPwIporAmount]);
+
+        const powerIporBalanceBefore = await powerIpor
+            .connect(userOne)
+            .balanceOf(await userOne.getAddress());
+
+        await john.connect(userOne).stake(tokens.ipTokenDai.address, stakedIpTokensAmount);
+
+        await hre.network.provider.send("hardhat_mine", ["0x64"]);
+
+        const exchangeRateBefore = await powerIpor.calculateExchangeRate();
+
+        await john
+            .connect(userOne)
+            .unstakeAndAllocatePwTokens(tokens.ipTokenDai.address, stakeIporAmount);
+        const allocatedTokensBefore = await john.balanceOfAllocatedPwTokens(
+            await userOne.getAddress()
+        );
+        //when
+        await john.connect(userOne).claimAllocatedPwTokens();
+        //then
+        const allocatedTokensAfter = await john.balanceOfAllocatedPwTokens(
+            await userOne.getAddress()
+        );
+        const exchangeRateAfter = await powerIpor.calculateExchangeRate();
+        const powerIporBalanceAfter = await powerIpor
+            .connect(userOne)
+            .balanceOf(await userOne.getAddress());
+        const userOneIporBalanceAfter = await iporToken.balanceOf(await userOne.getAddress());
+        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+        const johnIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(john.address);
+
+        expect(powerIporBalanceBefore).to.be.equal(BigNumber.from("100000000000000000000"));
+        expect(powerIporBalanceAfter).to.be.equal(powerIporBalanceBefore.add(expectedRewards));
+        expect(userOneIporBalanceAfter).to.be.equal(userOneIporBalanceBefore.sub(stakeIporAmount));
+        expect(powerIporIporTokenBalanceAfter).to.be.equal(
+            powerIporIporTokenBalanceBefore.add(stakeIporAmount).add(expectedRewards)
+        );
+        expect(johnIpDaiBalanceAfter).to.be.equal(ZERO);
+        expect(exchangeRateBefore).to.be.equal(exchangeRateAfter);
+        expect(allocatedTokensBefore).to.be.equal(expectedRewards);
+        expect(allocatedTokensAfter).to.be.equal(ZERO);
     });
 
     it("Should get 100 rewards when first stake 0.1 dai and after 1 Dai, 200 blocks mint", async () => {
@@ -193,7 +256,7 @@ describe("John claim", () => {
         expect(accruedRewardsBefore).to.be.equal(ZERO);
         expect(accountRewardsMiddle).to.be.equal(ZERO);
         expect(accruedRewardsMiddle).to.be.equal(ZERO);
-        expect(accountRewardsAfter).to.be.equal(expectedRewards);
+        expect(accountRewardsAfter).to.be.equal(expectedRewards.sub(BigNumber.from(1)));
         expect(accruedRewardsAfter).to.be.equal(expectedRewards);
         expect(userOneIporBalanceAfter).to.be.equal(userOneIporBalanceBefore.sub(stakeIporAmount));
 

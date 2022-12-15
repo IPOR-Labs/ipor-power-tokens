@@ -62,6 +62,28 @@ describe("John Stake and balance", () => {
         expect(actualResult).to.be.equal(expectedResult);
     });
 
+    it("Should return ~0.4 when pwIporAmount  = 0 and HS~0.5 and VS~1.4", async () => {
+        //    given
+        const { pwIporAmount, ipTokenAmount, verticalShift, horizontalShift } = getValues(
+            "0",
+            N1__0_18DEC.toString(),
+            "0x3fff6666666666666666666666666666",
+            "0x3ffe0000000000000000000000000000"
+        );
+        const expectedResult = "399999999999999999";
+
+        //    when
+        const actualResult = await miningCalculation.calculateAccountPowerUp(
+            pwIporAmount,
+            ipTokenAmount,
+            verticalShift,
+            horizontalShift
+        );
+
+        //    then
+        expect(actualResult).to.be.equal(expectedResult);
+    });
+
     it("Should return 0 when ipToken < 1", async () => {
         //    given
         const { pwIporAmount, ipTokenAmount, verticalShift, horizontalShift } = getValues(

@@ -133,9 +133,9 @@ describe("John sum of rewards", () => {
 
         expectGlobalIndicators(
             extractGlobalIndicators(globalIndicatorsBefore),
-            BigNumber.from("140000000000000000000"),
+            BigNumber.from("198496250072115618100"),
             ZERO,
-            BigNumber.from("7142857142857142857142857"),
+            BigNumber.from("5037878547512561444528052"),
             ZERO,
             -1,
             100000000
@@ -145,14 +145,14 @@ describe("John sum of rewards", () => {
             ZERO,
             BigNumber.from("101000000000000000000"),
             ZERO,
-            BigNumber.from("721428571428571428571428557"),
+            BigNumber.from("508825733298768705897333252"),
             -1,
             100000000
         );
 
         expectAccountIndicators(
             extractAccountIndicators(userParamsBefore),
-            BigNumber.from("1400000000000000000"),
+            BigNumber.from("1984962500721156181"),
             ZERO,
             BigNumber.from("100000000000000000000"),
             BigNumber.from("100000000000000000000")
@@ -161,7 +161,7 @@ describe("John sum of rewards", () => {
         expectAccountIndicators(
             extractAccountIndicators(userParamsAfter),
             ZERO, //powerUp
-            BigNumber.from("721428571428571428571428557"), //Cumulative
+            BigNumber.from("508825733298768705897333252"), //Cumulative
             ZERO, // ipToken
             BigNumber.from("100000000000000000000") //pwIpor
         );
@@ -215,7 +215,7 @@ describe("John sum of rewards", () => {
             ZERO,
             BigNumber.from("309000000000000000000"),
             ZERO,
-            BigNumber.from("1354761904761904761904761896"),
+            BigNumber.from("955517631178215820645487196"),
             -1,
             100000000
         );
@@ -288,7 +288,7 @@ describe("John sum of rewards", () => {
             ZERO,
             BigNumber.from("307000000000000000000"),
             ZERO,
-            BigNumber.from("1344047619047619047619047610"),
+            BigNumber.from("947960813356946978478695118"),
             -1,
             0
         );
@@ -394,7 +394,7 @@ describe("John sum of rewards", () => {
         expect(extractGlobalIndicators(globalIndicatorsAfter).aggregatedPowerUp).to.be.equal(ZERO);
         expect(johnIpDaiBalanceAfter).to.be.equal(johnIpDaiBalanceBefore);
         expect(powerIporIporTokenBalanceAfter).to.be.equal(
-            powerIporIporTokenBalanceBefore.add(BigNumber.from("813").mul(N1__0_18DEC))
+            powerIporIporTokenBalanceBefore.add(BigNumber.from("813000000000000000001"))
         );
     });
 

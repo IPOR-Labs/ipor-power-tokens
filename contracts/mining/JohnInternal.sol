@@ -38,6 +38,7 @@ abstract contract JohnInternal is
     address internal _pauseManager;
 
     mapping(address => bool) internal _ipTokens;
+    mapping(address => uint256) internal _allocatedPwTokens;
 
     //  ipToken (ipUSDT, ipUSDC, ipDAI, etc) address -> global parameters for ipToken
     mapping(address => JohnTypes.GlobalRewardsIndicators) internal _globalIndicators;
@@ -323,6 +324,54 @@ abstract contract JohnInternal is
         _unpause();
     }
 
+    function _unstake(
+        address ipToken,
+        uint256 ipTokenAmount,
+        bool claimRewards
+    ) internal {
+        require(ipTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+
+        address msgSender = _msgSender();
+
+        JohnTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[msgSender][
+            ipToken
+        ];
+
+        require(
+            accountIndicators.ipTokenBalance >= ipTokenAmount,
+            MiningErrors.ACCOUNT_IP_TOKEN_BALANCE_IS_TOO_LOW
+        );
+
+        JohnTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[ipToken];
+
+        (
+            uint256 rewards,
+            uint256 accruedCompMultiplierCumulativePrevBlock
+        ) = _calculateAccountRewards(globalIndicators, accountIndicators);
+
+        _rebalanceIndicators(
+            msgSender,
+            ipToken,
+            accruedCompMultiplierCumulativePrevBlock,
+            globalIndicators,
+            accountIndicators,
+            accountIndicators.ipTokenBalance - ipTokenAmount,
+            accountIndicators.delegatedPwIporBalance
+        );
+
+        if (rewards > 0) {
+            if (claimRewards) {
+                _transferRewardsToPowerIpor(msgSender, rewards);
+            } else {
+                _allocatedPwTokens[msgSender] += rewards;
+            }
+        }
+
+        IERC20Upgradeable(ipToken).transfer(msgSender, ipTokenAmount);
+
+        emit UnstakeIpTokens(msgSender, ipToken, ipTokenAmount);
+    }
+
     /// @dev Rebalance makes that rewards for account are reset in current block.
     function _rebalanceIndicators(
         address account,
@@ -458,18 +507,20 @@ abstract contract JohnInternal is
 
     /// @notice Gets Horizontal shift param used in Liquidity Mining equastions.
     /// @dev To pre-calculate this value from uint256, use {MiningCalculation._toQuadruplePrecision()} method.
-    /// @dev Notice! uint256 value before calculation has following constraints: 1 <= Horizontal Shift <= 10^3
+    /// @dev 0.5 = ABDKMathQuad.div(ABDKMathQuad.fromUInt(5), ABDKMathQuad.fromUInt(10))
+    /// @dev Notice! uint256 value before calculation has following constraints: 0.5 <= Horizontal Shift <= 10^3
     /// @return horizontal shift - value represented in bytes16, quadrupe precision, 128 bits, takes into consideration 18 decimals
     function _getHorizontalShift() internal pure virtual returns (bytes16) {
-        return 0x3fff0000000000000000000000000000;
+        return 0x3ffe0000000000000000000000000000;
     }
 
     /// @notice Gets vertical shift param used in Liquidity Mining equastions.
     /// @dev To pre-calculate this value from uint256, use {MiningCalculation._toQuadruplePrecision()} method.
+    /// @dev 1.4 = ABDKMathQuad.div(ABDKMathQuad.fromUInt(14), ABDKMathQuad.fromUInt(10))
     /// @dev Notice! uint256 value before calculation has following constraints: 10^(-4) <= Vertival Shift <= 3
     /// @return vertical shift - value represented in bytes16, quadrupe precision, 128 bits, takes into consideration 18 decimals
     function _getVerticalShift() internal pure virtual returns (bytes16) {
-        return 0x3ffd99999999999999e36310e0e2a848;
+        return 0x3fff6666666666666666666666666666;
     }
 
     function _getPowerIpor() internal view returns (address) {

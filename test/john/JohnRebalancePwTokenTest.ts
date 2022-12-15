@@ -146,16 +146,16 @@ describe("John - Rebalance on delegate pwIpor", () => {
 
             expectGlobalIndicators(
                 extractGlobalIndicators(afterDelegatePwIporGPR),
-                BigNumber.from("40000000000000000000"),
+                BigNumber.from("39999999999999999900"),
                 ZERO,
-                BigNumber.from("25000000000000000000000000"),
+                BigNumber.from("25000000000000000062500000"),
                 ZERO,
                 -1,
                 100000000
             );
             expectAccountIndicators(
                 extractAccountIndicators(afterDelegatePwIporUPR),
-                BigNumber.from("400000000000000000"),
+                BigNumber.from("399999999999999999"),
                 ZERO,
                 stakedIpTokens,
                 ZERO
@@ -163,18 +163,18 @@ describe("John - Rebalance on delegate pwIpor", () => {
 
             expectGlobalIndicators(
                 extractGlobalIndicators(afterStakeIpTokensGPR),
-                BigNumber.from("140000000000000000000"),
+                BigNumber.from("198496250072115618100"),
                 BigNumber.from("1000000000000000000"),
-                BigNumber.from("7142857142857142857142857"),
-                BigNumber.from("25000000000000000000000000"),
+                BigNumber.from("5037878547512561444528052"),
+                BigNumber.from("25000000000000000062500000"),
                 -1,
                 100000000
             );
 
             expectAccountIndicators(
                 extractAccountIndicators(afterStakeIpTokensUPR),
-                BigNumber.from("1400000000000000000"),
-                BigNumber.from("25000000000000000000000000"),
+                BigNumber.from("1984962500721156181"),
+                BigNumber.from("25000000000000000062500000"),
                 stakedIpTokens,
                 delegatedIporToken
             );
@@ -240,7 +240,7 @@ describe("John - Rebalance on delegate pwIpor", () => {
                 tokens.ipTokenDai.address
             );
             expect(rewardsAdmin.add(rewardsUserOne).add(rewardsUserTwo)).to.be.equal(
-                BigNumber.from("305652777777777777777")
+                BigNumber.from("305740747726576365693")
             );
             expect(johnIpDaiBalanceAfter).to.be.equal(
                 johnIpDaiBalanceBefore.add(stakedIpTokens).add(stakedIpTokens).add(stakedIpTokens)
@@ -250,7 +250,7 @@ describe("John - Rebalance on delegate pwIpor", () => {
                     .add(delegatedIporToken)
                     .add(delegatedIporToken)
                     .add(delegatedIporToken)
-                    .add(BigNumber.from("1347222222222222222"))
+                    .add(BigNumber.from("1259252273423634307"))
             );
         });
 
@@ -304,19 +304,19 @@ describe("John - Rebalance on delegate pwIpor", () => {
 
             expectGlobalIndicators(
                 globalIndicatorsBefore,
-                BigNumber.from("140000000000000000000"),
+                BigNumber.from("198496250072115618100"),
                 BigNumber.from("1000000000000000000"),
-                BigNumber.from("7142857142857142857142857"),
-                BigNumber.from("25000000000000000000000000"),
+                BigNumber.from("5037878547512561444528052"),
+                BigNumber.from("25000000000000000062500000"),
                 -1,
                 100000000
             );
             expectGlobalIndicators(
                 globalIndicatorsAfter,
-                BigNumber.from("140000000000000000000"),
+                BigNumber.from("198496250072115618100"),
                 BigNumber.from("102000000000000000000"),
                 ZERO,
-                BigNumber.from("746428571428571428571428557"),
+                BigNumber.from("533825733298768705959833252"),
                 -1,
                 0
             );

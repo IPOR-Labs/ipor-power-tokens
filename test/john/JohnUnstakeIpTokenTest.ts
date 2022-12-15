@@ -205,6 +205,70 @@ describe("John unstake ipToken", () => {
         expect(pwIporExchangeRateBefore).to.be.equal(pwIporExchangeRateAfter);
     });
 
+    it("Should revert when iporToken balance on john to low", async () => {
+        //    given
+        const dai = tokens.ipTokenDai.address;
+        await powerIpor.connect(userOne).stake(N100__0_18DEC);
+        await powerIpor
+            .connect(userOne)
+            .delegateToJohn([tokens.ipTokenDai.address], [N100__0_18DEC]);
+        await hre.network.provider.send("hardhat_mine", ["0x64"]);
+
+        // when
+        await john.connect(userOne).stake(dai, N2__0_18DEC.mul(BigNumber.from("1000")));
+        await hre.network.provider.send("hardhat_mine", ["0x2625A00"]);
+
+        await expect(john.connect(userOne).unstake(dai, N1__0_18DEC)).to.revertedWith(
+            "ERC20: transfer amount exceeds balance"
+        );
+    });
+
+    it("Should stake and unstakeAndAllocatePwTokens 1 users", async () => {
+        //    given
+        const dai = tokens.ipTokenDai.address;
+
+        await powerIpor.connect(userOne).stake(N100__0_18DEC);
+        await powerIpor
+            .connect(userOne)
+            .delegateToJohn([tokens.ipTokenDai.address], [N100__0_18DEC]);
+
+        await hre.network.provider.send("hardhat_mine", ["0x64"]);
+
+        const accountRewardsBefore = await john.calculateAccountRewards(
+            await userOne.getAddress(),
+            tokens.ipTokenDai.address
+        );
+        const accountAllocatedRewardsBefore = await john.balanceOfAllocatedPwTokens(
+            await userOne.getAddress()
+        );
+        const userOneIporTokenBalance = await powerIpor.balanceOf(await userOne.getAddress());
+        const pwIporExchangeRateBefore = await powerIpor.calculateExchangeRate();
+
+        // when
+        await john.connect(userOne).stake(dai, N2__0_18DEC);
+        await hre.network.provider.send("hardhat_mine", ["0x64"]);
+        await john.connect(userOne).unstakeAndAllocatePwTokens(dai, N2__0_18DEC);
+
+        // then
+        const userOneIporTokenAfter = await powerIpor.balanceOf(await userOne.getAddress());
+        const accountRewardsAfter = await john.calculateAccountRewards(
+            await userOne.getAddress(),
+            tokens.ipTokenDai.address
+        );
+        const pwIporExchangeRateAfter = await powerIpor.calculateExchangeRate();
+        const accountAllocatedRewardsAfter = await john.balanceOfAllocatedPwTokens(
+            await userOne.getAddress()
+        );
+
+        expect(accountRewardsBefore).to.be.equal(ZERO);
+        expect(accountRewardsAfter).to.be.equal(ZERO);
+        expect(accountAllocatedRewardsBefore).to.be.equal(ZERO);
+        expect(accountAllocatedRewardsAfter).to.be.equal(BigNumber.from("101").mul(N1__0_18DEC));
+        expect(userOneIporTokenBalance).to.be.equal(N100__0_18DEC);
+        expect(userOneIporTokenAfter).to.be.equal(N100__0_18DEC);
+        expect(pwIporExchangeRateBefore).to.be.equal(pwIporExchangeRateAfter);
+    });
+
     it("Should stake and unstake 2 users", async () => {
         //    given
         const dai = tokens.ipTokenDai.address;
@@ -508,11 +572,11 @@ describe("John unstake ipToken", () => {
         expect(accruedRewardsAfter).to.be.equal(accruedRewardsBefore.add(N1__0_18DEC));
 
         expect(globalIndicatorsBeforeExtract.aggregatedPowerUp).to.be.equal(
-            BigNumber.from("800000000000000000")
+            BigNumber.from("799999999999999998")
         );
         expect(globalIndicatorsAfterExtract.aggregatedPowerUp).to.be.equal(ZERO);
         expect(globalIndicatorsBeforeExtract.compositeMultiplierInTheBlock).to.be.equal(
-            BigNumber.from("1250000000").mul(N1__0_18DEC)
+            BigNumber.from("1250000000000000003125000000")
         );
         expect(globalIndicatorsAfterExtract.compositeMultiplierInTheBlock).to.be.equal(ZERO);
     });
