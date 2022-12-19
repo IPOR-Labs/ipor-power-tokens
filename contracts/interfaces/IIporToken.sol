@@ -3,7 +3,7 @@ pragma solidity 0.8.16;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-/// @title Interface of IvToken, which is IPOR Vault Token managed by Stanley in IPOR Protocol for a given asset.
+/// @title Interface of IporToken.
 interface IIporToken is IERC20 {
     /**
      * @dev Contract id.

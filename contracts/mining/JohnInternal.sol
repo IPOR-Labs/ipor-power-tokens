@@ -7,15 +7,15 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "../libraries/errors/MiningErrors.sol";
+import "../libraries/math/MiningCalculation.sol";
 import "../libraries/Constants.sol";
 import "../interfaces/types/JohnTypes.sol";
 import "../interfaces/IJohn.sol";
 import "../interfaces/IJohnInternal.sol";
 import "../interfaces/IPowerIpor.sol";
+import "../interfaces/IIporToken.sol";
 import "../interfaces/IPowerIporInternal.sol";
 import "../security/IporOwnableUpgradeable.sol";
-import "../libraries/math/MiningCalculation.sol";
-import "../interfaces/IIporToken.sol";
 
 abstract contract JohnInternal is
     Initializable,

@@ -7,13 +7,13 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "../libraries/errors/MiningErrors.sol";
+import "../libraries/math/IporMath.sol";
 import "../libraries/Constants.sol";
 import "../interfaces/types/PowerIporTypes.sol";
-import "../libraries/math/IporMath.sol";
+import "../interfaces/IIporToken.sol";
 import "../interfaces/IPowerIporInternal.sol";
 import "../interfaces/IJohn.sol";
 import "../security/IporOwnableUpgradeable.sol";
-import "../interfaces/IIporToken.sol";
 
 abstract contract PowerIporInternal is
     PausableUpgradeable,
