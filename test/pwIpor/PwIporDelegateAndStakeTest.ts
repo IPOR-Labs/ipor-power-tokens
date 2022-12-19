@@ -74,7 +74,7 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
                 [N0__1_18DEC, N1__0_18DEC],
                 [N0__1_18DEC, N1__0_18DEC]
             )
-        ).to.be.revertedWith("IPOR_005");
+        ).to.be.revertedWith("IPOR_718");
     });
 
     it("Should revert transaction when mismatch arrays - case 2", async () => {
@@ -88,7 +88,7 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
                 [N0__1_18DEC],
                 [N0__1_18DEC, N1__0_18DEC]
             )
-        ).to.be.revertedWith("IPOR_005");
+        ).to.be.revertedWith("IPOR_718");
     });
 
     it("Should revert transaction when mismatch arrays - case 3", async () => {
@@ -102,7 +102,7 @@ describe("PowerIpor delegateAndStakeToJohn", () => {
                 [N0__1_18DEC, N1__0_18DEC],
                 [N0__1_18DEC]
             )
-        ).to.be.revertedWith("IPOR_005");
+        ).to.be.revertedWith("IPOR_718");
     });
 
     it("Should revert transaction when insufficient number of tokens to stake", async () => {

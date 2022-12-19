@@ -32,4 +32,10 @@ library MiningErrors {
     string public constant ACCOUNT_COMPOSITE_MULTIPLIER_GT_COMPOSITE_MULTIPLIER = "IPOR_713";
     /// @notice The fee for unstacked iporTokens should be number between (0, 1e18)
     string public constant UNSTAKE_WITHOUT_COOLDOWN_FEE_IS_TO_HIGH = "IPOR_714";
+    /// @notice General problem, address is wrong
+    string public constant WRONG_ADDRESS = "IPOR_715";
+    /// @notice General problem, contract is wrong
+    string public constant WRONG_CONTRACT_ID = "IPOR_716";
+    string public constant VALUE_NOT_GREATER_THAN_ZERO = "IPOR_717";
+    string public constant INPUT_ARRAYS_LENGTH_MISMATCH = "IPOR_718";
 }

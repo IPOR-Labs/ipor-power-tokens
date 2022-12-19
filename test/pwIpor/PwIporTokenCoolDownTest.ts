@@ -65,7 +65,7 @@ describe("PowerIpor unstake", () => {
         const coolDownBefore = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
 
         // when
-        await expect(powerIpor.coolDown(ZERO)).to.be.revertedWith("IPOR_004");
+        await expect(powerIpor.coolDown(ZERO)).to.be.revertedWith("IPOR_717");
 
         // then
         const coolDownAfter = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());

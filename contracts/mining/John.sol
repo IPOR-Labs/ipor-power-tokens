@@ -83,7 +83,7 @@ contract John is JohnInternal, IJohn {
         nonReentrant
         whenNotPaused
     {
-        require(ipTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(ipTokenAmount > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
         require(_ipTokens[ipToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
 
         address msgSender = _msgSender();

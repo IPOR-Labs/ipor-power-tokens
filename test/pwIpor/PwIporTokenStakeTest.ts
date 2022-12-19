@@ -44,7 +44,7 @@ describe("PowerIpor configuration, deploy tests", () => {
         const balanceBefore = await powerIpor.balanceOf(adminAddress);
         const totalSupplyBefore = await powerIpor.totalSupplyBase();
         // when
-        await expect(powerIpor.stake(ZERO)).to.be.revertedWith("IPOR_004");
+        await expect(powerIpor.stake(ZERO)).to.be.revertedWith("IPOR_717");
         // then
         const balanceAfter = await powerIpor.balanceOf(adminAddress);
         const totalSupplyAfter = await powerIpor.totalSupplyBase();

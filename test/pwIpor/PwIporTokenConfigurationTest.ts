@@ -41,7 +41,7 @@ describe("PowerIpor configuration, deploy tests", () => {
         // when
         await expect(
             upgrades.deployProxy(PowerIpor, ["0x0000000000000000000000000000000000000000"])
-        ).to.be.revertedWith("IPOR_000");
+        ).to.be.revertedWith("IPOR_715");
         // then
     });
 

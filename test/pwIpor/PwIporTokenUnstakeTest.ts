@@ -73,7 +73,7 @@ describe("PowerIpor unstake", () => {
         const totalSupplyBefore = await powerIpor.totalSupplyBase();
 
         // when
-        await expect(powerIpor.unstake(ZERO)).to.be.revertedWith("IPOR_004");
+        await expect(powerIpor.unstake(ZERO)).to.be.revertedWith("IPOR_717");
         // then
         const balanceAfter = await powerIpor.balanceOf(adminAddress);
         const totalSupplyAfter = await powerIpor.totalSupplyBase();
