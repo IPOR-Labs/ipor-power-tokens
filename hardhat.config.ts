@@ -6,14 +6,11 @@ import "@openzeppelin/hardhat-upgrades";
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-web3";
-import { task } from "hardhat/config";
 import "hardhat-tracer";
 import "solidity-coverage";
 import "@typechain/hardhat";
 import "hardhat-abi-exporter";
 import networks from "./hardhat.network";
-import "@hardhat-docgen/core";
-import "@hardhat-docgen/markdown";
 
 let jobs = 2;
 
@@ -65,26 +62,7 @@ export default {
             pretty: false,
         },
     ],
-    docgen: {
-        path: "./docs",
-        clear: true,
-        runOnCompile: false,
-        only: [
-            "contracts/amm/Milton.sol",
-            "contracts/amm/MiltonStorage.sol",
-            "contracts/amm/MiltonSpreadModel.sol",
-            "contracts/amm/pool/Joseph.sol",
-            "contracts/facades/cockpit/CockpitDataProvider.sol",
-            "contracts/facades/MiltonFacadeDataProvider.sol",
-            "contracts/facades/IporOracleFacadeDataProvider.sol",
-            "contracts/oracles/IporOracle.sol",
-            "contracts/tokens/IpToken.sol",
-            "contracts/tokens/IvToken.sol",
-            "contracts/vault/Stanley.sol",
-            "contracts/vault/strategies/StrategyCompound.sol",
-            "contracts/vault/strategies/StrategyAave.sol",
-        ],
-    },
+
     mocha: {
         timeout: 100000,
         parallel: true,
