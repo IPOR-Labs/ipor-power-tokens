@@ -6,17 +6,16 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "../libraries/errors/IporErrors.sol";
 import "../libraries/errors/MiningErrors.sol";
+import "../libraries/math/MiningCalculation.sol";
 import "../libraries/Constants.sol";
 import "../interfaces/types/JohnTypes.sol";
 import "../interfaces/IJohn.sol";
 import "../interfaces/IJohnInternal.sol";
 import "../interfaces/IPowerIpor.sol";
+import "../interfaces/IIporToken.sol";
 import "../interfaces/IPowerIporInternal.sol";
 import "../security/IporOwnableUpgradeable.sol";
-import "../libraries/math/MiningCalculation.sol";
-import "../tokens/IporToken.sol";
 
 abstract contract JohnInternal is
     Initializable,
@@ -70,15 +69,15 @@ abstract contract JohnInternal is
         __Ownable_init_unchained();
         __UUPSUpgradeable_init_unchained();
 
-        require(powerIpor != address(0), IporErrors.WRONG_ADDRESS);
+        require(powerIpor != address(0), MiningErrors.WRONG_ADDRESS);
         require(
             IPowerIpor(powerIpor).getContractId() == _POWER_IPOR_ID,
-            IporErrors.WRONG_CONTRACT_ID
+            MiningErrors.WRONG_CONTRACT_ID
         );
-        require(iporToken != address(0), IporErrors.WRONG_ADDRESS);
+        require(iporToken != address(0), MiningErrors.WRONG_ADDRESS);
         require(
-            IporToken(iporToken).getContractId() == _IPOR_TOKEN_ID,
-            IporErrors.WRONG_CONTRACT_ID
+            IIporToken(iporToken).getContractId() == _IPOR_TOKEN_ID,
+            MiningErrors.WRONG_CONTRACT_ID
         );
 
         uint256 ipTokensLength = ipTokens.length;
@@ -86,10 +85,10 @@ abstract contract JohnInternal is
         _powerIpor = powerIpor;
         _pauseManager = _msgSender();
 
-        IporToken(iporToken).approve(powerIpor, Constants.MAX_VALUE);
+        IIporToken(iporToken).approve(powerIpor, Constants.MAX_VALUE);
 
         for (uint256 i; i != ipTokensLength; ++i) {
-            require(ipTokens[i] != address(0), IporErrors.WRONG_ADDRESS);
+            require(ipTokens[i] != address(0), MiningErrors.WRONG_ADDRESS);
 
             _ipTokens[ipTokens[i]] = true;
 
@@ -296,21 +295,21 @@ abstract contract JohnInternal is
     }
 
     function addIpTokenAsset(address ipToken) external onlyOwner {
-        require(ipToken != address(0), IporErrors.WRONG_ADDRESS);
+        require(ipToken != address(0), MiningErrors.WRONG_ADDRESS);
         _ipTokens[ipToken] = true;
 
         emit IpTokenAdded(_msgSender(), ipToken);
     }
 
     function removeIpTokenAsset(address ipToken) external override onlyOwner {
-        require(ipToken != address(0), IporErrors.WRONG_ADDRESS);
+        require(ipToken != address(0), MiningErrors.WRONG_ADDRESS);
         _setRewardsPerBlock(ipToken, 0);
         _ipTokens[ipToken] = false;
         emit IpTokenRemoved(_msgSender(), ipToken);
     }
 
     function setPauseManager(address newPauseManagerAddr) external override onlyOwner {
-        require(newPauseManagerAddr != address(0), IporErrors.WRONG_ADDRESS);
+        require(newPauseManagerAddr != address(0), MiningErrors.WRONG_ADDRESS);
         address oldPauseManagerAddr = _pauseManager;
         _pauseManager = newPauseManagerAddr;
         emit PauseManagerChanged(_msgSender(), oldPauseManagerAddr, newPauseManagerAddr);
@@ -329,7 +328,7 @@ abstract contract JohnInternal is
         uint256 ipTokenAmount,
         bool claimRewards
     ) internal {
-        require(ipTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(ipTokenAmount > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         address msgSender = _msgSender();
 

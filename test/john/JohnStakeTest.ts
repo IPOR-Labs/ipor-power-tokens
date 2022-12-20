@@ -132,7 +132,7 @@ describe("John Stake", () => {
         // when
         await expect(
             john.connect(userOne).stake(tokens.ipTokenUsdt.address, ZERO)
-        ).to.be.revertedWith("IPOR_004");
+        ).to.be.revertedWith("IPOR_717");
 
         // then
         const balanceAfter = await john.balanceOf(userOneAddress, tokens.ipTokenUsdc.address);

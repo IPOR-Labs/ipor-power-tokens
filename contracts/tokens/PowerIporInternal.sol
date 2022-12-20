@@ -6,15 +6,14 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "../libraries/errors/IporErrors.sol";
 import "../libraries/errors/MiningErrors.sol";
+import "../libraries/math/IporMath.sol";
 import "../libraries/Constants.sol";
 import "../interfaces/types/PowerIporTypes.sol";
-import "../libraries/math/IporMath.sol";
+import "../interfaces/IIporToken.sol";
 import "../interfaces/IPowerIporInternal.sol";
 import "../interfaces/IJohn.sol";
 import "../security/IporOwnableUpgradeable.sol";
-import "./IporToken.sol";
 
 abstract contract PowerIporInternal is
     PausableUpgradeable,
@@ -64,10 +63,10 @@ abstract contract PowerIporInternal is
         __Pausable_init_unchained();
         __Ownable_init_unchained();
         __UUPSUpgradeable_init_unchained();
-        require(iporToken != address(0), IporErrors.WRONG_ADDRESS);
+        require(iporToken != address(0), MiningErrors.WRONG_ADDRESS);
         require(
-            IporToken(iporToken).getContractId() == _IPOR_TOKEN_ID,
-            IporErrors.WRONG_CONTRACT_ID
+            IIporToken(iporToken).getContractId() == _IPOR_TOKEN_ID,
+            MiningErrors.WRONG_CONTRACT_ID
         );
         _iporToken = iporToken;
         _pauseManager = _msgSender();
@@ -113,15 +112,15 @@ abstract contract PowerIporInternal is
     }
 
     function setJohn(address newJohnAddr) external override onlyOwner {
-        require(newJohnAddr != address(0), IporErrors.WRONG_ADDRESS);
-        require(IJohn(newJohnAddr).getContractId() == _JOHN_ID, IporErrors.WRONG_CONTRACT_ID);
+        require(newJohnAddr != address(0), MiningErrors.WRONG_ADDRESS);
+        require(IJohn(newJohnAddr).getContractId() == _JOHN_ID, MiningErrors.WRONG_CONTRACT_ID);
         address oldJohnAddr = _john;
         _john = newJohnAddr;
         emit JohnChanged(_msgSender(), oldJohnAddr, newJohnAddr);
     }
 
     function setPauseManager(address newPauseManagerAddr) external override onlyOwner {
-        require(newPauseManagerAddr != address(0), IporErrors.WRONG_ADDRESS);
+        require(newPauseManagerAddr != address(0), MiningErrors.WRONG_ADDRESS);
         address oldPauseManagerAddr = _pauseManager;
         _pauseManager = newPauseManagerAddr;
         emit PauseManagerChanged(_msgSender(), oldPauseManagerAddr, newPauseManagerAddr);
@@ -136,7 +135,7 @@ abstract contract PowerIporInternal is
         address iporTokenAddress = _iporToken;
         /// @dev We need this value before transfer tokens
         uint256 exchangeRate = _calculateInternalExchangeRate(iporTokenAddress);
-        require(iporTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(iporTokenAmount > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         IERC20Upgradeable(iporTokenAddress).transferFrom(
             _msgSender(),

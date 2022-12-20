@@ -57,7 +57,7 @@ describe("John configuration, deploy tests", () => {
                 "0x0000000000000000000000000000000000000000",
                 iporToken.address,
             ])
-        ).to.be.revertedWith("IPOR_000");
+        ).to.be.revertedWith("IPOR_715");
     });
 
     it("Should not be able to deploy contract when address is not powerIpor", async () => {
@@ -67,7 +67,7 @@ describe("John configuration, deploy tests", () => {
         // when
         await expect(
             upgrades.deployProxy(John, [[], iporToken.address, iporToken.address])
-        ).to.be.revertedWith("IPOR_011");
+        ).to.be.revertedWith("IPOR_716");
     });
 
     it("Should not be able to deploy contract when address is not iporToken", async () => {
@@ -77,7 +77,7 @@ describe("John configuration, deploy tests", () => {
         // when
         await expect(
             upgrades.deployProxy(John, [[], powerIpor.address, powerIpor.address])
-        ).to.be.revertedWith("IPOR_011");
+        ).to.be.revertedWith("IPOR_716");
     });
 
     it("Should deploy contract with 3 assets", async () => {

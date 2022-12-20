@@ -52,7 +52,7 @@ describe("PowerIpor token delegate", () => {
         //    when
         await expect(
             powerIpor.delegateToJohn([await userOne.getAddress()], [N0__1_18DEC, N1__0_18DEC])
-        ).to.be.revertedWith("IPOR_005");
+        ).to.be.revertedWith("IPOR_718");
     });
 
     it("Should revert transaction when insufficient number of tokens to stake", async () => {

@@ -55,7 +55,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
     }
 
     function stake(uint256 iporTokenAmount) external override whenNotPaused nonReentrant {
-        require(iporTokenAmount != 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(iporTokenAmount != 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         address iporTokenAddress = _iporToken;
         address msgSender = _msgSender();
@@ -73,7 +73,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
     }
 
     function unstake(uint256 pwIporAmount) external override whenNotPaused nonReentrant {
-        require(pwIporAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(pwIporAmount > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         address iporTokenAddress = _iporToken;
         address msgSender = _msgSender();
@@ -118,7 +118,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         nonReentrant
     {
         uint256 pwIporAmountsLength = pwIporAmounts.length;
-        require(ipTokens.length == pwIporAmountsLength, IporErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
+        require(ipTokens.length == pwIporAmountsLength, MiningErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
         uint256 pwIporToDelegate;
 
         for (uint256 i; i != pwIporAmountsLength; ++i) {
@@ -145,7 +145,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
     ) external override whenNotPaused nonReentrant {
         require(
             ipTokens.length == pwIporAmounts.length && ipTokens.length == ipTokenAmounts.length,
-            IporErrors.INPUT_ARRAYS_LENGTH_MISMATCH
+            MiningErrors.INPUT_ARRAYS_LENGTH_MISMATCH
         );
 
         uint256 pwIporToDelegate;
@@ -180,12 +180,12 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         nonReentrant
     {
         uint256 ipTokensLength = ipTokens.length;
-        require(ipTokensLength == pwIporAmounts.length, IporErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
+        require(ipTokensLength == pwIporAmounts.length, MiningErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
 
         uint256 pwIporAmountToUndelegate;
 
         for (uint256 i; i != ipTokensLength; ++i) {
-            require(pwIporAmounts[i] > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+            require(pwIporAmounts[i] > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
             pwIporAmountToUndelegate += pwIporAmounts[i];
         }
 
@@ -204,7 +204,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
     }
 
     function coolDown(uint256 pwIporAmount) external override whenNotPaused nonReentrant {
-        require(pwIporAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(pwIporAmount > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         address msgSender = _msgSender();
 
@@ -236,7 +236,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         PowerIporTypes.PwIporCoolDown memory accountCoolDown = _coolDowns[msgSender];
 
         require(block.timestamp >= accountCoolDown.endTimestamp, MiningErrors.COOL_DOWN_NOT_FINISH);
-        require(accountCoolDown.pwIporAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(accountCoolDown.pwIporAmount > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         address iporTokenAddress = _iporToken;
 
