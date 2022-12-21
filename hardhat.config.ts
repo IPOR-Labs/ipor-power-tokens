@@ -8,7 +8,6 @@ import "@nomiclabs/hardhat-web3";
 import "hardhat-tracer";
 import "solidity-coverage";
 import "@typechain/hardhat";
-import "hardhat-abi-exporter";
 import networks from "./hardhat.network";
 
 let jobs = 2;
@@ -33,11 +32,11 @@ console.log("Hardhat Mocha Jobs =", jobs);
  */
 export default {
     solidity: {
-        version: "0.8.16",
+        version: "0.8.17",
         settings: {
             optimizer: {
                 enabled: true,
-                runs: 200,
+                runs: 800,
             },
         },
     },
@@ -48,8 +47,8 @@ export default {
     typechain: {
         outDir: "types",
         target: "ethers-v5",
-        alwaysGenerateOverloads: true, // should overloads with full signatures like deposit(uint256) be generated always, even if there are no overloads?
-        externalArtifacts: ["externalArtifacts/*.json"], // optional array of glob patterns with external artifacts to process (for example external libs from node_modules)
+        alwaysGenerateOverloads: true, 
+        externalArtifacts: ["externalArtifacts/*.json"], 
     },
 
     mocha: {

@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.16;
+pragma solidity 0.8.17;
 
 import "./LiquidityRewardsAgent.sol";
-
 
 contract LiquidityRewardsTestAction {
     //    interact with LiquidityRewards
@@ -16,8 +15,6 @@ contract LiquidityRewardsTestAction {
             LiquidityRewardsAgent(accounts[i]).stakeIpToken(ipToken, ipTokenAmount[i]);
         }
     }
-
-	
 
     function unstakeIpToken(
         address[] memory accounts,
@@ -40,7 +37,7 @@ contract LiquidityRewardsTestAction {
     function balanceOfDelegatedPwIpor(address account, address[] memory requestIpTokens)
         external
         view
-        returns (JohnTypes.DelegatedPwIporBalance[] memory balances)
+        returns (LiquidityMiningTypes.DelegatedPwIporBalance[] memory balances)
     {
         balances = LiquidityRewardsAgent(account).balanceOfDelegatedPwIpor(
             account,
@@ -58,8 +55,8 @@ contract LiquidityRewardsTestAction {
         }
     }
 
-    function delegatedToJohnBalanceOf(address account) external view returns (uint256) {
-        return LiquidityRewardsAgent(account).delegatedToJohnBalanceOf(account);
+    function delegatedToLiquidityMiningBalanceOf(address account) external view returns (uint256) {
+        return LiquidityRewardsAgent(account).delegatedToLiquidityMiningBalanceOf(account);
     }
 
     function stakeIporToken(address[] memory accounts, uint256[] memory iporTokenAmounts) external {

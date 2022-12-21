@@ -215,14 +215,17 @@ describe("PowerIpor configuration, deploy tests", () => {
         await powerIpor.setPauseManager(oldPauseManager);
     });
 
-    it("Should not be able execute receiveRewards because sender is not a John", async () => {
+    it("Should not be able execute receiveRewards because sender is not a LiquidityMining", async () => {
         //given
         const PowerIpor = await ethers.getContractFactory("PowerIpor");
         const powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
         const [admin, userOne, userThree] = accounts;
         //when
         await expect(
-            powerIpor.receiveRewardsFromJohn(await userOne.getAddress(), BigNumber.from("123"))
+            powerIpor.receiveRewardsFromLiquidityMining(
+                await userOne.getAddress(),
+                BigNumber.from("123")
+            )
         ).to.be.revertedWith("IPOR_703");
     });
 });

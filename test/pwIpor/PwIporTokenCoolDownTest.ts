@@ -4,7 +4,7 @@ import chai from "chai";
 import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { MockIporToken, John, PowerIpor } from "../../types";
+import { MockIporToken, LiquidityMining, PowerIpor } from "../../types";
 import {
     N1__0_18DEC,
     ZERO,
@@ -13,8 +13,7 @@ import {
     COOLDOWN_SECONDS,
 } from "../utils/Constants";
 import { it } from "mocha";
-import { getDeployedTokens, Tokens } from "../utils/JohnUtils";
-import exp from "constants";
+import { getDeployedTokens, Tokens } from "../utils/LiquidityMiningUtils";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -31,7 +30,7 @@ describe("PowerIpor unstake", () => {
     let iporToken: MockIporToken;
     let powerIpor: PowerIpor;
     let tokens: Tokens;
-    let john: John;
+    let liquidityMining: LiquidityMining;
 
     before(async () => {
         accounts = await ethers.getSigners();
@@ -48,14 +47,14 @@ describe("PowerIpor unstake", () => {
         const PowerIpor = await ethers.getContractFactory("PowerIpor");
         powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
         await iporToken.increaseAllowance(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
-        const John = await hre.ethers.getContractFactory("John");
-        john = (await upgrades.deployProxy(John, [
+        const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
+        liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [tokens.ipTokenDai.address],
             powerIpor.address,
             iporToken.address,
-        ])) as John;
+        ])) as LiquidityMining;
 
-        await powerIpor.setJohn(john.address);
+        await powerIpor.setLiquidityMining(liquidityMining.address);
     });
 
     it("Should not be able coolDown when amount is zero", async () => {
@@ -192,17 +191,21 @@ describe("PowerIpor unstake", () => {
 
         const coolDownBefore = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
         const balanceBefore = await powerIpor.balanceOf(adminAddress);
-        const delegatedBalanceBefore = await powerIpor.delegatedToJohnBalanceOf(adminAddress);
+        const delegatedBalanceBefore = await powerIpor.delegatedToLiquidityMiningBalanceOf(
+            adminAddress
+        );
         // when
 
         await expect(
-            powerIpor.delegateToJohn([tokens.ipTokenDai.address], [N0__5_18DEC])
+            powerIpor.delegateToLiquidityMining([tokens.ipTokenDai.address], [N0__5_18DEC])
         ).to.be.revertedWith("IPOR_708");
 
         // then
         const coolDownAfter = await powerIpor.getActiveCoolDown(await accounts[0].getAddress());
         const balanceAfter = await powerIpor.balanceOf(adminAddress);
-        const delegatedBalanceAfter = await powerIpor.delegatedToJohnBalanceOf(adminAddress);
+        const delegatedBalanceAfter = await powerIpor.delegatedToLiquidityMiningBalanceOf(
+            adminAddress
+        );
 
         expect(coolDownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
         expect(coolDownBefore.pwIporAmount).to.be.equal(N0__8_18DEC);

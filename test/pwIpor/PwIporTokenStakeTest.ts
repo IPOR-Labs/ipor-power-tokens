@@ -10,7 +10,6 @@ import {
     ZERO,
     TOTAL_SUPPLY_18_DECIMALS,
     N0__1_18DEC,
-    N2__0_18DEC,
 } from "../utils/Constants";
 import { it } from "mocha";
 

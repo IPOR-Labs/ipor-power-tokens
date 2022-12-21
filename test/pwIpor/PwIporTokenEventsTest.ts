@@ -4,11 +4,10 @@ import chai from "chai";
 import { Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { MockIporToken, PowerIpor, John } from "../../types";
+import { MockIporToken, PowerIpor, LiquidityMining, LiquidityMiningForTests } from "../../types";
 import { N1__0_18DEC, ZERO, TOTAL_SUPPLY_18_DECIMALS, N0__5_18DEC } from "../utils/Constants";
 import { it } from "mocha";
-import { getDeployedTokens, Tokens } from "../utils/JohnUtils";
-import { randomAddress } from "hardhat/internal/hardhat-network/provider/utils/random";
+import { getDeployedTokens, Tokens } from "../utils/LiquidityMiningUtils";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -19,7 +18,7 @@ describe("PowerIpor token delegate", () => {
     let iporToken: MockIporToken;
     let powerIpor: PowerIpor;
     let tokens: Tokens;
-    let john: John;
+    let liquidityMining: LiquidityMining;
 
     before(async () => {
         [admin, userOne, userTwo, userThree] = await ethers.getSigners();
@@ -36,14 +35,14 @@ describe("PowerIpor token delegate", () => {
         const PowerIpor = await ethers.getContractFactory("PowerIpor");
         powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
         await iporToken.increaseAllowance(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
-        const John = await hre.ethers.getContractFactory("John");
-        john = (await upgrades.deployProxy(John, [
+        const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
+        liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
             powerIpor.address,
             iporToken.address,
-        ])) as John;
+        ])) as LiquidityMining;
 
-        await powerIpor.setJohn(john.address);
+        await powerIpor.setLiquidityMining(liquidityMining.address);
     });
 
     it("Should emit Stake event", async () => {
@@ -81,19 +80,24 @@ describe("PowerIpor token delegate", () => {
         expect(iporTokenStakeBalanceAfter).to.be.equal(ZERO);
     });
 
-    it("Should emit DelegateToJohn event ", async () => {
+    it("Should emit DelegateToLiquidityMining event ", async () => {
         //    given
         const stakeIporTokenAmount = N1__0_18DEC;
         const delegatePwTokenAmount = N1__0_18DEC;
         await powerIpor.stake(stakeIporTokenAmount);
         const delegatedPwTokenBalanceBefore = (
-            await john.balanceOfDelegatedPwIpor(await admin.getAddress(), [
+            await liquidityMining.balanceOfDelegatedPwIpor(await admin.getAddress(), [
                 tokens.ipTokenDai.address,
             ])
         )[0].pwIporAmount;
         //    when
-        await expect(powerIpor.delegateToJohn([tokens.ipTokenDai.address], [delegatePwTokenAmount]))
-            .to.emit(powerIpor, "DelegateToJohn")
+        await expect(
+            powerIpor.delegateToLiquidityMining(
+                [tokens.ipTokenDai.address],
+                [delegatePwTokenAmount]
+            )
+        )
+            .to.emit(powerIpor, "DelegateToLiquidityMining")
             .withArgs(
                 await admin.getAddress(),
                 [tokens.ipTokenDai.address],
@@ -101,7 +105,7 @@ describe("PowerIpor token delegate", () => {
             );
         //    then
         const delegatedPwTokenBalanceAfter = (
-            await john.balanceOfDelegatedPwIpor(await admin.getAddress(), [
+            await liquidityMining.balanceOfDelegatedPwIpor(await admin.getAddress(), [
                 tokens.ipTokenDai.address,
             ])
         )[0].pwIporAmount;
@@ -117,17 +121,23 @@ describe("PowerIpor token delegate", () => {
         const delegatePwTokenAmount = N1__0_18DEC;
         const undelegatePwTokenAmount = N1__0_18DEC;
         await powerIpor.stake(stakeIporTokenAmount);
-        await powerIpor.delegateToJohn([tokens.ipTokenDai.address], [delegatePwTokenAmount]);
+        await powerIpor.delegateToLiquidityMining(
+            [tokens.ipTokenDai.address],
+            [delegatePwTokenAmount]
+        );
         const delegatedPwTokenBalanceBefore = (
-            await john.balanceOfDelegatedPwIpor(await admin.getAddress(), [
+            await liquidityMining.balanceOfDelegatedPwIpor(await admin.getAddress(), [
                 tokens.ipTokenDai.address,
             ])
         )[0].pwIporAmount;
         //    when
         await expect(
-            powerIpor.undelegateFromJohn([tokens.ipTokenDai.address], [undelegatePwTokenAmount])
+            powerIpor.undelegateFromLiquidityMining(
+                [tokens.ipTokenDai.address],
+                [undelegatePwTokenAmount]
+            )
         )
-            .to.emit(powerIpor, "UndelegateFromJohn")
+            .to.emit(powerIpor, "UndelegateFromLiquidityMining")
             .withArgs(
                 await admin.getAddress(),
                 [tokens.ipTokenDai.address],
@@ -135,7 +145,7 @@ describe("PowerIpor token delegate", () => {
             );
         //    then
         const delegatedPwTokenBalanceAfter = (
-            await john.balanceOfDelegatedPwIpor(await admin.getAddress(), [
+            await liquidityMining.balanceOfDelegatedPwIpor(await admin.getAddress(), [
                 tokens.ipTokenDai.address,
             ])
         )[0].pwIporAmount;
@@ -188,17 +198,20 @@ describe("PowerIpor token delegate", () => {
         );
     });
 
-    it("Should emit JohnChanged event", async () => {
+    it("Should emit LiquidityMiningChanged event", async () => {
         // given
-        const John = await hre.ethers.getContractFactory("JohnForTests");
-        const itfJohn = (await upgrades.deployProxy(John, [
+        const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMiningForTests");
+        const itfLiquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
             powerIpor.address,
             iporToken.address,
-        ])) as JohnForTests;
+        ])) as LiquidityMiningForTests;
 
         // when
-        await expect(powerIpor.setJohn(itfJohn.address)).to.be.emit(powerIpor, "JohnChanged");
+        await expect(powerIpor.setLiquidityMining(itfLiquidityMining.address)).to.be.emit(
+            powerIpor,
+            "LiquidityMiningChanged"
+        );
     });
 
     it("Should emit PauseManagerChanged event ", async () => {

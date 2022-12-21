@@ -40,7 +40,7 @@
     "scripts": {
         "compile:hardhat": "hardhat compile --force",
         "test:unit": "export FORK_ENABLED=false; hardhat test",
-        "test:miningrewards": "export FORK_ENABLED=false; hardhat test test/john/*.ts test/pwIpor/*.ts",
+        "test:miningrewards": "export FORK_ENABLED=false; hardhat test test/liquidityMining/*.ts test/pwIpor/*.ts",
         "test": "hardhat test",
         "solhint": "./node_modules/.bin/solhint -f table contracts/**/*.sol"
     },

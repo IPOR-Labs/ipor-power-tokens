@@ -1,26 +1,8 @@
 ### Environment ###
 /.env
-/containers/cockpit/.env
-
-### Java build artifacts ###
-/src/generated/
-/target/
 
 ### Node build artifacts ###
 /node_modules
-
-
-### Smart Contracts build artifacts ###
-/app/src/contracts/
-/app/src/contracts.zip
-/contracts/oracles/artifacts/
-/contracts/amm/artifacts/
-/contracts/artifacts/
-/contracts/interfaces/artifacts/
-/contracts/libraries/types/artifacts/
-/test-eth-gas-report.log
-/smart-contract-addresses.yaml
-/docs
 
 ### IntelliJ IDEA ###
 .idea
@@ -32,18 +14,8 @@
 .DS_Store
 
 ### Ansible build artifacts ###
-/contracts.zip
-/coverage/
-/containers/ganache/
-/containers/logs/nginx-eth-bc/access.log
-/containers/logs/nginx-eth-bc/error.log
-/bin/
-/test/output
-/.nyc_output/
 slither-report.json
-app/.env
 .vscode/settings.json
-/logs/
 
 ### hardhat ###
 /artifacts/
@@ -51,18 +23,4 @@ app/.env
 
 # OpenZeppelin
 .openzeppelin/*.json
-/coverage.json
 /types/
-/ipor-abi/
-/abi/
-
-### Smart Contracts migration artifacts ###
-.ipor/
-.logs/
-
-### Utiles results ###
-iporErrorList.json
-
-### ETH dumps ###
-/containers/eth-bc/eth-bc-dump
-

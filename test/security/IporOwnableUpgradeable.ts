@@ -46,7 +46,7 @@ describe("IporOwnableUpgradeable", () => {
         await expect(
             iporOwnable.transferOwnership(constants.AddressZero),
             "Should revert when 0x00 addres pass"
-        ).revertedWith("IPOR_000");
+        ).revertedWith("IPOR_715");
     });
 
     it("should not be possible to confirm the transfer ownership for different address", async () => {
@@ -57,7 +57,7 @@ describe("IporOwnableUpgradeable", () => {
         await expect(
             iporOwnable.connect(userTwo).confirmTransferOwnership(),
             "Should revert when pass userTwo address"
-        ).revertedWith("IPOR_007");
+        ).revertedWith("IPOR_719");
     });
 
     it("Should be able to transfer ownership to userOne", async () => {
@@ -115,7 +115,7 @@ describe("IporOwnableUpgradeable", () => {
         await iporOwnable.renounceOwnership();
         //    when
         await expect(iporOwnable.connect(userOne).confirmTransferOwnership()).revertedWith(
-            "IPOR_007"
+            "IPOR_719"
         );
 
         //    then
