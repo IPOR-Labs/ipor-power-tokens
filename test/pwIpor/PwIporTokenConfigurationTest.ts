@@ -4,7 +4,7 @@ import chai from "chai";
 import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { IporToken, PowerIpor } from "../../types";
+import { MockIporToken, PowerIpor } from "../../types";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -12,16 +12,16 @@ const { ethers } = hre;
 
 describe("PowerIpor configuration, deploy tests", () => {
     let accounts: Signer[];
-    let iporToken: IporToken;
+    let iporToken: MockIporToken;
     before(async () => {
         accounts = await ethers.getSigners();
 
-        const IporToken = await ethers.getContractFactory("IporToken");
+        const IporToken = await ethers.getContractFactory("MockIporToken");
         iporToken = (await IporToken.deploy(
             "IPOR Token",
             "IPOR",
             await accounts[0].getAddress()
-        )) as IporToken;
+        )) as MockIporToken;
     });
 
     it("Should deploy contract", async () => {

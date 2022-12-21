@@ -4,7 +4,7 @@ import chai from "chai";
 import { Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { John, IporToken, PowerIpor } from "../../types";
+import { John, MockIporToken, PowerIpor } from "../../types";
 import { Tokens, getDeployedTokens } from "../utils/JohnUtils";
 
 chai.use(solidity);
@@ -15,18 +15,18 @@ const randomAddress = "0x0B54FA10558caBBdd0D6df5b8667913C43567Bc5";
 describe("John configuration, deploy tests", () => {
     let tokens: Tokens;
     let accounts: Signer[];
-    let iporToken: IporToken;
+    let iporToken: MockIporToken;
     let powerIpor: PowerIpor;
 
     before(async () => {
         accounts = await hre.ethers.getSigners();
         tokens = await getDeployedTokens(accounts);
-        const IporToken = await ethers.getContractFactory("IporToken");
+        const IporToken = await ethers.getContractFactory("MockIporToken");
         iporToken = (await IporToken.deploy(
             "IPOR Token",
             "IPOR",
             await accounts[0].getAddress()
-        )) as IporToken;
+        )) as MockIporToken;
         const PowerIpor = await ethers.getContractFactory("PowerIpor");
         powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
     });

@@ -2,7 +2,7 @@ import hre from "hardhat";
 import { BigNumber, Signer } from "ethers";
 import chai from "chai";
 
-import { DaiMockedToken, UsdcMockedToken, UsdtMockedToken, IpToken } from "../../types";
+import { MockTestnetTokenDai, MockTestnetTokenUsdc, MockTestnetTokenUsdt, IpToken } from "../../types";
 
 import {
     USD_1_000_000,
@@ -15,9 +15,9 @@ import {
 const { expect } = chai;
 
 export type Tokens = {
-    tokenDai: DaiMockedToken;
-    tokenUsdc: UsdcMockedToken;
-    tokenUsdt: UsdtMockedToken;
+    tokenDai: MockTestnetTokenDai;
+    tokenUsdc: MockTestnetTokenUsdc;
+    tokenUsdt: MockTestnetTokenUsdt;
     ipTokenDai: IpToken;
     ipTokenUsdc: IpToken;
     ipTokenUsdt: IpToken;
@@ -41,18 +41,18 @@ export type UserParams = {
 
 export const getDeployedTokens = async (accounts: Signer[]): Promise<Tokens> => {
     const [admin, userOne, userTwo, userThree] = accounts;
-    const UsdtMockedToken = await hre.ethers.getContractFactory("UsdtMockedToken");
-    const UsdcMockedToken = await hre.ethers.getContractFactory("UsdcMockedToken");
-    const DaiMockedToken = await hre.ethers.getContractFactory("DaiMockedToken");
-    const IpToken = await hre.ethers.getContractFactory("IpToken");
+    const MockTestnetTokenUsdt = await hre.ethers.getContractFactory("MockTestnetTokenUsdt");
+    const MockTestnetTokenUsdc = await hre.ethers.getContractFactory("MockTestnetTokenUsdc");
+    const MockTestnetTokenDai = await hre.ethers.getContractFactory("MockTestnetTokenDai");
+    const IpToken = await hre.ethers.getContractFactory("MockIpToken");
 
-    const tokenDai = (await DaiMockedToken.deploy(TOTAL_SUPPLY_18_DECIMALS, 18)) as DaiMockedToken;
+    const tokenDai = (await MockTestnetTokenDai.deploy(TOTAL_SUPPLY_18_DECIMALS)) as MockTestnetTokenDai;
     await tokenDai.deployed();
 
-    const tokenUsdc = (await UsdcMockedToken.deploy(TOTAL_SUPPLY_6_DECIMALS, 6)) as UsdcMockedToken;
+    const tokenUsdc = (await MockTestnetTokenUsdc.deploy(TOTAL_SUPPLY_6_DECIMALS)) as MockTestnetTokenUsdc;
     await tokenUsdc.deployed();
 
-    const tokenUsdt = (await UsdtMockedToken.deploy(TOTAL_SUPPLY_6_DECIMALS, 6)) as UsdtMockedToken;
+    const tokenUsdt = (await MockTestnetTokenUsdt.deploy(TOTAL_SUPPLY_6_DECIMALS)) as MockTestnetTokenUsdt;
     await tokenUsdt.deployed();
 
     const ipTokenDai = (await IpToken.deploy("IP Dai", "ipDAI", tokenDai.address)) as IpToken;

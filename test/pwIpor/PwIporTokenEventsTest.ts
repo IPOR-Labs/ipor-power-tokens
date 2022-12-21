@@ -4,7 +4,7 @@ import chai from "chai";
 import { Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { IporToken, PowerIpor, John } from "../../types";
+import { MockIporToken, PowerIpor, John } from "../../types";
 import { N1__0_18DEC, ZERO, TOTAL_SUPPLY_18_DECIMALS, N0__5_18DEC } from "../utils/Constants";
 import { it } from "mocha";
 import { getDeployedTokens, Tokens } from "../utils/JohnUtils";
@@ -16,7 +16,7 @@ const { ethers } = hre;
 
 describe("PowerIpor token delegate", () => {
     let admin: Signer, userOne: Signer, userTwo: Signer, userThree: Signer;
-    let iporToken: IporToken;
+    let iporToken: MockIporToken;
     let powerIpor: PowerIpor;
     let tokens: Tokens;
     let john: John;
@@ -27,12 +27,12 @@ describe("PowerIpor token delegate", () => {
     });
 
     beforeEach(async () => {
-        const IporToken = await ethers.getContractFactory("IporToken");
+        const IporToken = await ethers.getContractFactory("MockIporToken");
         iporToken = (await IporToken.deploy(
             "IPOR Token",
             "IPOR",
             await admin.getAddress()
-        )) as IporToken;
+        )) as MockIporToken;
         const PowerIpor = await ethers.getContractFactory("PowerIpor");
         powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
         await iporToken.increaseAllowance(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
@@ -190,12 +190,12 @@ describe("PowerIpor token delegate", () => {
 
     it("Should emit JohnChanged event", async () => {
         // given
-        const John = await hre.ethers.getContractFactory("ItfJohn");
+        const John = await hre.ethers.getContractFactory("JohnForTests");
         const itfJohn = (await upgrades.deployProxy(John, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
             powerIpor.address,
             iporToken.address,
-        ])) as ItfJohn;
+        ])) as JohnForTests;
 
         // when
         await expect(powerIpor.setJohn(itfJohn.address)).to.be.emit(powerIpor, "JohnChanged");

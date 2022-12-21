@@ -1,6 +1,5 @@
 require("dotenv").config();
-require("hardhat-docgen");
-require("hardhat-contract-sizer");
+
 import "dotenv";
 import "@openzeppelin/hardhat-upgrades";
 import "@nomiclabs/hardhat-ethers";
@@ -52,16 +51,6 @@ export default {
         alwaysGenerateOverloads: true, // should overloads with full signatures like deposit(uint256) be generated always, even if there are no overloads?
         externalArtifacts: ["externalArtifacts/*.json"], // optional array of glob patterns with external artifacts to process (for example external libs from node_modules)
     },
-    abiExporter: [
-        {
-            path: "./.ipor/abis/pretty",
-            pretty: true,
-        },
-        {
-            path: "./.ipor/abis/ugly",
-            pretty: false,
-        },
-    ],
 
     mocha: {
         timeout: 100000,

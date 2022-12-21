@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.16;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "../../security/IporOwnable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract MockTestnetToken is ERC20, IporOwnable {
+contract MockTestnetToken is ERC20, Ownable {
     uint8 private _customDecimals;
 
     constructor(

@@ -4,7 +4,7 @@ import chai from "chai";
 import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { John, IporToken, PowerIpor, ItfJohn } from "../../types";
+import { John, MockIporToken, PowerIpor, JohnForTests } from "../../types";
 import { Tokens, getDeployedTokens } from "../utils/JohnUtils";
 import {
     N1__0_18DEC,
@@ -31,7 +31,7 @@ const expectedBalances = (
 describe("John rebalance ", () => {
     let tokens: Tokens;
     let powerIpor: PowerIpor;
-    let iporToken: IporToken;
+    let iporToken: MockIporToken;
     let john: John;
     let admin: Signer, userOne: Signer, userTwo: Signer, userThree: Signer;
 
@@ -42,12 +42,12 @@ describe("John rebalance ", () => {
     });
 
     beforeEach(async () => {
-        const IporToken = await hre.ethers.getContractFactory("IporToken");
+        const IporToken = await hre.ethers.getContractFactory("MockIporToken");
         iporToken = (await IporToken.deploy(
             "IPOR Token",
             "IPOR",
             await admin.getAddress()
-        )) as IporToken;
+        )) as MockIporToken;
 
         const PowerIpor = await hre.ethers.getContractFactory("PowerIpor");
         powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
@@ -98,12 +98,12 @@ describe("John rebalance ", () => {
 
     it("Should not be able to stake power token when ipToken is not supported", async () => {
         //    given
-        const John = await hre.ethers.getContractFactory("ItfJohn");
+        const John = await hre.ethers.getContractFactory("JohnForTests");
         const johnInternal = (await upgrades.deployProxy(John, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
             powerIpor.address,
             iporToken.address,
-        ])) as ItfJohn;
+        ])) as JohnForTests;
         await johnInternal.setPowerIpor(await admin.getAddress());
 
         //    when
@@ -179,12 +179,12 @@ describe("John rebalance ", () => {
 
     it("Should not be able to delegate pwIpor when contract is pause", async () => {
         //    given
-        const John = await hre.ethers.getContractFactory("ItfJohn");
+        const John = await hre.ethers.getContractFactory("JohnForTests");
         const johnInternal = (await upgrades.deployProxy(John, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
             powerIpor.address,
             iporToken.address,
-        ])) as ItfJohn;
+        ])) as JohnForTests;
 
         await johnInternal.setPowerIpor(await admin.getAddress());
 

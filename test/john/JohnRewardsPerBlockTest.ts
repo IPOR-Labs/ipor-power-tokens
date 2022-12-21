@@ -4,7 +4,7 @@ import chai from "chai";
 import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { John } from "../../types";
+import {John, MockIporToken} from "../../types";
 import { Tokens, getDeployedTokens, extractGlobalIndicators } from "../utils/JohnUtils";
 import {
     N1__0_18DEC,
@@ -32,21 +32,21 @@ describe("John Rewards per block", () => {
     });
 
     beforeEach(async () => {
-        const IporToken = await ethers.getContractFactory("IporToken");
+        const IporToken = await ethers.getContractFactory("MockIporToken");
         const iporToken = (await IporToken.deploy(
             "IPOR Token",
             "IPOR",
             await admin.getAddress()
-        )) as IporToken;
+        )) as MockIporToken;
         const PowerIpor = await ethers.getContractFactory("PowerIpor");
         const powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
 
-        const John = await hre.ethers.getContractFactory("ItfJohn");
+        const John = await hre.ethers.getContractFactory("JohnForTests");
         john = (await upgrades.deployProxy(John, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
             powerIpor.address,
             iporToken.address,
-        ])) as ItfJohn;
+        ])) as JohnForTests;
 
         await john.setPowerIpor(await admin.getAddress());
     });

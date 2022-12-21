@@ -4,7 +4,7 @@ import chai from "chai";
 import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { IporToken, John, PowerIpor } from "../../types";
+import { MockIporToken, John, PowerIpor } from "../../types";
 import {
     N1__0_18DEC,
     ZERO,
@@ -28,7 +28,7 @@ describe("PowerIpor unstake", () => {
     const N0__6_18DEC = N0__1_18DEC.mul(BigNumber.from("6"));
     const N0__8_18DEC = N0__1_18DEC.mul(BigNumber.from("8"));
     let accounts: Signer[];
-    let iporToken: IporToken;
+    let iporToken: MockIporToken;
     let powerIpor: PowerIpor;
     let tokens: Tokens;
     let john: John;
@@ -39,12 +39,12 @@ describe("PowerIpor unstake", () => {
     });
 
     beforeEach(async () => {
-        const IporToken = await ethers.getContractFactory("IporToken");
+        const IporToken = await ethers.getContractFactory("MockIporToken");
         iporToken = (await IporToken.deploy(
             "IPOR Token",
             "IPOR",
             await accounts[0].getAddress()
-        )) as IporToken;
+        )) as MockIporToken;
         const PowerIpor = await ethers.getContractFactory("PowerIpor");
         powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
         await iporToken.increaseAllowance(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);

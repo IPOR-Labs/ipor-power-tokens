@@ -4,7 +4,7 @@ import chai from "chai";
 import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { John, IporToken, PowerIpor } from "../../types";
+import { John, MockIporToken, PowerIpor } from "../../types";
 import {
     Tokens,
     getDeployedTokens,
@@ -28,7 +28,7 @@ describe("John sum of rewards", () => {
     let tokens: Tokens;
     let john: John;
     let admin: Signer, userOne: Signer, userTwo: Signer, userThree: Signer;
-    let iporToken: IporToken;
+    let iporToken: MockIporToken;
     let powerIpor: PowerIpor;
 
     before(async () => {
@@ -38,12 +38,12 @@ describe("John sum of rewards", () => {
     });
 
     beforeEach(async () => {
-        const IporToken = await hre.ethers.getContractFactory("IporToken");
+        const IporToken = await hre.ethers.getContractFactory("MockIporToken");
         iporToken = (await IporToken.deploy(
             "IPOR Token",
             "IPOR",
             await admin.getAddress()
-        )) as IporToken;
+        )) as MockIporToken;
         const PowerIpor = await hre.ethers.getContractFactory("PowerIpor");
         powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
 
