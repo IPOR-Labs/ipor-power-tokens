@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.16;
+pragma solidity 0.8.17;
 
 import "./types/PowerIporTypes.sol";
 
-/// @title
+/// @title Power Ipor smart contract interface
 interface IPowerIporInternal {
     /// @notice Returns current version of Power Ipor smart contract
     /// @return Current Power Ipor smart contract version
@@ -21,13 +21,13 @@ interface IPowerIporInternal {
     /// @param unstakeWithoutCooldownFee percentage of fee, represented in 18 decimals.
     function setUnstakeWithoutCooldownFee(uint256 unstakeWithoutCooldownFee) external;
 
-    /// @notice method allowed to transfer rewards from John contracts to balance of specific account
+    /// @notice method allowed to transfer rewards from LiquidityMining contracts to balance of specific account
     /// @param account - address of user who received rewards
     /// @param iporTokenAmount - amount of rewards, represented in 18 decimals.
-    function receiveRewardsFromJohn(address account, uint256 iporTokenAmount) external;
+    function receiveRewardsFromLiquidityMining(address account, uint256 iporTokenAmount) external;
 
-    /// @notice method returns actual address of liquidity rewards contract - the John
-    function getJohn() external view returns (address);
+    /// @notice method returns actual address of liquidity rewards contract - the LiquidityMining
+    function getLiquidityMining() external view returns (address);
 
     /// @notice method returns actual address of IPOR Token
     function getIporToken() external view returns (address);
@@ -36,9 +36,9 @@ interface IPowerIporInternal {
     /// @return Pause Manager's address
     function getPauseManager() external view returns (address);
 
-    /// @notice method setup address of John
-    /// @param john - new address of John contract
-    function setJohn(address john) external;
+    /// @notice method setup address of LiquidityMining
+    /// @param liquidityMining - new address of LiquidityMining contract
+    function setLiquidityMining(address liquidityMining) external;
 
     /// @notice Sets new Pause Manager address
     /// @param newPauseManagerAddr - new address of Pauyse Manager
@@ -52,10 +52,10 @@ interface IPowerIporInternal {
     /// @dev Emits {Unpaused}.
     function unpause() external;
 
-    /// @notice Emitted when user received rewards from john contract
+    /// @notice Emitted when user received rewards from liquidityMining contract
     /// @dev Receiving rewards not changes Internal Exchange Rate of Power Ipor Tokens in Power Ipor smart contract.
     /// @param account address
-    /// @param iporTokenAmount of power token received from john
+    /// @param iporTokenAmount of power token received from liquidityMining
     event ReceiveRewards(address account, uint256 iporTokenAmount);
 
     /// @notice Emitted when new fee for unstaking without cool down is setup.
@@ -69,13 +69,17 @@ interface IPowerIporInternal {
     );
 
     /// @notice Emmited when PauseManager's address is changed by its owner.
-    /// @param changedBy account address that has changed John's address
-    /// @param oldJohn PauseManager's old address
-    /// @param newJohn PauseManager's new address
-    event JohnChanged(address indexed changedBy, address indexed oldJohn, address indexed newJohn);
+    /// @param changedBy account address that has changed LiquidityMining's address
+    /// @param oldLiquidityMining PauseManager's old address
+    /// @param newLiquidityMining PauseManager's new address
+    event LiquidityMiningChanged(
+        address indexed changedBy,
+        address indexed oldLiquidityMining,
+        address indexed newLiquidityMining
+    );
 
     /// @notice Emmited when PauseManager's address is changed by its owner.
-    /// @param changedBy account address that has changed John's address
+    /// @param changedBy account address that has changed LiquidityMining's address
     /// @param oldPauseManager PauseManager's old address
     /// @param newPauseManager PauseManager's new address
     event PauseManagerChanged(

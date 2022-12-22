@@ -1,20 +1,19 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.16;
+pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "../libraries/errors/IporErrors.sol";
 import "../libraries/errors/MiningErrors.sol";
+import "../libraries/math/IporMath.sol";
 import "../libraries/Constants.sol";
 import "../interfaces/types/PowerIporTypes.sol";
-import "../libraries/math/IporMath.sol";
+import "../interfaces/IIporToken.sol";
 import "../interfaces/IPowerIporInternal.sol";
-import "../interfaces/IJohn.sol";
+import "../interfaces/ILiquidityMining.sol";
 import "../security/IporOwnableUpgradeable.sol";
-import "./IporToken.sol";
 
 abstract contract PowerIporInternal is
     PausableUpgradeable,
@@ -28,25 +27,25 @@ abstract contract PowerIporInternal is
 
     bytes32 internal constant _IPOR_TOKEN_ID =
         0xdba05ed67d0251facfcab8345f27ccd3e72b5a1da8cebfabbcccf4316e6d053c;
-    bytes32 internal constant _JOHN_ID =
+    bytes32 internal constant _LIQUIDITY_MINING_ID =
         0x9b1f3aa590476fc9aa58d44ad1419ab53d34c344bd5ed46b12e4af7d27c38e06;
 
-    address internal _john;
+    address internal _liquidityMining;
     address internal _iporToken;
     address internal _pauseManager;
 
     /// @dev account address -> base amount, represented in 18 decimals
     mapping(address => uint256) internal _baseBalance;
 
-    /// @dev balance of Power Ipor Token which are delegated to John, information per account, balance represented in 18 decimals
-    mapping(address => uint256) internal _delegatedToJohnBalance;
+    /// @dev balance of Power Ipor Token which are delegated to LiquidityMining, information per account, balance represented in 18 decimals
+    mapping(address => uint256) internal _delegatedToLiquidityMiningBalance;
     // account address -> {endTimestamp, amount}
     mapping(address => PowerIporTypes.PwIporCoolDown) internal _coolDowns;
     uint256 internal _baseTotalSupply;
     uint256 internal _unstakeWithoutCooldownFee;
 
-    modifier onlyJohn() {
-        require(_msgSender() == _john, MiningErrors.CALLER_NOT_JOHN);
+    modifier onlyLiquidityMining() {
+        require(_msgSender() == _liquidityMining, MiningErrors.CALLER_NOT_LIQUIDITY_MINING);
         _;
     }
 
@@ -64,10 +63,10 @@ abstract contract PowerIporInternal is
         __Pausable_init_unchained();
         __Ownable_init_unchained();
         __UUPSUpgradeable_init_unchained();
-        require(iporToken != address(0), IporErrors.WRONG_ADDRESS);
+        require(iporToken != address(0), MiningErrors.WRONG_ADDRESS);
         require(
-            IporToken(iporToken).getContractId() == _IPOR_TOKEN_ID,
-            IporErrors.WRONG_CONTRACT_ID
+            IIporToken(iporToken).getContractId() == _IPOR_TOKEN_ID,
+            MiningErrors.WRONG_CONTRACT_ID
         );
         _iporToken = iporToken;
         _pauseManager = _msgSender();
@@ -86,8 +85,8 @@ abstract contract PowerIporInternal is
         return _calculateInternalExchangeRate(_iporToken);
     }
 
-    function getJohn() external view override returns (address) {
-        return _john;
+    function getLiquidityMining() external view override returns (address) {
+        return _liquidityMining;
     }
 
     function getIporToken() external view override returns (address) {
@@ -112,31 +111,34 @@ abstract contract PowerIporInternal is
         emit UnstakeWithoutCooldownFeeChanged(_msgSender(), oldValue, unstakeWithoutCooldownFee);
     }
 
-    function setJohn(address newJohnAddr) external override onlyOwner {
-        require(newJohnAddr != address(0), IporErrors.WRONG_ADDRESS);
-        require(IJohn(newJohnAddr).getContractId() == _JOHN_ID, IporErrors.WRONG_CONTRACT_ID);
-        address oldJohnAddr = _john;
-        _john = newJohnAddr;
-        emit JohnChanged(_msgSender(), oldJohnAddr, newJohnAddr);
+    function setLiquidityMining(address newLiquidityMiningAddr) external override onlyOwner {
+        require(newLiquidityMiningAddr != address(0), MiningErrors.WRONG_ADDRESS);
+        require(
+            ILiquidityMining(newLiquidityMiningAddr).getContractId() == _LIQUIDITY_MINING_ID,
+            MiningErrors.WRONG_CONTRACT_ID
+        );
+        address oldLiquidityMiningAddr = _liquidityMining;
+        _liquidityMining = newLiquidityMiningAddr;
+        emit LiquidityMiningChanged(_msgSender(), oldLiquidityMiningAddr, newLiquidityMiningAddr);
     }
 
     function setPauseManager(address newPauseManagerAddr) external override onlyOwner {
-        require(newPauseManagerAddr != address(0), IporErrors.WRONG_ADDRESS);
+        require(newPauseManagerAddr != address(0), MiningErrors.WRONG_ADDRESS);
         address oldPauseManagerAddr = _pauseManager;
         _pauseManager = newPauseManagerAddr;
         emit PauseManagerChanged(_msgSender(), oldPauseManagerAddr, newPauseManagerAddr);
     }
 
-    function receiveRewardsFromJohn(address account, uint256 iporTokenAmount)
+    function receiveRewardsFromLiquidityMining(address account, uint256 iporTokenAmount)
         external
         override
         whenNotPaused
-        onlyJohn
+        onlyLiquidityMining
     {
         address iporTokenAddress = _iporToken;
         /// @dev We need this value before transfer tokens
         uint256 exchangeRate = _calculateInternalExchangeRate(iporTokenAddress);
-        require(iporTokenAmount > 0, IporErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(iporTokenAmount > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         IERC20Upgradeable(iporTokenAddress).transferFrom(
             _msgSender(),
@@ -207,7 +209,7 @@ abstract contract PowerIporInternal is
     {
         return
             _calculateBaseAmountToPwIpor(_baseBalance[account], exchangeRate) -
-            _delegatedToJohnBalance[account] -
+            _delegatedToLiquidityMiningBalance[account] -
             _coolDowns[account].pwIporAmount;
     }
 

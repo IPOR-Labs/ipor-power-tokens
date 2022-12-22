@@ -4,7 +4,7 @@ import chai from "chai";
 import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { IporToken, PowerIpor } from "../../types";
+import { MockIporToken, PowerIpor } from "../../types";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -12,16 +12,16 @@ const { ethers } = hre;
 
 describe("PowerIpor configuration, deploy tests", () => {
     let accounts: Signer[];
-    let iporToken: IporToken;
+    let iporToken: MockIporToken;
     before(async () => {
         accounts = await ethers.getSigners();
 
-        const IporToken = await ethers.getContractFactory("IporToken");
+        const IporToken = await ethers.getContractFactory("MockIporToken");
         iporToken = (await IporToken.deploy(
             "IPOR Token",
             "IPOR",
             await accounts[0].getAddress()
-        )) as IporToken;
+        )) as MockIporToken;
     });
 
     it("Should deploy contract", async () => {
@@ -41,7 +41,7 @@ describe("PowerIpor configuration, deploy tests", () => {
         // when
         await expect(
             upgrades.deployProxy(PowerIpor, ["0x0000000000000000000000000000000000000000"])
-        ).to.be.revertedWith("IPOR_000");
+        ).to.be.revertedWith("IPOR_715");
         // then
     });
 
@@ -215,14 +215,17 @@ describe("PowerIpor configuration, deploy tests", () => {
         await powerIpor.setPauseManager(oldPauseManager);
     });
 
-    it("Should not be able execute receiveRewards because sender is not a John", async () => {
+    it("Should not be able execute receiveRewards because sender is not a LiquidityMining", async () => {
         //given
         const PowerIpor = await ethers.getContractFactory("PowerIpor");
         const powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
         const [admin, userOne, userThree] = accounts;
         //when
         await expect(
-            powerIpor.receiveRewardsFromJohn(await userOne.getAddress(), BigNumber.from("123"))
+            powerIpor.receiveRewardsFromLiquidityMining(
+                await userOne.getAddress(),
+                BigNumber.from("123")
+            )
         ).to.be.revertedWith("IPOR_703");
     });
 });
