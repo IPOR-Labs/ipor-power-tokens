@@ -3,7 +3,7 @@ pragma solidity 0.8.17;
 
 import "./types/PowerIporTypes.sol";
 
-/// @title
+/// @title Power Ipor smart contract interface
 interface IPowerIporInternal {
     /// @notice Returns current version of Power Ipor smart contract
     /// @return Current Power Ipor smart contract version

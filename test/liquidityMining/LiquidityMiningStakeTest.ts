@@ -1,7 +1,7 @@
 import hre, { upgrades } from "hardhat";
 import chai from "chai";
 
-import { BigNumber, Signer } from "ethers";
+import { Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
 import { LiquidityMining, MockIporToken } from "../../types";
@@ -16,8 +16,6 @@ import {
 
 chai.use(solidity);
 const { expect } = chai;
-
-const randomAddress = "0x0B54FA10558caBBdd0D6df5b8667913C43567Bc5";
 
 describe("LiquidityMining Stake", () => {
     let tokens: Tokens;

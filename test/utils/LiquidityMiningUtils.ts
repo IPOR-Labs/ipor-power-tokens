@@ -55,9 +55,21 @@ export const getDeployedTokens = async (accounts: Signer[]): Promise<Tokens> => 
     const tokenUsdt = (await MockTokenUsdt.deploy(TOTAL_SUPPLY_6_DECIMALS)) as MockTokenUsdt;
     await tokenUsdt.deployed();
 
-    const ipTokenDai = (await MockIpToken.deploy("IP Dai", "ipDAI", tokenDai.address)) as MockIpToken;
-    const ipTokenUsdc = (await MockIpToken.deploy("IP USDC", "ipUSDC", tokenUsdc.address)) as MockIpToken;
-    const ipTokenUsdt = (await MockIpToken.deploy("IP USDT", "ipUSDT", tokenUsdt.address)) as MockIpToken;
+    const ipTokenDai = (await MockIpToken.deploy(
+        "IP Dai",
+        "ipDAI",
+        tokenDai.address
+    )) as MockIpToken;
+    const ipTokenUsdc = (await MockIpToken.deploy(
+        "IP USDC",
+        "ipUSDC",
+        tokenUsdc.address
+    )) as MockIpToken;
+    const ipTokenUsdt = (await MockIpToken.deploy(
+        "IP USDT",
+        "ipUSDT",
+        tokenUsdt.address
+    )) as MockIpToken;
 
     await ipTokenDai.setJoseph(await admin.getAddress());
     await ipTokenUsdc.setJoseph(await admin.getAddress());

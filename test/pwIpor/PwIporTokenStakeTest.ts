@@ -5,12 +5,7 @@ import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
 import { MockIporToken, PowerIpor } from "../../types";
-import {
-    N1__0_18DEC,
-    ZERO,
-    TOTAL_SUPPLY_18_DECIMALS,
-    N0__1_18DEC,
-} from "../utils/Constants";
+import { N1__0_18DEC, ZERO, TOTAL_SUPPLY_18_DECIMALS, N0__1_18DEC } from "../utils/Constants";
 import { it } from "mocha";
 
 chai.use(solidity);

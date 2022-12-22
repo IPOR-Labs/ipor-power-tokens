@@ -5,7 +5,7 @@ import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
 import { LiquidityMining, MockIporToken, PowerIpor } from "../../types";
-import { Tokens, getDeployedTokens, extractGlobalIndicators } from "../utils/LiquidityMiningUtils";
+import { Tokens, getDeployedTokens } from "../utils/LiquidityMiningUtils";
 import {
     N1__0_18DEC,
     N1__0_8DEC,

@@ -12,9 +12,7 @@ export const N0__1_18DEC = BigNumber.from("100000000000000000");
 export const N0__5_18DEC = BigNumber.from("500000000000000000");
 export const N0__01_18DEC = BigNumber.from("10000000000000000");
 
-
 export const USD_1_000_000_18DEC = BigNumber.from("1000000").mul(N1__0_18DEC);
-
 
 export const TOTAL_SUPPLY_18_DECIMALS = BigNumber.from("10000000000000000").mul(N1__0_18DEC);
 

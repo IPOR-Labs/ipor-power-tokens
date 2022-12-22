@@ -5,7 +5,7 @@ import { BigNumber } from "ethers";
 
 import { solidity } from "ethereum-waffle";
 import { MockMiningCalculation } from "../../types";
-import { N1__0_18DEC, ZERO, N0__1_18DEC, N2__0_18DEC } from "../utils/Constants";
+import { N1__0_18DEC, ZERO, N2__0_18DEC } from "../utils/Constants";
 
 chai.use(solidity);
 const { expect } = chai;
