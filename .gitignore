@@ -25,3 +25,5 @@ slither-report.json
 .openzeppelin/
 .openzeppelin/*.json
 /types/
+
+package-lock.json

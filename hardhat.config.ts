@@ -1,5 +1,7 @@
 import { HardhatUserConfig } from "hardhat/config";
-import "@nomicfoundation/hardhat-toolbox";
+import "@nomiclabs/hardhat-ethers";
+import "@nomiclabs/hardhat-waffle";
+import "@nomiclabs/hardhat-web3";
 import "@openzeppelin/hardhat-upgrades";
 import "@typechain/hardhat";
 require("dotenv").config();
@@ -24,7 +26,7 @@ const config: HardhatUserConfig = {
     },
     paths: {
         sources: "./contracts",
-        tests: "./tests",
+        tests: "./test",
     },
     typechain: {
         outDir: "types",
