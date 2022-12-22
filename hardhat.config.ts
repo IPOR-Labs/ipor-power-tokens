@@ -1,36 +1,11 @@
-require("dotenv").config();
-
-import "dotenv";
+import { HardhatUserConfig } from "hardhat/config";
+import "@nomicfoundation/hardhat-toolbox";
 import "@openzeppelin/hardhat-upgrades";
-import "@nomiclabs/hardhat-ethers";
-import "@nomiclabs/hardhat-waffle";
-import "@nomiclabs/hardhat-web3";
-import "hardhat-tracer";
-import "solidity-coverage";
 import "@typechain/hardhat";
-import networks from "./hardhat.network";
+require("dotenv").config();
+import "dotenv";
 
-let jobs = 2;
-
-if (process.env.HARDHAT_MOCHA_JOBS) {
-    jobs = Number(process.env.HARDHAT_MOCHA_JOBS);
-}
-
-if (process.env.HARDHAT_REPORT_GAS === "true") {
-    require("hardhat-gas-reporter");
-    jobs = 1;
-}
-
-if (process.env.FORK_ENABLED === "true") {
-    jobs = 1;
-}
-
-console.log("Hardhat Mocha Jobs =", jobs);
-
-/**
- * @type import('hardhat/config').HardhatUserConfig
- */
-export default {
+const config: HardhatUserConfig = {
     solidity: {
         version: "0.8.17",
         settings: {
@@ -40,20 +15,20 @@ export default {
             },
         },
     },
-    networks,
+    networks: {
+        hardhat: {
+            forking: {
+                url: `${process.env.HARDHAT_FORKING_URL}`,
+            },
+        },
+    },
     paths: {
-        tests: "./test",
+        sources: "./contracts",
+        tests: "./tests",
     },
     typechain: {
         outDir: "types",
-        target: "ethers-v5",
-        alwaysGenerateOverloads: true, 
-        externalArtifacts: ["externalArtifacts/*.json"], 
-    },
-
-    mocha: {
-        timeout: 100000,
-        parallel: true,
-        jobs,
     },
 };
+
+export default config;

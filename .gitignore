@@ -22,5 +22,6 @@ slither-report.json
 /cache/
 
 # OpenZeppelin
+.openzeppelin/
 .openzeppelin/*.json
 /types/
