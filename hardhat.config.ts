@@ -7,6 +7,8 @@ import "@typechain/hardhat";
 require("dotenv").config();
 import "dotenv";
 
+const URL = process.env.HARDHAT_FORKING_URL as string;
+
 const config: HardhatUserConfig = {
     solidity: {
         version: "0.8.17",
@@ -20,7 +22,7 @@ const config: HardhatUserConfig = {
     networks: {
         hardhat: {
             forking: {
-                url: `${process.env.HARDHAT_FORKING_URL}`,
+                url: URL,
             },
         },
     },
