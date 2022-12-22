@@ -4,10 +4,9 @@ import "@nomiclabs/hardhat-waffle";
 import "@nomiclabs/hardhat-web3";
 import "@openzeppelin/hardhat-upgrades";
 import "@typechain/hardhat";
-require("dotenv").config();
-import "dotenv";
+import * as dotenv from "dotenv";
 
-const URL = process.env.HARDHAT_FORKING_URL as string;
+dotenv.config();
 
 const config: HardhatUserConfig = {
     solidity: {
@@ -16,13 +15,6 @@ const config: HardhatUserConfig = {
             optimizer: {
                 enabled: true,
                 runs: 800,
-            },
-        },
-    },
-    networks: {
-        hardhat: {
-            forking: {
-                url: URL,
             },
         },
     },
