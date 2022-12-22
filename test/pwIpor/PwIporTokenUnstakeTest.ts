@@ -4,7 +4,7 @@ import chai from "chai";
 import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { IporToken, John, PowerIpor } from "../../types";
+import { MockIporToken, LiquidityMining, PowerIpor } from "../../types";
 import {
     N1__0_18DEC,
     ZERO,
@@ -14,7 +14,7 @@ import {
     N2__0_18DEC,
 } from "../utils/Constants";
 import { it } from "mocha";
-import { getDeployedTokens, Tokens } from "../utils/JohnUtils";
+import { getDeployedTokens, Tokens } from "../utils/LiquidityMiningUtils";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -28,10 +28,10 @@ describe("PowerIpor unstake", () => {
     const N0__6_18DEC = N0__1_18DEC.mul(BigNumber.from("6"));
     const N0__8_18DEC = N0__1_18DEC.mul(BigNumber.from("8"));
     let accounts: Signer[];
-    let iporToken: IporToken;
+    let iporToken: MockIporToken;
     let powerIpor: PowerIpor;
     let tokens: Tokens;
-    let john: John;
+    let liquidityMining: LiquidityMining;
 
     before(async () => {
         accounts = await ethers.getSigners();
@@ -39,23 +39,23 @@ describe("PowerIpor unstake", () => {
     });
 
     beforeEach(async () => {
-        const IporToken = await ethers.getContractFactory("IporToken");
+        const IporToken = await ethers.getContractFactory("MockIporToken");
         iporToken = (await IporToken.deploy(
             "IPOR Token",
             "IPOR",
             await accounts[0].getAddress()
-        )) as IporToken;
+        )) as MockIporToken;
         const PowerIpor = await ethers.getContractFactory("PowerIpor");
         powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
         await iporToken.increaseAllowance(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
-        const John = await hre.ethers.getContractFactory("John");
-        john = (await upgrades.deployProxy(John, [
+        const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
+        liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [tokens.ipTokenDai.address],
             powerIpor.address,
             iporToken.address,
-        ])) as John;
+        ])) as LiquidityMining;
 
-        await powerIpor.setJohn(john.address);
+        await powerIpor.setLiquidityMining(liquidityMining.address);
     });
 
     it("Should not be able set _unstakeWithoutCooldownFee to value highter than 1e18", async () => {
@@ -138,11 +138,11 @@ describe("PowerIpor unstake", () => {
         expect(exchangeRateAfter).to.be.equal(BigNumber.from("1500000000000000000"));
     });
 
-    it("Should not be able to unstake when user delegated tokens to John", async () => {
+    it("Should not be able to unstake when user delegated tokens to LiquidityMining", async () => {
         //    given
         await powerIpor.stake(N1__0_18DEC);
 
-        await powerIpor.delegateToJohn(
+        await powerIpor.delegateToLiquidityMining(
             [tokens.ipTokenDai.address],
             [N0__1_18DEC.mul(BigNumber.from("6"))]
         );
@@ -152,7 +152,7 @@ describe("PowerIpor unstake", () => {
         );
     });
 
-    it("Should be able to unstake tokens which is not delegate when he delegated tokens to John", async () => {
+    it("Should be able to unstake tokens which is not delegate when he delegated tokens to LiquidityMining", async () => {
         //    given
         const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
         const [admin] = accounts;
@@ -163,7 +163,7 @@ describe("PowerIpor unstake", () => {
         const iporBalanceBefore = await iporToken.balanceOf(await admin.getAddress());
         const exchangeRateBefore = await powerIpor.calculateExchangeRate();
 
-        await powerIpor.delegateToJohn([tokens.ipTokenDai.address], [N0__6_18DEC]);
+        await powerIpor.delegateToLiquidityMining([tokens.ipTokenDai.address], [N0__6_18DEC]);
         //    when
         await powerIpor.unstake(N0__4_18DEC);
 
@@ -200,7 +200,7 @@ describe("PowerIpor unstake", () => {
         const exchangeRateBefore = await powerIpor.calculateExchangeRate();
         const withdrawalFeeBefore = await powerIpor.getUnstakeWithoutCooldownFee();
 
-        await powerIpor.delegateToJohn([tokens.ipTokenDai.address], [N0__6_18DEC]);
+        await powerIpor.delegateToLiquidityMining([tokens.ipTokenDai.address], [N0__6_18DEC]);
         //    when
         await powerIpor.setUnstakeWithoutCooldownFee(N0__1_18DEC);
         await powerIpor.unstake(N0__4_18DEC);

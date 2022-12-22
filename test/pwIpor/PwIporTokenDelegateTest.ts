@@ -1,13 +1,13 @@
 import hre, { upgrades } from "hardhat";
 import chai from "chai";
 
-import { BigNumber, Signer } from "ethers";
+import { Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { IporToken, PowerIpor, John } from "../../types";
+import { MockIporToken, PowerIpor, LiquidityMining } from "../../types";
 import { N1__0_18DEC, ZERO, TOTAL_SUPPLY_18_DECIMALS, N0__1_18DEC } from "../utils/Constants";
 import { it } from "mocha";
-import { extractGlobalIndicators, getDeployedTokens, Tokens } from "../utils/JohnUtils";
+import { getDeployedTokens, Tokens } from "../utils/LiquidityMiningUtils";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -15,10 +15,10 @@ const { ethers } = hre;
 
 describe("PowerIpor token delegate", () => {
     let accounts: Signer[];
-    let iporToken: IporToken;
+    let iporToken: MockIporToken;
     let powerIpor: PowerIpor;
     let tokens: Tokens;
-    let john: John;
+    let liquidityMining: LiquidityMining;
 
     before(async () => {
         accounts = await ethers.getSigners();
@@ -26,23 +26,23 @@ describe("PowerIpor token delegate", () => {
     });
 
     beforeEach(async () => {
-        const IporToken = await ethers.getContractFactory("IporToken");
+        const IporToken = await ethers.getContractFactory("MockIporToken");
         iporToken = (await IporToken.deploy(
             "IPOR Token",
             "IPOR",
             await accounts[0].getAddress()
-        )) as IporToken;
+        )) as MockIporToken;
         const PowerIpor = await ethers.getContractFactory("PowerIpor");
         powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
         await iporToken.increaseAllowance(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
-        const John = await hre.ethers.getContractFactory("John");
-        john = (await upgrades.deployProxy(John, [
+        const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
+        liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
             powerIpor.address,
             iporToken.address,
-        ])) as John;
+        ])) as LiquidityMining;
 
-        await powerIpor.setJohn(john.address);
+        await powerIpor.setLiquidityMining(liquidityMining.address);
     });
 
     it("Should revert transaction when mismatch arrays", async () => {
@@ -51,7 +51,10 @@ describe("PowerIpor token delegate", () => {
         const [admin, userOne] = accounts;
         //    when
         await expect(
-            powerIpor.delegateToJohn([await userOne.getAddress()], [N0__1_18DEC, N1__0_18DEC])
+            powerIpor.delegateToLiquidityMining(
+                [await userOne.getAddress()],
+                [N0__1_18DEC, N1__0_18DEC]
+            )
         ).to.be.revertedWith("IPOR_718");
     });
 
@@ -61,7 +64,7 @@ describe("PowerIpor token delegate", () => {
         const [admin, userOne] = accounts;
         //    when
         await expect(
-            powerIpor.delegateToJohn([await admin.getAddress()], [N1__0_18DEC])
+            powerIpor.delegateToLiquidityMining([await admin.getAddress()], [N1__0_18DEC])
         ).to.be.revertedWith("IPOR_708");
     });
 
@@ -71,7 +74,7 @@ describe("PowerIpor token delegate", () => {
         const [admin, userOne] = accounts;
         //    when
         await expect(
-            powerIpor.delegateToJohn(
+            powerIpor.delegateToLiquidityMining(
                 [tokens.tokenDai.address, tokens.tokenUsdc.address],
                 [N1__0_18DEC, N0__1_18DEC]
             )
@@ -85,16 +88,19 @@ describe("PowerIpor token delegate", () => {
         const iporTokenStakeAmount = N1__0_18DEC;
         const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
         await powerIpor.stake(N1__0_18DEC);
-        const delegatedBalanceBefore = await powerIpor.delegatedToJohnBalanceOf(
+        const delegatedBalanceBefore = await powerIpor.delegatedToLiquidityMiningBalanceOf(
             await admin.getAddress()
         );
 
         //    when
-        await powerIpor.delegateToJohn([tokens.ipTokenDai.address], [pwTokenDelegationAmount]);
+        await powerIpor.delegateToLiquidityMining(
+            [tokens.ipTokenDai.address],
+            [pwTokenDelegationAmount]
+        );
 
         //    then
         const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
-        const delegatedBalanceAfter = await powerIpor.delegatedToJohnBalanceOf(
+        const delegatedBalanceAfter = await powerIpor.delegatedToLiquidityMiningBalanceOf(
             await admin.getAddress()
         );
 
@@ -112,17 +118,17 @@ describe("PowerIpor token delegate", () => {
         const pwTokenDelegationAmount = N0__1_18DEC;
         const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
         await powerIpor.stake(N1__0_18DEC);
-        const delegatedBalanceBefore = await powerIpor.delegatedToJohnBalanceOf(
+        const delegatedBalanceBefore = await powerIpor.delegatedToLiquidityMiningBalanceOf(
             await admin.getAddress()
         );
         //    when
-        await powerIpor.delegateToJohn(
+        await powerIpor.delegateToLiquidityMining(
             [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
             [pwTokenDelegationAmount, pwTokenDelegationAmount]
         );
         //    then
         const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
-        const delegatedBalanceAfter = await powerIpor.delegatedToJohnBalanceOf(
+        const delegatedBalanceAfter = await powerIpor.delegatedToLiquidityMiningBalanceOf(
             await admin.getAddress()
         );
 

@@ -4,14 +4,8 @@ import chai from "chai";
 import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { IporToken, PowerIpor } from "../../types";
-import {
-    N1__0_18DEC,
-    ZERO,
-    TOTAL_SUPPLY_18_DECIMALS,
-    N0__1_18DEC,
-    N2__0_18DEC,
-} from "../utils/Constants";
+import { MockIporToken, PowerIpor } from "../../types";
+import { N1__0_18DEC, ZERO, TOTAL_SUPPLY_18_DECIMALS, N0__1_18DEC } from "../utils/Constants";
 import { it } from "mocha";
 
 chai.use(solidity);
@@ -20,7 +14,7 @@ const { ethers } = hre;
 
 describe("PowerIpor configuration, deploy tests", () => {
     let accounts: Signer[];
-    let iporToken: IporToken;
+    let iporToken: MockIporToken;
     let powerIpor: PowerIpor;
 
     before(async () => {
@@ -28,12 +22,12 @@ describe("PowerIpor configuration, deploy tests", () => {
     });
 
     beforeEach(async () => {
-        const IporToken = await ethers.getContractFactory("IporToken");
+        const IporToken = await ethers.getContractFactory("MockIporToken");
         iporToken = (await IporToken.deploy(
             "IPOR Token",
             "IPOR",
             await accounts[0].getAddress()
-        )) as IporToken;
+        )) as MockIporToken;
         const PowerIpor = await ethers.getContractFactory("PowerIpor");
         powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
     });

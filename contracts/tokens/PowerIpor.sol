@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.16;
+pragma solidity 0.8.17;
 
-import "../interfaces/IJohnInternal.sol";
+import "../interfaces/ILiquidityMiningInternal.sol";
 import "../interfaces/IPowerIpor.sol";
 import "./PowerIporInternal.sol";
 
 ///@title Smart contract responsible for managing Power Ipor Token.
 /// @notice Power Ipor Token is retrieved when account stake Ipor Token.
-/// Power Ipor smart contract allows you to stake, unstake Ipor Token, deletage, undelegate to John Power Ipor Token.
-/// Interact with John smart contract.
+/// Power Ipor smart contract allows you to stake, unstake Ipor Token, deletage, undelegate to LiquidityMining Power Ipor Token.
+/// Interact with LiquidityMining smart contract.
 contract PowerIpor is PowerIporInternal, IPowerIpor {
     function name() external pure override returns (string memory) {
         return "Power IPOR";
@@ -38,8 +38,13 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         return _balanceOf(account);
     }
 
-    function delegatedToJohnBalanceOf(address account) external view override returns (uint256) {
-        return _delegatedToJohnBalance[account];
+    function delegatedToLiquidityMiningBalanceOf(address account)
+        external
+        view
+        override
+        returns (uint256)
+    {
+        return _delegatedToLiquidityMiningBalance[account];
     }
 
     function getUnstakeWithoutCooldownFee() external view override returns (uint256) {
@@ -111,12 +116,10 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         );
     }
 
-    function delegateToJohn(address[] calldata ipTokens, uint256[] calldata pwIporAmounts)
-        external
-        override
-        whenNotPaused
-        nonReentrant
-    {
+    function delegateToLiquidityMining(
+        address[] calldata ipTokens,
+        uint256[] calldata pwIporAmounts
+    ) external override whenNotPaused nonReentrant {
         uint256 pwIporAmountsLength = pwIporAmounts.length;
         require(ipTokens.length == pwIporAmountsLength, MiningErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
         uint256 pwIporToDelegate;
@@ -131,14 +134,18 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
             MiningErrors.ACC_AVAILABLE_POWER_IPOR_BALANCE_IS_TOO_LOW
         );
 
-        _delegatedToJohnBalance[_msgSender()] += pwIporToDelegate;
+        _delegatedToLiquidityMiningBalance[_msgSender()] += pwIporToDelegate;
 
-        IJohnInternal(_john).delegatePwIpor(_msgSender(), ipTokens, pwIporAmounts);
+        ILiquidityMiningInternal(_liquidityMining).delegatePwIpor(
+            _msgSender(),
+            ipTokens,
+            pwIporAmounts
+        );
 
-        emit DelegateToJohn(_msgSender(), ipTokens, pwIporAmounts);
+        emit DelegateToLiquidityMining(_msgSender(), ipTokens, pwIporAmounts);
     }
 
-    function delegateAndStakeToJohn(
+    function delegateAndStakeToLiquidityMining(
         address[] calldata ipTokens,
         uint256[] calldata pwIporAmounts,
         uint256[] calldata ipTokenAmounts
@@ -161,24 +168,22 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
             MiningErrors.ACC_AVAILABLE_POWER_IPOR_BALANCE_IS_TOO_LOW
         );
 
-        _delegatedToJohnBalance[_msgSender()] += pwIporToDelegate;
+        _delegatedToLiquidityMiningBalance[_msgSender()] += pwIporToDelegate;
 
-        IJohnInternal(_john).delegatePwIporAndStakeIpToken(
+        ILiquidityMiningInternal(_liquidityMining).delegatePwIporAndStakeIpToken(
             _msgSender(),
             ipTokens,
             pwIporAmounts,
             ipTokenAmounts
         );
 
-        emit DelegateToJohn(_msgSender(), ipTokens, pwIporAmounts);
+        emit DelegateToLiquidityMining(_msgSender(), ipTokens, pwIporAmounts);
     }
 
-    function undelegateFromJohn(address[] calldata ipTokens, uint256[] calldata pwIporAmounts)
-        external
-        override
-        whenNotPaused
-        nonReentrant
-    {
+    function undelegateFromLiquidityMining(
+        address[] calldata ipTokens,
+        uint256[] calldata pwIporAmounts
+    ) external override whenNotPaused nonReentrant {
         uint256 ipTokensLength = ipTokens.length;
         require(ipTokensLength == pwIporAmounts.length, MiningErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
 
@@ -192,15 +197,19 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         address msgSender = _msgSender();
 
         require(
-            _delegatedToJohnBalance[msgSender] >= pwIporAmountToUndelegate,
-            MiningErrors.ACC_DELEGATED_TO_JOHN_BALANCE_IS_TOO_LOW
+            _delegatedToLiquidityMiningBalance[msgSender] >= pwIporAmountToUndelegate,
+            MiningErrors.ACC_DELEGATED_TO_LIQUIDITY_MINING_BALANCE_IS_TOO_LOW
         );
 
-        IJohnInternal(_john).undelegatePwIpor(msgSender, ipTokens, pwIporAmounts);
+        ILiquidityMiningInternal(_liquidityMining).undelegatePwIpor(
+            msgSender,
+            ipTokens,
+            pwIporAmounts
+        );
 
-        _delegatedToJohnBalance[msgSender] -= pwIporAmountToUndelegate;
+        _delegatedToLiquidityMiningBalance[msgSender] -= pwIporAmountToUndelegate;
 
-        emit UndelegateFromJohn(msgSender, ipTokens, pwIporAmounts);
+        emit UndelegateFromLiquidityMining(msgSender, ipTokens, pwIporAmounts);
     }
 
     function coolDown(uint256 pwIporAmount) external override whenNotPaused nonReentrant {
@@ -211,7 +220,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         uint256 availablePwIporAmount = _calculateBaseAmountToPwIpor(
             _baseBalance[msgSender],
             _calculateInternalExchangeRate(_iporToken)
-        ) - _delegatedToJohnBalance[msgSender];
+        ) - _delegatedToLiquidityMiningBalance[msgSender];
 
         require(
             availablePwIporAmount >= pwIporAmount,

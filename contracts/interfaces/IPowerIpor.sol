@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.16;
+pragma solidity 0.8.17;
 
 import "./types/PowerIporTypes.sol";
 
 /// @title Interface for interaction with PowerIpor - smart contract responsible
 /// for managing Power Ipor Token (pwIpor), swap Ipor Token to Power Ipor tokens and
-/// delegating Power Ipor tokens to John contracts.
+/// delegating Power Ipor tokens to LiquidityMining contracts.
 interface IPowerIpor {
     /// @notice Gets name of the Power Ipor Token
     /// @return Returns the name of the Power Ipor token.
@@ -34,10 +34,10 @@ interface IPowerIpor {
     function balanceOf(address account) external view returns (uint256);
 
     /// @notice Gets delegated balance of Power Ipor Token for a given account address.
-    /// Token are delegated from PowerIpor to John smart contract (reponsible for rewards distribution).
+    /// Token are delegated from PowerIpor to LiquidityMining smart contract (reponsible for rewards distribution).
     /// @param account account address for which is checked balance of delegated Power Ipor Tokens
-    /// @return  Returns the amount of Power Ipor tokens owned by `account` and delegated to John contracts.
-    function delegatedToJohnBalanceOf(address account) external view returns (uint256);
+    /// @return  Returns the amount of Power Ipor tokens owned by `account` and delegated to LiquidityMining contracts.
+    function delegatedToLiquidityMiningBalanceOf(address account) external view returns (uint256);
 
     /// @notice Gets configuration param the fee which is taken when sender want to unstake Ipor Token from PowerIpor in time when cooldown is active.
     /// @dev Fee value represented in as a percentage in 18 decimals
@@ -63,28 +63,33 @@ interface IPowerIpor {
     /// @param pwIporAmount Power Ipor Tokens amount which will be unstake or a given sender
     function unstake(uint256 pwIporAmount) external;
 
-    /// @notice Delegates Power Ipor Tokens to John
+    /// @notice Delegates Power Ipor Tokens to LiquidityMining
     /// @param ipTokens - list of ipTokens to which are associated in delegation Power Ipor Tokens
     /// @param pwIporAmounts - list of Power Ipor Token amount which are delegated in relation to given ipToken
-    function delegateToJohn(address[] calldata ipTokens, uint256[] calldata pwIporAmounts) external;
+    function delegateToLiquidityMining(
+        address[] calldata ipTokens,
+        uint256[] calldata pwIporAmounts
+    ) external;
 
     /// @notice Delegates Power Ipor Tokens and stakes ipTokens
     /// @dev Power Ipor Token amounts can be equal zeros. IP Token amounts can be equal zeros.
     /// @param ipTokens - list of ipTokens to which sender delegates Power Ipor Tokens and stakes ipTokens
     /// @param pwIporAmounts - list of Power Ipor Token amount which sender delegates for a given ipToken
-    /// @param ipTokenAmounts - list of ipToken amount which sender stakes in John for a given ipToken
-    function delegateAndStakeToJohn(
+    /// @param ipTokenAmounts - list of ipToken amount which sender stakes in LiquidityMining for a given ipToken
+    function delegateAndStakeToLiquidityMining(
         address[] calldata ipTokens,
         uint256[] calldata pwIporAmounts,
         uint256[] calldata ipTokenAmounts
     ) external;
 
-    /// @notice Undelegates Power Ipor Token from John
+    /// @notice Undelegates Power Ipor Token from LiquidityMining
     /// @dev Power Ipor amounts have to be higher than zero, in other case transaction is rejected.
     /// @param ipTokens - list of ipToken from which sender will undelegate Power Ipor Tokens
-    /// @param pwIporAmounts - list of amounts of Power Ipor Tokens taken to undelegate from John
-    function undelegateFromJohn(address[] calldata ipTokens, uint256[] calldata pwIporAmounts)
-        external;
+    /// @param pwIporAmounts - list of amounts of Power Ipor Tokens taken to undelegate from LiquidityMining
+    function undelegateFromLiquidityMining(
+        address[] calldata ipTokens,
+        uint256[] calldata pwIporAmounts
+    ) external;
 
     /// @notice Resets freeze of a given Power Ipor Token amount in the next 2 weeks.
     /// @dev Power Ipor Tokens in cool down state cannot be unstaked without fee,
@@ -127,17 +132,25 @@ interface IPowerIpor {
         uint256 fee
     );
 
-    /// @notice Emitted when sender delegates Power Ipor Tokens to John contract
+    /// @notice Emitted when sender delegates Power Ipor Tokens to LiquidityMining contract
     /// @param account address who delegates Power Ipor Tokens
     /// @param ipTokens list of token to delegate Power Ipor Tokens
     /// @param pwIporAmounts list of values how Power Ipor token amount should be distributed across ipTokens
-    event DelegateToJohn(address indexed account, address[] ipTokens, uint256[] pwIporAmounts);
+    event DelegateToLiquidityMining(
+        address indexed account,
+        address[] ipTokens,
+        uint256[] pwIporAmounts
+    );
 
-    /// @notice Emitted when sender undelegate Power Ipor Tokens from John
+    /// @notice Emitted when sender undelegate Power Ipor Tokens from LiquidityMining
     /// @param account address who undelegates Power Ipor Tokens
     /// @param ipTokens list of assets from Power Ipor Tokens are undelegated
     /// @param pwIporAmounts list of values how Power Ipor token amounts should be undelegated from ipTokens
-    event UndelegateFromJohn(address indexed account, address[] ipTokens, uint256[] pwIporAmounts);
+    event UndelegateFromLiquidityMining(
+        address indexed account,
+        address[] ipTokens,
+        uint256[] pwIporAmounts
+    );
 
     /// @notice Emitted when sender setup coolDown
     /// @param changedBy account address that has changed CoolDown rules

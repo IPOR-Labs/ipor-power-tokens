@@ -31,9 +31,9 @@ jobs:
               run: npm install
 
             - name: Hardhat compile
-              run: npm run compile:hardhat
+              run: npm run compile
 
             - name: Tests
-              run: npm run test:miningrewards
+              run: npm run test
               env:
                   HARDHAT_FORKING_URL: ${{ secrets.HARDHAT_FORKING_URL }}
