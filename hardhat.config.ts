@@ -25,6 +25,12 @@ const config: HardhatUserConfig = {
     typechain: {
         outDir: "types",
     },
+
+    networks: {
+        localhost: {
+            url: "http://localhost:8545",
+        },
+    },
 };
 
 export default config;
