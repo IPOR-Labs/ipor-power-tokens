@@ -526,13 +526,13 @@ describe("LiquidityMining claim", () => {
             tokens.lpTokenDai.address
         );
 
-        await liquidityMining.removeLpTokenAsset(tokens.lpTokenDai.address);
+        await liquidityMining.removeLpToken(tokens.lpTokenDai.address);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
         const rewardsAfterRemoveLpToken = await liquidityMining.calculateAccountRewards(
             await userOne.getAddress(),
             tokens.lpTokenDai.address
         );
-        await liquidityMining.addLpTokenAsset(tokens.lpTokenDai.address);
+        await liquidityMining.addLpToken(tokens.lpTokenDai.address);
         const rewardsAfterAddLpToken = await liquidityMining.calculateAccountRewards(
             await userOne.getAddress(),
             tokens.lpTokenDai.address

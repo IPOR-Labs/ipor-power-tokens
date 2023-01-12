@@ -123,7 +123,7 @@ describe("LiquidityMining Stake", () => {
             userOneAddress,
             tokens.lpTokenUsdc.address
         );
-        await liquidityMining.removeLpTokenAsset(tokens.lpTokenUsdt.address);
+        await liquidityMining.removeLpToken(tokens.lpTokenUsdt.address);
 
         // when
         await expect(

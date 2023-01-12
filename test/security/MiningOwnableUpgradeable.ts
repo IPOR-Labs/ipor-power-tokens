@@ -15,7 +15,7 @@ describe("MiningOwnableUpgradeable", () => {
         [admin, userOne, userTwo] = await hre.ethers.getSigners();
 
         const MiningOwnableUpgradeable = await hre.ethers.getContractFactory(
-            "MockMiningOwnableUpgradeable"
+            "MockOwnableUpgradeable"
         );
         miningOwnable = (await MiningOwnableUpgradeable.deploy()) as MiningOwnableUpgradeable;
     });

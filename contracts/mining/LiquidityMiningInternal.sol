@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-3-Clause 
+// SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
@@ -6,7 +6,7 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "../libraries/errors/MiningErrors.sol";
+import "../libraries/errors/Errors.sol";
 import "../libraries/math/MiningCalculation.sol";
 import "../libraries/Constants.sol";
 import "../interfaces/types/LiquidityMiningTypes.sol";
@@ -45,12 +45,12 @@ abstract contract LiquidityMiningInternal is
         internal _accountIndicators;
 
     modifier onlyPowerToken() {
-        require(_msgSender() == _getPowerToken(), MiningErrors.CALLER_NOT_POWER_TOKEN);
+        require(_msgSender() == _getPowerToken(), Errors.CALLER_NOT_POWER_TOKEN);
         _;
     }
 
     modifier onlyPauseManager() {
-        require(_msgSender() == _pauseManager, MiningErrors.CALLER_NOT_PAUSE_MANAGER);
+        require(_msgSender() == _pauseManager, Errors.CALLER_NOT_PAUSE_MANAGER);
         _;
     }
 
@@ -68,15 +68,15 @@ abstract contract LiquidityMiningInternal is
         __Ownable_init_unchained();
         __UUPSUpgradeable_init_unchained();
 
-        require(powerToken != address(0), MiningErrors.WRONG_ADDRESS);
+        require(powerToken != address(0), Errors.WRONG_ADDRESS);
         require(
             IPowerToken(powerToken).getContractId() == _POWER_TOKEN_ID,
-            MiningErrors.WRONG_CONTRACT_ID
+            Errors.WRONG_CONTRACT_ID
         );
-        require(stakedToken != address(0), MiningErrors.WRONG_ADDRESS);
+        require(stakedToken != address(0), Errors.WRONG_ADDRESS);
         require(
             IStakedToken(stakedToken).getContractId() == _STAKED_TOKEN_ID,
-            MiningErrors.WRONG_CONTRACT_ID
+            Errors.WRONG_CONTRACT_ID
         );
 
         uint256 lpTokensLength = lpTokens.length;
@@ -87,7 +87,7 @@ abstract contract LiquidityMiningInternal is
         IStakedToken(stakedToken).approve(powerToken, Constants.MAX_VALUE);
 
         for (uint256 i; i != lpTokensLength; ++i) {
-            require(lpTokens[i] != address(0), MiningErrors.WRONG_ADDRESS);
+            require(lpTokens[i] != address(0), Errors.WRONG_ADDRESS);
 
             _lpTokens[lpTokens[i]] = true;
 
@@ -145,7 +145,7 @@ abstract contract LiquidityMiningInternal is
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators;
 
         for (uint256 i; i != lpTokensLength; ++i) {
-            require(_lpTokens[lpTokens[i]], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
+            require(_lpTokens[lpTokens[i]], Errors.LP_TOKEN_NOT_SUPPORTED);
 
             accountIndicators = _accountIndicators[account][lpTokens[i]];
             globalIndicators = _globalIndicators[lpTokens[i]];
@@ -155,7 +155,7 @@ abstract contract LiquidityMiningInternal is
                 uint256 newBalance = accountIndicators.delegatedPwTokenBalance + pwTokenAmounts[i];
                 _accountIndicators[account][lpTokens[i]].delegatedPwTokenBalance = newBalance
                     .toUint96();
-                emit DelegatePwToken(account, lpTokens[i], pwTokenAmounts[i]);
+                emit PwTokenDelegated(account, lpTokens[i], pwTokenAmounts[i]);
                 continue;
             }
 
@@ -175,7 +175,7 @@ abstract contract LiquidityMiningInternal is
                 accountIndicators.lpTokenBalance,
                 accountIndicators.delegatedPwTokenBalance + pwTokenAmounts[i]
             );
-            emit DelegatePwToken(account, lpTokens[i], pwTokenAmounts[i]);
+            emit PwTokenDelegated(account, lpTokens[i], pwTokenAmounts[i]);
         }
 
         if (rewards > 0) {
@@ -194,7 +194,7 @@ abstract contract LiquidityMiningInternal is
         uint256 pwTokenAmount;
 
         for (uint256 i; i != lpTokens.length; ++i) {
-            require(_lpTokens[lpTokens[i]], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
+            require(_lpTokens[lpTokens[i]], Errors.LP_TOKEN_NOT_SUPPORTED);
             lpTokenAmount = lpTokenAmounts[i];
             pwTokenAmount = pwTokenAmounts[i];
 
@@ -214,7 +214,7 @@ abstract contract LiquidityMiningInternal is
                 _accountIndicators[account][lpTokens[i]]
                     .delegatedPwTokenBalance = (accountIndicators.delegatedPwTokenBalance +
                     pwTokenAmount).toUint96();
-                emit DelegatePwToken(account, lpTokens[i], pwTokenAmount);
+                emit PwTokenDelegated(account, lpTokens[i], pwTokenAmount);
                 continue;
             }
 
@@ -234,7 +234,12 @@ abstract contract LiquidityMiningInternal is
                 accountIndicators.lpTokenBalance + lpTokenAmount,
                 accountIndicators.delegatedPwTokenBalance + pwTokenAmount
             );
-            emit DelegatePwTokenAndStakeLpToken(account, lpTokens[i], pwTokenAmount, lpTokenAmount);
+            emit PwTokenDelegatedAndLpTokenStaked(
+                account,
+                lpTokens[i],
+                pwTokenAmount,
+                lpTokenAmount
+            );
         }
 
         if (rewards > 0) {
@@ -255,13 +260,13 @@ abstract contract LiquidityMiningInternal is
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators;
 
         for (uint256 i; i != lpTokensLength; ++i) {
-            require(_lpTokens[lpTokens[i]], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
+            require(_lpTokens[lpTokens[i]], Errors.LP_TOKEN_NOT_SUPPORTED);
 
             accountIndicators = _accountIndicators[account][lpTokens[i]];
 
             require(
                 accountIndicators.delegatedPwTokenBalance >= pwTokenAmounts[i],
-                MiningErrors.ACC_DELEGATED_TO_LIQUIDITY_MINING_BALANCE_IS_TOO_LOW
+                Errors.ACC_DELEGATED_TO_LIQUIDITY_MINING_BALANCE_IS_TOO_LOW
             );
 
             globalIndicators = _globalIndicators[lpTokens[i]];
@@ -283,7 +288,7 @@ abstract contract LiquidityMiningInternal is
                 accountIndicators.delegatedPwTokenBalance - pwTokenAmounts[i]
             );
 
-            emit UndelegatePwToken(account, lpTokens[i], pwTokenAmounts[i]);
+            emit PwTokenUndelegated(account, lpTokens[i], pwTokenAmounts[i]);
         }
 
         if (rewards > 0) {
@@ -291,30 +296,26 @@ abstract contract LiquidityMiningInternal is
         }
     }
 
-    function setRewardsPerBlock(address lpToken, uint32 stakedTokenAmount)
-        external
-        override
-        onlyOwner
-    {
-        _setRewardsPerBlock(lpToken, stakedTokenAmount);
+    function setRewardsPerBlock(address lpToken, uint32 pwTokenAmount) external override onlyOwner {
+        _setRewardsPerBlock(lpToken, pwTokenAmount);
     }
 
-    function addLpTokenAsset(address lpToken) external onlyOwner {
-        require(lpToken != address(0), MiningErrors.WRONG_ADDRESS);
+    function addLpToken(address lpToken) external onlyOwner {
+        require(lpToken != address(0), Errors.WRONG_ADDRESS);
         _lpTokens[lpToken] = true;
 
         emit LpTokenAdded(_msgSender(), lpToken);
     }
 
-    function removeLpTokenAsset(address lpToken) external override onlyOwner {
-        require(lpToken != address(0), MiningErrors.WRONG_ADDRESS);
+    function removeLpToken(address lpToken) external override onlyOwner {
+        require(lpToken != address(0), Errors.WRONG_ADDRESS);
         _setRewardsPerBlock(lpToken, 0);
         _lpTokens[lpToken] = false;
         emit LpTokenRemoved(_msgSender(), lpToken);
     }
 
     function setPauseManager(address newPauseManagerAddr) external override onlyOwner {
-        require(newPauseManagerAddr != address(0), MiningErrors.WRONG_ADDRESS);
+        require(newPauseManagerAddr != address(0), Errors.WRONG_ADDRESS);
         address oldPauseManagerAddr = _pauseManager;
         _pauseManager = newPauseManagerAddr;
         emit PauseManagerChanged(_msgSender(), oldPauseManagerAddr, newPauseManagerAddr);
@@ -333,7 +334,7 @@ abstract contract LiquidityMiningInternal is
         uint256 lpTokenAmount,
         bool claimRewards
     ) internal {
-        require(lpTokenAmount > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(lpTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
         address msgSender = _msgSender();
 
@@ -343,7 +344,7 @@ abstract contract LiquidityMiningInternal is
 
         require(
             accountIndicators.lpTokenBalance >= lpTokenAmount,
-            MiningErrors.ACCOUNT_IP_TOKEN_BALANCE_IS_TOO_LOW
+            Errors.ACCOUNT_LP_TOKEN_BALANCE_IS_TOO_LOW
         );
 
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[
@@ -351,7 +352,7 @@ abstract contract LiquidityMiningInternal is
         ];
 
         (
-            uint256 rewards,
+            uint256 rewardsAmount,
             uint256 accruedCompMultiplierCumulativePrevBlock
         ) = _calculateAccountRewards(globalIndicators, accountIndicators);
 
@@ -365,17 +366,17 @@ abstract contract LiquidityMiningInternal is
             accountIndicators.delegatedPwTokenBalance
         );
 
-        if (rewards > 0) {
+        if (rewardsAmount > 0) {
             if (claimRewards) {
-                _transferRewardsToPowerToken(msgSender, rewards);
+                _transferRewardsToPowerToken(msgSender, rewardsAmount);
             } else {
-                _allocatedPwTokens[msgSender] += rewards;
+                _allocatedPwTokens[msgSender] += rewardsAmount;
             }
         }
 
         IERC20Upgradeable(lpToken).transfer(msgSender, lpTokenAmount);
 
-        emit UnstakeLpTokens(msgSender, lpToken, lpTokenAmount);
+        emit LpTokensUnstaked(msgSender, lpToken, lpTokenAmount);
     }
 
     /// @dev Rebalance makes that rewards for account are reset in current block.
@@ -442,7 +443,11 @@ abstract contract LiquidityMiningInternal is
     function _calculateAccountRewards(
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators,
         LiquidityMiningTypes.AccountRewardsIndicators memory accountIndicators
-    ) internal view returns (uint256 rewards, uint256 accruedCompMultiplierCumulativePrevBlock) {
+    )
+        internal
+        view
+        returns (uint256 rewardsAmount, uint256 accruedCompMultiplierCumulativePrevBlock)
+    {
         accruedCompMultiplierCumulativePrevBlock = MiningCalculation
             .calculateAccruedCompMultiplierCumulativePrevBlock(
                 block.number,
@@ -451,7 +456,7 @@ abstract contract LiquidityMiningInternal is
                 globalIndicators.compositeMultiplierCumulativePrevBlock
             );
 
-        rewards = MiningCalculation.calculateAccountRewards(
+        rewardsAmount = MiningCalculation.calculateAccountRewards(
             accountIndicators.lpTokenBalance,
             accountIndicators.powerUp,
             accountIndicators.compositeMultiplierCumulativePrevBlock,
@@ -459,8 +464,8 @@ abstract contract LiquidityMiningInternal is
         );
     }
 
-    function _setRewardsPerBlock(address lpToken, uint32 stakedTokenAmount) internal {
-        require(_lpTokens[lpToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
+    function _setRewardsPerBlock(address lpToken, uint32 pwTokenAmount) internal {
+        require(_lpTokens[lpToken], Errors.LP_TOKEN_NOT_SUPPORTED);
 
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[
             lpToken
@@ -488,7 +493,7 @@ abstract contract LiquidityMiningInternal is
         }
 
         uint256 compositeMultiplier = MiningCalculation.calculateCompositeMultiplier(
-            stakedTokenAmount,
+            pwTokenAmount,
             globalIndicators.aggregatedPowerUp
         );
 
@@ -497,20 +502,19 @@ abstract contract LiquidityMiningInternal is
             compositeMultiplier.toUint128(),
             accruedCompositeMultiplierCumulativePrevBlock.toUint128(),
             blockNumber.toUint32(),
-            stakedTokenAmount,
+            pwTokenAmount,
             accruedRewards.toUint88()
         );
 
-        emit RewardsPerBlockChanged(
-            _msgSender(),
-            globalIndicators.rewardsPerBlock,
-            stakedTokenAmount
-        );
+        emit RewardsPerBlockChanged(_msgSender(), globalIndicators.rewardsPerBlock, pwTokenAmount);
     }
 
     /// @dev Claim not changes Internal Exchange Rate of Power Tokens in PowerToken smart contract.
-    function _transferRewardsToPowerToken(address account, uint256 rewards) internal {
-        IPowerTokenInternal(_getPowerToken()).receiveRewardsFromLiquidityMining(account, rewards);
+    function _transferRewardsToPowerToken(address account, uint256 rewardsAmount) internal {
+        IPowerTokenInternal(_getPowerToken()).receiveRewardsFromLiquidityMining(
+            account,
+            rewardsAmount
+        );
     }
 
     /// @notice Gets Horizontal shift param used in Liquidity Mining equastions.

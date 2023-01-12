@@ -6,8 +6,8 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "../libraries/errors/MiningErrors.sol";
-import "../libraries/math/PowerTokenMath.sol";
+import "../libraries/errors/Errors.sol";
+import "../libraries/math/Math.sol";
 import "../libraries/Constants.sol";
 import "../interfaces/types/PowerTokenTypes.sol";
 import "../interfaces/IStakedToken.sol";
@@ -45,12 +45,12 @@ abstract contract PowerTokenInternal is
     uint256 internal _unstakeWithoutCooldownFee;
 
     modifier onlyLiquidityMining() {
-        require(_msgSender() == _liquidityMining, MiningErrors.CALLER_NOT_LIQUIDITY_MINING);
+        require(_msgSender() == _liquidityMining, Errors.CALLER_NOT_LIQUIDITY_MINING);
         _;
     }
 
     modifier onlyPauseManager() {
-        require(_msgSender() == _pauseManager, MiningErrors.CALLER_NOT_PAUSE_MANAGER);
+        require(_msgSender() == _pauseManager, Errors.CALLER_NOT_PAUSE_MANAGER);
         _;
     }
 
@@ -63,10 +63,10 @@ abstract contract PowerTokenInternal is
         __Pausable_init_unchained();
         __Ownable_init_unchained();
         __UUPSUpgradeable_init_unchained();
-        require(stakedToken != address(0), MiningErrors.WRONG_ADDRESS);
+        require(stakedToken != address(0), Errors.WRONG_ADDRESS);
         require(
             IStakedToken(stakedToken).getContractId() == _STAKED_TOKEN_ID,
-            MiningErrors.WRONG_CONTRACT_ID
+            Errors.WRONG_CONTRACT_ID
         );
         _stakedToken = stakedToken;
         _pauseManager = _msgSender();
@@ -104,7 +104,7 @@ abstract contract PowerTokenInternal is
     {
         require(
             unstakeWithoutCooldownFee <= Constants.D18,
-            MiningErrors.UNSTAKE_WITHOUT_COOLDOWN_FEE_IS_TO_HIGH
+            Errors.UNSTAKE_WITHOUT_COOLDOWN_FEE_IS_TO_HIGH
         );
         uint256 oldValue = _unstakeWithoutCooldownFee;
         _unstakeWithoutCooldownFee = unstakeWithoutCooldownFee;
@@ -112,10 +112,10 @@ abstract contract PowerTokenInternal is
     }
 
     function setLiquidityMining(address newLiquidityMiningAddr) external override onlyOwner {
-        require(newLiquidityMiningAddr != address(0), MiningErrors.WRONG_ADDRESS);
+        require(newLiquidityMiningAddr != address(0), Errors.WRONG_ADDRESS);
         require(
             ILiquidityMining(newLiquidityMiningAddr).getContractId() == _LIQUIDITY_MINING_ID,
-            MiningErrors.WRONG_CONTRACT_ID
+            Errors.WRONG_CONTRACT_ID
         );
         address oldLiquidityMiningAddr = _liquidityMining;
         _liquidityMining = newLiquidityMiningAddr;
@@ -123,13 +123,13 @@ abstract contract PowerTokenInternal is
     }
 
     function setPauseManager(address newPauseManagerAddr) external override onlyOwner {
-        require(newPauseManagerAddr != address(0), MiningErrors.WRONG_ADDRESS);
+        require(newPauseManagerAddr != address(0), Errors.WRONG_ADDRESS);
         address oldPauseManagerAddr = _pauseManager;
         _pauseManager = newPauseManagerAddr;
         emit PauseManagerChanged(_msgSender(), oldPauseManagerAddr, newPauseManagerAddr);
     }
 
-    function receiveRewardsFromLiquidityMining(address account, uint256 pwTokenAmount)
+    function receiveRewardsFromLiquidityMining(address account, uint256 rewardsAmount)
         external
         override
         whenNotPaused
@@ -138,20 +138,20 @@ abstract contract PowerTokenInternal is
         address stakedTokenAddress = _stakedToken;
         /// @dev We need this value before transfer tokens
         uint256 exchangeRate = _calculateInternalExchangeRate(stakedTokenAddress);
-        require(pwTokenAmount > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(rewardsAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
         IERC20Upgradeable(stakedTokenAddress).transferFrom(
             _msgSender(),
             address(this),
-            pwTokenAmount
+            rewardsAmount
         );
 
-        uint256 baseAmount = PowerTokenMath.division(pwTokenAmount * Constants.D18, exchangeRate);
+        uint256 baseAmount = Math.division(rewardsAmount * Constants.D18, exchangeRate);
 
         _baseBalance[account] += baseAmount;
         _baseTotalSupply += baseAmount;
 
-        emit ReceiveRewards(account, pwTokenAmount);
+        emit RewardsReceived(account, rewardsAmount);
     }
 
     function pause() external override onlyPauseManager {
@@ -181,7 +181,7 @@ abstract contract PowerTokenInternal is
             return Constants.D18;
         }
 
-        return PowerTokenMath.division(balanceOfStakedToken * Constants.D18, baseTotalSupply);
+        return Math.division(balanceOfStakedToken * Constants.D18, baseTotalSupply);
     }
 
     function _calculateAmountWithCooldownFeeSubtracted(uint256 baseAmount)
@@ -190,10 +190,7 @@ abstract contract PowerTokenInternal is
         returns (uint256)
     {
         return
-            PowerTokenMath.division(
-                (Constants.D18 - _unstakeWithoutCooldownFee) * baseAmount,
-                Constants.D18
-            );
+            Math.division((Constants.D18 - _unstakeWithoutCooldownFee) * baseAmount, Constants.D18);
     }
 
     function _calculateBaseAmountToPwToken(uint256 baseAmount, uint256 exchangeRate)
@@ -201,7 +198,7 @@ abstract contract PowerTokenInternal is
         pure
         returns (uint256)
     {
-        return PowerTokenMath.division(baseAmount * exchangeRate, Constants.D18);
+        return Math.division(baseAmount * exchangeRate, Constants.D18);
     }
 
     function _getAvailablePwTokenAmount(address account, uint256 exchangeRate)

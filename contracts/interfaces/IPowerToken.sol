@@ -113,7 +113,7 @@ interface IPowerToken {
     /// @param stakedTokenAmount of Staked Token amount which should be stake into PowerToken contract
     /// @param internalExchangeRate internal exchange rate used to calculate base amount
     /// @param baseAmount calculated value based on stakedTokenAmount and internalExchangeRate
-    event Stake(
+    event Staked(
         address indexed account,
         uint256 stakedTokenAmount,
         uint256 internalExchangeRate,
@@ -125,7 +125,7 @@ interface IPowerToken {
     /// @param pwTokenAmount amount of Staked Token which was unstaked
     /// @param internalExchangeRate which was used to calculate base amount
     /// @param fee value which was subtract from pwTokenAmount
-    event Unstake(
+    event Unstaked(
         address indexed account,
         uint256 pwTokenAmount,
         uint256 internalExchangeRate,
@@ -136,7 +136,7 @@ interface IPowerToken {
     /// @param account address who delegates Power Tokens
     /// @param lpTokens list of token to delegate Power Tokens
     /// @param pwTokenAmounts list of values how Power token amount should be distributed across lpTokens
-    event DelegateToLiquidityMining(
+    event ToLiquidityMiningDelegated(
         address indexed account,
         address[] lpTokens,
         uint256[] pwTokenAmounts
@@ -146,7 +146,7 @@ interface IPowerToken {
     /// @param account address who undelegates Power Tokens
     /// @param lpTokens list of assets from Power Tokens are undelegated
     /// @param pwTokenAmounts list of values how Power token amounts should be undelegated from lpTokens
-    event UndelegateFromLiquidityMining(
+    event FromLiquidityMiningUndelegated(
         address indexed account,
         address[] lpTokens,
         uint256[] pwTokenAmounts

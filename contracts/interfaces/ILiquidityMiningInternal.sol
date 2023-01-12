@@ -77,12 +77,12 @@ interface ILiquidityMiningInternal {
     /// @notice Adds new supported by LiquidityMining lpToken asset
     /// @dev Can be executed only by the Owner
     /// @param lpToken address of lpToken asset
-    function addLpTokenAsset(address lpToken) external;
+    function addLpToken(address lpToken) external;
 
     /// @notice Remove lpToken asset from list of supported lpTokens in LiquidityMining smart contract
-    /// @dev Can be executed only by the Owner. Notice! When Ip Token asset removed, then rewards cannot be claimed. To recover claiming execute method {addLpTokenAsset()} and {setRewardsPerBlock()}
+    /// @dev Can be executed only by the Owner. Notice! When Ip Token asset removed, then rewards cannot be claimed. To recover claiming execute method {addLpToken()} and {setRewardsPerBlock()}
     /// @param lpToken address of lpToken asset
-    function removeLpTokenAsset(address lpToken) external;
+    function removeLpToken(address lpToken) external;
 
     /// @notice Sets new Pause Manager address
     /// @param newPauseManagerAddr - new address of Pauyse Manager
@@ -100,7 +100,7 @@ interface ILiquidityMiningInternal {
     /// @param account account address in the context of which activities of unstaking lpTokens are performed
     /// @param lpToken address of lpToken which should be stake
     /// @param lpTokenAmount of lpTokens to stake, represented in 18 decimals
-    event UnstakeLpTokens(address account, address lpToken, uint256 lpTokenAmount);
+    event LpTokensUnstaked(address account, address lpToken, uint256 lpTokenAmount);
 
     /// @notice Emitted when LiquidityMining's Owner change rewards per block, the number of power tokens per block.
     /// @param changedBy address of account who execute changes
@@ -126,14 +126,14 @@ interface ILiquidityMiningInternal {
     /// @param account account address in the context of which activities of delegation are performed
     /// @param lpToken address of lpToken for which Power Token are delegated
     /// @param pwTokenAmount amount of Power Tokens delegated to LiquidityMining, represented in 18 decimals
-    event DelegatePwToken(address account, address lpToken, uint256 pwTokenAmount);
+    event PwTokenDelegated(address account, address lpToken, uint256 pwTokenAmount);
 
     /// @notice Emitted when account delegates Power Tokens and stake lpTokens to the LiquidityMining
     /// @param account account address in the context of which activities of delegation and staking are performed
     /// @param lpToken address of lpToken which should be unstake
     /// @param pwTokenAmount of Power Token to delegate, represented in 18 decimals
     /// @param lpTokenAmount of lpTokens to stake, represented in 18 decimals
-    event DelegatePwTokenAndStakeLpToken(
+    event PwTokenDelegatedAndLpTokenStaked(
         address account,
         address lpToken,
         uint256 pwTokenAmount,
@@ -144,7 +144,7 @@ interface ILiquidityMiningInternal {
     /// @param account account address in the context of which activities of undelegation are performed
     /// @param lpToken address of lpToken
     /// @param pwTokenAmount amount of Power Token which was undelegated, represented in 18 decimals
-    event UndelegatePwToken(address account, address lpToken, uint256 pwTokenAmount);
+    event PwTokenUndelegated(address account, address lpToken, uint256 pwTokenAmount);
 
     /// @notice Emitted when PauseManager's address is changed by its owner.
     /// @param changedBy account address that has changed LiquidityMining's address

@@ -76,16 +76,16 @@ interface ILiquidityMining {
     /// @param account account address in the context of which activities of staking lpTokens are performed
     /// @param lpToken address of lpToken which should be stake
     /// @param lpTokenAmount of lpTokens to stake, represented in 18 decimals
-    event StakeLpTokens(address account, address lpToken, uint256 lpTokenAmount);
+    event LpTokensStaked(address account, address lpToken, uint256 lpTokenAmount);
 
     /// @notice Emitted when account claim rewards
     /// @param account account address in the context of which activities of claiming are performed
     /// @param lpToken address of lpToken
-    /// @param pwTokenAmount reward amount in pwToken, represented in 18 decimals
-    event Claim(address account, address lpToken, uint256 pwTokenAmount);
+    /// @param rewardsAmount reward amount in pwToken, represented in 18 decimals
+    event Claimed(address account, address lpToken, uint256 rewardsAmount);
 
     /// @notice Emitted when account claim allocated rewards
     /// @param account account address in the context of which activities of claiming are performed
-    /// @param pwTokenAmount reward amount in pwToken, represented in 18 decimals
-    event ClaimAllocatedTokens(address account, uint256 pwTokenAmount);
+    /// @param allocatedRewards reward amount in pwToken, represented in 18 decimals
+    event AllocatedTokensClaimed(address account, uint256 allocatedRewards);
 }

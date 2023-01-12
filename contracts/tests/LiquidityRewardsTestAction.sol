@@ -4,8 +4,6 @@ pragma solidity 0.8.17;
 import "./LiquidityRewardsAgent.sol";
 
 contract LiquidityRewardsTestAction {
-    //    interact with LiquidityRewards
-
     function stakeLpToken(
         address[] memory accounts,
         address lpToken,
@@ -34,15 +32,12 @@ contract LiquidityRewardsTestAction {
         return LiquidityRewardsAgent(account).calculateAccountRewards(lpToken);
     }
 
-    function balanceOfDelegatedPwToken(address account, address[] memory requestLpTokens)
+    function balanceOfDelegatedPwToken(address account, address[] memory lpTokens)
         external
         view
         returns (LiquidityMiningTypes.DelegatedPwTokenBalance[] memory balances)
     {
-        balances = LiquidityRewardsAgent(account).balanceOfDelegatedPwToken(
-            account,
-            requestLpTokens
-        );
+        balances = LiquidityRewardsAgent(account).balanceOfDelegatedPwToken(account, lpTokens);
     }
 
     function balanceOf(address account, address lpToken) external view returns (uint256) {
@@ -95,27 +90,25 @@ contract LiquidityRewardsTestAction {
         }
     }
 
-    //  Test action
-
     function depositAndWithdrawStakedTokensAndLpToken(
         address account,
         address[] memory lpTokens,
-        uint256[] memory stakedTokenAmounts,
+        uint256[] memory pwTokenAmounts,
         uint256[] memory lpTokenAmounts
     ) external {
-        LiquidityRewardsAgent(account).delegatePwToken(lpTokens, stakedTokenAmounts);
+        LiquidityRewardsAgent(account).delegatePwToken(lpTokens, pwTokenAmounts);
         LiquidityRewardsAgent(account).stakeLpToken(lpTokens[0], lpTokenAmounts[0]);
-        LiquidityRewardsAgent(account).undelegatePwToken(lpTokens, stakedTokenAmounts);
+        LiquidityRewardsAgent(account).undelegatePwToken(lpTokens, pwTokenAmounts);
         LiquidityRewardsAgent(account).unstakeLpToken(lpTokens[0], lpTokenAmounts[0]);
     }
 
     function depositStakedTokensAndLpToken(
         address account,
         address[] memory lpTokens,
-        uint256[] memory stakedTokenAmounts,
+        uint256[] memory pwTokenAmounts,
         uint256[] memory lpTokenAmounts
     ) external {
-        LiquidityRewardsAgent(account).delegatePwToken(lpTokens, stakedTokenAmounts);
+        LiquidityRewardsAgent(account).delegatePwToken(lpTokens, pwTokenAmounts);
         LiquidityRewardsAgent(account).stakeLpToken(lpTokens[0], lpTokenAmounts[0]);
     }
 }

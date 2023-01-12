@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BSD-3-Clause 
+// SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.17;
 
 import "../interfaces/ILiquidityMining.sol";
@@ -19,19 +19,19 @@ contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
         return _accountIndicators[account][lpToken].lpTokenBalance;
     }
 
-    function balanceOfDelegatedPwToken(address account, address[] calldata requestLpTokens)
+    function balanceOfDelegatedPwToken(address account, address[] calldata lpTokens)
         external
         view
         override
         returns (LiquidityMiningTypes.DelegatedPwTokenBalance[] memory balances)
     {
-        uint256 lpTokensLength = requestLpTokens.length;
+        uint256 lpTokensLength = lpTokens.length;
         balances = new LiquidityMiningTypes.DelegatedPwTokenBalance[](lpTokensLength);
         address lpToken;
 
         for (uint256 i; i != lpTokensLength; ++i) {
-            lpToken = requestLpTokens[i];
-            require(_lpTokens[lpToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
+            lpToken = lpTokens[i];
+            require(_lpTokens[lpToken], Errors.LP_TOKEN_NOT_SUPPORTED);
             balances[i] = LiquidityMiningTypes.DelegatedPwTokenBalance(
                 lpToken,
                 _accountIndicators[account][lpToken].delegatedPwTokenBalance
@@ -76,9 +76,9 @@ contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
             account
         ][lpToken];
 
-        (uint256 rewards, ) = _calculateAccountRewards(globalIndicators, accountIndicators);
+        (uint256 rewardsAmount, ) = _calculateAccountRewards(globalIndicators, accountIndicators);
 
-        return rewards;
+        return rewardsAmount;
     }
 
     function stake(address lpToken, uint256 lpTokenAmount)
@@ -87,8 +87,8 @@ contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
         nonReentrant
         whenNotPaused
     {
-        require(lpTokenAmount > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
-        require(_lpTokens[lpToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
+        require(lpTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(_lpTokens[lpToken], Errors.LP_TOKEN_NOT_SUPPORTED);
 
         address msgSender = _msgSender();
 
@@ -102,7 +102,7 @@ contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
         ];
 
         (
-            uint256 rewards,
+            uint256 rewardsAmount,
             uint256 accruedCompMultiplierCumulativePrevBlock
         ) = _calculateAccountRewards(globalIndicators, accountIndicators);
 
@@ -116,11 +116,11 @@ contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
             accountIndicators.delegatedPwTokenBalance
         );
 
-        if (rewards > 0) {
-            _transferRewardsToPowerToken(msgSender, rewards);
+        if (rewardsAmount > 0) {
+            _transferRewardsToPowerToken(msgSender, rewardsAmount);
         }
 
-        emit StakeLpTokens(msgSender, lpToken, lpTokenAmount);
+        emit LpTokensStaked(msgSender, lpToken, lpTokenAmount);
     }
 
     function unstake(address lpToken, uint256 lpTokenAmount)
@@ -152,11 +152,11 @@ contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
         ];
 
         (
-            uint256 stakedTokenAmount,
+            uint256 rewardsAmount,
             uint256 accruedCompMultiplierCumulativePrevBlock
         ) = _calculateAccountRewards(globalIndicators, accountIndicators);
 
-        require(stakedTokenAmount > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
+        require(rewardsAmount > 0, Errors.NO_REWARDS_TO_CLAIM);
 
         uint256 accountPowerUp = MiningCalculation.calculateAccountPowerUp(
             accountIndicators.delegatedPwTokenBalance,
@@ -172,17 +172,17 @@ contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
             accountIndicators.delegatedPwTokenBalance
         );
 
-        _transferRewardsToPowerToken(msgSender, stakedTokenAmount);
+        _transferRewardsToPowerToken(msgSender, rewardsAmount);
 
-        emit Claim(msgSender, lpToken, stakedTokenAmount);
+        emit Claimed(msgSender, lpToken, rewardsAmount);
     }
 
     function claimAllocatedPwTokens() external override whenNotPaused nonReentrant {
         address msgSender = _msgSender();
-        uint256 stakedTokenAmount = _allocatedPwTokens[msgSender];
-        require(stakedTokenAmount > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
+        uint256 allocatedRewards = _allocatedPwTokens[msgSender];
+        require(allocatedRewards > 0, Errors.NO_REWARDS_TO_CLAIM);
         _allocatedPwTokens[msgSender] = 0;
-        _transferRewardsToPowerToken(msgSender, stakedTokenAmount);
-        emit ClaimAllocatedTokens(msgSender, stakedTokenAmount);
+        _transferRewardsToPowerToken(msgSender, allocatedRewards);
+        emit AllocatedTokensClaimed(msgSender, allocatedRewards);
     }
 }

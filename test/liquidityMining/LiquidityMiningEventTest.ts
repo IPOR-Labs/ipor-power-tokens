@@ -210,7 +210,7 @@ describe("LiquidityMining event tests", () => {
         );
 
         //    when
-        await expect(liquidityMining.addLpTokenAsset(tokens.lpTokenUsdc.address))
+        await expect(liquidityMining.addLpToken(tokens.lpTokenUsdc.address))
             .to.emit(liquidityMining, "LpTokenAdded")
             .withArgs(await admin.getAddress(), tokens.lpTokenUsdc.address);
 
@@ -225,13 +225,13 @@ describe("LiquidityMining event tests", () => {
 
     it("Should emit LpTokenRemoved event", async () => {
         //    given
-        await liquidityMining.addLpTokenAsset(tokens.lpTokenUsdc.address);
+        await liquidityMining.addLpToken(tokens.lpTokenUsdc.address);
         const lpTokenSupportedBefore = await liquidityMining.isLpTokenSupported(
             tokens.lpTokenUsdc.address
         );
 
         //    when
-        await expect(liquidityMining.removeLpTokenAsset(tokens.lpTokenUsdc.address))
+        await expect(liquidityMining.removeLpToken(tokens.lpTokenUsdc.address))
             .to.emit(liquidityMining, "LpTokenRemoved")
             .withArgs(await admin.getAddress(), tokens.lpTokenUsdc.address);
 

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.17;
 
-library MiningErrors {
-    /// @notice Error appeared when  IP Token address is not supported
+library Errors {
+    /// @notice Error appeared when  LP Token address is not supported
     /// @dev List of supported LpTokens are in field {LiquidityMining._lpTokens}
-    string public constant IP_TOKEN_NOT_SUPPORTED = "PT_701";
+    string public constant LP_TOKEN_NOT_SUPPORTED = "PT_701";
     /// @notice Error appeared when caller / msgSender is not a PowerToken smart contract
     string public constant CALLER_NOT_POWER_TOKEN = "PT_702";
     /// @notice Error appeared when caller / msgSender is not a LiquidityMining smart contract
@@ -15,7 +15,7 @@ library MiningErrors {
     /// @notice Error appeared when account's base balance is too low
     string public constant ACCOUNT_BASE_BALANCE_IS_TOO_LOW = "PT_705";
     /// @notice Error appeared when account's lp token balance is too low
-    string public constant ACCOUNT_IP_TOKEN_BALANCE_IS_TOO_LOW = "PT_706";
+    string public constant ACCOUNT_LP_TOKEN_BALANCE_IS_TOO_LOW = "PT_706";
     /// @notice Error appeared when account's delegated balance is too low
     string public constant ACC_DELEGATED_TO_LIQUIDITY_MINING_BALANCE_IS_TOO_LOW = "PT_707";
     /// @notice Error appeared when account's available Power Token balance is too low

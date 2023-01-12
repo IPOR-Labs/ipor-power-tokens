@@ -28,7 +28,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
 
     function totalSupply() external view override returns (uint256) {
         return
-            PowerTokenMath.division(
+            Math.division(
                 _baseTotalSupply * _calculateInternalExchangeRate(_stakedToken),
                 Constants.D18
             );
@@ -60,7 +60,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
     }
 
     function stake(uint256 stakedTokenAmount) external override whenNotPaused nonReentrant {
-        require(stakedTokenAmount != 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(stakedTokenAmount != 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
         address stakedTokenAddress = _stakedToken;
         address msgSender = _msgSender();
@@ -73,19 +73,16 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
             stakedTokenAmount
         );
 
-        uint256 baseAmount = PowerTokenMath.division(
-            stakedTokenAmount * Constants.D18,
-            exchangeRate
-        );
+        uint256 baseAmount = Math.division(stakedTokenAmount * Constants.D18, exchangeRate);
 
         _baseBalance[msgSender] += baseAmount;
         _baseTotalSupply += baseAmount;
 
-        emit Stake(msgSender, stakedTokenAmount, exchangeRate, baseAmount);
+        emit Staked(msgSender, stakedTokenAmount, exchangeRate, baseAmount);
     }
 
     function unstake(uint256 pwTokenAmount) external override whenNotPaused nonReentrant {
-        require(pwTokenAmount > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(pwTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
         address stakedTokenAddress = _stakedToken;
         address msgSender = _msgSender();
@@ -95,17 +92,14 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
 
         require(
             availablePwTokenAmount >= pwTokenAmount,
-            MiningErrors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW
+            Errors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW
         );
 
-        uint256 baseAmountToUnstake = PowerTokenMath.division(
-            pwTokenAmount * Constants.D18,
-            exchangeRate
-        );
+        uint256 baseAmountToUnstake = Math.division(pwTokenAmount * Constants.D18, exchangeRate);
 
         require(
             _baseBalance[msgSender] >= baseAmountToUnstake,
-            MiningErrors.ACCOUNT_BASE_BALANCE_IS_TOO_LOW
+            Errors.ACCOUNT_BASE_BALANCE_IS_TOO_LOW
         );
 
         _baseBalance[msgSender] -= baseAmountToUnstake;
@@ -118,7 +112,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
 
         IERC20Upgradeable(stakedTokenAddress).transfer(msgSender, stakedTokenAmountToTransfer);
 
-        emit Unstake(
+        emit Unstaked(
             msgSender,
             pwTokenAmount,
             exchangeRate,
@@ -131,7 +125,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         uint256[] calldata pwTokenAmounts
     ) external override whenNotPaused nonReentrant {
         uint256 pwTokenAmountsLength = pwTokenAmounts.length;
-        require(lpTokens.length == pwTokenAmountsLength, MiningErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
+        require(lpTokens.length == pwTokenAmountsLength, Errors.INPUT_ARRAYS_LENGTH_MISMATCH);
         uint256 pwTokenToDelegate;
 
         for (uint256 i; i != pwTokenAmountsLength; ++i) {
@@ -143,7 +137,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
                 _msgSender(),
                 _calculateInternalExchangeRate(_stakedToken)
             ) >= pwTokenToDelegate,
-            MiningErrors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW
+            Errors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW
         );
 
         _delegatedToLiquidityMiningBalance[_msgSender()] += pwTokenToDelegate;
@@ -154,7 +148,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
             pwTokenAmounts
         );
 
-        emit DelegateToLiquidityMining(_msgSender(), lpTokens, pwTokenAmounts);
+        emit ToLiquidityMiningDelegated(_msgSender(), lpTokens, pwTokenAmounts);
     }
 
     function delegateAndStakeToLiquidityMining(
@@ -164,7 +158,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
     ) external override whenNotPaused nonReentrant {
         require(
             lpTokens.length == pwTokenAmounts.length && lpTokens.length == lpTokenAmounts.length,
-            MiningErrors.INPUT_ARRAYS_LENGTH_MISMATCH
+            Errors.INPUT_ARRAYS_LENGTH_MISMATCH
         );
 
         uint256 pwTokenToDelegate;
@@ -179,7 +173,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
                 _msgSender(),
                 _calculateInternalExchangeRate(_stakedToken)
             ) >= pwTokenToDelegate,
-            MiningErrors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW
+            Errors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW
         );
 
         _delegatedToLiquidityMiningBalance[_msgSender()] += pwTokenToDelegate;
@@ -191,7 +185,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
             lpTokenAmounts
         );
 
-        emit DelegateToLiquidityMining(_msgSender(), lpTokens, pwTokenAmounts);
+        emit ToLiquidityMiningDelegated(_msgSender(), lpTokens, pwTokenAmounts);
     }
 
     function undelegateFromLiquidityMining(
@@ -199,12 +193,12 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         uint256[] calldata pwTokenAmounts
     ) external override whenNotPaused nonReentrant {
         uint256 lpTokensLength = lpTokens.length;
-        require(lpTokensLength == pwTokenAmounts.length, MiningErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
+        require(lpTokensLength == pwTokenAmounts.length, Errors.INPUT_ARRAYS_LENGTH_MISMATCH);
 
         uint256 pwTokenAmountToUndelegate;
 
         for (uint256 i; i != lpTokensLength; ++i) {
-            require(pwTokenAmounts[i] > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
+            require(pwTokenAmounts[i] > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
             pwTokenAmountToUndelegate += pwTokenAmounts[i];
         }
 
@@ -212,7 +206,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
 
         require(
             _delegatedToLiquidityMiningBalance[msgSender] >= pwTokenAmountToUndelegate,
-            MiningErrors.ACC_DELEGATED_TO_LIQUIDITY_MINING_BALANCE_IS_TOO_LOW
+            Errors.ACC_DELEGATED_TO_LIQUIDITY_MINING_BALANCE_IS_TOO_LOW
         );
 
         ILiquidityMiningInternal(_liquidityMining).undelegatePwToken(
@@ -223,11 +217,11 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
 
         _delegatedToLiquidityMiningBalance[msgSender] -= pwTokenAmountToUndelegate;
 
-        emit UndelegateFromLiquidityMining(msgSender, lpTokens, pwTokenAmounts);
+        emit FromLiquidityMiningUndelegated(msgSender, lpTokens, pwTokenAmounts);
     }
 
     function coolDown(uint256 pwTokenAmount) external override whenNotPaused nonReentrant {
-        require(pwTokenAmount > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(pwTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
         address msgSender = _msgSender();
 
@@ -238,7 +232,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
 
         require(
             availablePwTokenAmount >= pwTokenAmount,
-            MiningErrors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW
+            Errors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW
         );
 
         _coolDowns[msgSender] = PowerTokenTypes.PwTokenCoolDown(
@@ -258,20 +252,20 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
 
         PowerTokenTypes.PwTokenCoolDown memory accountCoolDown = _coolDowns[msgSender];
 
-        require(block.timestamp >= accountCoolDown.endTimestamp, MiningErrors.COOL_DOWN_NOT_FINISH);
-        require(accountCoolDown.pwTokenAmount > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(block.timestamp >= accountCoolDown.endTimestamp, Errors.COOL_DOWN_NOT_FINISH);
+        require(accountCoolDown.pwTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
         address stakedTokenAddress = _stakedToken;
 
         uint256 exchangeRate = _calculateInternalExchangeRate(stakedTokenAddress);
-        uint256 baseAmountToUnstake = PowerTokenMath.division(
+        uint256 baseAmountToUnstake = Math.division(
             accountCoolDown.pwTokenAmount * Constants.D18,
             exchangeRate
         );
 
         require(
             _baseBalance[msgSender] >= baseAmountToUnstake,
-            MiningErrors.ACCOUNT_BASE_BALANCE_IS_TOO_LOW
+            Errors.ACCOUNT_BASE_BALANCE_IS_TOO_LOW
         );
 
         _baseBalance[msgSender] -= baseAmountToUnstake;

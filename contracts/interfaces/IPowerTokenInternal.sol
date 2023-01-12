@@ -23,8 +23,8 @@ interface IPowerTokenInternal {
 
     /// @notice method allowed to transfer rewards from LiquidityMining contracts to balance of specific account
     /// @param account - address of user who received rewards
-    /// @param pwTokenAmount - amount of rewards, represented in 18 decimals.
-    function receiveRewardsFromLiquidityMining(address account, uint256 pwTokenAmount) external;
+    /// @param rewardsAmount - amount of rewards, represented in 18 decimals.
+    function receiveRewardsFromLiquidityMining(address account, uint256 rewardsAmount) external;
 
     /// @notice method returns actual address of liquidity rewards contract - the LiquidityMining
     function getLiquidityMining() external view returns (address);
@@ -55,8 +55,8 @@ interface IPowerTokenInternal {
     /// @notice Emitted when user received rewards from liquidityMining contract
     /// @dev Receiving rewards not changes Internal Exchange Rate of Power Tokens in PowerToken smart contract.
     /// @param account address
-    /// @param pwTokenAmount of power token received from liquidityMining
-    event ReceiveRewards(address account, uint256 pwTokenAmount);
+    /// @param rewardsAmount of power token received from liquidityMining
+    event RewardsReceived(address account, uint256 rewardsAmount);
 
     /// @notice Emitted when new fee for unstaking without cool down is setup.
     /// @param changedBy account address who change this configuration param

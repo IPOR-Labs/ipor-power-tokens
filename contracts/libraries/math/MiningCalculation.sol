@@ -4,9 +4,9 @@ pragma solidity 0.8.17;
 import "abdk-libraries-solidity/ABDKMathQuad.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 
-import "../errors/MiningErrors.sol";
+import "../errors/Errors.sol";
 import "../Constants.sol";
-import "./PowerTokenMath.sol";
+import "./Math.sol";
 
 /// @title Library which contains core logic used in Liquidity Mining module.
 library MiningCalculation {
@@ -46,9 +46,9 @@ library MiningCalculation {
     /// @notice Calculates aggreagated power up. Aggregate Power-up is a synthetic summary of all power-ups across all users.
     /// It's used to calculate individual rewards in relation to the rest of the pool.
     /// @param accountPowerUp power up indicator calculated for a given account
-    /// @param accountLpTokenAmount IP Token amount for a given account
+    /// @param accountLpTokenAmount LP Token amount for a given account
     /// @param previousAccountPowerUp previous power up indicator for a given account
-    /// @param previousAccountLpTokenAmount previous IP Token amount for a given account
+    /// @param previousAccountLpTokenAmount previous LP Token amount for a given account
     /// @param previousAggregatedPowerUp previous aggregated power up indicator
     function calculateAggregatedPowerUp(
         uint256 accountPowerUp,
@@ -65,7 +65,7 @@ library MiningCalculation {
         uint256 newApu;
 
         if (apu < 0) {
-            uint256 absApu = PowerTokenMath.division((-apu).toUint256(), Constants.D18);
+            uint256 absApu = Math.division((-apu).toUint256(), Constants.D18);
 
             /// @dev last unstake lpTokens we can have rounding error
             if (previousAggregatedPowerUp < absApu && previousAggregatedPowerUp + 10000 >= absApu) {
@@ -74,14 +74,12 @@ library MiningCalculation {
 
             require(
                 previousAggregatedPowerUp >= absApu,
-                MiningErrors.AGGREGATE_POWER_UP_COULD_NOT_BE_NEGATIVE
+                Errors.AGGREGATE_POWER_UP_COULD_NOT_BE_NEGATIVE
             );
 
             newApu = previousAggregatedPowerUp - absApu;
         } else {
-            newApu =
-                previousAggregatedPowerUp +
-                PowerTokenMath.division(apu.toUint256(), Constants.D18);
+            newApu = previousAggregatedPowerUp + Math.division(apu.toUint256(), Constants.D18);
         }
 
         if (newApu < 10000) {
@@ -104,7 +102,7 @@ library MiningCalculation {
     ) internal pure returns (uint256) {
         require(
             blockNumber >= lastRebalanceBlockNumber,
-            MiningErrors.BLOCK_NUMBER_LOWER_THAN_PREVIOUS_BLOCK_NUMBER
+            Errors.BLOCK_NUMBER_LOWER_THAN_PREVIOUS_BLOCK_NUMBER
         );
         uint256 newRewards = (blockNumber - lastRebalanceBlockNumber) *
             rewardsPerBlock *
@@ -125,11 +123,7 @@ library MiningCalculation {
             return 0;
         }
         /// @dev decimals: 8 + 18 + 19 - 18 = 27
-        return
-            PowerTokenMath.division(
-                rewardsPerBlock * Constants.D18 * Constants.D19,
-                aggregatedPowerUp
-            );
+        return Math.division(rewardsPerBlock * Constants.D18 * Constants.D19, aggregatedPowerUp);
     }
 
     /// @notice calculates account rewards represented in pwTokens
@@ -147,7 +141,7 @@ library MiningCalculation {
     ) internal pure returns (uint256) {
         require(
             accruedCompMultiplierCumulativePrevBlock >= accountCompMultiplierCumulativePrevBlock,
-            MiningErrors.ACCOUNT_COMPOSITE_MULTIPLIER_GT_COMPOSITE_MULTIPLIER
+            Errors.ACCOUNT_COMPOSITE_MULTIPLIER_GT_COMPOSITE_MULTIPLIER
         );
 
         uint256 accountStakedTokenRewards = accountLpTokenAmount *
@@ -155,7 +149,7 @@ library MiningCalculation {
             (accruedCompMultiplierCumulativePrevBlock - accountCompMultiplierCumulativePrevBlock);
 
         /// @dev decimals: 18 + 18 + 27 - 45 =  18
-        return PowerTokenMath.division(accountStakedTokenRewards, Constants.D45);
+        return Math.division(accountStakedTokenRewards, Constants.D45);
     }
 
     /// @notice Calculates accrued Composite Multiplier Cumulative for a previous block

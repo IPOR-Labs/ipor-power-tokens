@@ -141,8 +141,8 @@ describe("LiquidityMining configuration, deploy tests", () => {
         );
 
         // when
-        await liquidityMining.addLpTokenAsset(tokens.lpTokenUsdc.address);
-        await liquidityMining.addLpTokenAsset(tokens.lpTokenUsdt.address);
+        await liquidityMining.addLpToken(tokens.lpTokenUsdc.address);
+        await liquidityMining.addLpToken(tokens.lpTokenUsdt.address);
 
         // then
         const isDaiActiveAfter = await liquidityMining.isLpTokenSupported(
@@ -177,7 +177,7 @@ describe("LiquidityMining configuration, deploy tests", () => {
         // when
         await expect(
             //when
-            liquidityMining.connect(userOne).addLpTokenAsset(tokens.lpTokenUsdc.address)
+            liquidityMining.connect(userOne).addLpToken(tokens.lpTokenUsdc.address)
             //then
         ).to.be.revertedWith("Ownable: caller is not the owner");
     });

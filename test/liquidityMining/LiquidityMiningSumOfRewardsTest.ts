@@ -304,7 +304,7 @@ describe("LiquidityMining sum of rewards", () => {
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
         //turn off support
-        await liquidityMining.removeLpTokenAsset(tokens.lpTokenDai.address);
+        await liquidityMining.removeLpToken(tokens.lpTokenDai.address);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
         //    when

@@ -20,8 +20,6 @@ contract LiquidityRewardsAgent {
         IERC20(stakedToken).approve(powerToken, Constants.MAX_VALUE);
     }
 
-    //    interact with LiquidityMining
-
     function stakeLpToken(address lpToken, uint256 lpTokenAmount) external {
         _liquidityMining.stake(lpToken, lpTokenAmount);
     }
@@ -42,12 +40,12 @@ contract LiquidityRewardsAgent {
         return _liquidityMining.getAccountIndicators(address(this), lpToken);
     }
 
-    function balanceOfDelegatedPwToken(address account, address[] memory requestLpTokens)
+    function balanceOfDelegatedPwToken(address account, address[] memory lpTokens)
         external
         view
         returns (LiquidityMiningTypes.DelegatedPwTokenBalance[] memory balances)
     {
-        balances = _liquidityMining.balanceOfDelegatedPwToken(account, requestLpTokens);
+        balances = _liquidityMining.balanceOfDelegatedPwToken(account, lpTokens);
     }
 
     function balanceOf(address lpToken) external view returns (uint256) {
