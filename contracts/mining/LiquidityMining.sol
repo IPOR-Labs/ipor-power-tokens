@@ -19,22 +19,22 @@ contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
         return _accountIndicators[account][lpToken].lpTokenBalance;
     }
 
-    function balanceOfDelegatedPwIpor(address account, address[] calldata requestLpTokens)
+    function balanceOfDelegatedPwToken(address account, address[] calldata requestLpTokens)
         external
         view
         override
-        returns (LiquidityMiningTypes.DelegatedPwIporBalance[] memory balances)
+        returns (LiquidityMiningTypes.DelegatedPwTokenBalance[] memory balances)
     {
         uint256 lpTokensLength = requestLpTokens.length;
-        balances = new LiquidityMiningTypes.DelegatedPwIporBalance[](lpTokensLength);
+        balances = new LiquidityMiningTypes.DelegatedPwTokenBalance[](lpTokensLength);
         address lpToken;
 
         for (uint256 i; i != lpTokensLength; ++i) {
             lpToken = requestLpTokens[i];
             require(_lpTokens[lpToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
-            balances[i] = LiquidityMiningTypes.DelegatedPwIporBalance(
+            balances[i] = LiquidityMiningTypes.DelegatedPwTokenBalance(
                 lpToken,
-                _accountIndicators[account][lpToken].delegatedPwIporBalance
+                _accountIndicators[account][lpToken].delegatedPwTokenBalance
             );
         }
     }
@@ -113,7 +113,7 @@ contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
             globalIndicators,
             accountIndicators,
             accountIndicators.lpTokenBalance + lpTokenAmount,
-            accountIndicators.delegatedPwIporBalance
+            accountIndicators.delegatedPwTokenBalance
         );
 
         if (rewards > 0) {
@@ -159,7 +159,7 @@ contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
         require(iporTokenAmount > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
 
         uint256 accountPowerUp = MiningCalculation.calculateAccountPowerUp(
-            accountIndicators.delegatedPwIporBalance,
+            accountIndicators.delegatedPwTokenBalance,
             accountIndicators.lpTokenBalance,
             _getVerticalShift(),
             _getHorizontalShift()
@@ -169,7 +169,7 @@ contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
             accruedCompMultiplierCumulativePrevBlock.toUint128(),
             accountIndicators.lpTokenBalance,
             accountPowerUp.toUint72(),
-            accountIndicators.delegatedPwIporBalance
+            accountIndicators.delegatedPwTokenBalance
         );
 
         _transferRewardsToPowerIpor(msgSender, iporTokenAmount);

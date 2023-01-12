@@ -145,16 +145,16 @@ describe("LiquidityMining Stake and balance", () => {
                 [delegatedIporToken]
             );
 
-            const afterDelegatePwIporGPR = await liquidityMining.getGlobalIndicators(
+            const afterDelegatePwTokenGPR = await liquidityMining.getGlobalIndicators(
                 tokens.lpTokenDai.address
             );
-            const afterDelegatePwIporUPR = await liquidityMining.getAccountIndicators(
+            const afterDelegatePwTokenUPR = await liquidityMining.getAccountIndicators(
                 await admin.getAddress(),
                 tokens.lpTokenDai.address
             );
 
             expectGlobalIndicators(
-                extractGlobalIndicators(afterDelegatePwIporGPR),
+                extractGlobalIndicators(afterDelegatePwTokenGPR),
                 ZERO,
                 ZERO,
                 ZERO,
@@ -163,7 +163,7 @@ describe("LiquidityMining Stake and balance", () => {
                 100000000
             );
             expectAccountIndicators(
-                extractAccountIndicators(afterDelegatePwIporUPR),
+                extractAccountIndicators(afterDelegatePwTokenUPR),
                 ZERO,
                 ZERO,
                 ZERO,
@@ -219,7 +219,7 @@ describe("LiquidityMining Stake and balance", () => {
             );
         });
 
-        it("Should sum of rewards for 3 users should be equal all rewards when all users staked lpTokens and pwIpor tokens ", async () => {
+        it("Should sum of rewards for 3 users should be equal all rewards when all users staked lpTokens and pwToken tokens ", async () => {
             //    given
             const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
             const stakedLpTokens = N1__0_18DEC.mul(BigNumber.from("100"));

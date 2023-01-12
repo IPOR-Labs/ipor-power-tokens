@@ -113,7 +113,7 @@ describe("LiquidityMining claim", () => {
 
     it("Should claim rewards when 100 blocks were mint", async () => {
         //    given
-        const delegatedPwIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
+        const delegatedPwTokenAmount = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakeIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedLpTokensAmount = N1__0_18DEC.mul(BigNumber.from("100"));
         const expectedRewards = BigNumber.from("101000000000000000000");
@@ -127,7 +127,7 @@ describe("LiquidityMining claim", () => {
 
         await powerIpor
             .connect(userOne)
-            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedPwIporAmount]);
+            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedPwTokenAmount]);
 
         const powerIporBalanceBefore = await powerIpor
             .connect(userOne)
@@ -169,7 +169,7 @@ describe("LiquidityMining claim", () => {
 
     it("Should claimAllocatedPwTokens rewards when 100 blocks were mint", async () => {
         //    given
-        const delegatedPwIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
+        const delegatedPwTokenAmount = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakeIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedLpTokensAmount = N1__0_18DEC.mul(BigNumber.from("100"));
         const expectedRewards = BigNumber.from("101000000000000000000");
@@ -183,7 +183,7 @@ describe("LiquidityMining claim", () => {
 
         await powerIpor
             .connect(userOne)
-            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedPwIporAmount]);
+            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedPwTokenAmount]);
 
         const powerIporBalanceBefore = await powerIpor
             .connect(userOne)
@@ -233,7 +233,7 @@ describe("LiquidityMining claim", () => {
 
     it("Should get 100 rewards when first stake 0.1 dai and after 1 Dai, 200 blocks mint", async () => {
         //    given
-        const delegatedPwIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
+        const delegatedPwTokenAmount = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakeIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedLpTokensAmount = N0__1_18DEC;
         const expectedRewards = BigNumber.from("100000000000000000000");
@@ -256,7 +256,7 @@ describe("LiquidityMining claim", () => {
 
         await powerIpor
             .connect(userOne)
-            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedPwIporAmount]);
+            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedPwTokenAmount]);
 
         //    when
         await liquidityMining
@@ -309,7 +309,7 @@ describe("LiquidityMining claim", () => {
 
     it("Should count proper transfer rewards when one user stake lpTokens twice", async () => {
         //    given
-        const delegatedPwIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
+        const delegatedPwTokenAmount = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakeIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedLpTokensAmount = N1__0_18DEC.mul(BigNumber.from("100"));
 
@@ -321,7 +321,7 @@ describe("LiquidityMining claim", () => {
             liquidityMining.address
         );
 
-        await powerIpor.connect(userOne).stake(delegatedPwIporAmount);
+        await powerIpor.connect(userOne).stake(delegatedPwTokenAmount);
         await powerIpor
             .connect(userOne)
             .delegateToLiquidityMining([tokens.lpTokenDai.address], [stakeIporAmount]);
@@ -384,9 +384,9 @@ describe("LiquidityMining claim", () => {
         );
     });
 
-    it("Should count proper rewards when one user stake Power Ipor Tokens (pwIpor) twice", async () => {
+    it("Should count proper rewards when one user stake Power Ipor Tokens (pwToken) twice", async () => {
         //    given
-        const delegatedPwIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
+        const delegatedPwTokenAmount = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakeIporAmount = N1__0_18DEC.mul(BigNumber.from("200"));
         const stakedLpTokensAmount = N1__0_18DEC.mul(BigNumber.from("100"));
 
@@ -410,7 +410,7 @@ describe("LiquidityMining claim", () => {
             .stake(tokens.lpTokenDai.address, stakedLpTokensAmount);
         await powerIpor
             .connect(userOne)
-            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedPwIporAmount]);
+            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedPwTokenAmount]);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
         const powerIporBalanceAfter1Stake = await powerIpor
@@ -423,7 +423,7 @@ describe("LiquidityMining claim", () => {
 
         await powerIpor
             .connect(userOne)
-            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedPwIporAmount]);
+            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedPwTokenAmount]);
 
         const rewardsAfterSecondStake = await liquidityMining.calculateAccountRewards(
             await userOne.getAddress(),
@@ -462,9 +462,9 @@ describe("LiquidityMining claim", () => {
         );
     });
 
-    it("Should count proper rewards when one user stake Power Ipor Tokens (pwIpor) twice and ipAsset was removed", async () => {
+    it("Should count proper rewards when one user stake Power Ipor Tokens (pwToken) twice and ipAsset was removed", async () => {
         //    given
-        const delegatedPwIporAmount = N1__0_18DEC.mul(BigNumber.from("100"));
+        const delegatedPwTokenAmount = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakeIporAmount = N1__0_18DEC.mul(BigNumber.from("200"));
         const stakedLpTokensAmount = N1__0_18DEC.mul(BigNumber.from("100"));
 
@@ -488,7 +488,7 @@ describe("LiquidityMining claim", () => {
             .stake(tokens.lpTokenDai.address, stakedLpTokensAmount);
         await powerIpor
             .connect(userOne)
-            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedPwIporAmount]);
+            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedPwTokenAmount]);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
         const powerIporBalanceAfter1Stake = await powerIpor
@@ -513,7 +513,7 @@ describe("LiquidityMining claim", () => {
 
         await powerIpor
             .connect(userOne)
-            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedPwIporAmount]);
+            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedPwTokenAmount]);
 
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 

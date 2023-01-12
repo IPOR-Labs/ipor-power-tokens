@@ -24,7 +24,7 @@ import {
 chai.use(solidity);
 const { expect } = chai;
 
-describe("LiquidityMining - Rebalance on delegate pwIpor", () => {
+describe("LiquidityMining - Rebalance on delegate pwToken", () => {
     let tokens: Tokens;
     let liquidityMining: LiquidityMining;
     let admin: Signer, userOne: Signer, userTwo: Signer, userThree: Signer;
@@ -122,10 +122,10 @@ describe("LiquidityMining - Rebalance on delegate pwIpor", () => {
             await powerIpor.stake(delegatedIporToken);
             await liquidityMining.stake(tokens.lpTokenDai.address, stakedLpTokens);
 
-            const afterDelegatePwIporGPR = await liquidityMining.getGlobalIndicators(
+            const afterDelegatePwTokenGPR = await liquidityMining.getGlobalIndicators(
                 tokens.lpTokenDai.address
             );
-            const afterDelegatePwIporUPR = await liquidityMining.getAccountIndicators(
+            const afterDelegatePwTokenUPR = await liquidityMining.getAccountIndicators(
                 await admin.getAddress(),
                 tokens.lpTokenDai.address
             );
@@ -169,7 +169,7 @@ describe("LiquidityMining - Rebalance on delegate pwIpor", () => {
             );
 
             expectGlobalIndicators(
-                extractGlobalIndicators(afterDelegatePwIporGPR),
+                extractGlobalIndicators(afterDelegatePwTokenGPR),
                 BigNumber.from("39999999999999999900"),
                 ZERO,
                 BigNumber.from("25000000000000000062500000"),
@@ -178,7 +178,7 @@ describe("LiquidityMining - Rebalance on delegate pwIpor", () => {
                 100000000
             );
             expectAccountIndicators(
-                extractAccountIndicators(afterDelegatePwIporUPR),
+                extractAccountIndicators(afterDelegatePwTokenUPR),
                 BigNumber.from("399999999999999999"),
                 ZERO,
                 stakedLpTokens,
@@ -290,7 +290,7 @@ describe("LiquidityMining - Rebalance on delegate pwIpor", () => {
             );
         });
 
-        it("Should count proper rewards when one account stake pwIpor tokens twice", async () => {
+        it("Should count proper rewards when one account stake pwToken tokens twice", async () => {
             //    given
             const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
             const stakedLpTokens = N1__0_18DEC.mul(BigNumber.from("100"));

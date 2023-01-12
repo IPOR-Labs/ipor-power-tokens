@@ -42,12 +42,12 @@ contract LiquidityRewardsAgent {
         return _liquidityMining.getAccountIndicators(address(this), lpToken);
     }
 
-    function balanceOfDelegatedPwIpor(address account, address[] memory requestLpTokens)
+    function balanceOfDelegatedPwToken(address account, address[] memory requestLpTokens)
         external
         view
-        returns (LiquidityMiningTypes.DelegatedPwIporBalance[] memory balances)
+        returns (LiquidityMiningTypes.DelegatedPwTokenBalance[] memory balances)
     {
-        balances = _liquidityMining.balanceOfDelegatedPwIpor(account, requestLpTokens);
+        balances = _liquidityMining.balanceOfDelegatedPwToken(account, requestLpTokens);
     }
 
     function balanceOf(address lpToken) external view returns (uint256) {
@@ -66,19 +66,19 @@ contract LiquidityRewardsAgent {
         _powerIpor.stake(iporTokenAmount);
     }
 
-    function unstakePwIpor(uint256 pwIporAmount) external {
-        _powerIpor.unstake(pwIporAmount);
+    function unstakePwToken(uint256 pwTokenAmount) external {
+        _powerIpor.unstake(pwTokenAmount);
     }
 
-    function delegatePwIpor(address[] calldata lpTokens, uint256[] calldata pwIporAmounts)
+    function delegatePwToken(address[] calldata lpTokens, uint256[] calldata pwTokenAmounts)
         external
     {
-        _powerIpor.delegateToLiquidityMining(lpTokens, pwIporAmounts);
+        _powerIpor.delegateToLiquidityMining(lpTokens, pwTokenAmounts);
     }
 
-    function undelegatePwIpor(address[] calldata lpTokens, uint256[] calldata pwIporAmounts)
+    function undelegatePwToken(address[] calldata lpTokens, uint256[] calldata pwTokenAmounts)
         external
     {
-        _powerIpor.undelegateFromLiquidityMining(lpTokens, pwIporAmounts);
+        _powerIpor.undelegateFromLiquidityMining(lpTokens, pwTokenAmounts);
     }
 }

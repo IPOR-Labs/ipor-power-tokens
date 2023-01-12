@@ -14,13 +14,13 @@ library MiningCalculation {
     using SafeCast for int256;
 
     /// @notice Calculases Power Up Indicator specific for one account.
-    /// @param accountPwIporAmount account's Power Ipor Tokens amount
+    /// @param accountPwTokenAmount account's Power Ipor Tokens amount
     /// @param accountLpTokenAmount account's IP Tokens Amount
     /// @param verticalShift preconfigured param, vertical shift used in equation which calculate account power up indicator
     /// @param horizontalShift preconfigured param, horizontal shift used in equation which calculate account power up indicator
     /// @return power up indicator for a given account
     function calculateAccountPowerUp(
-        uint256 accountPwIporAmount,
+        uint256 accountPwTokenAmount,
         uint256 accountLpTokenAmount,
         bytes16 verticalShift,
         bytes16 horizontalShift
@@ -29,11 +29,11 @@ library MiningCalculation {
             return 0;
         }
 
-        bytes16 pwIporAmountQP = _toQuadruplePrecision(accountPwIporAmount, Constants.D18);
+        bytes16 pwTokenAmountQP = _toQuadruplePrecision(accountPwTokenAmount, Constants.D18);
         bytes16 lpTokenAmountQP = _toQuadruplePrecision(accountLpTokenAmount, Constants.D18);
 
         bytes16 underLog = ABDKMathQuad.add(
-            ABDKMathQuad.div(pwIporAmountQP, lpTokenAmountQP),
+            ABDKMathQuad.div(pwTokenAmountQP, lpTokenAmountQP),
             horizontalShift
         );
 

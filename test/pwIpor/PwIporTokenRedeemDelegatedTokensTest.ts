@@ -80,7 +80,7 @@ describe("PowerIpor configuration, deploy tests", () => {
         ).to.be.revertedWith("IPOR_707");
     });
 
-    it("Should revert transaction when delegated pwIpor amount is less than staked lpToken amount", async () => {
+    it("Should revert transaction when delegated pwToken amount is less than staked lpToken amount", async () => {
         //    given
         await powerIpor.stake(N2__0_18DEC);
         await powerIpor.delegateToLiquidityMining(
@@ -142,7 +142,7 @@ describe("PowerIpor configuration, deploy tests", () => {
             await admin.getAddress()
         );
         const exchangeRateBefore = await powerIpor.calculateExchangeRate();
-        const pwIporBalanceBefore = await powerIpor.balanceOf(await admin.getAddress());
+        const pwTokenBalanceBefore = await powerIpor.balanceOf(await admin.getAddress());
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
         //    when
@@ -157,15 +157,15 @@ describe("PowerIpor configuration, deploy tests", () => {
             await admin.getAddress()
         );
         const exchangeRateAfter = await powerIpor.calculateExchangeRate();
-        const pwIporBalanceAfter = await powerIpor.balanceOf(await admin.getAddress());
+        const pwTokenBalanceAfter = await powerIpor.balanceOf(await admin.getAddress());
 
         expect(delegatedBalanceBefore).to.be.equal(N2__0_18DEC);
         expect(exchangeRateBefore).to.be.equal(N1__0_18DEC);
-        expect(pwIporBalanceBefore).to.be.equal(N2__0_18DEC);
+        expect(pwTokenBalanceBefore).to.be.equal(N2__0_18DEC);
 
         expect(delegatedBalanceAfter).to.be.equal(N0__1_18DEC.mul(BigNumber.from("9")));
         expect(exchangeRateAfter).to.be.equal(N1__0_18DEC);
-        expect(pwIporBalanceAfter).to.be.equal(N2__0_18DEC);
+        expect(pwTokenBalanceAfter).to.be.equal(N2__0_18DEC);
         expect(powerIporIporTokenBalanceAfter).to.be.equal(
             powerIporIporTokenBalanceBefore.add(N2__0_18DEC)
         );

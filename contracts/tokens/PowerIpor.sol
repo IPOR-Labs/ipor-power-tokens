@@ -54,7 +54,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
     function getActiveCoolDown(address account)
         external
         view
-        returns (PowerIporTypes.PwIporCoolDown memory)
+        returns (PowerIporTypes.PwTokenCoolDown memory)
     {
         return _coolDowns[account];
     }
@@ -77,21 +77,21 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         emit Stake(msgSender, iporTokenAmount, exchangeRate, baseAmount);
     }
 
-    function unstake(uint256 pwIporAmount) external override whenNotPaused nonReentrant {
-        require(pwIporAmount > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
+    function unstake(uint256 pwTokenAmount) external override whenNotPaused nonReentrant {
+        require(pwTokenAmount > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         address iporTokenAddress = _iporToken;
         address msgSender = _msgSender();
 
         uint256 exchangeRate = _calculateInternalExchangeRate(iporTokenAddress);
-        uint256 availablePwIporAmount = _getAvailablePwIporAmount(msgSender, exchangeRate);
+        uint256 availablePwTokenAmount = _getAvailablePwTokenAmount(msgSender, exchangeRate);
 
         require(
-            availablePwIporAmount >= pwIporAmount,
+            availablePwTokenAmount >= pwTokenAmount,
             MiningErrors.ACC_AVAILABLE_POWER_IPOR_BALANCE_IS_TOO_LOW
         );
 
-        uint256 baseAmountToUnstake = IporMath.division(pwIporAmount * Constants.D18, exchangeRate);
+        uint256 baseAmountToUnstake = IporMath.division(pwTokenAmount * Constants.D18, exchangeRate);
 
         require(
             _baseBalance[msgSender] >= baseAmountToUnstake,
@@ -101,7 +101,7 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         _baseBalance[msgSender] -= baseAmountToUnstake;
         _baseTotalSupply -= baseAmountToUnstake;
 
-        uint256 iporTokenAmountToTransfer = _calculateBaseAmountToPwIpor(
+        uint256 iporTokenAmountToTransfer = _calculateBaseAmountToPwToken(
             _calculateAmountWithCooldownFeeSubtracted(baseAmountToUnstake),
             exchangeRate
         );
@@ -110,128 +110,128 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
         emit Unstake(
             msgSender,
-            pwIporAmount,
+            pwTokenAmount,
             exchangeRate,
-            pwIporAmount - iporTokenAmountToTransfer
+            pwTokenAmount - iporTokenAmountToTransfer
         );
     }
 
     function delegateToLiquidityMining(
         address[] calldata lpTokens,
-        uint256[] calldata pwIporAmounts
+        uint256[] calldata pwTokenAmounts
     ) external override whenNotPaused nonReentrant {
-        uint256 pwIporAmountsLength = pwIporAmounts.length;
-        require(lpTokens.length == pwIporAmountsLength, MiningErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
-        uint256 pwIporToDelegate;
+        uint256 pwTokenAmountsLength = pwTokenAmounts.length;
+        require(lpTokens.length == pwTokenAmountsLength, MiningErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
+        uint256 pwTokenToDelegate;
 
-        for (uint256 i; i != pwIporAmountsLength; ++i) {
-            pwIporToDelegate += pwIporAmounts[i];
+        for (uint256 i; i != pwTokenAmountsLength; ++i) {
+            pwTokenToDelegate += pwTokenAmounts[i];
         }
 
         require(
-            _getAvailablePwIporAmount(_msgSender(), _calculateInternalExchangeRate(_iporToken)) >=
-                pwIporToDelegate,
+            _getAvailablePwTokenAmount(_msgSender(), _calculateInternalExchangeRate(_iporToken)) >=
+                pwTokenToDelegate,
             MiningErrors.ACC_AVAILABLE_POWER_IPOR_BALANCE_IS_TOO_LOW
         );
 
-        _delegatedToLiquidityMiningBalance[_msgSender()] += pwIporToDelegate;
+        _delegatedToLiquidityMiningBalance[_msgSender()] += pwTokenToDelegate;
 
-        ILiquidityMiningInternal(_liquidityMining).delegatePwIpor(
+        ILiquidityMiningInternal(_liquidityMining).delegatePwToken(
             _msgSender(),
             lpTokens,
-            pwIporAmounts
+            pwTokenAmounts
         );
 
-        emit DelegateToLiquidityMining(_msgSender(), lpTokens, pwIporAmounts);
+        emit DelegateToLiquidityMining(_msgSender(), lpTokens, pwTokenAmounts);
     }
 
     function delegateAndStakeToLiquidityMining(
         address[] calldata lpTokens,
-        uint256[] calldata pwIporAmounts,
+        uint256[] calldata pwTokenAmounts,
         uint256[] calldata lpTokenAmounts
     ) external override whenNotPaused nonReentrant {
         require(
-            lpTokens.length == pwIporAmounts.length && lpTokens.length == lpTokenAmounts.length,
+            lpTokens.length == pwTokenAmounts.length && lpTokens.length == lpTokenAmounts.length,
             MiningErrors.INPUT_ARRAYS_LENGTH_MISMATCH
         );
 
-        uint256 pwIporToDelegate;
+        uint256 pwTokenToDelegate;
 
-        uint256 pwIporAmountsLength = pwIporAmounts.length;
-        for (uint256 i; i != pwIporAmountsLength; ++i) {
-            pwIporToDelegate += pwIporAmounts[i];
+        uint256 pwTokenAmountsLength = pwTokenAmounts.length;
+        for (uint256 i; i != pwTokenAmountsLength; ++i) {
+            pwTokenToDelegate += pwTokenAmounts[i];
         }
 
         require(
-            _getAvailablePwIporAmount(_msgSender(), _calculateInternalExchangeRate(_iporToken)) >=
-                pwIporToDelegate,
+            _getAvailablePwTokenAmount(_msgSender(), _calculateInternalExchangeRate(_iporToken)) >=
+                pwTokenToDelegate,
             MiningErrors.ACC_AVAILABLE_POWER_IPOR_BALANCE_IS_TOO_LOW
         );
 
-        _delegatedToLiquidityMiningBalance[_msgSender()] += pwIporToDelegate;
+        _delegatedToLiquidityMiningBalance[_msgSender()] += pwTokenToDelegate;
 
-        ILiquidityMiningInternal(_liquidityMining).delegatePwIporAndStakeLpToken(
+        ILiquidityMiningInternal(_liquidityMining).delegatePwTokenAndStakeLpToken(
             _msgSender(),
             lpTokens,
-            pwIporAmounts,
+            pwTokenAmounts,
             lpTokenAmounts
         );
 
-        emit DelegateToLiquidityMining(_msgSender(), lpTokens, pwIporAmounts);
+        emit DelegateToLiquidityMining(_msgSender(), lpTokens, pwTokenAmounts);
     }
 
     function undelegateFromLiquidityMining(
         address[] calldata lpTokens,
-        uint256[] calldata pwIporAmounts
+        uint256[] calldata pwTokenAmounts
     ) external override whenNotPaused nonReentrant {
         uint256 lpTokensLength = lpTokens.length;
-        require(lpTokensLength == pwIporAmounts.length, MiningErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
+        require(lpTokensLength == pwTokenAmounts.length, MiningErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
 
-        uint256 pwIporAmountToUndelegate;
+        uint256 pwTokenAmountToUndelegate;
 
         for (uint256 i; i != lpTokensLength; ++i) {
-            require(pwIporAmounts[i] > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
-            pwIporAmountToUndelegate += pwIporAmounts[i];
+            require(pwTokenAmounts[i] > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
+            pwTokenAmountToUndelegate += pwTokenAmounts[i];
         }
 
         address msgSender = _msgSender();
 
         require(
-            _delegatedToLiquidityMiningBalance[msgSender] >= pwIporAmountToUndelegate,
+            _delegatedToLiquidityMiningBalance[msgSender] >= pwTokenAmountToUndelegate,
             MiningErrors.ACC_DELEGATED_TO_LIQUIDITY_MINING_BALANCE_IS_TOO_LOW
         );
 
-        ILiquidityMiningInternal(_liquidityMining).undelegatePwIpor(
+        ILiquidityMiningInternal(_liquidityMining).undelegatePwToken(
             msgSender,
             lpTokens,
-            pwIporAmounts
+            pwTokenAmounts
         );
 
-        _delegatedToLiquidityMiningBalance[msgSender] -= pwIporAmountToUndelegate;
+        _delegatedToLiquidityMiningBalance[msgSender] -= pwTokenAmountToUndelegate;
 
-        emit UndelegateFromLiquidityMining(msgSender, lpTokens, pwIporAmounts);
+        emit UndelegateFromLiquidityMining(msgSender, lpTokens, pwTokenAmounts);
     }
 
-    function coolDown(uint256 pwIporAmount) external override whenNotPaused nonReentrant {
-        require(pwIporAmount > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
+    function coolDown(uint256 pwTokenAmount) external override whenNotPaused nonReentrant {
+        require(pwTokenAmount > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         address msgSender = _msgSender();
 
-        uint256 availablePwIporAmount = _calculateBaseAmountToPwIpor(
+        uint256 availablePwTokenAmount = _calculateBaseAmountToPwToken(
             _baseBalance[msgSender],
             _calculateInternalExchangeRate(_iporToken)
         ) - _delegatedToLiquidityMiningBalance[msgSender];
 
         require(
-            availablePwIporAmount >= pwIporAmount,
+            availablePwTokenAmount >= pwTokenAmount,
             MiningErrors.ACC_AVAILABLE_POWER_IPOR_BALANCE_IS_TOO_LOW
         );
 
-        _coolDowns[msgSender] = PowerIporTypes.PwIporCoolDown(
+        _coolDowns[msgSender] = PowerIporTypes.PwTokenCoolDown(
             block.timestamp + COOL_DOWN_IN_SECONDS,
-            pwIporAmount
+            pwTokenAmount
         );
-        emit CoolDownChanged(msgSender, pwIporAmount, block.timestamp + COOL_DOWN_IN_SECONDS);
+        emit CoolDownChanged(msgSender, pwTokenAmount, block.timestamp + COOL_DOWN_IN_SECONDS);
     }
 
     function cancelCoolDown() external override whenNotPaused {
@@ -242,16 +242,16 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
     function redeem() external override whenNotPaused nonReentrant {
         address msgSender = _msgSender();
 
-        PowerIporTypes.PwIporCoolDown memory accountCoolDown = _coolDowns[msgSender];
+        PowerIporTypes.PwTokenCoolDown memory accountCoolDown = _coolDowns[msgSender];
 
         require(block.timestamp >= accountCoolDown.endTimestamp, MiningErrors.COOL_DOWN_NOT_FINISH);
-        require(accountCoolDown.pwIporAmount > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(accountCoolDown.pwTokenAmount > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
         address iporTokenAddress = _iporToken;
 
         uint256 exchangeRate = _calculateInternalExchangeRate(iporTokenAddress);
         uint256 baseAmountToUnstake = IporMath.division(
-            accountCoolDown.pwIporAmount * Constants.D18,
+            accountCoolDown.pwTokenAmount * Constants.D18,
             exchangeRate
         );
 
@@ -265,9 +265,9 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
         delete _coolDowns[msgSender];
 
-        ///@dev We can transfer pwIporAmount because it is in relation 1:1 to Ipor Token
-        IERC20Upgradeable(iporTokenAddress).transfer(msgSender, accountCoolDown.pwIporAmount);
+        ///@dev We can transfer pwTokenAmount because it is in relation 1:1 to Ipor Token
+        IERC20Upgradeable(iporTokenAddress).transfer(msgSender, accountCoolDown.pwTokenAmount);
 
-        emit Redeem(msgSender, accountCoolDown.pwIporAmount);
+        emit Redeem(msgSender, accountCoolDown.pwTokenAmount);
     }
 }

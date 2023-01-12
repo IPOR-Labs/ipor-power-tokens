@@ -5,14 +5,14 @@ import "../libraries/math/MiningCalculation.sol";
 
 contract MockMiningCalculation {
     function calculateAccountPowerUp(
-        uint256 pwIporAmount,
+        uint256 pwTokenAmount,
         uint256 lpTokenAmount,
         bytes16 verticalShift,
         bytes16 horizontalShift
     ) public pure returns (uint256) {
         return
             MiningCalculation.calculateAccountPowerUp(
-                pwIporAmount,
+                pwTokenAmount,
                 lpTokenAmount,
                 verticalShift,
                 horizontalShift

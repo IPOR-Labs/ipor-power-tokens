@@ -120,7 +120,7 @@ describe("LiquidityMining sum of rewards", () => {
             .connect(userOne)
             .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedIporToken]);
 
-        const pwIporBalanceBefore = await powerIpor
+        const pwTokenBalanceBefore = await powerIpor
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
@@ -148,7 +148,7 @@ describe("LiquidityMining sum of rewards", () => {
         );
         const lpTokenBalanceAfter = await tokens.lpTokenDai.balanceOf(await userOne.getAddress());
 
-        const pwIporBalanceAfter = await powerIpor
+        const pwTokenBalanceAfter = await powerIpor
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
@@ -184,12 +184,12 @@ describe("LiquidityMining sum of rewards", () => {
             ZERO, //powerUp
             BigNumber.from("508825733298768705897333252"), //Cumulative
             ZERO, // lpToken
-            BigNumber.from("100000000000000000000") //pwIpor
+            BigNumber.from("100000000000000000000") //pwToken
         );
         expect(lpTokenBalanceBefore).to.be.eq(BigNumber.from("999900000000000000000000"));
         expect(lpTokenBalanceAfter).to.be.eq(BigNumber.from("1000000000000000000000000"));
-        expect(pwIporBalanceBefore).to.be.equal(BigNumber.from("100000000000000000000"));
-        expect(pwIporBalanceAfter).to.be.equal(BigNumber.from("201000000000000000000"));
+        expect(pwTokenBalanceBefore).to.be.equal(BigNumber.from("100000000000000000000"));
+        expect(pwTokenBalanceAfter).to.be.equal(BigNumber.from("201000000000000000000"));
     });
 
     it("Should unstake 3 users", async () => {
@@ -479,7 +479,7 @@ describe("LiquidityMining sum of rewards", () => {
             .connect(userOne)
             .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedIporToken]);
 
-        const pwIporBalanceBefore = await powerIpor
+        const pwTokenBalanceBefore = await powerIpor
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
@@ -490,7 +490,7 @@ describe("LiquidityMining sum of rewards", () => {
         const accruedRewardsAfter1Unstake = await liquidityMining.calculateAccruedRewards(
             tokens.lpTokenDai.address
         );
-        const pwIporBalanceAfter1Unstake = await powerIpor
+        const pwTokenBalanceAfter1Unstake = await powerIpor
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
@@ -519,7 +519,7 @@ describe("LiquidityMining sum of rewards", () => {
             await admin.getAddress(),
             tokens.lpTokenDai.address
         );
-        const pwIporBalanceAfter = await powerIpor
+        const pwTokenBalanceAfter = await powerIpor
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
@@ -533,9 +533,9 @@ describe("LiquidityMining sum of rewards", () => {
             BigNumber.from("202000000000000000000")
         );
 
-        expect(pwIporBalanceBefore).to.be.equal(BigNumber.from("100000000000000000000"));
-        expect(pwIporBalanceAfter1Unstake).to.be.equal(BigNumber.from("201000000000000000000"));
-        expect(pwIporBalanceAfter).to.be.equal(BigNumber.from("302000000000000000000"));
+        expect(pwTokenBalanceBefore).to.be.equal(BigNumber.from("100000000000000000000"));
+        expect(pwTokenBalanceAfter1Unstake).to.be.equal(BigNumber.from("201000000000000000000"));
+        expect(pwTokenBalanceAfter).to.be.equal(BigNumber.from("302000000000000000000"));
         expect(accountRewardsAfter).to.be.equal(ZERO);
         expect(liquidityMiningIpDaiBalanceAfter).to.be.equal(liquidityMiningIpDaiBalanceBefore);
         expect(powerIporIporTokenBalanceAfter).to.be.equal(

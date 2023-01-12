@@ -40,7 +40,7 @@ abstract contract PowerIporInternal is
     /// @dev balance of Power Ipor Token which are delegated to LiquidityMining, information per account, balance represented in 18 decimals
     mapping(address => uint256) internal _delegatedToLiquidityMiningBalance;
     // account address -> {endTimestamp, amount}
-    mapping(address => PowerIporTypes.PwIporCoolDown) internal _coolDowns;
+    mapping(address => PowerIporTypes.PwTokenCoolDown) internal _coolDowns;
     uint256 internal _baseTotalSupply;
     uint256 internal _unstakeWithoutCooldownFee;
 
@@ -194,7 +194,7 @@ abstract contract PowerIporInternal is
             );
     }
 
-    function _calculateBaseAmountToPwIpor(uint256 baseAmount, uint256 exchangeRate)
+    function _calculateBaseAmountToPwToken(uint256 baseAmount, uint256 exchangeRate)
         internal
         pure
         returns (uint256)
@@ -202,20 +202,20 @@ abstract contract PowerIporInternal is
         return IporMath.division(baseAmount * exchangeRate, Constants.D18);
     }
 
-    function _getAvailablePwIporAmount(address account, uint256 exchangeRate)
+    function _getAvailablePwTokenAmount(address account, uint256 exchangeRate)
         internal
         view
         returns (uint256)
     {
         return
-            _calculateBaseAmountToPwIpor(_baseBalance[account], exchangeRate) -
+            _calculateBaseAmountToPwToken(_baseBalance[account], exchangeRate) -
             _delegatedToLiquidityMiningBalance[account] -
-            _coolDowns[account].pwIporAmount;
+            _coolDowns[account].pwTokenAmount;
     }
 
     function _balanceOf(address account) internal view returns (uint256) {
         return
-            _calculateBaseAmountToPwIpor(
+            _calculateBaseAmountToPwToken(
                 _baseBalance[account],
                 _calculateInternalExchangeRate(_iporToken)
             );

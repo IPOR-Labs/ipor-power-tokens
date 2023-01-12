@@ -21,11 +21,11 @@ interface ILiquidityMining {
     /// @notice Returns balance of delegated Power Ipor Tokens for a given `account` and list of lpToken addresses.
     /// @param account address for which we want get information about balance of delegated Power Ipor Tokens
     /// @param lpTokens list of lpTokens addresses(lpTokens) for which we want fetch balances
-    /// @return balances list of {LiquidityMiningTypes.DelegatedPwIporBalance} structure, with information how much Power Ipor Token is delegated per lpToken address.
-    function balanceOfDelegatedPwIpor(address account, address[] memory lpTokens)
+    /// @return balances list of {LiquidityMiningTypes.DelegatedPwTokenBalance} structure, with information how much Power Ipor Token is delegated per lpToken address.
+    function balanceOfDelegatedPwToken(address account, address[] memory lpTokens)
         external
         view
-        returns (LiquidityMiningTypes.DelegatedPwIporBalance[] memory balances);
+        returns (LiquidityMiningTypes.DelegatedPwTokenBalance[] memory balances);
 
     /// @notice Gets account allocated rewards
     /// @param account address for which we want get information about balance of allocated power tokens

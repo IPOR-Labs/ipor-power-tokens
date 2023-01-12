@@ -3,13 +3,13 @@ pragma solidity 0.8.17;
 
 /// @title Structures used in LiquidityMining smart contract.
 library LiquidityMiningTypes {
-    /// @title Struct pair represented pwIpor balance delegated
-    struct DelegatedPwIporBalance {
+    /// @title Struct pair represented pwToken balance delegated
+    struct DelegatedPwTokenBalance {
         /// @notice lpToken address
         address lpToken;
         /// @notice amount of Power Ipor Token which was delegated for given lpToken
         /// @dev value represented in 18 decimals
-        uint256 pwIporAmount;
+        uint256 pwTokenAmount;
     }
 
     /// @title Global indicators used in rewards calculation.
@@ -47,6 +47,6 @@ library LiquidityMiningTypes {
         uint72 powerUp;
         /// @notice balance of Power Ipor Tokens which are delegated to LiquidityMining
         /// @dev delegatedPwTokenBalance < 10^26 < 2^87
-        uint96 delegatedPwIporBalance;
+        uint96 delegatedPwTokenBalance;
     }
 }

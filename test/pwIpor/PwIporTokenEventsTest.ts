@@ -86,10 +86,10 @@ describe("PowerIpor token delegate", () => {
         const delegatePwTokenAmount = N1__0_18DEC;
         await powerIpor.stake(stakeIporTokenAmount);
         const delegatedPwTokenBalanceBefore = (
-            await liquidityMining.balanceOfDelegatedPwIpor(await admin.getAddress(), [
+            await liquidityMining.balanceOfDelegatedPwToken(await admin.getAddress(), [
                 tokens.lpTokenDai.address,
             ])
-        )[0].pwIporAmount;
+        )[0].pwTokenAmount;
         //    when
         await expect(
             powerIpor.delegateToLiquidityMining(
@@ -105,17 +105,17 @@ describe("PowerIpor token delegate", () => {
             );
         //    then
         const delegatedPwTokenBalanceAfter = (
-            await liquidityMining.balanceOfDelegatedPwIpor(await admin.getAddress(), [
+            await liquidityMining.balanceOfDelegatedPwToken(await admin.getAddress(), [
                 tokens.lpTokenDai.address,
             ])
-        )[0].pwIporAmount;
+        )[0].pwTokenAmount;
 
         expect(delegatedPwTokenBalanceAfter).to.be.equal(
             delegatedPwTokenBalanceBefore.add(delegatePwTokenAmount)
         );
     });
 
-    it("Should emit UndelegatePwIpor event ", async () => {
+    it("Should emit UndelegatePwToken event ", async () => {
         //    given
         const stakeIporTokenAmount = N1__0_18DEC;
         const delegatePwTokenAmount = N1__0_18DEC;
@@ -126,10 +126,10 @@ describe("PowerIpor token delegate", () => {
             [delegatePwTokenAmount]
         );
         const delegatedPwTokenBalanceBefore = (
-            await liquidityMining.balanceOfDelegatedPwIpor(await admin.getAddress(), [
+            await liquidityMining.balanceOfDelegatedPwToken(await admin.getAddress(), [
                 tokens.lpTokenDai.address,
             ])
-        )[0].pwIporAmount;
+        )[0].pwTokenAmount;
         //    when
         await expect(
             powerIpor.undelegateFromLiquidityMining(
@@ -145,10 +145,10 @@ describe("PowerIpor token delegate", () => {
             );
         //    then
         const delegatedPwTokenBalanceAfter = (
-            await liquidityMining.balanceOfDelegatedPwIpor(await admin.getAddress(), [
+            await liquidityMining.balanceOfDelegatedPwToken(await admin.getAddress(), [
                 tokens.lpTokenDai.address,
             ])
-        )[0].pwIporAmount;
+        )[0].pwTokenAmount;
 
         expect(delegatedPwTokenBalanceAfter).to.be.equal(
             delegatedPwTokenBalanceBefore.sub(undelegatePwTokenAmount)

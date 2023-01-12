@@ -53,7 +53,7 @@ const randomDelegateIporToken = async (
     await powerIpor.connect(account).delegateToLiquidityMining([lpToken], [delegateAmount]);
 };
 
-const randomWithdrawPwIpor = async (
+const randomWithdrawPwToken = async (
     account: Signer,
     lpToken: string,
     liquidityMining: LiquidityMining,
@@ -61,11 +61,11 @@ const randomWithdrawPwIpor = async (
 ) => {
     if (flipCoin()) return;
 
-    const balanceOfDelegatedPwIpor = await liquidityMining.balanceOfDelegatedPwIpor(
+    const balanceOfDelegatedPwToken = await liquidityMining.balanceOfDelegatedPwToken(
         await account.getAddress(),
         [lpToken]
     );
-    const balance = balanceOfDelegatedPwIpor[0].pwIporAmount.div(N1__0_18DEC);
+    const balance = balanceOfDelegatedPwToken[0].pwTokenAmount.div(N1__0_18DEC);
     const withdrawAmount = randomBigNumberFromInterval(1, balance.toNumber(), N1__0_18DEC);
 
     if (balance.lte(ZERO)) return;
@@ -221,7 +221,7 @@ describe("LiquidityMining unstake lpToken", () => {
             tokens.lpTokenDai.address
         );
         const userOneIporTokenBalance = await powerIpor.balanceOf(await userOne.getAddress());
-        const pwIporExchangeRateBefore = await powerIpor.calculateExchangeRate();
+        const pwTokenExchangeRateBefore = await powerIpor.calculateExchangeRate();
 
         // when
         for (let i = 0; i < 50; i++) {
@@ -238,12 +238,12 @@ describe("LiquidityMining unstake lpToken", () => {
         const accruedRewardsAfter = await liquidityMining.calculateAccruedRewards(
             tokens.lpTokenDai.address
         );
-        const pwIporExchangeRateAfter = await powerIpor.calculateExchangeRate();
+        const pwTokenExchangeRateAfter = await powerIpor.calculateExchangeRate();
 
         expect(accruedRewardsBefore).to.be.equal(ZERO);
         expect(userOneIporTokenBalance).to.be.equal(N100__0_18DEC);
         expect(accruedRewardsAfter).to.be.equal(userOneIporTokenAfter.sub(userOneIporTokenBalance));
-        expect(pwIporExchangeRateBefore).to.be.equal(pwIporExchangeRateAfter);
+        expect(pwTokenExchangeRateBefore).to.be.equal(pwTokenExchangeRateAfter);
     });
 
     it("Should revert when iporToken balance on liquidityMining to low", async () => {
@@ -283,7 +283,7 @@ describe("LiquidityMining unstake lpToken", () => {
             await userOne.getAddress()
         );
         const userOneIporTokenBalance = await powerIpor.balanceOf(await userOne.getAddress());
-        const pwIporExchangeRateBefore = await powerIpor.calculateExchangeRate();
+        const pwTokenExchangeRateBefore = await powerIpor.calculateExchangeRate();
 
         // when
         await liquidityMining.connect(userOne).stake(dai, N2__0_18DEC);
@@ -296,7 +296,7 @@ describe("LiquidityMining unstake lpToken", () => {
             await userOne.getAddress(),
             tokens.lpTokenDai.address
         );
-        const pwIporExchangeRateAfter = await powerIpor.calculateExchangeRate();
+        const pwTokenExchangeRateAfter = await powerIpor.calculateExchangeRate();
         const accountAllocatedRewardsAfter = await liquidityMining.balanceOfAllocatedPwTokens(
             await userOne.getAddress()
         );
@@ -307,7 +307,7 @@ describe("LiquidityMining unstake lpToken", () => {
         expect(accountAllocatedRewardsAfter).to.be.equal(BigNumber.from("101").mul(N1__0_18DEC));
         expect(userOneIporTokenBalance).to.be.equal(N100__0_18DEC);
         expect(userOneIporTokenAfter).to.be.equal(N100__0_18DEC);
-        expect(pwIporExchangeRateBefore).to.be.equal(pwIporExchangeRateAfter);
+        expect(pwTokenExchangeRateBefore).to.be.equal(pwTokenExchangeRateAfter);
     });
 
     it("Should stake and unstake 2 users", async () => {
@@ -332,7 +332,7 @@ describe("LiquidityMining unstake lpToken", () => {
         );
         const userOneIporTokenBalance = await powerIpor.balanceOf(await userOne.getAddress());
         const userTwoIporTokenBalance = await powerIpor.balanceOf(await userTwo.getAddress());
-        const pwIporExchangeRateBefore = await powerIpor.calculateExchangeRate();
+        const pwTokenExchangeRateBefore = await powerIpor.calculateExchangeRate();
 
         // when
         for (let i = 0; i < 50; i++) {
@@ -356,7 +356,7 @@ describe("LiquidityMining unstake lpToken", () => {
             .add(userTwoIporTokenAfter)
             .sub(userTwoIporTokenBalance)
             .sub(userOneIporTokenBalance);
-        const pwIporExchangeRateAfter = await powerIpor.calculateExchangeRate();
+        const pwTokenExchangeRateAfter = await powerIpor.calculateExchangeRate();
         const allRewardsMinusUsersRewards = accruedRewardsAfter.sub(sumOfRewards).abs();
 
         expect(accruedRewardsBefore).to.be.equal(ZERO);
@@ -364,7 +364,7 @@ describe("LiquidityMining unstake lpToken", () => {
         expect(userTwoIporTokenBalance).to.be.equal(N100__0_18DEC);
         expect(accruedRewardsAfter).to.be.equal(BigNumber.from("5101").mul(N1__0_18DEC));
         expect(allRewardsMinusUsersRewards.lt(BigNumber.from("10"))).to.be.true;
-        expect(pwIporExchangeRateBefore).to.be.equal(pwIporExchangeRateAfter);
+        expect(pwTokenExchangeRateBefore).to.be.equal(pwTokenExchangeRateAfter);
     });
 
     it("Should stake and unstake 3 users", async () => {
@@ -394,7 +394,7 @@ describe("LiquidityMining unstake lpToken", () => {
         const adminIporTokenBalance = await powerIpor.balanceOf(await admin.getAddress());
         const userOneIporTokenBalance = await powerIpor.balanceOf(await userOne.getAddress());
         const userTwoIporTokenBalance = await powerIpor.balanceOf(await userTwo.getAddress());
-        const pwIporExchangeRateBefore = await powerIpor.calculateExchangeRate();
+        const pwTokenExchangeRateBefore = await powerIpor.calculateExchangeRate();
 
         // when
         for (let i = 0; i < 50; i++) {
@@ -429,7 +429,7 @@ describe("LiquidityMining unstake lpToken", () => {
             .add(userOneIporTokenAfter)
             .add(userTwoIporTokenAfter)
             .sub(N300__0_18DEC);
-        const pwIporExchangeRateAfter = await powerIpor.calculateExchangeRate();
+        const pwTokenExchangeRateAfter = await powerIpor.calculateExchangeRate();
         const allRewardsMinusUsersRewards = accruedRewardsAfter.sub(sumOfRewards).abs();
 
         expect(accruedRewardsBefore).to.be.equal(ZERO);
@@ -439,7 +439,7 @@ describe("LiquidityMining unstake lpToken", () => {
 
         expect(accruedRewardsAfter).to.be.equal(BigNumber.from("5155").mul(N1__0_18DEC));
         expect(allRewardsMinusUsersRewards.lt(BigNumber.from("10"))).to.be.true;
-        expect(pwIporExchangeRateBefore).to.be.equal(pwIporExchangeRateAfter);
+        expect(pwTokenExchangeRateBefore).to.be.equal(pwTokenExchangeRateAfter);
     });
 
     it("Should stake and unstake, 3 users when block rewards change", async () => {
@@ -469,7 +469,7 @@ describe("LiquidityMining unstake lpToken", () => {
         const adminIporTokenBalance = await powerIpor.balanceOf(await admin.getAddress());
         const userOneIporTokenBalance = await powerIpor.balanceOf(await userOne.getAddress());
         const userTwoIporTokenBalance = await powerIpor.balanceOf(await userTwo.getAddress());
-        const pwIporExchangeRateBefore = await powerIpor.calculateExchangeRate();
+        const pwTokenExchangeRateBefore = await powerIpor.calculateExchangeRate();
 
         // when
         for (let i = 0; i < 50; i++) {
@@ -505,7 +505,7 @@ describe("LiquidityMining unstake lpToken", () => {
             .add(userOneIporTokenAfter)
             .add(userTwoIporTokenAfter)
             .sub(N300__0_18DEC);
-        const pwIporExchangeRateAfter = await powerIpor.calculateExchangeRate();
+        const pwTokenExchangeRateAfter = await powerIpor.calculateExchangeRate();
         const allRewardsMinusUsersRewards = accruedRewardsAfter.sub(sumOfRewards).abs();
 
         expect(accruedRewardsBefore).to.be.equal(ZERO);
@@ -514,7 +514,7 @@ describe("LiquidityMining unstake lpToken", () => {
         expect(userTwoIporTokenBalance).to.be.equal(N100__0_18DEC);
 
         expect(allRewardsMinusUsersRewards.lt(BigNumber.from("10"))).to.be.true;
-        expect(pwIporExchangeRateBefore).to.be.equal(pwIporExchangeRateAfter);
+        expect(pwTokenExchangeRateBefore).to.be.equal(pwTokenExchangeRateAfter);
     });
 
     it("Should random stake and delegate to LiquidityMining", async () => {
@@ -534,7 +534,7 @@ describe("LiquidityMining unstake lpToken", () => {
         const userThreeIporTokenBalanceBefore = await powerIpor.balanceOf(
             await userThree.getAddress()
         );
-        const pwIporExchangeRateBefore = await powerIpor.calculateExchangeRate();
+        const pwTokenExchangeRateBefore = await powerIpor.calculateExchangeRate();
 
         const accruedRewardsBefore = await liquidityMining.calculateAccruedRewards(
             tokens.lpTokenDai.address
@@ -557,7 +557,7 @@ describe("LiquidityMining unstake lpToken", () => {
                 await hre.network.provider.send("hardhat_mine", ["0x64"]);
                 await randomUnstakeLpToken(users[userIndex], ipDai, liquidityMining);
                 await hre.network.provider.send("hardhat_mine", ["0x64"]);
-                await randomWithdrawPwIpor(users[userIndex], ipDai, liquidityMining, powerIpor);
+                await randomWithdrawPwToken(users[userIndex], ipDai, liquidityMining, powerIpor);
                 await hre.network.provider.send("hardhat_mine", ["0x64"]);
             }
         }
@@ -592,13 +592,13 @@ describe("LiquidityMining unstake lpToken", () => {
             .sub(userOneIporTokenBalanceBefore)
             .sub(userTwoIporTokenBalanceBefore)
             .sub(userThreeIporTokenBalanceBefore);
-        const pwIporExchangeRateAfter = await powerIpor.calculateExchangeRate();
+        const pwTokenExchangeRateAfter = await powerIpor.calculateExchangeRate();
         const allRewardsMinusUsersRewards = accruedRewardsAfter.sub(sumOfRewards).abs();
 
         expect(accruedRewardsBefore).to.be.equal(ZERO);
 
         expect(allRewardsMinusUsersRewards.lt(BigNumber.from("100000"))).to.be.true;
-        expect(pwIporExchangeRateBefore).to.be.equal(pwIporExchangeRateAfter);
+        expect(pwTokenExchangeRateBefore).to.be.equal(pwTokenExchangeRateAfter);
     });
 
     it("Should stop adding rewards when unstake and left 0.5 ipDai", async () => {

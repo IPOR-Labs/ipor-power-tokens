@@ -21,10 +21,10 @@ const { expect } = chai;
 
 const expectedBalances = (
     amounts: BigNumber[],
-    response: LiquidityMiningTypes.DelegatedPwIporBalanceStruct[]
+    response: LiquidityMiningTypes.DelegatedPwTokenBalanceStruct[]
 ) => {
     for (let i = 0; i < 3; i++) {
-        expect(response[i].pwIporAmount).to.be.equal(amounts[i]);
+        expect(response[i].pwTokenAmount).to.be.equal(amounts[i]);
     }
 };
 
@@ -75,7 +75,7 @@ describe("LiquidityMining rebalance ", () => {
     it("Should has zero balance when contract was deployed", async () => {
         //    given
         //    when
-        const balances = await liquidityMining.balanceOfDelegatedPwIpor(await admin.getAddress(), [
+        const balances = await liquidityMining.balanceOfDelegatedPwToken(await admin.getAddress(), [
             tokens.lpTokenDai.address,
             tokens.lpTokenUsdc.address,
             tokens.lpTokenUsdt.address,
@@ -90,7 +90,7 @@ describe("LiquidityMining rebalance ", () => {
         await expect(
             liquidityMining
                 .connect(userOne)
-                .delegatePwIpor(
+                .delegatePwToken(
                     await userOne.getAddress(),
                     [tokens.lpTokenDai.address],
                     [N1__0_18DEC]
@@ -111,7 +111,7 @@ describe("LiquidityMining rebalance ", () => {
 
         //    when
         await expect(
-            liquidityMiningInternal.delegatePwIpor(
+            liquidityMiningInternal.delegatePwToken(
                 await admin.getAddress(),
                 [tokens.tokenDai.address],
                 [N1__0_18DEC]
@@ -120,9 +120,9 @@ describe("LiquidityMining rebalance ", () => {
         //    then
     });
 
-    it("Should be able to delegate pwIpor", async () => {
+    it("Should be able to delegate pwToken", async () => {
         //    given
-        const balancesBefore = await liquidityMining.balanceOfDelegatedPwIpor(
+        const balancesBefore = await liquidityMining.balanceOfDelegatedPwToken(
             await admin.getAddress(),
             [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address]
         );
@@ -163,7 +163,7 @@ describe("LiquidityMining rebalance ", () => {
         );
 
         //    then
-        const balancesAfter = await liquidityMining.balanceOfDelegatedPwIpor(
+        const balancesAfter = await liquidityMining.balanceOfDelegatedPwToken(
             await admin.getAddress(),
             [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address]
         );
@@ -196,7 +196,7 @@ describe("LiquidityMining rebalance ", () => {
         );
     });
 
-    it("Should not be able to delegate pwIpor when contract is pause", async () => {
+    it("Should not be able to delegate pwToken when contract is pause", async () => {
         //    given
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMiningForTests");
         const liquidityMiningInternal = (await upgrades.deployProxy(LiquidityMining, [
@@ -212,7 +212,7 @@ describe("LiquidityMining rebalance ", () => {
 
         //    when
         await expect(
-            liquidityMiningInternal.delegatePwIpor(
+            liquidityMiningInternal.delegatePwToken(
                 await admin.getAddress(),
                 [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address],
                 amounts
