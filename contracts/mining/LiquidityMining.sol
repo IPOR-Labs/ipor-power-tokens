@@ -4,9 +4,9 @@ pragma solidity 0.8.17;
 import "../interfaces/ILiquidityMining.sol";
 import "./LiquidityMiningInternal.sol";
 
-/// @title Smart contract responsible for distribution IPOR token rewards across accounts contributed in IPOR Protocol
-/// by staking lpTokens and / or delegating Power Ipor Tokens to LiquidityMining. LpTokens can be staked directly to LiquidityMining,
-/// Power Ipor Tokens account can get stake IPOR Tokens in PowerIpor smart contract.
+/// @title Smart contract responsible for distribution Staked token rewards across accounts contributed in Protocol
+/// by staking lpTokens and / or delegating Power Tokens to LiquidityMining. LpTokens can be staked directly to LiquidityMining,
+/// Power Tokens account can get stake Staked Tokens in PowerToken smart contract.
 contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
     using SafeCast for uint256;
     using SafeCast for int256;
@@ -117,7 +117,7 @@ contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
         );
 
         if (rewards > 0) {
-            _transferRewardsToPowerIpor(msgSender, rewards);
+            _transferRewardsToPowerToken(msgSender, rewards);
         }
 
         emit StakeLpTokens(msgSender, lpToken, lpTokenAmount);
@@ -152,11 +152,11 @@ contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
         ];
 
         (
-            uint256 iporTokenAmount,
+            uint256 stakedTokenAmount,
             uint256 accruedCompMultiplierCumulativePrevBlock
         ) = _calculateAccountRewards(globalIndicators, accountIndicators);
 
-        require(iporTokenAmount > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
+        require(stakedTokenAmount > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
 
         uint256 accountPowerUp = MiningCalculation.calculateAccountPowerUp(
             accountIndicators.delegatedPwTokenBalance,
@@ -172,17 +172,17 @@ contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
             accountIndicators.delegatedPwTokenBalance
         );
 
-        _transferRewardsToPowerIpor(msgSender, iporTokenAmount);
+        _transferRewardsToPowerToken(msgSender, stakedTokenAmount);
 
-        emit Claim(msgSender, lpToken, iporTokenAmount);
+        emit Claim(msgSender, lpToken, stakedTokenAmount);
     }
 
     function claimAllocatedPwTokens() external override whenNotPaused nonReentrant {
         address msgSender = _msgSender();
-        uint256 iporTokenAmount = _allocatedPwTokens[msgSender];
-        require(iporTokenAmount > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
+        uint256 stakedTokenAmount = _allocatedPwTokens[msgSender];
+        require(stakedTokenAmount > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
         _allocatedPwTokens[msgSender] = 0;
-        _transferRewardsToPowerIpor(msgSender, iporTokenAmount);
-        emit ClaimAllocatedTokens(msgSender, iporTokenAmount);
+        _transferRewardsToPowerToken(msgSender, stakedTokenAmount);
+        emit ClaimAllocatedTokens(msgSender, stakedTokenAmount);
     }
 }

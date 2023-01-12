@@ -3,7 +3,7 @@ pragma solidity 0.8.17;
 
 import "./types/LiquidityMiningTypes.sol";
 
-/// @title Interface to interact with LiquidityMining smart contract. Mainly technical methods or methods used by PowerIpor smart contract.
+/// @title Interface to interact with LiquidityMining smart contract. Mainly technical methods or methods used by PowerToken smart contract.
 interface ILiquidityMiningInternal {
     /// @notice Returns current version of LiquidityMining (Liquidity Rewards) contract
     /// @return Current LiquidityMining (Liquidity Rewards) version
@@ -35,21 +35,21 @@ interface ILiquidityMiningInternal {
         view
         returns (LiquidityMiningTypes.AccountRewardsIndicators memory);
 
-    /// @notice Delegates Power Ipor Tokens from a given account to LiquidityMining smart contract.
-    /// @param account account address who want to delegate its own Power Ipor Tokens to LiquidityMining
-    /// @param lpTokens list of lpToken addresses to which delegated Power Ipor Tokens are transfered
-    /// @param pwTokenAmount list of Power Ipor amounts for which should be assigns to given lpTokens defined above, represented in 18 decimals
+    /// @notice Delegates Power Tokens from a given account to LiquidityMining smart contract.
+    /// @param account account address who want to delegate its own Power Tokens to LiquidityMining
+    /// @param lpTokens list of lpToken addresses to which delegated Power Tokens are transfered
+    /// @param pwTokenAmount list of Power amounts for which should be assigns to given lpTokens defined above, represented in 18 decimals
     function delegatePwToken(
         address account,
         address[] calldata lpTokens,
         uint256[] calldata pwTokenAmount
     ) external;
 
-    /// @notice Delegates Power Ipor Tokens an stake lpTokens to LiquidityMining.
-    /// @dev Power Ipor Token amounts can be equal zeros. IP Token amounts can be equal zeros.
-    /// @param account account address who want to delegate its Power Ipor Tokens and stake lpTokens to LiquidityMining
-    /// @param lpTokens list of lpToken addresses to which delegated Power Ipor Tokens are transfered
-    /// @param pwTokenAmounts list of Power Ipor Token amounts which should be assign to lpTokens defined above , represented in 18 decimals
+    /// @notice Delegates Power Tokens an stake lpTokens to LiquidityMining.
+    /// @dev Power Token amounts can be equal zeros. IP Token amounts can be equal zeros.
+    /// @param account account address who want to delegate its Power Tokens and stake lpTokens to LiquidityMining
+    /// @param lpTokens list of lpToken addresses to which delegated Power Tokens are transfered
+    /// @param pwTokenAmounts list of Power Token amounts which should be assign to lpTokens defined above , represented in 18 decimals
     /// @param lpTokenAmounts list of lpToken amounts which should be stake to liquidityMining, represented in 18 decimals
     function delegatePwTokenAndStakeLpToken(
         address account,
@@ -58,11 +58,11 @@ interface ILiquidityMiningInternal {
         uint256[] calldata lpTokenAmounts
     ) external;
 
-    /// @notice Undelegates Power Ipor Tokens from LiquidityMining
-    /// @dev Power Ipor Token amounts can be equal zeros.
-    /// @param account address which one undelegate Power Ipor Tokens
-    /// @param lpTokens list of lpTokens from which you want to undelegate Power Ipor Tokens
-    /// @param pwTokenAmounts list of amounts of Power Ipor Tokens which will be undelegated, represented in 18 decimals
+    /// @notice Undelegates Power Tokens from LiquidityMining
+    /// @dev Power Token amounts can be equal zeros.
+    /// @param account address which one undelegate Power Tokens
+    /// @param lpTokens list of lpTokens from which you want to undelegate Power Tokens
+    /// @param pwTokenAmounts list of amounts of Power Tokens which will be undelegated, represented in 18 decimals
     function undelegatePwToken(
         address account,
         address[] calldata lpTokens,
@@ -71,8 +71,8 @@ interface ILiquidityMiningInternal {
 
     /// @notice Sets global configuration indicator rewardsPerBlock for a given lpToken
     /// @param lpToken address for which one should setup rewards per block
-    /// @param iporTokenAmount new value of rewards per block, Ipor token amount, represented in 8 decimals
-    function setRewardsPerBlock(address lpToken, uint32 iporTokenAmount) external;
+    /// @param pwTokenAmount new value of rewards per block, token amount, represented in 8 decimals
+    function setRewardsPerBlock(address lpToken, uint32 pwTokenAmount) external;
 
     /// @notice Adds new supported by LiquidityMining lpToken asset
     /// @dev Can be executed only by the Owner
@@ -102,14 +102,14 @@ interface ILiquidityMiningInternal {
     /// @param lpTokenAmount of lpTokens to stake, represented in 18 decimals
     event UnstakeLpTokens(address account, address lpToken, uint256 lpTokenAmount);
 
-    /// @notice Emitted when LiquidityMining's Owner change rewards per block, the number of Ipor tokens per block.
+    /// @notice Emitted when LiquidityMining's Owner change rewards per block, the number of power tokens per block.
     /// @param changedBy address of account who execute changes
-    /// @param oldIporTokenAmount old value of rewards per block, Ipor token amount, represented in 8 decimals
-    /// @param newIporTokenAmount new value of rewards per block, Ipor token amount, represented in 8 decimals
+    /// @param oldPwTokenAmount old value of rewards per block, power token amount, represented in 8 decimals
+    /// @param newPwTokenAmount new value of rewards per block, power token amount, represented in 8 decimals
     event RewardsPerBlockChanged(
         address indexed changedBy,
-        uint256 oldIporTokenAmount,
-        uint256 newIporTokenAmount
+        uint256 oldPwTokenAmount,
+        uint256 newPwTokenAmount
     );
 
     /// @notice Emitted when LiquidityMining's Owner add new lpToken asset which is going to be supported by LiquidityMining
@@ -122,16 +122,16 @@ interface ILiquidityMiningInternal {
     /// @param lpToken address of lpToken
     event LpTokenRemoved(address account, address lpToken);
 
-    /// @notice Emitted when account delegates Power Ipor Tokens to LiquidityMining
+    /// @notice Emitted when account delegates Power Tokens to LiquidityMining
     /// @param account account address in the context of which activities of delegation are performed
-    /// @param lpToken address of lpToken for which Power Ipor Token are delegated
-    /// @param pwTokenAmount amount of Power Ipor Tokens delegated to LiquidityMining, represented in 18 decimals
+    /// @param lpToken address of lpToken for which Power Token are delegated
+    /// @param pwTokenAmount amount of Power Tokens delegated to LiquidityMining, represented in 18 decimals
     event DelegatePwToken(address account, address lpToken, uint256 pwTokenAmount);
 
-    /// @notice Emitted when account delegates Power Ipor Tokens and stake lpTokens to the LiquidityMining
+    /// @notice Emitted when account delegates Power Tokens and stake lpTokens to the LiquidityMining
     /// @param account account address in the context of which activities of delegation and staking are performed
     /// @param lpToken address of lpToken which should be unstake
-    /// @param pwTokenAmount of Power Ipor Token to delegate, represented in 18 decimals
+    /// @param pwTokenAmount of Power Token to delegate, represented in 18 decimals
     /// @param lpTokenAmount of lpTokens to stake, represented in 18 decimals
     event DelegatePwTokenAndStakeLpToken(
         address account,
@@ -140,10 +140,10 @@ interface ILiquidityMiningInternal {
         uint256 lpTokenAmount
     );
 
-    /// @notice Emitted when account undelegate Power Ipor Tokens from LiquidityMining contract
+    /// @notice Emitted when account undelegate Power Tokens from LiquidityMining contract
     /// @param account account address in the context of which activities of undelegation are performed
     /// @param lpToken address of lpToken
-    /// @param pwTokenAmount amount of Power Ipor Token which was undelegated, represented in 18 decimals
+    /// @param pwTokenAmount amount of Power Token which was undelegated, represented in 18 decimals
     event UndelegatePwToken(address account, address lpToken, uint256 pwTokenAmount);
 
     /// @notice Emitted when PauseManager's address is changed by its owner.

@@ -4,7 +4,7 @@ import chai from "chai";
 import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { LiquidityMining, MockIporToken, PowerIpor, LiquidityMiningForTests } from "../../types";
+import { LiquidityMining, MockStakedToken, PowerToken, LiquidityMiningForTests } from "../../types";
 import { Tokens, getDeployedTokens } from "../utils/LiquidityMiningUtils";
 import {
     N1__0_18DEC,
@@ -30,8 +30,8 @@ const expectedBalances = (
 
 describe("LiquidityMining rebalance ", () => {
     let tokens: Tokens;
-    let powerIpor: PowerIpor;
-    let iporToken: MockIporToken;
+    let powerToken: PowerToken;
+    let stakedToken: MockStakedToken;
     let liquidityMining: LiquidityMining;
     let admin: Signer, userOne: Signer, userTwo: Signer, userThree: Signer;
 
@@ -42,34 +42,34 @@ describe("LiquidityMining rebalance ", () => {
     });
 
     beforeEach(async () => {
-        const IporToken = await hre.ethers.getContractFactory("MockIporToken");
-        iporToken = (await IporToken.deploy(
+        const StakedToken = await hre.ethers.getContractFactory("MockStakedToken");
+        stakedToken = (await StakedToken.deploy(
             "IPOR Token",
             "IPOR",
             await admin.getAddress()
-        )) as MockIporToken;
+        )) as MockStakedToken;
 
-        const PowerIpor = await hre.ethers.getContractFactory("PowerIpor");
-        powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
+        const PowerToken = await hre.ethers.getContractFactory("PowerToken");
+        powerToken = (await upgrades.deployProxy(PowerToken, [stakedToken.address])) as PowerToken;
 
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
 
         liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address],
-            powerIpor.address,
-            iporToken.address,
+            powerToken.address,
+            stakedToken.address,
         ])) as LiquidityMining;
 
         await tokens.lpTokenDai.approve(liquidityMining.address, N2__0_18DEC);
         await tokens.lpTokenUsdc.approve(liquidityMining.address, N2__0_18DEC);
         await tokens.lpTokenUsdt.approve(liquidityMining.address, N2__0_18DEC);
 
-        await iporToken.transfer(
+        await stakedToken.transfer(
             liquidityMining.address,
             N1__0_18DEC.mul(BigNumber.from("100000"))
         );
 
-        await powerIpor.setLiquidityMining(liquidityMining.address);
+        await powerToken.setLiquidityMining(liquidityMining.address);
     });
 
     it("Should has zero balance when contract was deployed", async () => {
@@ -84,7 +84,7 @@ describe("LiquidityMining rebalance ", () => {
         expectedBalances([ZERO, ZERO, ZERO], balances);
     });
 
-    it("Should not be able to stake power token when sender is not Power Ipor", async () => {
+    it("Should not be able to stake power token when sender is not Power Token", async () => {
         //    given
         //    when
         await expect(
@@ -95,7 +95,7 @@ describe("LiquidityMining rebalance ", () => {
                     [tokens.lpTokenDai.address],
                     [N1__0_18DEC]
                 )
-        ).to.be.revertedWith("IPOR_702");
+        ).to.be.revertedWith("PT_702");
         //    then
     });
 
@@ -104,10 +104,10 @@ describe("LiquidityMining rebalance ", () => {
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMiningForTests");
         const liquidityMiningInternal = (await upgrades.deployProxy(LiquidityMining, [
             [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address],
-            powerIpor.address,
-            iporToken.address,
+            powerToken.address,
+            stakedToken.address,
         ])) as LiquidityMiningForTests;
-        await liquidityMiningInternal.setPowerIpor(await admin.getAddress());
+        await liquidityMiningInternal.setPowerToken(await admin.getAddress());
 
         //    when
         await expect(
@@ -116,7 +116,7 @@ describe("LiquidityMining rebalance ", () => {
                 [tokens.tokenDai.address],
                 [N1__0_18DEC]
             )
-        ).to.be.revertedWith("IPOR_701");
+        ).to.be.revertedWith("PT_701");
         //    then
     });
 
@@ -137,10 +137,10 @@ describe("LiquidityMining rebalance ", () => {
         const liquidityMiningIpUsdcBalanceBefore = await tokens.lpTokenUsdc.balanceOf(
             liquidityMining.address
         );
-        const liquidityMiningIpUsdtBalanceBefore = await tokens.lpTokenUsdt.balanceOf(
+        const liquidityMiningLpUsdtBalanceBefore = await tokens.lpTokenUsdt.balanceOf(
             liquidityMining.address
         );
-        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+        const powerTokenStakedTokenBalanceBefore = await stakedToken.balanceOf(powerToken.address);
 
         await tokens.lpTokenDai.mint(await admin.getAddress(), N2__0_18DEC);
         await tokens.lpTokenUsdc.mint(await admin.getAddress(), N2__0_18DEC);
@@ -152,12 +152,12 @@ describe("LiquidityMining rebalance ", () => {
 
         const amounts = [N1__0_18DEC, N0__1_18DEC, N0__01_18DEC];
 
-        await iporToken.approve(powerIpor.address, N2__0_18DEC.add(N2__0_18DEC));
+        await stakedToken.approve(powerToken.address, N2__0_18DEC.add(N2__0_18DEC));
 
-        await powerIpor.stake(N2__0_18DEC);
+        await powerToken.stake(N2__0_18DEC);
 
         //    when
-        await powerIpor.delegateToLiquidityMining(
+        await powerToken.delegateToLiquidityMining(
             [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address],
             amounts
         );
@@ -174,10 +174,10 @@ describe("LiquidityMining rebalance ", () => {
         const liquidityMiningIpUsdcBalanceAfter = await tokens.lpTokenUsdc.balanceOf(
             liquidityMining.address
         );
-        const liquidityMiningIpUsdtBalanceAfter = await tokens.lpTokenUsdt.balanceOf(
+        const liquidityMiningLpUsdtBalanceAfter = await tokens.lpTokenUsdt.balanceOf(
             liquidityMining.address
         );
-        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+        const powerTokenStakedTokenBalanceAfter = await stakedToken.balanceOf(powerToken.address);
 
         expectedBalances([ZERO, ZERO, ZERO], balancesBefore);
         expectedBalances(amounts, balancesAfter);
@@ -188,11 +188,11 @@ describe("LiquidityMining rebalance ", () => {
         expect(liquidityMiningIpUsdcBalanceAfter).to.be.equal(
             liquidityMiningIpUsdcBalanceBefore.add(N1__0_18DEC)
         );
-        expect(liquidityMiningIpUsdtBalanceAfter).to.be.equal(
-            liquidityMiningIpUsdtBalanceBefore.add(N1__0_18DEC)
+        expect(liquidityMiningLpUsdtBalanceAfter).to.be.equal(
+            liquidityMiningLpUsdtBalanceBefore.add(N1__0_18DEC)
         );
-        expect(powerIporIporTokenBalanceAfter).to.be.equal(
-            powerIporIporTokenBalanceBefore.add(N1__0_18DEC.mul(BigNumber.from("14")))
+        expect(powerTokenStakedTokenBalanceAfter).to.be.equal(
+            powerTokenStakedTokenBalanceBefore.add(N1__0_18DEC.mul(BigNumber.from("14")))
         );
     });
 
@@ -201,11 +201,11 @@ describe("LiquidityMining rebalance ", () => {
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMiningForTests");
         const liquidityMiningInternal = (await upgrades.deployProxy(LiquidityMining, [
             [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address],
-            powerIpor.address,
-            iporToken.address,
+            powerToken.address,
+            stakedToken.address,
         ])) as LiquidityMiningForTests;
 
-        await liquidityMiningInternal.setPowerIpor(await admin.getAddress());
+        await liquidityMiningInternal.setPowerToken(await admin.getAddress());
 
         const amounts = [N1__0_18DEC, N0__1_18DEC, N0__01_18DEC];
         await liquidityMiningInternal.pause();

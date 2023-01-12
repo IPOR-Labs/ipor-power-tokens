@@ -4,7 +4,7 @@ import chai from "chai";
 import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { LiquidityMining, MockIporToken } from "../../types";
+import { LiquidityMining, MockStakedToken } from "../../types";
 import { Tokens, getDeployedTokens, extractGlobalIndicators } from "../utils/LiquidityMiningUtils";
 import {
     N1__0_18DEC,
@@ -32,23 +32,25 @@ describe("LiquidityMining Rewards per block", () => {
     });
 
     beforeEach(async () => {
-        const IporToken = await ethers.getContractFactory("MockIporToken");
-        const iporToken = (await IporToken.deploy(
+        const StakedToken = await ethers.getContractFactory("MockStakedToken");
+        const stakedToken = (await StakedToken.deploy(
             "IPOR Token",
             "IPOR",
             await admin.getAddress()
-        )) as MockIporToken;
-        const PowerIpor = await ethers.getContractFactory("PowerIpor");
-        const powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
+        )) as MockStakedToken;
+        const PowerToken = await ethers.getContractFactory("PowerToken");
+        const powerToken = (await upgrades.deployProxy(PowerToken, [
+            stakedToken.address,
+        ])) as PowerToken;
 
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMiningForTests");
         liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address],
-            powerIpor.address,
-            iporToken.address,
+            powerToken.address,
+            stakedToken.address,
         ])) as LiquidityMiningForTests;
 
-        await liquidityMining.setPowerIpor(await admin.getAddress());
+        await liquidityMining.setPowerToken(await admin.getAddress());
     });
 
     it("Should set up block rewards for lpToken", async () => {
@@ -167,33 +169,33 @@ describe("LiquidityMining Rewards per block", () => {
 
     it("Should stop adding new rewards when rewards per block setup to zero", async () => {
         //    given
-        const ipDai = tokens.lpTokenDai.address;
+        const lpDai = tokens.lpTokenDai.address;
         await tokens.lpTokenDai.mint(await admin.getAddress(), USD_1_000_000_18DEC);
         await tokens.lpTokenDai.approve(liquidityMining.address, USD_1_000_000_18DEC);
 
         await liquidityMining.setRewardsPerBlock(tokens.lpTokenDai.address, N1__0_8DEC);
 
         await network.provider.send("evm_setAutomine", [false]);
-        await liquidityMining.stake(ipDai, N2__0_18DEC);
+        await liquidityMining.stake(lpDai, N2__0_18DEC);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
         const accountRewardsBefore = await liquidityMining.calculateAccountRewards(
             await admin.getAddress(),
-            ipDai
+            lpDai
         );
-        const accruedRewardsBefore = await liquidityMining.calculateAccruedRewards(ipDai);
-        const globalIndicatorsBefore = await liquidityMining.getGlobalIndicators(ipDai);
+        const accruedRewardsBefore = await liquidityMining.calculateAccruedRewards(lpDai);
+        const globalIndicatorsBefore = await liquidityMining.getGlobalIndicators(lpDai);
 
         //    when
-        await liquidityMining.setRewardsPerBlock(ipDai, ZERO);
+        await liquidityMining.setRewardsPerBlock(lpDai, ZERO);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
         //    then
         const accountRewardsAfter = await liquidityMining.calculateAccountRewards(
             await admin.getAddress(),
-            ipDai
+            lpDai
         );
-        const accruedRewardsAfter = await liquidityMining.calculateAccruedRewards(ipDai);
-        const globalIndicatorsAfter = await liquidityMining.getGlobalIndicators(ipDai);
+        const accruedRewardsAfter = await liquidityMining.calculateAccruedRewards(lpDai);
+        const globalIndicatorsAfter = await liquidityMining.getGlobalIndicators(lpDai);
 
         const globalIndicatorsBeforeExtract = extractGlobalIndicators(globalIndicatorsBefore);
         const globalIndicatorsAfterExtract = extractGlobalIndicators(globalIndicatorsAfter);
@@ -217,33 +219,33 @@ describe("LiquidityMining Rewards per block", () => {
 
     it("Should restart grant rewards  when rewards per block setup from zero to one", async () => {
         //    given
-        const ipDai = tokens.lpTokenDai.address;
+        const lpDai = tokens.lpTokenDai.address;
         await tokens.lpTokenDai.mint(await admin.getAddress(), USD_1_000_000_18DEC);
         await tokens.lpTokenDai.approve(liquidityMining.address, USD_1_000_000_18DEC);
 
         await network.provider.send("evm_setAutomine", [false]);
-        await liquidityMining.stake(ipDai, N2__0_18DEC);
+        await liquidityMining.stake(lpDai, N2__0_18DEC);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
-        await liquidityMining.setRewardsPerBlock(ipDai, ZERO);
+        await liquidityMining.setRewardsPerBlock(lpDai, ZERO);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
         const accountRewardsBefore = await liquidityMining.calculateAccountRewards(
             await admin.getAddress(),
-            ipDai
+            lpDai
         );
-        const accruedRewardsBefore = await liquidityMining.calculateAccruedRewards(ipDai);
-        const globalIndicatorsBefore = await liquidityMining.getGlobalIndicators(ipDai);
+        const accruedRewardsBefore = await liquidityMining.calculateAccruedRewards(lpDai);
+        const globalIndicatorsBefore = await liquidityMining.getGlobalIndicators(lpDai);
 
         //    when
-        await liquidityMining.setRewardsPerBlock(ipDai, BigNumber.from("100000000"));
+        await liquidityMining.setRewardsPerBlock(lpDai, BigNumber.from("100000000"));
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
         //    then
         const accountRewardsAfter = await liquidityMining.calculateAccountRewards(
             await admin.getAddress(),
-            ipDai
+            lpDai
         );
-        const accruedRewardsAfter = await liquidityMining.calculateAccruedRewards(ipDai);
-        const globalIndicatorsAfter = await liquidityMining.getGlobalIndicators(ipDai);
+        const accruedRewardsAfter = await liquidityMining.calculateAccruedRewards(lpDai);
+        const globalIndicatorsAfter = await liquidityMining.getGlobalIndicators(lpDai);
         const globalIndicatorsBeforeExtract = extractGlobalIndicators(globalIndicatorsBefore);
         const globalIndicatorsAfterExtract = extractGlobalIndicators(globalIndicatorsAfter);
 

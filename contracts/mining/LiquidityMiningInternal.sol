@@ -12,41 +12,40 @@ import "../libraries/Constants.sol";
 import "../interfaces/types/LiquidityMiningTypes.sol";
 import "../interfaces/ILiquidityMining.sol";
 import "../interfaces/ILiquidityMiningInternal.sol";
-import "../interfaces/IPowerIpor.sol";
-import "../interfaces/IIporToken.sol";
-import "../interfaces/IPowerIporInternal.sol";
-import "../security/IporOwnableUpgradeable.sol";
+import "../interfaces/IPowerToken.sol";
+import "../interfaces/IStakedToken.sol";
+import "../interfaces/IPowerTokenInternal.sol";
+import "../security/MiningOwnableUpgradeable.sol";
 
 abstract contract LiquidityMiningInternal is
     Initializable,
     PausableUpgradeable,
     UUPSUpgradeable,
-    IporOwnableUpgradeable,
+    MiningOwnableUpgradeable,
     ReentrancyGuardUpgradeable,
     ILiquidityMiningInternal
 {
     using SafeCast for uint256;
     using SafeCast for int256;
 
-    bytes32 internal constant _IPOR_TOKEN_ID =
+    bytes32 internal constant _STAKED_TOKEN_ID =
         0xdba05ed67d0251facfcab8345f27ccd3e72b5a1da8cebfabbcccf4316e6d053c;
-    bytes32 internal constant _POWER_IPOR_ID =
+    bytes32 internal constant _POWER_TOKEN_ID =
         0xbd22bf01cb7daed462db61de31bb111aabcdae27adc748450fb9a9ea1c419cce;
 
-    address internal _powerIpor;
+    address internal _powerToken;
     address internal _pauseManager;
 
     mapping(address => bool) internal _lpTokens;
     mapping(address => uint256) internal _allocatedPwTokens;
 
-    //  lpToken (ipUSDT, ipUSDC, ipDAI, etc) address -> global parameters for lpToken
     mapping(address => LiquidityMiningTypes.GlobalRewardsIndicators) internal _globalIndicators;
     //  account address => lpToken address => account params
     mapping(address => mapping(address => LiquidityMiningTypes.AccountRewardsIndicators))
         internal _accountIndicators;
 
-    modifier onlyPowerIpor() {
-        require(_msgSender() == _getPowerIpor(), MiningErrors.CALLER_NOT_POWER_IPOR);
+    modifier onlyPowerToken() {
+        require(_msgSender() == _getPowerToken(), MiningErrors.CALLER_NOT_POWER_TOKEN);
         _;
     }
 
@@ -62,30 +61,30 @@ abstract contract LiquidityMiningInternal is
 
     function initialize(
         address[] calldata lpTokens,
-        address powerIpor,
-        address iporToken
+        address powerToken,
+        address stakedToken
     ) public initializer {
         __Pausable_init_unchained();
         __Ownable_init_unchained();
         __UUPSUpgradeable_init_unchained();
 
-        require(powerIpor != address(0), MiningErrors.WRONG_ADDRESS);
+        require(powerToken != address(0), MiningErrors.WRONG_ADDRESS);
         require(
-            IPowerIpor(powerIpor).getContractId() == _POWER_IPOR_ID,
+            IPowerToken(powerToken).getContractId() == _POWER_TOKEN_ID,
             MiningErrors.WRONG_CONTRACT_ID
         );
-        require(iporToken != address(0), MiningErrors.WRONG_ADDRESS);
+        require(stakedToken != address(0), MiningErrors.WRONG_ADDRESS);
         require(
-            IIporToken(iporToken).getContractId() == _IPOR_TOKEN_ID,
+            IStakedToken(stakedToken).getContractId() == _STAKED_TOKEN_ID,
             MiningErrors.WRONG_CONTRACT_ID
         );
 
         uint256 lpTokensLength = lpTokens.length;
 
-        _powerIpor = powerIpor;
+        _powerToken = powerToken;
         _pauseManager = _msgSender();
 
-        IIporToken(iporToken).approve(powerIpor, Constants.MAX_VALUE);
+        IStakedToken(stakedToken).approve(powerToken, Constants.MAX_VALUE);
 
         for (uint256 i; i != lpTokensLength; ++i) {
             require(lpTokens[i] != address(0), MiningErrors.WRONG_ADDRESS);
@@ -137,7 +136,7 @@ abstract contract LiquidityMiningInternal is
         address account,
         address[] calldata lpTokens,
         uint256[] calldata pwTokenAmounts
-    ) external override onlyPowerIpor whenNotPaused {
+    ) external override onlyPowerToken whenNotPaused {
         uint256 rewards;
         uint256 lpTokensLength = lpTokens.length;
         uint256 rewardsIteration;
@@ -180,7 +179,7 @@ abstract contract LiquidityMiningInternal is
         }
 
         if (rewards > 0) {
-            _transferRewardsToPowerIpor(account, rewards);
+            _transferRewardsToPowerToken(account, rewards);
         }
     }
 
@@ -189,7 +188,7 @@ abstract contract LiquidityMiningInternal is
         address[] calldata lpTokens,
         uint256[] calldata pwTokenAmounts,
         uint256[] calldata lpTokenAmounts
-    ) external override onlyPowerIpor whenNotPaused {
+    ) external override onlyPowerToken whenNotPaused {
         uint256 rewards;
         uint256 lpTokenAmount;
         uint256 pwTokenAmount;
@@ -212,8 +211,9 @@ abstract contract LiquidityMiningInternal is
 
             /// @dev Delegate
             if (accountIndicators.lpTokenBalance == 0 && lpTokenAmount == 0) {
-                _accountIndicators[account][lpTokens[i]].delegatedPwTokenBalance = (accountIndicators
-                    .delegatedPwTokenBalance + pwTokenAmount).toUint96();
+                _accountIndicators[account][lpTokens[i]]
+                    .delegatedPwTokenBalance = (accountIndicators.delegatedPwTokenBalance +
+                    pwTokenAmount).toUint96();
                 emit DelegatePwToken(account, lpTokens[i], pwTokenAmount);
                 continue;
             }
@@ -238,7 +238,7 @@ abstract contract LiquidityMiningInternal is
         }
 
         if (rewards > 0) {
-            _transferRewardsToPowerIpor(account, rewards);
+            _transferRewardsToPowerToken(account, rewards);
         }
     }
 
@@ -246,7 +246,7 @@ abstract contract LiquidityMiningInternal is
         address account,
         address[] calldata lpTokens,
         uint256[] calldata pwTokenAmounts
-    ) external onlyPowerIpor whenNotPaused {
+    ) external onlyPowerToken whenNotPaused {
         uint256 rewards;
         uint256 lpTokensLength = lpTokens.length;
         uint256 rewardsIteration;
@@ -287,16 +287,16 @@ abstract contract LiquidityMiningInternal is
         }
 
         if (rewards > 0) {
-            _transferRewardsToPowerIpor(account, rewards);
+            _transferRewardsToPowerToken(account, rewards);
         }
     }
 
-    function setRewardsPerBlock(address lpToken, uint32 iporTokenAmount)
+    function setRewardsPerBlock(address lpToken, uint32 stakedTokenAmount)
         external
         override
         onlyOwner
     {
-        _setRewardsPerBlock(lpToken, iporTokenAmount);
+        _setRewardsPerBlock(lpToken, stakedTokenAmount);
     }
 
     function addLpTokenAsset(address lpToken) external onlyOwner {
@@ -367,7 +367,7 @@ abstract contract LiquidityMiningInternal is
 
         if (rewards > 0) {
             if (claimRewards) {
-                _transferRewardsToPowerIpor(msgSender, rewards);
+                _transferRewardsToPowerToken(msgSender, rewards);
             } else {
                 _allocatedPwTokens[msgSender] += rewards;
             }
@@ -459,7 +459,7 @@ abstract contract LiquidityMiningInternal is
         );
     }
 
-    function _setRewardsPerBlock(address lpToken, uint32 iporTokenAmount) internal {
+    function _setRewardsPerBlock(address lpToken, uint32 stakedTokenAmount) internal {
         require(_lpTokens[lpToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
 
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[
@@ -488,7 +488,7 @@ abstract contract LiquidityMiningInternal is
         }
 
         uint256 compositeMultiplier = MiningCalculation.calculateCompositeMultiplier(
-            iporTokenAmount,
+            stakedTokenAmount,
             globalIndicators.aggregatedPowerUp
         );
 
@@ -497,20 +497,20 @@ abstract contract LiquidityMiningInternal is
             compositeMultiplier.toUint128(),
             accruedCompositeMultiplierCumulativePrevBlock.toUint128(),
             blockNumber.toUint32(),
-            iporTokenAmount,
+            stakedTokenAmount,
             accruedRewards.toUint88()
         );
 
         emit RewardsPerBlockChanged(
             _msgSender(),
             globalIndicators.rewardsPerBlock,
-            iporTokenAmount
+            stakedTokenAmount
         );
     }
 
-    /// @dev Claim not changes Internal Exchange Rate of Power Ipor Tokens in Power Ipor smart contract.
-    function _transferRewardsToPowerIpor(address account, uint256 rewards) internal {
-        IPowerIporInternal(_getPowerIpor()).receiveRewardsFromLiquidityMining(account, rewards);
+    /// @dev Claim not changes Internal Exchange Rate of Power Tokens in PowerToken smart contract.
+    function _transferRewardsToPowerToken(address account, uint256 rewards) internal {
+        IPowerTokenInternal(_getPowerToken()).receiveRewardsFromLiquidityMining(account, rewards);
     }
 
     /// @notice Gets Horizontal shift param used in Liquidity Mining equastions.
@@ -531,8 +531,8 @@ abstract contract LiquidityMiningInternal is
         return 0x3fff6666666666666666666666666666;
     }
 
-    function _getPowerIpor() internal view returns (address) {
-        return _powerIpor;
+    function _getPowerToken() internal view returns (address) {
+        return _powerToken;
     }
 
     //solhint-disable no-empty-blocks

@@ -4,7 +4,7 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "../libraries/errors/MiningErrors.sol";
 
-contract IporOwnableUpgradeable is OwnableUpgradeable {
+contract MiningOwnableUpgradeable is OwnableUpgradeable {
     address private _appointedOwner;
 
     event AppointedToTransferOwnership(address indexed appointedOwner);

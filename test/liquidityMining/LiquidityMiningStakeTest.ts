@@ -4,7 +4,7 @@ import chai from "chai";
 import { Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { LiquidityMining, MockIporToken } from "../../types";
+import { LiquidityMining, MockStakedToken } from "../../types";
 import { Tokens, getDeployedTokens, extractGlobalIndicators } from "../utils/LiquidityMiningUtils";
 import {
     N1__0_18DEC,
@@ -32,23 +32,25 @@ describe("LiquidityMining Stake", () => {
     });
 
     beforeEach(async () => {
-        const IporToken = await ethers.getContractFactory("MockIporToken");
-        const iporToken = (await IporToken.deploy(
+        const StakedToken = await ethers.getContractFactory("MockStakedToken");
+        const stakedToken = (await StakedToken.deploy(
             "IPOR Token",
             "IPOR",
             await admin.getAddress()
-        )) as MockIporToken;
-        const PowerIpor = await ethers.getContractFactory("PowerIpor");
-        const powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
+        )) as MockStakedToken;
+        const PowerToken = await ethers.getContractFactory("PowerToken");
+        const powerToken = (await upgrades.deployProxy(PowerToken, [
+            stakedToken.address,
+        ])) as PowerToken;
 
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMiningForTests");
         liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address],
-            powerIpor.address,
-            iporToken.address,
+            powerToken.address,
+            stakedToken.address,
         ])) as LiquidityMiningForTests;
 
-        await liquidityMining.setPowerIpor(await admin.getAddress());
+        await liquidityMining.setPowerToken(await admin.getAddress());
 
         tokens.lpTokenDai.approve(liquidityMining.address, TOTAL_SUPPLY_18_DECIMALS);
         tokens.lpTokenDai
@@ -126,7 +128,7 @@ describe("LiquidityMining Stake", () => {
         // when
         await expect(
             liquidityMining.connect(userOne).stake(tokens.lpTokenUsdt.address, N1__0_6DEC)
-        ).to.be.revertedWith("IPOR_701");
+        ).to.be.revertedWith("PT_701");
 
         // then
         const balanceAfter = await liquidityMining.balanceOf(
@@ -169,7 +171,7 @@ describe("LiquidityMining Stake", () => {
         // when
         await expect(
             liquidityMining.connect(userOne).stake(tokens.lpTokenUsdt.address, ZERO)
-        ).to.be.revertedWith("IPOR_717");
+        ).to.be.revertedWith("PT_717");
 
         // then
         const balanceAfter = await liquidityMining.balanceOf(

@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 
 import "../errors/MiningErrors.sol";
 import "../Constants.sol";
-import "./IporMath.sol";
+import "./PowerTokenMath.sol";
 
 /// @title Library which contains core logic used in Liquidity Mining module.
 library MiningCalculation {
@@ -14,7 +14,7 @@ library MiningCalculation {
     using SafeCast for int256;
 
     /// @notice Calculases Power Up Indicator specific for one account.
-    /// @param accountPwTokenAmount account's Power Ipor Tokens amount
+    /// @param accountPwTokenAmount account's Power Tokens amount
     /// @param accountLpTokenAmount account's IP Tokens Amount
     /// @param verticalShift preconfigured param, vertical shift used in equation which calculate account power up indicator
     /// @param horizontalShift preconfigured param, horizontal shift used in equation which calculate account power up indicator
@@ -65,7 +65,7 @@ library MiningCalculation {
         uint256 newApu;
 
         if (apu < 0) {
-            uint256 absApu = IporMath.division((-apu).toUint256(), Constants.D18);
+            uint256 absApu = PowerTokenMath.division((-apu).toUint256(), Constants.D18);
 
             /// @dev last unstake lpTokens we can have rounding error
             if (previousAggregatedPowerUp < absApu && previousAggregatedPowerUp + 10000 >= absApu) {
@@ -79,7 +79,9 @@ library MiningCalculation {
 
             newApu = previousAggregatedPowerUp - absApu;
         } else {
-            newApu = previousAggregatedPowerUp + IporMath.division(apu.toUint256(), Constants.D18);
+            newApu =
+                previousAggregatedPowerUp +
+                PowerTokenMath.division(apu.toUint256(), Constants.D18);
         }
 
         if (newApu < 10000) {
@@ -91,9 +93,9 @@ library MiningCalculation {
     /// @notice Calculates rewards from last rebalancing including block number given as a param.
     /// @param blockNumber blok number for which is executed rewards calculation
     /// @param lastRebalanceBlockNumber blok number when last rewards rebalance was executed
-    /// @param rewardsPerBlock configuration param describes how many Ipor Tokens are rewarded across all participants per one block, represendet in 8 decimals
+    /// @param rewardsPerBlock configuration param describes how many pwTokens are rewarded across all participants per one block, represendet in 8 decimals
     /// @param previousAccruedRewards number of previous cumulated/accrued rewards
-    /// @return new accrued rewards, number of Ipor Tokens (or Power Ipor Tokens because are in relation 1:1 with Ipor Tokens) accrued for given above params
+    /// @return new accrued rewards, number of Staked Tokens (or Power Tokens because are in relation 1:1 with Staked Tokens) accrued for given above params
     function calculateAccruedRewards(
         uint256 blockNumber,
         uint256 lastRebalanceBlockNumber,
@@ -111,7 +113,7 @@ library MiningCalculation {
     }
 
     /// @notice Calculates Composite Multiplier Indicator
-    /// @param rewardsPerBlock config param, number of Ipor Tokens (or Power Ipor Tokens because in 1:1 relation with Ipor Tokens) rewardes across all participants in one block, represented in 8 decimals
+    /// @param rewardsPerBlock config param, number of Staked Tokens (or Power Tokens because in 1:1 relation with Staked Tokens) rewardes across all participants in one block, represented in 8 decimals
     /// @param aggregatedPowerUp Aggregated Power Up indicator, represented in 18 decimals
     /// @return composite multiplier, value represented in 27 decimals
     function calculateCompositeMultiplier(uint256 rewardsPerBlock, uint256 aggregatedPowerUp)
@@ -124,16 +126,19 @@ library MiningCalculation {
         }
         /// @dev decimals: 8 + 18 + 19 - 18 = 27
         return
-            IporMath.division(rewardsPerBlock * Constants.D18 * Constants.D19, aggregatedPowerUp);
+            PowerTokenMath.division(
+                rewardsPerBlock * Constants.D18 * Constants.D19,
+                aggregatedPowerUp
+            );
     }
 
-    /// @notice calculates account rewards represented in Ipor Tokens
-    /// @dev Account rewards can be also interpreted as a value in Power Ipor Tokens, because ration between Ipor Tokens and Power Ipor Tokens is 1:1.
+    /// @notice calculates account rewards represented in pwTokens
+    /// @dev Account rewards can be also interpreted as a value in Power Tokens, because ration between Staked Tokens and Power Tokens is 1:1.
     /// @param accountLpTokenAmount amount of lpToken for a given account
     /// @param accountPowerUp value of powerUp indicator for a given account
     /// @param accountCompMultiplierCumulativePrevBlock Account Composite Multiplier Cumulative for a Previous Block, value from last Account Indicator update of param Composite Multiplier Cumulative for a given account
     /// @param accruedCompMultiplierCumulativePrevBlock Accrued Composite Multiplier Cumulative for a Previous Block, accrued value (in a current block) of param Composite Multiplier Cumulative global
-    /// @return rewards, amount of Ipor Tokens (or Power Ipor Tokens because are in 1:1 relation with Ipor Tokens), represented in 18 decimals
+    /// @return rewards, amount of Staked Tokens (or Power Tokens because are in 1:1 relation with Staked Tokens), represented in 18 decimals
     function calculateAccountRewards(
         uint256 accountLpTokenAmount,
         uint256 accountPowerUp,
@@ -145,12 +150,12 @@ library MiningCalculation {
             MiningErrors.ACCOUNT_COMPOSITE_MULTIPLIER_GT_COMPOSITE_MULTIPLIER
         );
 
-        uint256 accountIporTokenRewards = accountLpTokenAmount *
+        uint256 accountStakedTokenRewards = accountLpTokenAmount *
             accountPowerUp *
             (accruedCompMultiplierCumulativePrevBlock - accountCompMultiplierCumulativePrevBlock);
 
         /// @dev decimals: 18 + 18 + 27 - 45 =  18
-        return IporMath.division(accountIporTokenRewards, Constants.D45);
+        return PowerTokenMath.division(accountStakedTokenRewards, Constants.D45);
     }
 
     /// @notice Calculates accrued Composite Multiplier Cumulative for a previous block

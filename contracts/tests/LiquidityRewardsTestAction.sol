@@ -59,15 +59,19 @@ contract LiquidityRewardsTestAction {
         return LiquidityRewardsAgent(account).delegatedToLiquidityMiningBalanceOf(account);
     }
 
-    function stakeIporToken(address[] memory accounts, uint256[] memory iporTokenAmounts) external {
+    function stakeStakedToken(address[] memory accounts, uint256[] memory stakedTokenAmounts)
+        external
+    {
         for (uint256 i; i != accounts.length; ++i) {
-            LiquidityRewardsAgent(accounts[i]).stakeIporToken(iporTokenAmounts[i]);
+            LiquidityRewardsAgent(accounts[i]).stakeStakedToken(stakedTokenAmounts[i]);
         }
     }
 
-    function unstakePwToken(address[] memory accounts, uint256[] memory iporTokenAmounts) external {
+    function unstakePwToken(address[] memory accounts, uint256[] memory stakedTokenAmounts)
+        external
+    {
         for (uint256 i; i != accounts.length; ++i) {
-            LiquidityRewardsAgent(accounts[i]).unstakePwToken(iporTokenAmounts[i]);
+            LiquidityRewardsAgent(accounts[i]).unstakePwToken(stakedTokenAmounts[i]);
         }
     }
 
@@ -93,25 +97,25 @@ contract LiquidityRewardsTestAction {
 
     //  Test action
 
-    function depositAndWithdrawIporTokensAndLpToken(
+    function depositAndWithdrawStakedTokensAndLpToken(
         address account,
         address[] memory lpTokens,
-        uint256[] memory iporTokenAmounts,
+        uint256[] memory stakedTokenAmounts,
         uint256[] memory lpTokenAmounts
     ) external {
-        LiquidityRewardsAgent(account).delegatePwToken(lpTokens, iporTokenAmounts);
+        LiquidityRewardsAgent(account).delegatePwToken(lpTokens, stakedTokenAmounts);
         LiquidityRewardsAgent(account).stakeLpToken(lpTokens[0], lpTokenAmounts[0]);
-        LiquidityRewardsAgent(account).undelegatePwToken(lpTokens, iporTokenAmounts);
+        LiquidityRewardsAgent(account).undelegatePwToken(lpTokens, stakedTokenAmounts);
         LiquidityRewardsAgent(account).unstakeLpToken(lpTokens[0], lpTokenAmounts[0]);
     }
 
-    function depositIporTokensAndLpToken(
+    function depositStakedTokensAndLpToken(
         address account,
         address[] memory lpTokens,
-        uint256[] memory iporTokenAmounts,
+        uint256[] memory stakedTokenAmounts,
         uint256[] memory lpTokenAmounts
     ) external {
-        LiquidityRewardsAgent(account).delegatePwToken(lpTokens, iporTokenAmounts);
+        LiquidityRewardsAgent(account).delegatePwToken(lpTokens, stakedTokenAmounts);
         LiquidityRewardsAgent(account).stakeLpToken(lpTokens[0], lpTokenAmounts[0]);
     }
 }

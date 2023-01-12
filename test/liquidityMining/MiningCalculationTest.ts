@@ -121,7 +121,7 @@ describe("LiquidityMining Stake and balance", () => {
         expect(result).to.be.equal(BigNumber.from("1400000000000000000"));
     });
 
-    it("Should throw IPOR_711 - aggregate power up is negative", async () => {
+    it("Should throw PT_711 - aggregate power up is negative", async () => {
         //given
         const accountPowerUp = BigNumber.from("900").mul(N1__0_18DEC);
         const accountLpTokenAmount = BigNumber.from("1").mul(N1__0_18DEC);
@@ -138,10 +138,10 @@ describe("LiquidityMining Stake and balance", () => {
                 previousAccountLpTokenAmount,
                 previousAggregatedPowerUp
             )
-        ).to.be.revertedWith("IPOR_711");
+        ).to.be.revertedWith("PT_711");
     });
 
-    it("Should throw IPOR_712 - block number lower than previous block number", async () => {
+    it("Should throw PT_712 - block number lower than previous block number", async () => {
         //given
         const blockNumber = BigNumber.from("900").mul(N1__0_18DEC);
         const lastRebalanceBlockNumber = BigNumber.from("1000").mul(N1__0_18DEC);
@@ -156,10 +156,10 @@ describe("LiquidityMining Stake and balance", () => {
                 rewardsPerBlock,
                 previousAccruedRewards
             )
-        ).to.be.revertedWith("IPOR_712");
+        ).to.be.revertedWith("PT_712");
     });
 
-    it("Should throw IPOR_713 - composite multiplier lower than account composite multiplier ", async () => {
+    it("Should throw PT_713 - composite multiplier lower than account composite multiplier ", async () => {
         //given
         const accountLpTokenAmount = BigNumber.from("1000").mul(N1__0_18DEC);
         const accountPowerUp = BigNumber.from("1000").mul(N1__0_18DEC);
@@ -175,7 +175,7 @@ describe("LiquidityMining Stake and balance", () => {
                 accountCompositeMultiplierCumulativePrevBlock,
                 compositeMultiplierCumulativePrevBlock
             )
-        ).to.be.revertedWith("IPOR_713");
+        ).to.be.revertedWith("PT_713");
     });
 
     it("Should not calculate any rewards when IP Token amount = 0", async () => {
