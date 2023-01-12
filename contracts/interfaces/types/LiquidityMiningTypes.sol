@@ -7,7 +7,7 @@ library LiquidityMiningTypes {
     struct DelegatedPwTokenBalance {
         /// @notice lpToken address
         address lpToken;
-        /// @notice amount of Power Ipor Token which was delegated for given lpToken
+        /// @notice amount of Power Token which was delegated for given lpToken
         /// @dev value represented in 18 decimals
         uint256 pwTokenAmount;
     }
@@ -45,7 +45,7 @@ library LiquidityMiningTypes {
         /// parameter used to recalculate composite multiplier.
         /// @dev  powerUp < 100 *10^18
         uint72 powerUp;
-        /// @notice balance of Power Ipor Tokens which are delegated to LiquidityMining
+        /// @notice balance of Power Tokens which are delegated to LiquidityMining
         /// @dev delegatedPwTokenBalance < 10^26 < 2^87
         uint96 delegatedPwTokenBalance;
     }

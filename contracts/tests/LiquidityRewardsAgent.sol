@@ -2,22 +2,22 @@
 pragma solidity 0.8.17;
 
 import "../mining/LiquidityMining.sol";
-import "../tokens/PowerIpor.sol";
+import "../tokens/PowerToken.sol";
 
 contract LiquidityRewardsAgent {
     LiquidityMining private _liquidityMining;
-    PowerIpor private _powerIpor;
+    PowerToken private _powerToken;
 
     constructor(
-        address powerIpor,
+        address powerToken,
         address liquidityMining,
         address lpToken,
-        address iporToken
+        address stakedToken
     ) {
         _liquidityMining = LiquidityMining(liquidityMining);
-        _powerIpor = PowerIpor(powerIpor);
+        _powerToken = PowerToken(powerToken);
         IERC20(lpToken).approve(liquidityMining, Constants.MAX_VALUE);
-        IERC20(iporToken).approve(powerIpor, Constants.MAX_VALUE);
+        IERC20(stakedToken).approve(powerToken, Constants.MAX_VALUE);
     }
 
     //    interact with LiquidityMining
@@ -59,26 +59,26 @@ contract LiquidityRewardsAgent {
     }
 
     function delegatedToLiquidityMiningBalanceOf(address account) external view returns (uint256) {
-        return _powerIpor.delegatedToLiquidityMiningBalanceOf(account);
+        return _powerToken.delegatedToLiquidityMiningBalanceOf(account);
     }
 
-    function stakeIporToken(uint256 iporTokenAmount) external {
-        _powerIpor.stake(iporTokenAmount);
+    function stakeStakedToken(uint256 pwTokenAmount) external {
+        _powerToken.stake(pwTokenAmount);
     }
 
     function unstakePwToken(uint256 pwTokenAmount) external {
-        _powerIpor.unstake(pwTokenAmount);
+        _powerToken.unstake(pwTokenAmount);
     }
 
     function delegatePwToken(address[] calldata lpTokens, uint256[] calldata pwTokenAmounts)
         external
     {
-        _powerIpor.delegateToLiquidityMining(lpTokens, pwTokenAmounts);
+        _powerToken.delegateToLiquidityMining(lpTokens, pwTokenAmounts);
     }
 
     function undelegatePwToken(address[] calldata lpTokens, uint256[] calldata pwTokenAmounts)
         external
     {
-        _powerIpor.undelegateFromLiquidityMining(lpTokens, pwTokenAmounts);
+        _powerToken.undelegateFromLiquidityMining(lpTokens, pwTokenAmounts);
     }
 }

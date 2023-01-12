@@ -3,8 +3,8 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-/// @title Interface of IporToken.
-interface IIporToken is IERC20 {
+/// @title Interface of Staked Token.
+interface IStakedToken is IERC20 {
     /**
      * @dev Contract id.
      * This is the keccak-256 hash of "io.ipor.IporToken" subtracted by 1

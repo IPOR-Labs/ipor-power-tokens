@@ -4,7 +4,7 @@ import chai from "chai";
 import { BigNumber, Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { LiquidityMining, MockIporToken, PowerIpor } from "../../types";
+import { LiquidityMining, MockStakedToken, PowerToken } from "../../types";
 import {
     Tokens,
     getDeployedTokens,
@@ -28,8 +28,8 @@ describe("LiquidityMining sum of rewards", () => {
     let tokens: Tokens;
     let liquidityMining: LiquidityMining;
     let admin: Signer, userOne: Signer, userTwo: Signer, userThree: Signer;
-    let iporToken: MockIporToken;
-    let powerIpor: PowerIpor;
+    let stakedToken: MockStakedToken;
+    let powerToken: PowerToken;
 
     before(async () => {
         [admin, userOne, userTwo, userThree] = await hre.ethers.getSigners();
@@ -38,20 +38,20 @@ describe("LiquidityMining sum of rewards", () => {
     });
 
     beforeEach(async () => {
-        const IporToken = await hre.ethers.getContractFactory("MockIporToken");
-        iporToken = (await IporToken.deploy(
+        const StakedToken = await hre.ethers.getContractFactory("MockStakedToken");
+        stakedToken = (await StakedToken.deploy(
             "IPOR Token",
             "IPOR",
             await admin.getAddress()
-        )) as MockIporToken;
-        const PowerIpor = await hre.ethers.getContractFactory("PowerIpor");
-        powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
+        )) as MockStakedToken;
+        const PowerToken = await hre.ethers.getContractFactory("PowerToken");
+        powerToken = (await upgrades.deployProxy(PowerToken, [stakedToken.address])) as PowerToken;
 
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
         liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address],
-            powerIpor.address,
-            iporToken.address,
+            powerToken.address,
+            stakedToken.address,
         ])) as LiquidityMining;
 
         await liquidityMining.setRewardsPerBlock(tokens.lpTokenDai.address, N1__0_8DEC);
@@ -82,45 +82,43 @@ describe("LiquidityMining sum of rewards", () => {
             .connect(userTwo)
             .approve(liquidityMining.address, TOTAL_SUPPLY_6_DECIMALS);
 
-        await iporToken.approve(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
-        await iporToken.connect(userOne).approve(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
+        await stakedToken.approve(powerToken.address, TOTAL_SUPPLY_18_DECIMALS);
+        await stakedToken.connect(userOne).approve(powerToken.address, TOTAL_SUPPLY_18_DECIMALS);
 
-        await iporToken.connect(userTwo).approve(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
-        await iporToken.transfer(
+        await stakedToken.connect(userTwo).approve(powerToken.address, TOTAL_SUPPLY_18_DECIMALS);
+        await stakedToken.transfer(
             await userOne.getAddress(),
             N1__0_18DEC.mul(BigNumber.from("10000"))
         );
-        await iporToken.transfer(
+        await stakedToken.transfer(
             await userTwo.getAddress(),
             N1__0_18DEC.mul(BigNumber.from("10000"))
         );
-        await iporToken.transfer(
+        await stakedToken.transfer(
             liquidityMining.address,
             N1__0_18DEC.mul(BigNumber.from("100000"))
         );
-        await powerIpor.setLiquidityMining(liquidityMining.address);
+        await powerToken.setLiquidityMining(liquidityMining.address);
     });
 
     it("Should not claim when no stake lpTokens", async () => {
         //    given
         //    when
-        await expect(liquidityMining.claim(tokens.lpTokenDai.address)).to.be.revertedWith(
-            "IPOR_709"
-        );
+        await expect(liquidityMining.claim(tokens.lpTokenDai.address)).to.be.revertedWith("PT_709");
     });
 
     it("Should unstake all lpTokens", async () => {
         //    given
-        const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
+        const delegatedStakedToken = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedLpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
 
-        await powerIpor.connect(userOne).stake(delegatedIporToken);
+        await powerToken.connect(userOne).stake(delegatedStakedToken);
 
-        await powerIpor
+        await powerToken
             .connect(userOne)
-            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedIporToken]);
+            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedStakedToken]);
 
-        const pwTokenBalanceBefore = await powerIpor
+        const pwTokenBalanceBefore = await powerToken
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
@@ -148,7 +146,7 @@ describe("LiquidityMining sum of rewards", () => {
         );
         const lpTokenBalanceAfter = await tokens.lpTokenDai.balanceOf(await userOne.getAddress());
 
-        const pwTokenBalanceAfter = await powerIpor
+        const pwTokenBalanceAfter = await powerToken
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
@@ -194,36 +192,36 @@ describe("LiquidityMining sum of rewards", () => {
 
     it("Should unstake 3 users", async () => {
         //    given
-        const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
+        const delegatedStakedToken = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedLpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
 
         const liquidityMiningIpDaiBalanceBefore = await tokens.lpTokenDai.balanceOf(
             liquidityMining.address
         );
-        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+        const powerTokenStakedTokenBalanceBefore = await stakedToken.balanceOf(powerToken.address);
 
         // Admin
-        await powerIpor.stake(delegatedIporToken);
-        await powerIpor.delegateToLiquidityMining(
+        await powerToken.stake(delegatedStakedToken);
+        await powerToken.delegateToLiquidityMining(
             [tokens.lpTokenDai.address],
-            [delegatedIporToken]
+            [delegatedStakedToken]
         );
         await liquidityMining.stake(tokens.lpTokenDai.address, stakedLpTokens);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
         // UserOne
-        await powerIpor.connect(userOne).stake(delegatedIporToken);
-        await powerIpor
+        await powerToken.connect(userOne).stake(delegatedStakedToken);
+        await powerToken
             .connect(userOne)
-            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedIporToken]);
+            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedStakedToken]);
         await liquidityMining.connect(userOne).stake(tokens.lpTokenDai.address, stakedLpTokens);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
         // UserTwo
-        await powerIpor.connect(userTwo).stake(delegatedIporToken);
-        await powerIpor
+        await powerToken.connect(userTwo).stake(delegatedStakedToken);
+        await powerToken
             .connect(userTwo)
-            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedIporToken]);
+            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedStakedToken]);
         await liquidityMining.connect(userTwo).stake(tokens.lpTokenDai.address, stakedLpTokens);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
@@ -238,7 +236,7 @@ describe("LiquidityMining sum of rewards", () => {
         const liquidityMiningIpDaiBalanceAfter = await tokens.lpTokenDai.balanceOf(
             liquidityMining.address
         );
-        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+        const powerTokenStakedTokenBalanceAfter = await stakedToken.balanceOf(powerToken.address);
 
         expectGlobalIndicators(
             extractGlobalIndicators(globalIndicatorsAfter),
@@ -265,43 +263,43 @@ describe("LiquidityMining sum of rewards", () => {
         expect(rewardsAdmin.add(rewardsUserOne).add(rewardsUserTwo)).to.be.equal(ZERO);
 
         expect(liquidityMiningIpDaiBalanceAfter).to.be.equal(liquidityMiningIpDaiBalanceBefore);
-        expect(powerIporIporTokenBalanceAfter).to.be.equal(
-            powerIporIporTokenBalanceBefore.add(BigNumber.from("609000000000000000001"))
+        expect(powerTokenStakedTokenBalanceAfter).to.be.equal(
+            powerTokenStakedTokenBalanceBefore.add(BigNumber.from("609000000000000000001"))
         );
     });
 
     it("Should unstake 3 users - DAI is not supported before unstake", async () => {
         //    given
-        const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
+        const delegatedStakedToken = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedLpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
 
         const liquidityMiningIpDaiBalanceBefore = await tokens.lpTokenDai.balanceOf(
             liquidityMining.address
         );
-        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+        const powerTokenStakedTokenBalanceBefore = await stakedToken.balanceOf(powerToken.address);
 
         // Admin
-        await powerIpor.stake(delegatedIporToken);
-        await powerIpor.delegateToLiquidityMining(
+        await powerToken.stake(delegatedStakedToken);
+        await powerToken.delegateToLiquidityMining(
             [tokens.lpTokenDai.address],
-            [delegatedIporToken]
+            [delegatedStakedToken]
         );
         await liquidityMining.stake(tokens.lpTokenDai.address, stakedLpTokens);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
         // UserOne
-        await powerIpor.connect(userOne).stake(delegatedIporToken);
-        await powerIpor
+        await powerToken.connect(userOne).stake(delegatedStakedToken);
+        await powerToken
             .connect(userOne)
-            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedIporToken]);
+            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedStakedToken]);
         await liquidityMining.connect(userOne).stake(tokens.lpTokenDai.address, stakedLpTokens);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
         // UserTwo
-        await powerIpor.connect(userTwo).stake(delegatedIporToken);
-        await powerIpor
+        await powerToken.connect(userTwo).stake(delegatedStakedToken);
+        await powerToken
             .connect(userTwo)
-            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedIporToken]);
+            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedStakedToken]);
         await liquidityMining.connect(userTwo).stake(tokens.lpTokenDai.address, stakedLpTokens);
         await hre.network.provider.send("hardhat_mine", ["0x64"]);
 
@@ -320,7 +318,7 @@ describe("LiquidityMining sum of rewards", () => {
         const liquidityMiningIpDaiBalanceAfter = await tokens.lpTokenDai.balanceOf(
             liquidityMining.address
         );
-        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+        const powerTokenStakedTokenBalanceAfter = await stakedToken.balanceOf(powerToken.address);
 
         expectGlobalIndicators(
             extractGlobalIndicators(globalIndicatorsAfter),
@@ -347,26 +345,26 @@ describe("LiquidityMining sum of rewards", () => {
         expect(rewardsAdmin.add(rewardsUserOne).add(rewardsUserTwo)).to.be.equal(ZERO);
 
         expect(liquidityMiningIpDaiBalanceAfter).to.be.equal(liquidityMiningIpDaiBalanceBefore);
-        expect(powerIporIporTokenBalanceAfter).to.be.equal(
-            powerIporIporTokenBalanceBefore.add(BigNumber.from("607000000000000000001"))
+        expect(powerTokenStakedTokenBalanceAfter).to.be.equal(
+            powerTokenStakedTokenBalanceBefore.add(BigNumber.from("607000000000000000001"))
         );
     });
 
     it("Should aggregate powerUp be equal zero", async () => {
         //    given
-        const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
+        const delegatedStakedToken = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedLpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
 
         const liquidityMiningIpDaiBalanceBefore = await tokens.lpTokenDai.balanceOf(
             liquidityMining.address
         );
-        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+        const powerTokenStakedTokenBalanceBefore = await stakedToken.balanceOf(powerToken.address);
 
         // Admin
-        await powerIpor.stake(delegatedIporToken);
-        await powerIpor.delegateToLiquidityMining(
+        await powerToken.stake(delegatedStakedToken);
+        await powerToken.delegateToLiquidityMining(
             [tokens.lpTokenDai.address],
-            [delegatedIporToken]
+            [delegatedStakedToken]
         );
         await liquidityMining.stake(
             tokens.lpTokenDai.address,
@@ -385,10 +383,10 @@ describe("LiquidityMining sum of rewards", () => {
         await hre.network.provider.send("hardhat_mine", ["0x20"]);
 
         // UserOne
-        await powerIpor.connect(userOne).stake(delegatedIporToken);
-        await powerIpor
+        await powerToken.connect(userOne).stake(delegatedStakedToken);
+        await powerToken
             .connect(userOne)
-            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedIporToken]);
+            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedStakedToken]);
         await liquidityMining
             .connect(userOne)
             .stake(tokens.lpTokenDai.address, N1__0_18DEC.mul(BigNumber.from("100")));
@@ -404,10 +402,10 @@ describe("LiquidityMining sum of rewards", () => {
         await hre.network.provider.send("hardhat_mine", ["0x20"]);
 
         // UserTwo
-        await powerIpor.connect(userTwo).stake(delegatedIporToken);
-        await powerIpor
+        await powerToken.connect(userTwo).stake(delegatedStakedToken);
+        await powerToken
             .connect(userTwo)
-            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedIporToken]);
+            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedStakedToken]);
         await liquidityMining
             .connect(userTwo)
             .stake(tokens.lpTokenDai.address, N1__0_18DEC.mul(BigNumber.from("60")));
@@ -450,36 +448,36 @@ describe("LiquidityMining sum of rewards", () => {
         const liquidityMiningIpDaiBalanceAfter = await tokens.lpTokenDai.balanceOf(
             liquidityMining.address
         );
-        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+        const powerTokenStakedTokenBalanceAfter = await stakedToken.balanceOf(powerToken.address);
         const globalIndicatorsAfter = await liquidityMining.getGlobalIndicators(
             tokens.lpTokenDai.address
         );
         expect(extractGlobalIndicators(globalIndicatorsAfter).aggregatedPowerUp).to.be.equal(ZERO);
         expect(liquidityMiningIpDaiBalanceAfter).to.be.equal(liquidityMiningIpDaiBalanceBefore);
-        expect(powerIporIporTokenBalanceAfter).to.be.equal(
-            powerIporIporTokenBalanceBefore.add(BigNumber.from("813000000000000000001"))
+        expect(powerTokenStakedTokenBalanceAfter).to.be.equal(
+            powerTokenStakedTokenBalanceBefore.add(BigNumber.from("813000000000000000001"))
         );
     });
 
     it("Should not add rewards when no lpToken was stake", async () => {
         //    given
-        const delegatedIporToken = N1__0_18DEC.mul(BigNumber.from("100"));
+        const delegatedStakedToken = N1__0_18DEC.mul(BigNumber.from("100"));
         const stakedLpTokens = N1__0_18DEC.mul(BigNumber.from("100"));
 
         const liquidityMiningIpDaiBalanceBefore = await tokens.lpTokenDai.balanceOf(
             liquidityMining.address
         );
-        const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
+        const powerTokenStakedTokenBalanceBefore = await stakedToken.balanceOf(powerToken.address);
 
         const accruedRewardsBefore = await liquidityMining.calculateAccruedRewards(
             tokens.lpTokenDai.address
         );
-        await powerIpor.connect(userOne).stake(delegatedIporToken);
-        await powerIpor
+        await powerToken.connect(userOne).stake(delegatedStakedToken);
+        await powerToken
             .connect(userOne)
-            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedIporToken]);
+            .delegateToLiquidityMining([tokens.lpTokenDai.address], [delegatedStakedToken]);
 
-        const pwTokenBalanceBefore = await powerIpor
+        const pwTokenBalanceBefore = await powerToken
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
@@ -490,7 +488,7 @@ describe("LiquidityMining sum of rewards", () => {
         const accruedRewardsAfter1Unstake = await liquidityMining.calculateAccruedRewards(
             tokens.lpTokenDai.address
         );
-        const pwTokenBalanceAfter1Unstake = await powerIpor
+        const pwTokenBalanceAfter1Unstake = await powerToken
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
@@ -514,12 +512,12 @@ describe("LiquidityMining sum of rewards", () => {
         const liquidityMiningIpDaiBalanceAfter = await tokens.lpTokenDai.balanceOf(
             liquidityMining.address
         );
-        const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
+        const powerTokenStakedTokenBalanceAfter = await stakedToken.balanceOf(powerToken.address);
         const accountRewardsAfter = await liquidityMining.calculateAccountRewards(
             await admin.getAddress(),
             tokens.lpTokenDai.address
         );
-        const pwTokenBalanceAfter = await powerIpor
+        const pwTokenBalanceAfter = await powerToken
             .connect(userOne)
             .balanceOf(await userOne.getAddress());
 
@@ -538,8 +536,8 @@ describe("LiquidityMining sum of rewards", () => {
         expect(pwTokenBalanceAfter).to.be.equal(BigNumber.from("302000000000000000000"));
         expect(accountRewardsAfter).to.be.equal(ZERO);
         expect(liquidityMiningIpDaiBalanceAfter).to.be.equal(liquidityMiningIpDaiBalanceBefore);
-        expect(powerIporIporTokenBalanceAfter).to.be.equal(
-            powerIporIporTokenBalanceBefore.add(BigNumber.from("302").mul(N1__0_18DEC))
+        expect(powerTokenStakedTokenBalanceAfter).to.be.equal(
+            powerTokenStakedTokenBalanceBefore.add(BigNumber.from("302").mul(N1__0_18DEC))
         );
     });
 });

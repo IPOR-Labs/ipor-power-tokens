@@ -4,7 +4,7 @@ import chai from "chai";
 import { Signer } from "ethers";
 
 import { solidity } from "ethereum-waffle";
-import { LiquidityMining, MockIporToken, PowerIpor } from "../../types";
+import { LiquidityMining, MockStakedToken, PowerToken } from "../../types";
 import { Tokens, getDeployedTokens } from "../utils/LiquidityMiningUtils";
 
 chai.use(solidity);
@@ -15,20 +15,20 @@ const randomAddress = "0x0B54FA10558caBBdd0D6df5b8667913C43567Bc5";
 describe("LiquidityMining configuration, deploy tests", () => {
     let tokens: Tokens;
     let accounts: Signer[];
-    let iporToken: MockIporToken;
-    let powerIpor: PowerIpor;
+    let stakedToken: MockStakedToken;
+    let powerToken: PowerToken;
 
     before(async () => {
         accounts = await hre.ethers.getSigners();
         tokens = await getDeployedTokens(accounts);
-        const IporToken = await ethers.getContractFactory("MockIporToken");
-        iporToken = (await IporToken.deploy(
+        const StakedToken = await ethers.getContractFactory("MockStakedToken");
+        stakedToken = (await StakedToken.deploy(
             "IPOR Token",
             "IPOR",
             await accounts[0].getAddress()
-        )) as MockIporToken;
-        const PowerIpor = await ethers.getContractFactory("PowerIpor");
-        powerIpor = (await upgrades.deployProxy(PowerIpor, [iporToken.address])) as PowerIpor;
+        )) as MockStakedToken;
+        const PowerToken = await ethers.getContractFactory("PowerToken");
+        powerToken = (await upgrades.deployProxy(PowerToken, [stakedToken.address])) as PowerToken;
     });
 
     it("Should deploy contract without assets", async () => {
@@ -37,8 +37,8 @@ describe("LiquidityMining configuration, deploy tests", () => {
         // when
         const liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [],
-            powerIpor.address,
-            iporToken.address,
+            powerToken.address,
+            stakedToken.address,
         ])) as LiquidityMining;
         // then
         expect(liquidityMining.address).to.be.not.undefined;
@@ -46,7 +46,7 @@ describe("LiquidityMining configuration, deploy tests", () => {
         expect(liquidityMining.address).to.be.not.equal("");
     });
 
-    it("Should not be able to deploy contract when Power Ipor Token address is zero", async () => {
+    it("Should not be able to deploy contract when Power Token address is zero", async () => {
         // given
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
 
@@ -55,29 +55,29 @@ describe("LiquidityMining configuration, deploy tests", () => {
             upgrades.deployProxy(LiquidityMining, [
                 [],
                 "0x0000000000000000000000000000000000000000",
-                iporToken.address,
+                stakedToken.address,
             ])
-        ).to.be.revertedWith("IPOR_715");
+        ).to.be.revertedWith("PT_715");
     });
 
-    it("Should not be able to deploy contract when address is not powerIpor", async () => {
+    it("Should not be able to deploy contract when address is not powerToken", async () => {
         // given
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
 
         // when
         await expect(
-            upgrades.deployProxy(LiquidityMining, [[], iporToken.address, iporToken.address])
-        ).to.be.revertedWith("IPOR_716");
+            upgrades.deployProxy(LiquidityMining, [[], stakedToken.address, stakedToken.address])
+        ).to.be.revertedWith("PT_716");
     });
 
-    it("Should not be able to deploy contract when address is not iporToken", async () => {
+    it("Should not be able to deploy contract when address is not stakedToken", async () => {
         // given
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
 
         // when
         await expect(
-            upgrades.deployProxy(LiquidityMining, [[], powerIpor.address, powerIpor.address])
-        ).to.be.revertedWith("IPOR_716");
+            upgrades.deployProxy(LiquidityMining, [[], powerToken.address, powerToken.address])
+        ).to.be.revertedWith("PT_716");
     });
 
     it("Should deploy contract with 3 assets", async () => {
@@ -87,8 +87,8 @@ describe("LiquidityMining configuration, deploy tests", () => {
         // when
         const liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address],
-            powerIpor.address,
-            iporToken.address,
+            powerToken.address,
+            stakedToken.address,
         ])) as LiquidityMining;
 
         // then
@@ -108,8 +108,8 @@ describe("LiquidityMining configuration, deploy tests", () => {
         // when
         const liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [tokens.lpTokenDai.address],
-            powerIpor.address,
-            iporToken.address,
+            powerToken.address,
+            stakedToken.address,
         ])) as LiquidityMining;
 
         // then
@@ -127,8 +127,8 @@ describe("LiquidityMining configuration, deploy tests", () => {
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
         const liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [],
-            powerIpor.address,
-            iporToken.address,
+            powerToken.address,
+            stakedToken.address,
         ])) as LiquidityMining;
         const isDaiActiveBefore = await liquidityMining.isLpTokenSupported(
             tokens.lpTokenDai.address
@@ -169,8 +169,8 @@ describe("LiquidityMining configuration, deploy tests", () => {
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
         const liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [],
-            powerIpor.address,
-            iporToken.address,
+            powerToken.address,
+            stakedToken.address,
         ])) as LiquidityMining;
         const [_, userOne] = accounts;
 
@@ -187,8 +187,8 @@ describe("LiquidityMining configuration, deploy tests", () => {
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
         const liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [],
-            powerIpor.address,
-            iporToken.address,
+            powerToken.address,
+            stakedToken.address,
         ])) as LiquidityMining;
 
         const [admin, userOne] = accounts;
@@ -210,8 +210,8 @@ describe("LiquidityMining configuration, deploy tests", () => {
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
         const liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [],
-            powerIpor.address,
-            iporToken.address,
+            powerToken.address,
+            stakedToken.address,
         ])) as LiquidityMining;
 
         const [_, userOne] = accounts;
@@ -229,8 +229,8 @@ describe("LiquidityMining configuration, deploy tests", () => {
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
         const liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [],
-            powerIpor.address,
-            iporToken.address,
+            powerToken.address,
+            stakedToken.address,
         ])) as LiquidityMining;
 
         const isPausedBefore = await liquidityMining.paused();
@@ -251,8 +251,8 @@ describe("LiquidityMining configuration, deploy tests", () => {
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
         const liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [],
-            powerIpor.address,
-            iporToken.address,
+            powerToken.address,
+            stakedToken.address,
         ])) as LiquidityMining;
 
         const isPausedBefore = await liquidityMining.paused();
@@ -278,15 +278,15 @@ describe("LiquidityMining configuration, deploy tests", () => {
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
         const liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [],
-            powerIpor.address,
-            iporToken.address,
+            powerToken.address,
+            stakedToken.address,
         ])) as LiquidityMining;
 
         const [_, userOne] = accounts;
         const isPausedBefore = await liquidityMining.paused();
 
         // when
-        await expect(liquidityMining.connect(userOne).pause()).to.be.revertedWith("IPOR_704");
+        await expect(liquidityMining.connect(userOne).pause()).to.be.revertedWith("PT_704");
 
         // then
         const isPausedAfter = await liquidityMining.paused();
@@ -300,8 +300,8 @@ describe("LiquidityMining configuration, deploy tests", () => {
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
         const liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [],
-            powerIpor.address,
-            iporToken.address,
+            powerToken.address,
+            stakedToken.address,
         ])) as LiquidityMining;
 
         const [_, userOne] = accounts;
@@ -311,7 +311,7 @@ describe("LiquidityMining configuration, deploy tests", () => {
         await liquidityMining.setPauseManager(await userOne.getAddress());
 
         // when
-        await expect(liquidityMining.pause()).to.be.revertedWith("IPOR_704");
+        await expect(liquidityMining.pause()).to.be.revertedWith("PT_704");
 
         // then
         const isPausedAfter = await liquidityMining.paused();
@@ -328,8 +328,8 @@ describe("LiquidityMining configuration, deploy tests", () => {
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
         const liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [],
-            powerIpor.address,
-            iporToken.address,
+            powerToken.address,
+            stakedToken.address,
         ])) as LiquidityMining;
         await liquidityMining.pause();
         const isPausedBefore = await liquidityMining.paused();
@@ -350,8 +350,8 @@ describe("LiquidityMining configuration, deploy tests", () => {
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
         const liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [],
-            powerIpor.address,
-            iporToken.address,
+            powerToken.address,
+            stakedToken.address,
         ])) as LiquidityMining;
         await liquidityMining.pause();
         const isPausedBefore = await liquidityMining.paused();
@@ -378,8 +378,8 @@ describe("LiquidityMining configuration, deploy tests", () => {
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
         const liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [],
-            powerIpor.address,
-            iporToken.address,
+            powerToken.address,
+            stakedToken.address,
         ])) as LiquidityMining;
 
         const [_, userOne] = accounts;
@@ -387,7 +387,7 @@ describe("LiquidityMining configuration, deploy tests", () => {
         const isPausedBefore = await liquidityMining.paused();
 
         // when
-        await expect(liquidityMining.connect(userOne).unpause()).to.be.revertedWith("IPOR_704");
+        await expect(liquidityMining.connect(userOne).unpause()).to.be.revertedWith("PT_704");
 
         // then
         const isPausedAfter = await liquidityMining.paused();
@@ -401,8 +401,8 @@ describe("LiquidityMining configuration, deploy tests", () => {
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
         const liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
             [],
-            powerIpor.address,
-            iporToken.address,
+            powerToken.address,
+            stakedToken.address,
         ])) as LiquidityMining;
 
         const [_, userOne, userThree] = accounts;
@@ -414,7 +414,7 @@ describe("LiquidityMining configuration, deploy tests", () => {
         await liquidityMining.setPauseManager(await userThree.getAddress());
 
         // when
-        await expect(liquidityMining.unpause()).to.be.revertedWith("IPOR_704");
+        await expect(liquidityMining.unpause()).to.be.revertedWith("PT_704");
 
         // then
         const isPausedAfter = await liquidityMining.paused();

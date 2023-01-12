@@ -1,20 +1,20 @@
-// SPDX-License-Identifier: BSD-3-Clause 
+// SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.17;
 
-import "./types/PowerIporTypes.sol";
+import "./types/PowerTokenTypes.sol";
 
-/// @title Power Ipor smart contract interface
-interface IPowerIporInternal {
-    /// @notice Returns the current version of the Power Ipor smart contract
-    /// @return Current Power Ipor smart contract version
+/// @title PowerToken smart contract interface
+interface IPowerTokenInternal {
+    /// @notice Returns current version of PowerToken smart contract
+    /// @return Current PowerToken smart contract version
     function getVersion() external pure returns (uint256);
 
     /// @notice Gets the total supply base amount
     /// @return total supply base amount, represented in 18 decimals
     function totalSupplyBase() external view returns (uint256);
 
-    /// @notice Calculates internal exchange rate between Ipor Token and total supply of a base amount
-    /// @return Current exchange rate between Ipor Token and the total supply of a base amount, represented in 18 decimals.
+    /// @notice Calculates internal exchange rate between Staked Token and total supply of a base amount
+    /// @return Current exchange rate between Staked Token and the total supply of a base amount, represented in 18 decimals.
     function calculateExchangeRate() external view returns (uint256);
 
     /// @notice Method setup unstake fee
@@ -23,14 +23,14 @@ interface IPowerIporInternal {
 
     /// @notice method allowed to transfer rewards from LiquidityMining contracts to balance of specific account
     /// @param account - address of user who received rewards
-    /// @param iporTokenAmount - amount of rewards, represented in 18 decimals.
-    function receiveRewardsFromLiquidityMining(address account, uint256 iporTokenAmount) external;
+    /// @param pwTokenAmount - amount of rewards, represented in 18 decimals.
+    function receiveRewardsFromLiquidityMining(address account, uint256 pwTokenAmount) external;
 
     /// @notice method returns actual address of liquidity rewards contract - the LiquidityMining
     function getLiquidityMining() external view returns (address);
 
-    /// @notice method returns actual address of IPOR Token
-    function getIporToken() external view returns (address);
+    /// @notice method returns actual address of Staked Token
+    function getStakedToken() external view returns (address);
 
     /// @notice Gets Pause Manager address
     /// @return Pause Manager's address
@@ -53,10 +53,10 @@ interface IPowerIporInternal {
     function unpause() external;
 
     /// @notice Emitted when user received rewards from liquidityMining contract
-    /// @dev Receiving rewards not changes Internal Exchange Rate of Power Ipor Tokens in Power Ipor smart contract.
+    /// @dev Receiving rewards not changes Internal Exchange Rate of Power Tokens in PowerToken smart contract.
     /// @param account address
-    /// @param iporTokenAmount of power token received from liquidityMining
-    event ReceiveRewards(address account, uint256 iporTokenAmount);
+    /// @param pwTokenAmount of power token received from liquidityMining
+    event ReceiveRewards(address account, uint256 pwTokenAmount);
 
     /// @notice Emitted when new fee for unstaking without cool down is setup.
     /// @param changedBy account address who change this configuration param

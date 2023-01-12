@@ -56,18 +56,18 @@ export const getDeployedTokens = async (accounts: Signer[]): Promise<Tokens> => 
     await tokenUsdt.deployed();
 
     const lpTokenDai = (await MockLpToken.deploy(
-        "IP Dai",
-        "ipDAI",
+        "LP Dai",
+        "lpDAI",
         tokenDai.address
     )) as MockLpToken;
     const lpTokenUsdc = (await MockLpToken.deploy(
-        "IP USDC",
-        "ipUSDC",
+        "LP USDC",
+        "lpUSDC",
         tokenUsdc.address
     )) as MockLpToken;
     const lpTokenUsdt = (await MockLpToken.deploy(
-        "IP USDT",
-        "ipUSDT",
+        "LP USDT",
+        "lpUSDT",
         tokenUsdt.address
     )) as MockLpToken;
 

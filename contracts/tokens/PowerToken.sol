@@ -2,14 +2,14 @@
 pragma solidity 0.8.17;
 
 import "../interfaces/ILiquidityMiningInternal.sol";
-import "../interfaces/IPowerIpor.sol";
-import "./PowerIporInternal.sol";
+import "../interfaces/IPowerToken.sol";
+import "./PowerTokenInternal.sol";
 
-///@title Smart contract responsible for managing Power Ipor Token.
-/// @notice Power Ipor Token is retrieved when account stake Ipor Token.
-/// Power Ipor smart contract allows you to stake, unstake Ipor Token, deletage, undelegate to LiquidityMining Power Ipor Token.
+///@title Smart contract responsible for managing Power Token.
+/// @notice Power Token is retrieved when account stake Staked Token.
+/// PowerToken smart contract allows you to stake, unstake Staked Token, deletage, undelegate to LiquidityMining Power Token.
 /// Interact with LiquidityMining smart contract.
-contract PowerIpor is PowerIporInternal, IPowerIpor {
+contract PowerToken is PowerTokenInternal, IPowerToken {
     function name() external pure override returns (string memory) {
         return "Power IPOR";
     }
@@ -28,8 +28,8 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
     function totalSupply() external view override returns (uint256) {
         return
-            IporMath.division(
-                _baseTotalSupply * _calculateInternalExchangeRate(_iporToken),
+            PowerTokenMath.division(
+                _baseTotalSupply * _calculateInternalExchangeRate(_stakedToken),
                 Constants.D18
             );
     }
@@ -54,44 +54,54 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
     function getActiveCoolDown(address account)
         external
         view
-        returns (PowerIporTypes.PwTokenCoolDown memory)
+        returns (PowerTokenTypes.PwTokenCoolDown memory)
     {
         return _coolDowns[account];
     }
 
-    function stake(uint256 iporTokenAmount) external override whenNotPaused nonReentrant {
-        require(iporTokenAmount != 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
+    function stake(uint256 stakedTokenAmount) external override whenNotPaused nonReentrant {
+        require(stakedTokenAmount != 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
-        address iporTokenAddress = _iporToken;
+        address stakedTokenAddress = _stakedToken;
         address msgSender = _msgSender();
 
-        uint256 exchangeRate = _calculateInternalExchangeRate(iporTokenAddress);
+        uint256 exchangeRate = _calculateInternalExchangeRate(stakedTokenAddress);
 
-        IERC20Upgradeable(iporTokenAddress).transferFrom(msgSender, address(this), iporTokenAmount);
+        IERC20Upgradeable(stakedTokenAddress).transferFrom(
+            msgSender,
+            address(this),
+            stakedTokenAmount
+        );
 
-        uint256 baseAmount = IporMath.division(iporTokenAmount * Constants.D18, exchangeRate);
+        uint256 baseAmount = PowerTokenMath.division(
+            stakedTokenAmount * Constants.D18,
+            exchangeRate
+        );
 
         _baseBalance[msgSender] += baseAmount;
         _baseTotalSupply += baseAmount;
 
-        emit Stake(msgSender, iporTokenAmount, exchangeRate, baseAmount);
+        emit Stake(msgSender, stakedTokenAmount, exchangeRate, baseAmount);
     }
 
     function unstake(uint256 pwTokenAmount) external override whenNotPaused nonReentrant {
         require(pwTokenAmount > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
-        address iporTokenAddress = _iporToken;
+        address stakedTokenAddress = _stakedToken;
         address msgSender = _msgSender();
 
-        uint256 exchangeRate = _calculateInternalExchangeRate(iporTokenAddress);
+        uint256 exchangeRate = _calculateInternalExchangeRate(stakedTokenAddress);
         uint256 availablePwTokenAmount = _getAvailablePwTokenAmount(msgSender, exchangeRate);
 
         require(
             availablePwTokenAmount >= pwTokenAmount,
-            MiningErrors.ACC_AVAILABLE_POWER_IPOR_BALANCE_IS_TOO_LOW
+            MiningErrors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW
         );
 
-        uint256 baseAmountToUnstake = IporMath.division(pwTokenAmount * Constants.D18, exchangeRate);
+        uint256 baseAmountToUnstake = PowerTokenMath.division(
+            pwTokenAmount * Constants.D18,
+            exchangeRate
+        );
 
         require(
             _baseBalance[msgSender] >= baseAmountToUnstake,
@@ -101,18 +111,18 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         _baseBalance[msgSender] -= baseAmountToUnstake;
         _baseTotalSupply -= baseAmountToUnstake;
 
-        uint256 iporTokenAmountToTransfer = _calculateBaseAmountToPwToken(
+        uint256 stakedTokenAmountToTransfer = _calculateBaseAmountToPwToken(
             _calculateAmountWithCooldownFeeSubtracted(baseAmountToUnstake),
             exchangeRate
         );
 
-        IERC20Upgradeable(iporTokenAddress).transfer(msgSender, iporTokenAmountToTransfer);
+        IERC20Upgradeable(stakedTokenAddress).transfer(msgSender, stakedTokenAmountToTransfer);
 
         emit Unstake(
             msgSender,
             pwTokenAmount,
             exchangeRate,
-            pwTokenAmount - iporTokenAmountToTransfer
+            pwTokenAmount - stakedTokenAmountToTransfer
         );
     }
 
@@ -129,9 +139,11 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         }
 
         require(
-            _getAvailablePwTokenAmount(_msgSender(), _calculateInternalExchangeRate(_iporToken)) >=
-                pwTokenToDelegate,
-            MiningErrors.ACC_AVAILABLE_POWER_IPOR_BALANCE_IS_TOO_LOW
+            _getAvailablePwTokenAmount(
+                _msgSender(),
+                _calculateInternalExchangeRate(_stakedToken)
+            ) >= pwTokenToDelegate,
+            MiningErrors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW
         );
 
         _delegatedToLiquidityMiningBalance[_msgSender()] += pwTokenToDelegate;
@@ -163,9 +175,11 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
         }
 
         require(
-            _getAvailablePwTokenAmount(_msgSender(), _calculateInternalExchangeRate(_iporToken)) >=
-                pwTokenToDelegate,
-            MiningErrors.ACC_AVAILABLE_POWER_IPOR_BALANCE_IS_TOO_LOW
+            _getAvailablePwTokenAmount(
+                _msgSender(),
+                _calculateInternalExchangeRate(_stakedToken)
+            ) >= pwTokenToDelegate,
+            MiningErrors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW
         );
 
         _delegatedToLiquidityMiningBalance[_msgSender()] += pwTokenToDelegate;
@@ -219,15 +233,15 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
         uint256 availablePwTokenAmount = _calculateBaseAmountToPwToken(
             _baseBalance[msgSender],
-            _calculateInternalExchangeRate(_iporToken)
+            _calculateInternalExchangeRate(_stakedToken)
         ) - _delegatedToLiquidityMiningBalance[msgSender];
 
         require(
             availablePwTokenAmount >= pwTokenAmount,
-            MiningErrors.ACC_AVAILABLE_POWER_IPOR_BALANCE_IS_TOO_LOW
+            MiningErrors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW
         );
 
-        _coolDowns[msgSender] = PowerIporTypes.PwTokenCoolDown(
+        _coolDowns[msgSender] = PowerTokenTypes.PwTokenCoolDown(
             block.timestamp + COOL_DOWN_IN_SECONDS,
             pwTokenAmount
         );
@@ -242,15 +256,15 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
     function redeem() external override whenNotPaused nonReentrant {
         address msgSender = _msgSender();
 
-        PowerIporTypes.PwTokenCoolDown memory accountCoolDown = _coolDowns[msgSender];
+        PowerTokenTypes.PwTokenCoolDown memory accountCoolDown = _coolDowns[msgSender];
 
         require(block.timestamp >= accountCoolDown.endTimestamp, MiningErrors.COOL_DOWN_NOT_FINISH);
         require(accountCoolDown.pwTokenAmount > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
 
-        address iporTokenAddress = _iporToken;
+        address stakedTokenAddress = _stakedToken;
 
-        uint256 exchangeRate = _calculateInternalExchangeRate(iporTokenAddress);
-        uint256 baseAmountToUnstake = IporMath.division(
+        uint256 exchangeRate = _calculateInternalExchangeRate(stakedTokenAddress);
+        uint256 baseAmountToUnstake = PowerTokenMath.division(
             accountCoolDown.pwTokenAmount * Constants.D18,
             exchangeRate
         );
@@ -265,8 +279,8 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
         delete _coolDowns[msgSender];
 
-        ///@dev We can transfer pwTokenAmount because it is in relation 1:1 to Ipor Token
-        IERC20Upgradeable(iporTokenAddress).transfer(msgSender, accountCoolDown.pwTokenAmount);
+        ///@dev We can transfer pwTokenAmount because it is in relation 1:1 to Staked Token
+        IERC20Upgradeable(stakedTokenAddress).transfer(msgSender, accountCoolDown.pwTokenAmount);
 
         emit Redeem(msgSender, accountCoolDown.pwTokenAmount);
     }
