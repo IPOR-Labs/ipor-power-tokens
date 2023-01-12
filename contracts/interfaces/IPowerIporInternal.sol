@@ -5,11 +5,11 @@ import "./types/PowerIporTypes.sol";
 
 /// @title Power Ipor smart contract interface
 interface IPowerIporInternal {
-    /// @notice Returns current version of Power Ipor smart contract
+    /// @notice Returns the current version of the Power Ipor smart contract
     /// @return Current Power Ipor smart contract version
     function getVersion() external pure returns (uint256);
 
-    /// @notice Gets total supply base amount
+    /// @notice Gets the total supply base amount
     /// @return total supply base amount, represented in 18 decimals
     function totalSupplyBase() external view returns (uint256);
 
