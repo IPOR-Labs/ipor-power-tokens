@@ -20,9 +20,9 @@ describe("LiquidityMining Stake and balance", () => {
         miningCalculation = (await MiningCalculation.deploy()) as MockMiningCalculation;
     });
 
-    it("Should return zero when ipTokenAmount  = 0 ", async () => {
+    it("Should return zero when lpTokenAmount  = 0 ", async () => {
         //    given
-        const { pwIporAmount, ipTokenAmount, verticalShift, horizontalShift } = getValues(
+        const { pwTokenAmount, lpTokenAmount, verticalShift, horizontalShift } = getValues(
             "2",
             "0",
             "0x3ffd99999999999999e36310e0e2a848",
@@ -30,8 +30,8 @@ describe("LiquidityMining Stake and balance", () => {
         );
         //    when
         const result = await miningCalculation.calculateAccountPowerUp(
-            pwIporAmount,
-            ipTokenAmount,
+            pwTokenAmount,
+            lpTokenAmount,
             verticalShift,
             horizontalShift
         );
@@ -39,9 +39,9 @@ describe("LiquidityMining Stake and balance", () => {
         expect(result).to.be.equal(ZERO);
     });
 
-    it("Should return verticalShift when pwIporAmount  = 0 ", async () => {
+    it("Should return verticalShift when pwTokenAmount  = 0 ", async () => {
         //    given
-        const { pwIporAmount, ipTokenAmount, verticalShift, horizontalShift } = getValues(
+        const { pwTokenAmount, lpTokenAmount, verticalShift, horizontalShift } = getValues(
             "0",
             N1__0_18DEC.toString(),
             "0x3ffd99999999999999e36310e0e2a848",
@@ -51,8 +51,8 @@ describe("LiquidityMining Stake and balance", () => {
 
         //    when
         const actualResult = await miningCalculation.calculateAccountPowerUp(
-            pwIporAmount,
-            ipTokenAmount,
+            pwTokenAmount,
+            lpTokenAmount,
             verticalShift,
             horizontalShift
         );
@@ -61,9 +61,9 @@ describe("LiquidityMining Stake and balance", () => {
         expect(actualResult).to.be.equal(expectedResult);
     });
 
-    it("Should return ~0.4 when pwIporAmount  = 0 and HS~0.5 and VS~1.4", async () => {
+    it("Should return ~0.4 when pwTokenAmount  = 0 and HS~0.5 and VS~1.4", async () => {
         //    given
-        const { pwIporAmount, ipTokenAmount, verticalShift, horizontalShift } = getValues(
+        const { pwTokenAmount, lpTokenAmount, verticalShift, horizontalShift } = getValues(
             "0",
             N1__0_18DEC.toString(),
             "0x3fff6666666666666666666666666666",
@@ -73,8 +73,8 @@ describe("LiquidityMining Stake and balance", () => {
 
         //    when
         const actualResult = await miningCalculation.calculateAccountPowerUp(
-            pwIporAmount,
-            ipTokenAmount,
+            pwTokenAmount,
+            lpTokenAmount,
             verticalShift,
             horizontalShift
         );
@@ -83,9 +83,9 @@ describe("LiquidityMining Stake and balance", () => {
         expect(actualResult).to.be.equal(expectedResult);
     });
 
-    it("Should return 0 when ipToken < 1", async () => {
+    it("Should return 0 when lpToken < 1", async () => {
         //    given
-        const { pwIporAmount, ipTokenAmount, verticalShift, horizontalShift } = getValues(
+        const { pwTokenAmount, lpTokenAmount, verticalShift, horizontalShift } = getValues(
             "0",
             "999999999999999999",
             "0x3ffd99999999999999e36310e0e2a848",
@@ -93,8 +93,8 @@ describe("LiquidityMining Stake and balance", () => {
         );
         //    when
         const result = await miningCalculation.calculateAccountPowerUp(
-            pwIporAmount,
-            ipTokenAmount,
+            pwTokenAmount,
+            lpTokenAmount,
             verticalShift,
             horizontalShift
         );
@@ -104,7 +104,7 @@ describe("LiquidityMining Stake and balance", () => {
 
     it("Should calculate simple case 1 ", async () => {
         //    given
-        const { pwIporAmount, ipTokenAmount, verticalShift, horizontalShift } = getValues(
+        const { pwTokenAmount, lpTokenAmount, verticalShift, horizontalShift } = getValues(
             N1__0_18DEC.toString(),
             N1__0_18DEC.toString(),
             "0x3ffd99999999999999e36310e0e2a848",
@@ -112,8 +112,8 @@ describe("LiquidityMining Stake and balance", () => {
         );
         //    when
         const result = await miningCalculation.calculateAccountPowerUp(
-            pwIporAmount,
-            ipTokenAmount,
+            pwTokenAmount,
+            lpTokenAmount,
             verticalShift,
             horizontalShift
         );
@@ -121,27 +121,27 @@ describe("LiquidityMining Stake and balance", () => {
         expect(result).to.be.equal(BigNumber.from("1400000000000000000"));
     });
 
-    it("Should throw IPOR_711 - aggregate power up is negative", async () => {
+    it("Should throw PT_711 - aggregate power up is negative", async () => {
         //given
         const accountPowerUp = BigNumber.from("900").mul(N1__0_18DEC);
-        const accountIpTokenAmount = BigNumber.from("1").mul(N1__0_18DEC);
+        const accountLpTokenAmount = BigNumber.from("1").mul(N1__0_18DEC);
         const previousAccountPowerUp = BigNumber.from("1000").mul(N1__0_18DEC);
-        const previousAccountIpTokenAmount = BigNumber.from("10").mul(N1__0_18DEC);
+        const previousAccountLpTokenAmount = BigNumber.from("10").mul(N1__0_18DEC);
         const previousAggregatedPowerUp = BigNumber.from("900").mul(N1__0_18DEC);
 
         //when
         await expect(
             miningCalculation.calculateAggregatedPowerUp(
                 accountPowerUp,
-                accountIpTokenAmount,
+                accountLpTokenAmount,
                 previousAccountPowerUp,
-                previousAccountIpTokenAmount,
+                previousAccountLpTokenAmount,
                 previousAggregatedPowerUp
             )
-        ).to.be.revertedWith("IPOR_711");
+        ).to.be.revertedWith("PT_711");
     });
 
-    it("Should throw IPOR_712 - block number lower than previous block number", async () => {
+    it("Should throw PT_712 - block number lower than previous block number", async () => {
         //given
         const blockNumber = BigNumber.from("900").mul(N1__0_18DEC);
         const lastRebalanceBlockNumber = BigNumber.from("1000").mul(N1__0_18DEC);
@@ -156,12 +156,12 @@ describe("LiquidityMining Stake and balance", () => {
                 rewardsPerBlock,
                 previousAccruedRewards
             )
-        ).to.be.revertedWith("IPOR_712");
+        ).to.be.revertedWith("PT_712");
     });
 
-    it("Should throw IPOR_713 - composite multiplier lower than account composite multiplier ", async () => {
+    it("Should throw PT_713 - composite multiplier lower than account composite multiplier ", async () => {
         //given
-        const accountIpTokenAmount = BigNumber.from("1000").mul(N1__0_18DEC);
+        const accountLpTokenAmount = BigNumber.from("1000").mul(N1__0_18DEC);
         const accountPowerUp = BigNumber.from("1000").mul(N1__0_18DEC);
         const accountCompositeMultiplierCumulativePrevBlock =
             BigNumber.from("1000").mul(N1__0_18DEC);
@@ -170,17 +170,17 @@ describe("LiquidityMining Stake and balance", () => {
         //when
         await expect(
             miningCalculation.calculateAccountRewards(
-                accountIpTokenAmount,
+                accountLpTokenAmount,
                 accountPowerUp,
                 accountCompositeMultiplierCumulativePrevBlock,
                 compositeMultiplierCumulativePrevBlock
             )
-        ).to.be.revertedWith("IPOR_713");
+        ).to.be.revertedWith("PT_713");
     });
 
     it("Should not calculate any rewards when IP Token amount = 0", async () => {
         //given
-        const accountIpTokenAmount = ZERO;
+        const accountLpTokenAmount = ZERO;
         const accountPowerUp = BigNumber.from("1000").mul(N1__0_18DEC);
         const accountCompositeMultiplierCumulativePrevBlock =
             BigNumber.from("1000").mul(N1__0_18DEC);
@@ -188,7 +188,7 @@ describe("LiquidityMining Stake and balance", () => {
 
         //when
         const result = await miningCalculation.calculateAccountRewards(
-            accountIpTokenAmount,
+            accountLpTokenAmount,
             accountPowerUp,
             accountCompositeMultiplierCumulativePrevBlock,
             compositeMultiplierCumulativePrevBlock
@@ -198,54 +198,54 @@ describe("LiquidityMining Stake and balance", () => {
         expect(result).to.be.equal(ZERO);
     });
 
-    type TestData = { ipTokenAmount: string; pwIporAmount: string; result: string };
+    type TestData = { lpTokenAmount: string; pwTokenAmount: string; result: string };
 
     const powerUpTestData: TestData[] = [
         {
-            ipTokenAmount: N1__0_18DEC.toString(),
-            pwIporAmount: N1__0_18DEC.toString(),
+            lpTokenAmount: N1__0_18DEC.toString(),
+            pwTokenAmount: N1__0_18DEC.toString(),
             result: "1400000000000000000",
         },
         {
-            ipTokenAmount: N1__0_18DEC.toString(),
-            pwIporAmount: N2__0_18DEC.toString(),
+            lpTokenAmount: N1__0_18DEC.toString(),
+            pwTokenAmount: N2__0_18DEC.toString(),
             result: "1984962500721156182",
         },
         {
-            ipTokenAmount: N2__0_18DEC.toString(),
-            pwIporAmount: N1__0_18DEC.toString(),
+            lpTokenAmount: N2__0_18DEC.toString(),
+            pwTokenAmount: N1__0_18DEC.toString(),
             result: "984962500721156182",
         },
         {
-            ipTokenAmount: N1__0_18DEC.mul(BigNumber.from("10")).toString(),
-            pwIporAmount: N1__0_18DEC.toString(),
+            lpTokenAmount: N1__0_18DEC.mul(BigNumber.from("10")).toString(),
+            pwTokenAmount: N1__0_18DEC.toString(),
             result: "537503523749934909",
         },
         {
-            ipTokenAmount: N1__0_18DEC.mul(BigNumber.from("10")).toString(),
-            pwIporAmount: N1__0_18DEC.mul(BigNumber.from("123")).toString(),
+            lpTokenAmount: N1__0_18DEC.mul(BigNumber.from("10")).toString(),
+            pwTokenAmount: N1__0_18DEC.mul(BigNumber.from("123")).toString(),
             result: "4133354340613827254",
         },
         {
-            ipTokenAmount: N1__0_18DEC.mul(BigNumber.from("33")).toString(),
-            pwIporAmount: N1__0_18DEC.mul(BigNumber.from("44")).toString(),
+            lpTokenAmount: N1__0_18DEC.mul(BigNumber.from("33")).toString(),
+            pwTokenAmount: N1__0_18DEC.mul(BigNumber.from("44")).toString(),
             result: "1622392421336447926",
         },
     ];
 
     itParam("Should calculate proper accountPowerUp", powerUpTestData, async (item: TestData) => {
         //    given
-        const { pwIporAmount, ipTokenAmount, verticalShift, horizontalShift } = getValues(
-            item.pwIporAmount,
-            item.ipTokenAmount,
+        const { pwTokenAmount, lpTokenAmount, verticalShift, horizontalShift } = getValues(
+            item.pwTokenAmount,
+            item.lpTokenAmount,
             "0x3ffd99999999999999e36310e0e2a848",
             "0x3fff0000000000000000000000000000"
         );
 
         //    when
         const actualResult = await miningCalculation.calculateAccountPowerUp(
-            pwIporAmount,
-            ipTokenAmount,
+            pwTokenAmount,
+            lpTokenAmount,
             verticalShift,
             horizontalShift
         );
@@ -255,19 +255,19 @@ describe("LiquidityMining Stake and balance", () => {
 });
 
 const getValues = (
-    pwIporAmount: string,
-    ipTokenAmount: string,
+    pwTokenAmount: string,
+    lpTokenAmount: string,
     verticalShift: string,
     horizontalShift: string
 ): {
-    pwIporAmount: BigNumber;
-    ipTokenAmount: BigNumber;
+    pwTokenAmount: BigNumber;
+    lpTokenAmount: BigNumber;
     verticalShift: string;
     horizontalShift: string;
 } => {
     return {
-        pwIporAmount: BigNumber.from(pwIporAmount),
-        ipTokenAmount: BigNumber.from(ipTokenAmount),
+        pwTokenAmount: BigNumber.from(pwTokenAmount),
+        lpTokenAmount: BigNumber.from(lpTokenAmount),
         verticalShift: verticalShift,
         horizontalShift: horizontalShift,
     };

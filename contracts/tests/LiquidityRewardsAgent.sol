@@ -2,83 +2,83 @@
 pragma solidity 0.8.17;
 
 import "../mining/LiquidityMining.sol";
-import "../tokens/PowerIpor.sol";
+import "../tokens/PowerToken.sol";
 
 contract LiquidityRewardsAgent {
     LiquidityMining private _liquidityMining;
-    PowerIpor private _powerIpor;
+    PowerToken private _powerToken;
 
     constructor(
-        address powerIpor,
+        address powerToken,
         address liquidityMining,
-        address ipToken,
-        address iporToken
+        address lpToken,
+        address stakedToken
     ) {
         _liquidityMining = LiquidityMining(liquidityMining);
-        _powerIpor = PowerIpor(powerIpor);
-        IERC20(ipToken).approve(liquidityMining, Constants.MAX_VALUE);
-        IERC20(iporToken).approve(powerIpor, Constants.MAX_VALUE);
+        _powerToken = PowerToken(powerToken);
+        IERC20(lpToken).approve(liquidityMining, Constants.MAX_VALUE);
+        IERC20(stakedToken).approve(powerToken, Constants.MAX_VALUE);
     }
 
     //    interact with LiquidityMining
 
-    function stakeIpToken(address ipToken, uint256 ipTokenAmount) external {
-        _liquidityMining.stake(ipToken, ipTokenAmount);
+    function stakeLpToken(address lpToken, uint256 lpTokenAmount) external {
+        _liquidityMining.stake(lpToken, lpTokenAmount);
     }
 
-    function unstakeIpToken(address ipToken, uint256 ipTokenAmount) external {
-        _liquidityMining.unstake(ipToken, ipTokenAmount);
+    function unstakeLpToken(address lpToken, uint256 lpTokenAmount) external {
+        _liquidityMining.unstake(lpToken, lpTokenAmount);
     }
 
-    function calculateAccountRewards(address ipToken) external view returns (uint256) {
-        return _liquidityMining.calculateAccountRewards(address(this), ipToken);
+    function calculateAccountRewards(address lpToken) external view returns (uint256) {
+        return _liquidityMining.calculateAccountRewards(address(this), lpToken);
     }
 
-    function getAccountIndicators(address ipToken)
+    function getAccountIndicators(address lpToken)
         external
         view
         returns (LiquidityMiningTypes.AccountRewardsIndicators memory)
     {
-        return _liquidityMining.getAccountIndicators(address(this), ipToken);
+        return _liquidityMining.getAccountIndicators(address(this), lpToken);
     }
 
-    function balanceOfDelegatedPwIpor(address account, address[] memory requestIpTokens)
+    function balanceOfDelegatedPwToken(address account, address[] memory requestLpTokens)
         external
         view
-        returns (LiquidityMiningTypes.DelegatedPwIporBalance[] memory balances)
+        returns (LiquidityMiningTypes.DelegatedPwTokenBalance[] memory balances)
     {
-        balances = _liquidityMining.balanceOfDelegatedPwIpor(account, requestIpTokens);
+        balances = _liquidityMining.balanceOfDelegatedPwToken(account, requestLpTokens);
     }
 
-    function balanceOf(address ipToken) external view returns (uint256) {
-        return _liquidityMining.balanceOf(address(this), ipToken);
+    function balanceOf(address lpToken) external view returns (uint256) {
+        return _liquidityMining.balanceOf(address(this), lpToken);
     }
 
-    function claim(address ipToken) external {
-        _liquidityMining.claim(ipToken);
+    function claim(address lpToken) external {
+        _liquidityMining.claim(lpToken);
     }
 
     function delegatedToLiquidityMiningBalanceOf(address account) external view returns (uint256) {
-        return _powerIpor.delegatedToLiquidityMiningBalanceOf(account);
+        return _powerToken.delegatedToLiquidityMiningBalanceOf(account);
     }
 
-    function stakeIporToken(uint256 iporTokenAmount) external {
-        _powerIpor.stake(iporTokenAmount);
+    function stakeStakedToken(uint256 pwTokenAmount) external {
+        _powerToken.stake(pwTokenAmount);
     }
 
-    function unstakePwIpor(uint256 pwIporAmount) external {
-        _powerIpor.unstake(pwIporAmount);
+    function unstakePwToken(uint256 pwTokenAmount) external {
+        _powerToken.unstake(pwTokenAmount);
     }
 
-    function delegatePwIpor(address[] calldata ipTokens, uint256[] calldata pwIporAmounts)
+    function delegatePwToken(address[] calldata lpTokens, uint256[] calldata pwTokenAmounts)
         external
     {
-        _powerIpor.delegateToLiquidityMining(ipTokens, pwIporAmounts);
+        _powerToken.delegateToLiquidityMining(lpTokens, pwTokenAmounts);
     }
 
-    function undelegatePwIpor(address[] calldata ipTokens, uint256[] calldata pwIporAmounts)
+    function undelegatePwToken(address[] calldata lpTokens, uint256[] calldata pwTokenAmounts)
         external
     {
-        _powerIpor.undelegateFromLiquidityMining(ipTokens, pwIporAmounts);
+        _powerToken.undelegateFromLiquidityMining(lpTokens, pwTokenAmounts);
     }
 }

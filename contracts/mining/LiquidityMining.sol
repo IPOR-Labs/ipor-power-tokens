@@ -1,12 +1,12 @@
-// SPDX-License-Identifier: BUSL-1.1
+// SPDX-License-Identifier: BSD-3-Clause 
 pragma solidity 0.8.17;
 
 import "../interfaces/ILiquidityMining.sol";
 import "./LiquidityMiningInternal.sol";
 
-/// @title Smart contract responsible for distribution IPOR token rewards across accounts contributed in IPOR Protocol
-/// by staking ipTokens and / or delegating Power Ipor Tokens to LiquidityMining. IpTokens can be staked directly to LiquidityMining,
-/// Power Ipor Tokens account can get stake IPOR Tokens in PowerIpor smart contract.
+/// @title Smart contract responsible for distribution Staked token rewards across accounts contributed in Protocol
+/// by staking lpTokens and / or delegating Power Tokens to LiquidityMining. LpTokens can be staked directly to LiquidityMining,
+/// Power Tokens account can get stake Staked Tokens in PowerToken smart contract.
 contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
     using SafeCast for uint256;
     using SafeCast for int256;
@@ -15,26 +15,26 @@ contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
         return 0x9b1f3aa590476fc9aa58d44ad1419ab53d34c344bd5ed46b12e4af7d27c38e06;
     }
 
-    function balanceOf(address account, address ipToken) external view override returns (uint256) {
-        return _accountIndicators[account][ipToken].ipTokenBalance;
+    function balanceOf(address account, address lpToken) external view override returns (uint256) {
+        return _accountIndicators[account][lpToken].lpTokenBalance;
     }
 
-    function balanceOfDelegatedPwIpor(address account, address[] calldata requestIpTokens)
+    function balanceOfDelegatedPwToken(address account, address[] calldata requestLpTokens)
         external
         view
         override
-        returns (LiquidityMiningTypes.DelegatedPwIporBalance[] memory balances)
+        returns (LiquidityMiningTypes.DelegatedPwTokenBalance[] memory balances)
     {
-        uint256 ipTokensLength = requestIpTokens.length;
-        balances = new LiquidityMiningTypes.DelegatedPwIporBalance[](ipTokensLength);
-        address ipToken;
+        uint256 lpTokensLength = requestLpTokens.length;
+        balances = new LiquidityMiningTypes.DelegatedPwTokenBalance[](lpTokensLength);
+        address lpToken;
 
-        for (uint256 i; i != ipTokensLength; ++i) {
-            ipToken = requestIpTokens[i];
-            require(_ipTokens[ipToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
-            balances[i] = LiquidityMiningTypes.DelegatedPwIporBalance(
-                ipToken,
-                _accountIndicators[account][ipToken].delegatedPwIporBalance
+        for (uint256 i; i != lpTokensLength; ++i) {
+            lpToken = requestLpTokens[i];
+            require(_lpTokens[lpToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
+            balances[i] = LiquidityMiningTypes.DelegatedPwTokenBalance(
+                lpToken,
+                _accountIndicators[account][lpToken].delegatedPwTokenBalance
             );
         }
     }
@@ -47,9 +47,9 @@ contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
         allocatedPwTokens = _allocatedPwTokens[account];
     }
 
-    function calculateAccruedRewards(address ipToken) external view override returns (uint256) {
+    function calculateAccruedRewards(address lpToken) external view override returns (uint256) {
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[
-            ipToken
+            lpToken
         ];
         if (globalIndicators.aggregatedPowerUp == 0) {
             return globalIndicators.accruedRewards;
@@ -63,42 +63,42 @@ contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
             );
     }
 
-    function calculateAccountRewards(address account, address ipToken)
+    function calculateAccountRewards(address account, address lpToken)
         external
         view
         override
         returns (uint256)
     {
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[
-            ipToken
+            lpToken
         ];
         LiquidityMiningTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[
             account
-        ][ipToken];
+        ][lpToken];
 
         (uint256 rewards, ) = _calculateAccountRewards(globalIndicators, accountIndicators);
 
         return rewards;
     }
 
-    function stake(address ipToken, uint256 ipTokenAmount)
+    function stake(address lpToken, uint256 lpTokenAmount)
         external
         override
         nonReentrant
         whenNotPaused
     {
-        require(ipTokenAmount > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
-        require(_ipTokens[ipToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
+        require(lpTokenAmount > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(_lpTokens[lpToken], MiningErrors.IP_TOKEN_NOT_SUPPORTED);
 
         address msgSender = _msgSender();
 
-        IERC20Upgradeable(ipToken).transferFrom(msgSender, address(this), ipTokenAmount);
+        IERC20Upgradeable(lpToken).transferFrom(msgSender, address(this), lpTokenAmount);
 
         LiquidityMiningTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[
             msgSender
-        ][ipToken];
+        ][lpToken];
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[
-            ipToken
+            lpToken
         ];
 
         (
@@ -108,81 +108,81 @@ contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
 
         _rebalanceIndicators(
             msgSender,
-            ipToken,
+            lpToken,
             accruedCompMultiplierCumulativePrevBlock,
             globalIndicators,
             accountIndicators,
-            accountIndicators.ipTokenBalance + ipTokenAmount,
-            accountIndicators.delegatedPwIporBalance
+            accountIndicators.lpTokenBalance + lpTokenAmount,
+            accountIndicators.delegatedPwTokenBalance
         );
 
         if (rewards > 0) {
-            _transferRewardsToPowerIpor(msgSender, rewards);
+            _transferRewardsToPowerToken(msgSender, rewards);
         }
 
-        emit StakeIpTokens(msgSender, ipToken, ipTokenAmount);
+        emit StakeLpTokens(msgSender, lpToken, lpTokenAmount);
     }
 
-    function unstake(address ipToken, uint256 ipTokenAmount)
+    function unstake(address lpToken, uint256 lpTokenAmount)
         external
         override
         nonReentrant
         whenNotPaused
     {
-        _unstake(ipToken, ipTokenAmount, true);
+        _unstake(lpToken, lpTokenAmount, true);
     }
 
-    function unstakeAndAllocatePwTokens(address ipToken, uint256 ipTokenAmount)
+    function unstakeAndAllocatePwTokens(address lpToken, uint256 lpTokenAmount)
         external
         override
         nonReentrant
         whenNotPaused
     {
-        _unstake(ipToken, ipTokenAmount, false);
+        _unstake(lpToken, lpTokenAmount, false);
     }
 
-    function claim(address ipToken) external override whenNotPaused nonReentrant {
+    function claim(address lpToken) external override whenNotPaused nonReentrant {
         address msgSender = _msgSender();
 
         LiquidityMiningTypes.AccountRewardsIndicators memory accountIndicators = _accountIndicators[
             msgSender
-        ][ipToken];
+        ][lpToken];
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[
-            ipToken
+            lpToken
         ];
 
         (
-            uint256 iporTokenAmount,
+            uint256 stakedTokenAmount,
             uint256 accruedCompMultiplierCumulativePrevBlock
         ) = _calculateAccountRewards(globalIndicators, accountIndicators);
 
-        require(iporTokenAmount > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
+        require(stakedTokenAmount > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
 
         uint256 accountPowerUp = MiningCalculation.calculateAccountPowerUp(
-            accountIndicators.delegatedPwIporBalance,
-            accountIndicators.ipTokenBalance,
+            accountIndicators.delegatedPwTokenBalance,
+            accountIndicators.lpTokenBalance,
             _getVerticalShift(),
             _getHorizontalShift()
         );
 
-        _accountIndicators[msgSender][ipToken] = LiquidityMiningTypes.AccountRewardsIndicators(
+        _accountIndicators[msgSender][lpToken] = LiquidityMiningTypes.AccountRewardsIndicators(
             accruedCompMultiplierCumulativePrevBlock.toUint128(),
-            accountIndicators.ipTokenBalance,
+            accountIndicators.lpTokenBalance,
             accountPowerUp.toUint72(),
-            accountIndicators.delegatedPwIporBalance
+            accountIndicators.delegatedPwTokenBalance
         );
 
-        _transferRewardsToPowerIpor(msgSender, iporTokenAmount);
+        _transferRewardsToPowerToken(msgSender, stakedTokenAmount);
 
-        emit Claim(msgSender, ipToken, iporTokenAmount);
+        emit Claim(msgSender, lpToken, stakedTokenAmount);
     }
 
     function claimAllocatedPwTokens() external override whenNotPaused nonReentrant {
         address msgSender = _msgSender();
-        uint256 iporTokenAmount = _allocatedPwTokens[msgSender];
-        require(iporTokenAmount > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
+        uint256 stakedTokenAmount = _allocatedPwTokens[msgSender];
+        require(stakedTokenAmount > 0, MiningErrors.NO_REWARDS_TO_CLAIM);
         _allocatedPwTokens[msgSender] = 0;
-        _transferRewardsToPowerIpor(msgSender, iporTokenAmount);
-        emit ClaimAllocatedTokens(msgSender, iporTokenAmount);
+        _transferRewardsToPowerToken(msgSender, stakedTokenAmount);
+        emit ClaimAllocatedTokens(msgSender, stakedTokenAmount);
     }
 }

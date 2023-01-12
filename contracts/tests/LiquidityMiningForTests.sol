@@ -4,7 +4,7 @@ pragma solidity 0.8.17;
 import "../mining/LiquidityMining.sol";
 
 contract LiquidityMiningForTests is LiquidityMining {
-    function setPowerIpor(address powerIpor) external {
-        _powerIpor = powerIpor;
+    function setPowerToken(address powerToken) external {
+        _powerToken = powerToken;
     }
 }
