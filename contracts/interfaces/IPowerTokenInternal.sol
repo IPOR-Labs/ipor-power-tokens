@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BUSL-1.1
+// SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.17;
 
 import "./types/PowerTokenTypes.sol";
@@ -9,7 +9,7 @@ interface IPowerTokenInternal {
     /// @return Current PowerToken smart contract version
     function getVersion() external pure returns (uint256);
 
-    /// @notice Gets total supply base amount
+    /// @notice Gets the total supply base amount
     /// @return total supply base amount, represented in 18 decimals
     function totalSupplyBase() external view returns (uint256);
 
