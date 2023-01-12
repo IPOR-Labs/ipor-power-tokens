@@ -37,7 +37,7 @@ describe("PowerIpor token delegate", () => {
         await iporToken.increaseAllowance(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
         liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
-            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
+            [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address],
             powerIpor.address,
             iporToken.address,
         ])) as LiquidityMining;
@@ -87,26 +87,26 @@ describe("PowerIpor token delegate", () => {
         await powerIpor.stake(stakeIporTokenAmount);
         const delegatedPwTokenBalanceBefore = (
             await liquidityMining.balanceOfDelegatedPwIpor(await admin.getAddress(), [
-                tokens.ipTokenDai.address,
+                tokens.lpTokenDai.address,
             ])
         )[0].pwIporAmount;
         //    when
         await expect(
             powerIpor.delegateToLiquidityMining(
-                [tokens.ipTokenDai.address],
+                [tokens.lpTokenDai.address],
                 [delegatePwTokenAmount]
             )
         )
             .to.emit(powerIpor, "DelegateToLiquidityMining")
             .withArgs(
                 await admin.getAddress(),
-                [tokens.ipTokenDai.address],
+                [tokens.lpTokenDai.address],
                 [delegatePwTokenAmount]
             );
         //    then
         const delegatedPwTokenBalanceAfter = (
             await liquidityMining.balanceOfDelegatedPwIpor(await admin.getAddress(), [
-                tokens.ipTokenDai.address,
+                tokens.lpTokenDai.address,
             ])
         )[0].pwIporAmount;
 
@@ -122,31 +122,31 @@ describe("PowerIpor token delegate", () => {
         const undelegatePwTokenAmount = N1__0_18DEC;
         await powerIpor.stake(stakeIporTokenAmount);
         await powerIpor.delegateToLiquidityMining(
-            [tokens.ipTokenDai.address],
+            [tokens.lpTokenDai.address],
             [delegatePwTokenAmount]
         );
         const delegatedPwTokenBalanceBefore = (
             await liquidityMining.balanceOfDelegatedPwIpor(await admin.getAddress(), [
-                tokens.ipTokenDai.address,
+                tokens.lpTokenDai.address,
             ])
         )[0].pwIporAmount;
         //    when
         await expect(
             powerIpor.undelegateFromLiquidityMining(
-                [tokens.ipTokenDai.address],
+                [tokens.lpTokenDai.address],
                 [undelegatePwTokenAmount]
             )
         )
             .to.emit(powerIpor, "UndelegateFromLiquidityMining")
             .withArgs(
                 await admin.getAddress(),
-                [tokens.ipTokenDai.address],
+                [tokens.lpTokenDai.address],
                 [undelegatePwTokenAmount]
             );
         //    then
         const delegatedPwTokenBalanceAfter = (
             await liquidityMining.balanceOfDelegatedPwIpor(await admin.getAddress(), [
-                tokens.ipTokenDai.address,
+                tokens.lpTokenDai.address,
             ])
         )[0].pwIporAmount;
 
@@ -202,7 +202,7 @@ describe("PowerIpor token delegate", () => {
         // given
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMiningForTests");
         const itfLiquidityMining = (await upgrades.deployProxy(LiquidityMining, [
-            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
+            [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address],
             powerIpor.address,
             iporToken.address,
         ])) as LiquidityMiningForTests;

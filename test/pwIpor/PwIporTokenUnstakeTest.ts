@@ -50,7 +50,7 @@ describe("PowerIpor unstake", () => {
         await iporToken.increaseAllowance(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
         liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
-            [tokens.ipTokenDai.address],
+            [tokens.lpTokenDai.address],
             powerIpor.address,
             iporToken.address,
         ])) as LiquidityMining;
@@ -143,7 +143,7 @@ describe("PowerIpor unstake", () => {
         await powerIpor.stake(N1__0_18DEC);
 
         await powerIpor.delegateToLiquidityMining(
-            [tokens.ipTokenDai.address],
+            [tokens.lpTokenDai.address],
             [N0__1_18DEC.mul(BigNumber.from("6"))]
         );
         //    when
@@ -163,7 +163,7 @@ describe("PowerIpor unstake", () => {
         const iporBalanceBefore = await iporToken.balanceOf(await admin.getAddress());
         const exchangeRateBefore = await powerIpor.calculateExchangeRate();
 
-        await powerIpor.delegateToLiquidityMining([tokens.ipTokenDai.address], [N0__6_18DEC]);
+        await powerIpor.delegateToLiquidityMining([tokens.lpTokenDai.address], [N0__6_18DEC]);
         //    when
         await powerIpor.unstake(N0__4_18DEC);
 
@@ -200,7 +200,7 @@ describe("PowerIpor unstake", () => {
         const exchangeRateBefore = await powerIpor.calculateExchangeRate();
         const withdrawalFeeBefore = await powerIpor.getUnstakeWithoutCooldownFee();
 
-        await powerIpor.delegateToLiquidityMining([tokens.ipTokenDai.address], [N0__6_18DEC]);
+        await powerIpor.delegateToLiquidityMining([tokens.lpTokenDai.address], [N0__6_18DEC]);
         //    when
         await powerIpor.setUnstakeWithoutCooldownFee(N0__1_18DEC);
         await powerIpor.unstake(N0__4_18DEC);

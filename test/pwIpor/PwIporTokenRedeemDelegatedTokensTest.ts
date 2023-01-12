@@ -44,7 +44,7 @@ describe("PowerIpor configuration, deploy tests", () => {
         await iporToken.increaseAllowance(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
         liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
-            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
+            [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address],
             powerIpor.address,
             iporToken.address,
         ])) as LiquidityMining;
@@ -57,7 +57,7 @@ describe("PowerIpor configuration, deploy tests", () => {
         await powerIpor.stake(N1__0_18DEC);
         //    when
         await expect(
-            powerIpor.undelegateFromLiquidityMining([tokens.ipTokenDai.address], [ZERO])
+            powerIpor.undelegateFromLiquidityMining([tokens.lpTokenDai.address], [ZERO])
         ).to.be.revertedWith("IPOR_717");
     });
 
@@ -66,31 +66,31 @@ describe("PowerIpor configuration, deploy tests", () => {
         await powerIpor.stake(N1__0_18DEC);
         //    when
         await expect(
-            powerIpor.undelegateFromLiquidityMining([tokens.ipTokenDai.address], [N0__1_18DEC])
+            powerIpor.undelegateFromLiquidityMining([tokens.lpTokenDai.address], [N0__1_18DEC])
         ).to.be.revertedWith("IPOR_707");
     });
 
     it("Should revert transaction when delegate amount is less then withdraw amount", async () => {
         //    given
         await powerIpor.stake(N1__0_18DEC);
-        await powerIpor.delegateToLiquidityMining([tokens.ipTokenDai.address], [N0__1_18DEC]);
+        await powerIpor.delegateToLiquidityMining([tokens.lpTokenDai.address], [N0__1_18DEC]);
         //    when
         await expect(
-            powerIpor.undelegateFromLiquidityMining([tokens.ipTokenDai.address], [N0__5_18DEC])
+            powerIpor.undelegateFromLiquidityMining([tokens.lpTokenDai.address], [N0__5_18DEC])
         ).to.be.revertedWith("IPOR_707");
     });
 
-    it("Should revert transaction when delegated pwIpor amount is less than staked ipToken amount", async () => {
+    it("Should revert transaction when delegated pwIpor amount is less than staked lpToken amount", async () => {
         //    given
         await powerIpor.stake(N2__0_18DEC);
         await powerIpor.delegateToLiquidityMining(
-            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
+            [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address],
             [N1__0_18DEC, N1__0_18DEC]
         );
         //    when
         await expect(
             powerIpor.undelegateFromLiquidityMining(
-                [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
+                [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address],
                 [N1__0_18DEC, N2__0_18DEC]
             )
         ).to.be.revertedWith("IPOR_707");
@@ -100,13 +100,13 @@ describe("PowerIpor configuration, deploy tests", () => {
         //    given
         await powerIpor.stake(N2__0_18DEC);
         await powerIpor.delegateToLiquidityMining(
-            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
+            [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address],
             [N1__0_18DEC, N1__0_18DEC]
         );
         //    when
         await expect(
             powerIpor.undelegateFromLiquidityMining(
-                [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
+                [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address],
                 [N1__0_18DEC]
             )
         ).to.be.revertedWith("IPOR_718");
@@ -116,13 +116,13 @@ describe("PowerIpor configuration, deploy tests", () => {
         //    given
         await powerIpor.stake(N2__0_18DEC);
         await powerIpor.delegateToLiquidityMining(
-            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
+            [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address],
             [N1__0_18DEC, N1__0_18DEC]
         );
         //    when
         await expect(
             powerIpor.undelegateFromLiquidityMining(
-                [tokens.ipTokenDai.address],
+                [tokens.lpTokenDai.address],
                 [N1__0_18DEC, N1__0_18DEC]
             )
         ).to.be.revertedWith("IPOR_718");
@@ -135,7 +135,7 @@ describe("PowerIpor configuration, deploy tests", () => {
         const [admin] = accounts;
         await powerIpor.stake(N2__0_18DEC);
         await powerIpor.delegateToLiquidityMining(
-            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
+            [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address],
             [N1__0_18DEC, N1__0_18DEC]
         );
         const delegatedBalanceBefore = await powerIpor.delegatedToLiquidityMiningBalanceOf(
@@ -147,7 +147,7 @@ describe("PowerIpor configuration, deploy tests", () => {
 
         //    when
         await powerIpor.undelegateFromLiquidityMining(
-            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
+            [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address],
             [N1__0_18DEC, N0__1_18DEC]
         );
 

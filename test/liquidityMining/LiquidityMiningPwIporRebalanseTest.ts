@@ -55,14 +55,14 @@ describe("LiquidityMining rebalance ", () => {
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
 
         liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
-            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
+            [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address],
             powerIpor.address,
             iporToken.address,
         ])) as LiquidityMining;
 
-        await tokens.ipTokenDai.approve(liquidityMining.address, N2__0_18DEC);
-        await tokens.ipTokenUsdc.approve(liquidityMining.address, N2__0_18DEC);
-        await tokens.ipTokenUsdt.approve(liquidityMining.address, N2__0_18DEC);
+        await tokens.lpTokenDai.approve(liquidityMining.address, N2__0_18DEC);
+        await tokens.lpTokenUsdc.approve(liquidityMining.address, N2__0_18DEC);
+        await tokens.lpTokenUsdt.approve(liquidityMining.address, N2__0_18DEC);
 
         await iporToken.transfer(
             liquidityMining.address,
@@ -76,9 +76,9 @@ describe("LiquidityMining rebalance ", () => {
         //    given
         //    when
         const balances = await liquidityMining.balanceOfDelegatedPwIpor(await admin.getAddress(), [
-            tokens.ipTokenDai.address,
-            tokens.ipTokenUsdc.address,
-            tokens.ipTokenUsdt.address,
+            tokens.lpTokenDai.address,
+            tokens.lpTokenUsdc.address,
+            tokens.lpTokenUsdt.address,
         ]);
         //    then
         expectedBalances([ZERO, ZERO, ZERO], balances);
@@ -92,18 +92,18 @@ describe("LiquidityMining rebalance ", () => {
                 .connect(userOne)
                 .delegatePwIpor(
                     await userOne.getAddress(),
-                    [tokens.ipTokenDai.address],
+                    [tokens.lpTokenDai.address],
                     [N1__0_18DEC]
                 )
         ).to.be.revertedWith("IPOR_702");
         //    then
     });
 
-    it("Should not be able to stake power token when ipToken is not supported", async () => {
+    it("Should not be able to stake power token when lpToken is not supported", async () => {
         //    given
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMiningForTests");
         const liquidityMiningInternal = (await upgrades.deployProxy(LiquidityMining, [
-            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
+            [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address],
             powerIpor.address,
             iporToken.address,
         ])) as LiquidityMiningForTests;
@@ -124,31 +124,31 @@ describe("LiquidityMining rebalance ", () => {
         //    given
         const balancesBefore = await liquidityMining.balanceOfDelegatedPwIpor(
             await admin.getAddress(),
-            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address]
+            [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address]
         );
 
-        await liquidityMining.setRewardsPerBlock(tokens.ipTokenDai.address, N1__0_8DEC);
-        await liquidityMining.setRewardsPerBlock(tokens.ipTokenUsdc.address, N1__0_8DEC);
-        await liquidityMining.setRewardsPerBlock(tokens.ipTokenUsdt.address, N1__0_8DEC);
+        await liquidityMining.setRewardsPerBlock(tokens.lpTokenDai.address, N1__0_8DEC);
+        await liquidityMining.setRewardsPerBlock(tokens.lpTokenUsdc.address, N1__0_8DEC);
+        await liquidityMining.setRewardsPerBlock(tokens.lpTokenUsdt.address, N1__0_8DEC);
 
-        const liquidityMiningIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(
+        const liquidityMiningIpDaiBalanceBefore = await tokens.lpTokenDai.balanceOf(
             liquidityMining.address
         );
-        const liquidityMiningIpUsdcBalanceBefore = await tokens.ipTokenUsdc.balanceOf(
+        const liquidityMiningIpUsdcBalanceBefore = await tokens.lpTokenUsdc.balanceOf(
             liquidityMining.address
         );
-        const liquidityMiningIpUsdtBalanceBefore = await tokens.ipTokenUsdt.balanceOf(
+        const liquidityMiningIpUsdtBalanceBefore = await tokens.lpTokenUsdt.balanceOf(
             liquidityMining.address
         );
         const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
 
-        await tokens.ipTokenDai.mint(await admin.getAddress(), N2__0_18DEC);
-        await tokens.ipTokenUsdc.mint(await admin.getAddress(), N2__0_18DEC);
-        await tokens.ipTokenUsdt.mint(await admin.getAddress(), N2__0_18DEC);
+        await tokens.lpTokenDai.mint(await admin.getAddress(), N2__0_18DEC);
+        await tokens.lpTokenUsdc.mint(await admin.getAddress(), N2__0_18DEC);
+        await tokens.lpTokenUsdt.mint(await admin.getAddress(), N2__0_18DEC);
 
-        await liquidityMining.stake(tokens.ipTokenDai.address, N1__0_18DEC);
-        await liquidityMining.stake(tokens.ipTokenUsdc.address, N1__0_18DEC);
-        await liquidityMining.stake(tokens.ipTokenUsdt.address, N1__0_18DEC);
+        await liquidityMining.stake(tokens.lpTokenDai.address, N1__0_18DEC);
+        await liquidityMining.stake(tokens.lpTokenUsdc.address, N1__0_18DEC);
+        await liquidityMining.stake(tokens.lpTokenUsdt.address, N1__0_18DEC);
 
         const amounts = [N1__0_18DEC, N0__1_18DEC, N0__01_18DEC];
 
@@ -158,23 +158,23 @@ describe("LiquidityMining rebalance ", () => {
 
         //    when
         await powerIpor.delegateToLiquidityMining(
-            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
+            [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address],
             amounts
         );
 
         //    then
         const balancesAfter = await liquidityMining.balanceOfDelegatedPwIpor(
             await admin.getAddress(),
-            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address]
+            [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address]
         );
 
-        const liquidityMiningIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(
+        const liquidityMiningIpDaiBalanceAfter = await tokens.lpTokenDai.balanceOf(
             liquidityMining.address
         );
-        const liquidityMiningIpUsdcBalanceAfter = await tokens.ipTokenUsdc.balanceOf(
+        const liquidityMiningIpUsdcBalanceAfter = await tokens.lpTokenUsdc.balanceOf(
             liquidityMining.address
         );
-        const liquidityMiningIpUsdtBalanceAfter = await tokens.ipTokenUsdt.balanceOf(
+        const liquidityMiningIpUsdtBalanceAfter = await tokens.lpTokenUsdt.balanceOf(
             liquidityMining.address
         );
         const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
@@ -200,7 +200,7 @@ describe("LiquidityMining rebalance ", () => {
         //    given
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMiningForTests");
         const liquidityMiningInternal = (await upgrades.deployProxy(LiquidityMining, [
-            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
+            [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address],
             powerIpor.address,
             iporToken.address,
         ])) as LiquidityMiningForTests;
@@ -214,7 +214,7 @@ describe("LiquidityMining rebalance ", () => {
         await expect(
             liquidityMiningInternal.delegatePwIpor(
                 await admin.getAddress(),
-                [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
+                [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address],
                 amounts
             )
         ).to.be.revertedWith("Pausable: paused");

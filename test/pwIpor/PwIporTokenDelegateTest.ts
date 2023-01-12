@@ -37,7 +37,7 @@ describe("PowerIpor token delegate", () => {
         await iporToken.increaseAllowance(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
         liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
-            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
+            [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address],
             powerIpor.address,
             iporToken.address,
         ])) as LiquidityMining;
@@ -94,7 +94,7 @@ describe("PowerIpor token delegate", () => {
 
         //    when
         await powerIpor.delegateToLiquidityMining(
-            [tokens.ipTokenDai.address],
+            [tokens.lpTokenDai.address],
             [pwTokenDelegationAmount]
         );
 
@@ -123,7 +123,7 @@ describe("PowerIpor token delegate", () => {
         );
         //    when
         await powerIpor.delegateToLiquidityMining(
-            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
+            [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address],
             [pwTokenDelegationAmount, pwTokenDelegationAmount]
         );
         //    then

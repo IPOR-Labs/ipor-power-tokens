@@ -64,30 +64,30 @@ interface IPowerIpor {
     function unstake(uint256 pwIporAmount) external;
 
     /// @notice Delegates Power Ipor Tokens to LiquidityMining
-    /// @param ipTokens - list of ipTokens to which are associated in delegation Power Ipor Tokens
-    /// @param pwIporAmounts - list of Power Ipor Token amount which are delegated in relation to given ipToken
+    /// @param lpTokens - list of lpTokens to which are associated in delegation Power Ipor Tokens
+    /// @param pwIporAmounts - list of Power Ipor Token amount which are delegated in relation to given lpToken
     function delegateToLiquidityMining(
-        address[] calldata ipTokens,
+        address[] calldata lpTokens,
         uint256[] calldata pwIporAmounts
     ) external;
 
-    /// @notice Delegates Power Ipor Tokens and stakes ipTokens
+    /// @notice Delegates Power Ipor Tokens and stakes lpTokens
     /// @dev Power Ipor Token amounts can be equal zeros. IP Token amounts can be equal zeros.
-    /// @param ipTokens - list of ipTokens to which sender delegates Power Ipor Tokens and stakes ipTokens
-    /// @param pwIporAmounts - list of Power Ipor Token amount which sender delegates for a given ipToken
-    /// @param ipTokenAmounts - list of ipToken amount which sender stakes in LiquidityMining for a given ipToken
+    /// @param lpTokens - list of lpTokens to which sender delegates Power Ipor Tokens and stakes lpTokens
+    /// @param pwIporAmounts - list of Power Ipor Token amount which sender delegates for a given lpToken
+    /// @param lpTokenAmounts - list of lpToken amount which sender stakes in LiquidityMining for a given lpToken
     function delegateAndStakeToLiquidityMining(
-        address[] calldata ipTokens,
+        address[] calldata lpTokens,
         uint256[] calldata pwIporAmounts,
-        uint256[] calldata ipTokenAmounts
+        uint256[] calldata lpTokenAmounts
     ) external;
 
     /// @notice Undelegates Power Ipor Token from LiquidityMining
     /// @dev Power Ipor amounts have to be higher than zero, in other case transaction is rejected.
-    /// @param ipTokens - list of ipToken from which sender will undelegate Power Ipor Tokens
+    /// @param lpTokens - list of lpToken from which sender will undelegate Power Ipor Tokens
     /// @param pwIporAmounts - list of amounts of Power Ipor Tokens taken to undelegate from LiquidityMining
     function undelegateFromLiquidityMining(
-        address[] calldata ipTokens,
+        address[] calldata lpTokens,
         uint256[] calldata pwIporAmounts
     ) external;
 
@@ -134,21 +134,21 @@ interface IPowerIpor {
 
     /// @notice Emitted when sender delegates Power Ipor Tokens to LiquidityMining contract
     /// @param account address who delegates Power Ipor Tokens
-    /// @param ipTokens list of token to delegate Power Ipor Tokens
-    /// @param pwIporAmounts list of values how Power Ipor token amount should be distributed across ipTokens
+    /// @param lpTokens list of token to delegate Power Ipor Tokens
+    /// @param pwIporAmounts list of values how Power Ipor token amount should be distributed across lpTokens
     event DelegateToLiquidityMining(
         address indexed account,
-        address[] ipTokens,
+        address[] lpTokens,
         uint256[] pwIporAmounts
     );
 
     /// @notice Emitted when sender undelegate Power Ipor Tokens from LiquidityMining
     /// @param account address who undelegates Power Ipor Tokens
-    /// @param ipTokens list of assets from Power Ipor Tokens are undelegated
-    /// @param pwIporAmounts list of values how Power Ipor token amounts should be undelegated from ipTokens
+    /// @param lpTokens list of assets from Power Ipor Tokens are undelegated
+    /// @param pwIporAmounts list of values how Power Ipor token amounts should be undelegated from lpTokens
     event UndelegateFromLiquidityMining(
         address indexed account,
-        address[] ipTokens,
+        address[] lpTokens,
         uint256[] pwIporAmounts
     );
 

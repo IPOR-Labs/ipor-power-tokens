@@ -49,7 +49,7 @@ describe("PowerIpor unstake", () => {
         await iporToken.increaseAllowance(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
         liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
-            [tokens.ipTokenDai.address],
+            [tokens.lpTokenDai.address],
             powerIpor.address,
             iporToken.address,
         ])) as LiquidityMining;
@@ -197,7 +197,7 @@ describe("PowerIpor unstake", () => {
         // when
 
         await expect(
-            powerIpor.delegateToLiquidityMining([tokens.ipTokenDai.address], [N0__5_18DEC])
+            powerIpor.delegateToLiquidityMining([tokens.lpTokenDai.address], [N0__5_18DEC])
         ).to.be.revertedWith("IPOR_708");
 
         // then

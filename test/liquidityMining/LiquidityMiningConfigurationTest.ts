@@ -86,15 +86,15 @@ describe("LiquidityMining configuration, deploy tests", () => {
 
         // when
         const liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
-            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
+            [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address],
             powerIpor.address,
             iporToken.address,
         ])) as LiquidityMining;
 
         // then
-        const isDaiActive = await liquidityMining.isIpTokenSupported(tokens.ipTokenDai.address);
-        const isUsdcActive = await liquidityMining.isIpTokenSupported(tokens.ipTokenUsdc.address);
-        const isUsdtActive = await liquidityMining.isIpTokenSupported(tokens.ipTokenUsdt.address);
+        const isDaiActive = await liquidityMining.isLpTokenSupported(tokens.lpTokenDai.address);
+        const isUsdcActive = await liquidityMining.isLpTokenSupported(tokens.lpTokenUsdc.address);
+        const isUsdtActive = await liquidityMining.isLpTokenSupported(tokens.lpTokenUsdt.address);
 
         expect(isDaiActive).to.be.true;
         expect(isUsdcActive).to.be.true;
@@ -107,15 +107,15 @@ describe("LiquidityMining configuration, deploy tests", () => {
 
         // when
         const liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
-            [tokens.ipTokenDai.address],
+            [tokens.lpTokenDai.address],
             powerIpor.address,
             iporToken.address,
         ])) as LiquidityMining;
 
         // then
-        const isDaiActive = await liquidityMining.isIpTokenSupported(tokens.ipTokenDai.address);
-        const isUsdcActive = await liquidityMining.isIpTokenSupported(tokens.ipTokenUsdc.address);
-        const isUsdtActive = await liquidityMining.isIpTokenSupported(tokens.ipTokenUsdt.address);
+        const isDaiActive = await liquidityMining.isLpTokenSupported(tokens.lpTokenDai.address);
+        const isUsdcActive = await liquidityMining.isLpTokenSupported(tokens.lpTokenUsdc.address);
+        const isUsdtActive = await liquidityMining.isLpTokenSupported(tokens.lpTokenUsdt.address);
 
         expect(isDaiActive).to.be.true;
         expect(isUsdcActive).to.be.false;
@@ -130,29 +130,29 @@ describe("LiquidityMining configuration, deploy tests", () => {
             powerIpor.address,
             iporToken.address,
         ])) as LiquidityMining;
-        const isDaiActiveBefore = await liquidityMining.isIpTokenSupported(
-            tokens.ipTokenDai.address
+        const isDaiActiveBefore = await liquidityMining.isLpTokenSupported(
+            tokens.lpTokenDai.address
         );
-        const isUsdcActiveBefore = await liquidityMining.isIpTokenSupported(
-            tokens.ipTokenUsdc.address
+        const isUsdcActiveBefore = await liquidityMining.isLpTokenSupported(
+            tokens.lpTokenUsdc.address
         );
-        const isUsdtActiveBefore = await liquidityMining.isIpTokenSupported(
-            tokens.ipTokenUsdt.address
+        const isUsdtActiveBefore = await liquidityMining.isLpTokenSupported(
+            tokens.lpTokenUsdt.address
         );
 
         // when
-        await liquidityMining.addIpTokenAsset(tokens.ipTokenUsdc.address);
-        await liquidityMining.addIpTokenAsset(tokens.ipTokenUsdt.address);
+        await liquidityMining.addLpTokenAsset(tokens.lpTokenUsdc.address);
+        await liquidityMining.addLpTokenAsset(tokens.lpTokenUsdt.address);
 
         // then
-        const isDaiActiveAfter = await liquidityMining.isIpTokenSupported(
-            tokens.ipTokenDai.address
+        const isDaiActiveAfter = await liquidityMining.isLpTokenSupported(
+            tokens.lpTokenDai.address
         );
-        const isUsdcActiveAfter = await liquidityMining.isIpTokenSupported(
-            tokens.ipTokenUsdc.address
+        const isUsdcActiveAfter = await liquidityMining.isLpTokenSupported(
+            tokens.lpTokenUsdc.address
         );
-        const isUsdtActiveAfter = await liquidityMining.isIpTokenSupported(
-            tokens.ipTokenUsdt.address
+        const isUsdtActiveAfter = await liquidityMining.isLpTokenSupported(
+            tokens.lpTokenUsdt.address
         );
 
         expect(isDaiActiveBefore).to.be.false;
@@ -177,7 +177,7 @@ describe("LiquidityMining configuration, deploy tests", () => {
         // when
         await expect(
             //when
-            liquidityMining.connect(userOne).addIpTokenAsset(tokens.ipTokenUsdc.address)
+            liquidityMining.connect(userOne).addLpTokenAsset(tokens.lpTokenUsdc.address)
             //then
         ).to.be.revertedWith("Ownable: caller is not the owner");
     });

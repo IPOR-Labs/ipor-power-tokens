@@ -117,11 +117,11 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
     }
 
     function delegateToLiquidityMining(
-        address[] calldata ipTokens,
+        address[] calldata lpTokens,
         uint256[] calldata pwIporAmounts
     ) external override whenNotPaused nonReentrant {
         uint256 pwIporAmountsLength = pwIporAmounts.length;
-        require(ipTokens.length == pwIporAmountsLength, MiningErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
+        require(lpTokens.length == pwIporAmountsLength, MiningErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
         uint256 pwIporToDelegate;
 
         for (uint256 i; i != pwIporAmountsLength; ++i) {
@@ -138,20 +138,20 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
         ILiquidityMiningInternal(_liquidityMining).delegatePwIpor(
             _msgSender(),
-            ipTokens,
+            lpTokens,
             pwIporAmounts
         );
 
-        emit DelegateToLiquidityMining(_msgSender(), ipTokens, pwIporAmounts);
+        emit DelegateToLiquidityMining(_msgSender(), lpTokens, pwIporAmounts);
     }
 
     function delegateAndStakeToLiquidityMining(
-        address[] calldata ipTokens,
+        address[] calldata lpTokens,
         uint256[] calldata pwIporAmounts,
-        uint256[] calldata ipTokenAmounts
+        uint256[] calldata lpTokenAmounts
     ) external override whenNotPaused nonReentrant {
         require(
-            ipTokens.length == pwIporAmounts.length && ipTokens.length == ipTokenAmounts.length,
+            lpTokens.length == pwIporAmounts.length && lpTokens.length == lpTokenAmounts.length,
             MiningErrors.INPUT_ARRAYS_LENGTH_MISMATCH
         );
 
@@ -170,26 +170,26 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
         _delegatedToLiquidityMiningBalance[_msgSender()] += pwIporToDelegate;
 
-        ILiquidityMiningInternal(_liquidityMining).delegatePwIporAndStakeIpToken(
+        ILiquidityMiningInternal(_liquidityMining).delegatePwIporAndStakeLpToken(
             _msgSender(),
-            ipTokens,
+            lpTokens,
             pwIporAmounts,
-            ipTokenAmounts
+            lpTokenAmounts
         );
 
-        emit DelegateToLiquidityMining(_msgSender(), ipTokens, pwIporAmounts);
+        emit DelegateToLiquidityMining(_msgSender(), lpTokens, pwIporAmounts);
     }
 
     function undelegateFromLiquidityMining(
-        address[] calldata ipTokens,
+        address[] calldata lpTokens,
         uint256[] calldata pwIporAmounts
     ) external override whenNotPaused nonReentrant {
-        uint256 ipTokensLength = ipTokens.length;
-        require(ipTokensLength == pwIporAmounts.length, MiningErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
+        uint256 lpTokensLength = lpTokens.length;
+        require(lpTokensLength == pwIporAmounts.length, MiningErrors.INPUT_ARRAYS_LENGTH_MISMATCH);
 
         uint256 pwIporAmountToUndelegate;
 
-        for (uint256 i; i != ipTokensLength; ++i) {
+        for (uint256 i; i != lpTokensLength; ++i) {
             require(pwIporAmounts[i] > 0, MiningErrors.VALUE_NOT_GREATER_THAN_ZERO);
             pwIporAmountToUndelegate += pwIporAmounts[i];
         }
@@ -203,13 +203,13 @@ contract PowerIpor is PowerIporInternal, IPowerIpor {
 
         ILiquidityMiningInternal(_liquidityMining).undelegatePwIpor(
             msgSender,
-            ipTokens,
+            lpTokens,
             pwIporAmounts
         );
 
         _delegatedToLiquidityMiningBalance[msgSender] -= pwIporAmountToUndelegate;
 
-        emit UndelegateFromLiquidityMining(msgSender, ipTokens, pwIporAmounts);
+        emit UndelegateFromLiquidityMining(msgSender, lpTokens, pwIporAmounts);
     }
 
     function coolDown(uint256 pwIporAmount) external override whenNotPaused nonReentrant {

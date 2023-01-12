@@ -5,9 +5,9 @@ pragma solidity 0.8.17;
 library LiquidityMiningTypes {
     /// @title Struct pair represented pwIpor balance delegated
     struct DelegatedPwIporBalance {
-        /// @notice ipToken address
-        address ipToken;
-        /// @notice amount of Power Ipor Token which was delegated for given ipToken
+        /// @notice lpToken address
+        address lpToken;
+        /// @notice amount of Power Ipor Token which was delegated for given lpToken
         /// @dev value represented in 18 decimals
         uint256 pwIporAmount;
     }
@@ -39,8 +39,8 @@ library LiquidityMiningTypes {
         /// @notice composite multiplier cumulative calculated for previous block
         /// @dev represented in 27 decimals
         uint128 compositeMultiplierCumulativePrevBlock;
-        /// @notice ipToken account's balance
-        uint128 ipTokenBalance;
+        /// @notice lpToken account's balance
+        uint128 lpTokenBalance;
         /// @notive PowerUp is a result of logarithmic equastion defined in documentation,
         /// parameter used to recalculate composite multiplier.
         /// @dev  powerUp < 100 *10^18

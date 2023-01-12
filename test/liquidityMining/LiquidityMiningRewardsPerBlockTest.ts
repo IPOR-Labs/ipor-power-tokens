@@ -43,7 +43,7 @@ describe("LiquidityMining Rewards per block", () => {
 
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMiningForTests");
         liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
-            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
+            [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address],
             powerIpor.address,
             iporToken.address,
         ])) as LiquidityMiningForTests;
@@ -51,19 +51,19 @@ describe("LiquidityMining Rewards per block", () => {
         await liquidityMining.setPowerIpor(await admin.getAddress());
     });
 
-    it("Should set up block rewards for ipToken", async () => {
+    it("Should set up block rewards for lpToken", async () => {
         // given
         const globalIndicatorsUsdcBefore = await liquidityMining.getGlobalIndicators(
-            tokens.ipTokenUsdc.address
+            tokens.lpTokenUsdc.address
         );
         const rewardsBefore = globalIndicatorsUsdcBefore.rewardsPerBlock;
 
         // when
-        await liquidityMining.setRewardsPerBlock(tokens.ipTokenUsdc.address, N2_0_8D);
+        await liquidityMining.setRewardsPerBlock(tokens.lpTokenUsdc.address, N2_0_8D);
 
         // then
         const globalIndicatorsUsdcAfter = await liquidityMining.getGlobalIndicators(
-            tokens.ipTokenUsdc.address
+            tokens.lpTokenUsdc.address
         );
         const rewardsAfter = globalIndicatorsUsdcAfter.rewardsPerBlock;
 
@@ -74,19 +74,19 @@ describe("LiquidityMining Rewards per block", () => {
     it("Should not update accrued rewards when update block rewords", async () => {
         //    given
         const globalIndicatorsUsdcBefore = await liquidityMining.getGlobalIndicators(
-            tokens.ipTokenUsdc.address
+            tokens.lpTokenUsdc.address
         );
         const rewardsBefore = globalIndicatorsUsdcBefore.rewardsPerBlock;
         const globalIndicatorsBefore = await liquidityMining.getGlobalIndicators(
-            tokens.ipTokenUsdc.address
+            tokens.lpTokenUsdc.address
         );
 
         //    when
-        await liquidityMining.setRewardsPerBlock(tokens.ipTokenUsdc.address, N2_0_8D);
+        await liquidityMining.setRewardsPerBlock(tokens.lpTokenUsdc.address, N2_0_8D);
 
         //    then
         const globalIndicatorsUsdcAfter = await liquidityMining.getGlobalIndicators(
-            tokens.ipTokenUsdc.address
+            tokens.lpTokenUsdc.address
         );
         const rewardsAfter = globalIndicatorsUsdcAfter.rewardsPerBlock;
 
@@ -96,41 +96,41 @@ describe("LiquidityMining Rewards per block", () => {
         expect(extractGlobalIndicators(globalIndicatorsUsdcAfter).accruedRewards).to.be.equal(ZERO);
     });
 
-    it("Should setup block rewards for 3 ipTokens", async () => {
+    it("Should setup block rewards for 3 lpTokens", async () => {
         //    given
         const globalIndicatorsDaiBefore = await liquidityMining.getGlobalIndicators(
-            tokens.ipTokenDai.address
+            tokens.lpTokenDai.address
         );
         const rewardsDaiBefore = globalIndicatorsDaiBefore.rewardsPerBlock;
 
         const globalIndicatorsUsdcBefore = await liquidityMining.getGlobalIndicators(
-            tokens.ipTokenUsdc.address
+            tokens.lpTokenUsdc.address
         );
         const rewardsUsdcBefore = globalIndicatorsUsdcBefore.rewardsPerBlock;
 
         const globalIndicatorsUsdtBefore = await liquidityMining.getGlobalIndicators(
-            tokens.ipTokenUsdt.address
+            tokens.lpTokenUsdt.address
         );
         const rewardsUsdtBefore = globalIndicatorsUsdtBefore.rewardsPerBlock;
 
         //    when
-        await liquidityMining.setRewardsPerBlock(tokens.ipTokenDai.address, N1_0_8D);
-        await liquidityMining.setRewardsPerBlock(tokens.ipTokenUsdc.address, N2_0_8D);
-        await liquidityMining.setRewardsPerBlock(tokens.ipTokenUsdt.address, N0_1_8D);
+        await liquidityMining.setRewardsPerBlock(tokens.lpTokenDai.address, N1_0_8D);
+        await liquidityMining.setRewardsPerBlock(tokens.lpTokenUsdc.address, N2_0_8D);
+        await liquidityMining.setRewardsPerBlock(tokens.lpTokenUsdt.address, N0_1_8D);
 
         //    then
         const globalIndicatorsDaiAfter = await liquidityMining.getGlobalIndicators(
-            tokens.ipTokenDai.address
+            tokens.lpTokenDai.address
         );
         const rewardsDaiAfter = await globalIndicatorsDaiAfter.rewardsPerBlock;
 
         const globalIndicatorsUsdcAfter = await liquidityMining.getGlobalIndicators(
-            tokens.ipTokenUsdc.address
+            tokens.lpTokenUsdc.address
         );
         const rewardsUsdcAfter = globalIndicatorsUsdcAfter.rewardsPerBlock;
 
         const globalIndicatorsUsdtAfter = await liquidityMining.getGlobalIndicators(
-            tokens.ipTokenUsdt.address
+            tokens.lpTokenUsdt.address
         );
         const rewardsUsdtAfter = globalIndicatorsUsdtAfter.rewardsPerBlock;
 
@@ -146,18 +146,18 @@ describe("LiquidityMining Rewards per block", () => {
     it("Should not be able to update value when not owner", async () => {
         //    given
         const globalIndicatorsBefore = await liquidityMining.getGlobalIndicators(
-            tokens.ipTokenDai.address
+            tokens.lpTokenDai.address
         );
         const rewardsDaiBefore = globalIndicatorsBefore.rewardsPerBlock;
 
         //    when
         await expect(
-            liquidityMining.connect(userOne).setRewardsPerBlock(tokens.ipTokenDai.address, N2_0_8D)
+            liquidityMining.connect(userOne).setRewardsPerBlock(tokens.lpTokenDai.address, N2_0_8D)
         ).to.be.revertedWith("Ownable: caller is not the owner");
 
         //    then
         const globalIndicatorsAfter = await liquidityMining.getGlobalIndicators(
-            tokens.ipTokenDai.address
+            tokens.lpTokenDai.address
         );
         const rewardsDaiAfter = globalIndicatorsAfter.rewardsPerBlock;
 
@@ -167,11 +167,11 @@ describe("LiquidityMining Rewards per block", () => {
 
     it("Should stop adding new rewards when rewards per block setup to zero", async () => {
         //    given
-        const ipDai = tokens.ipTokenDai.address;
-        await tokens.ipTokenDai.mint(await admin.getAddress(), USD_1_000_000_18DEC);
-        await tokens.ipTokenDai.approve(liquidityMining.address, USD_1_000_000_18DEC);
+        const ipDai = tokens.lpTokenDai.address;
+        await tokens.lpTokenDai.mint(await admin.getAddress(), USD_1_000_000_18DEC);
+        await tokens.lpTokenDai.approve(liquidityMining.address, USD_1_000_000_18DEC);
 
-        await liquidityMining.setRewardsPerBlock(tokens.ipTokenDai.address, N1__0_8DEC);
+        await liquidityMining.setRewardsPerBlock(tokens.lpTokenDai.address, N1__0_8DEC);
 
         await network.provider.send("evm_setAutomine", [false]);
         await liquidityMining.stake(ipDai, N2__0_18DEC);
@@ -217,9 +217,9 @@ describe("LiquidityMining Rewards per block", () => {
 
     it("Should restart grant rewards  when rewards per block setup from zero to one", async () => {
         //    given
-        const ipDai = tokens.ipTokenDai.address;
-        await tokens.ipTokenDai.mint(await admin.getAddress(), USD_1_000_000_18DEC);
-        await tokens.ipTokenDai.approve(liquidityMining.address, USD_1_000_000_18DEC);
+        const ipDai = tokens.lpTokenDai.address;
+        await tokens.lpTokenDai.mint(await admin.getAddress(), USD_1_000_000_18DEC);
+        await tokens.lpTokenDai.approve(liquidityMining.address, USD_1_000_000_18DEC);
 
         await network.provider.send("evm_setAutomine", [false]);
         await liquidityMining.stake(ipDai, N2__0_18DEC);

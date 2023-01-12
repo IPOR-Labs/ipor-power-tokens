@@ -43,95 +43,95 @@ describe("LiquidityMining Stake", () => {
 
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMiningForTests");
         liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
-            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
+            [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address],
             powerIpor.address,
             iporToken.address,
         ])) as LiquidityMiningForTests;
 
         await liquidityMining.setPowerIpor(await admin.getAddress());
 
-        tokens.ipTokenDai.approve(liquidityMining.address, TOTAL_SUPPLY_18_DECIMALS);
-        tokens.ipTokenDai
+        tokens.lpTokenDai.approve(liquidityMining.address, TOTAL_SUPPLY_18_DECIMALS);
+        tokens.lpTokenDai
             .connect(userOne)
             .approve(liquidityMining.address, TOTAL_SUPPLY_18_DECIMALS);
-        tokens.ipTokenDai
+        tokens.lpTokenDai
             .connect(userTwo)
             .approve(liquidityMining.address, TOTAL_SUPPLY_18_DECIMALS);
 
-        tokens.ipTokenUsdc.approve(liquidityMining.address, TOTAL_SUPPLY_6_DECIMALS);
-        tokens.ipTokenUsdc
+        tokens.lpTokenUsdc.approve(liquidityMining.address, TOTAL_SUPPLY_6_DECIMALS);
+        tokens.lpTokenUsdc
             .connect(userOne)
             .approve(liquidityMining.address, TOTAL_SUPPLY_6_DECIMALS);
-        tokens.ipTokenUsdc
+        tokens.lpTokenUsdc
             .connect(userTwo)
             .approve(liquidityMining.address, TOTAL_SUPPLY_6_DECIMALS);
 
-        tokens.ipTokenUsdt.approve(liquidityMining.address, TOTAL_SUPPLY_6_DECIMALS);
-        tokens.ipTokenUsdt
+        tokens.lpTokenUsdt.approve(liquidityMining.address, TOTAL_SUPPLY_6_DECIMALS);
+        tokens.lpTokenUsdt
             .connect(userOne)
             .approve(liquidityMining.address, TOTAL_SUPPLY_6_DECIMALS);
-        tokens.ipTokenUsdt
+        tokens.lpTokenUsdt
             .connect(userTwo)
             .approve(liquidityMining.address, TOTAL_SUPPLY_6_DECIMALS);
     });
 
-    it("Should not be able to stake when insufficient allowance on ipToken(Dai) ", async () => {
+    it("Should not be able to stake when insufficient allowance on lpToken(Dai) ", async () => {
         // given
         const balanceBefore = await liquidityMining.balanceOf(
             adminAddress,
-            tokens.ipTokenDai.address
+            tokens.lpTokenDai.address
         );
         // when
         await expect(
-            liquidityMining.connect(userThree).stake(tokens.ipTokenDai.address, N1__0_18DEC)
+            liquidityMining.connect(userThree).stake(tokens.lpTokenDai.address, N1__0_18DEC)
         ).to.be.revertedWith("ERC20: insufficient allowance");
 
         // then
         const balanceAfter = await liquidityMining.balanceOf(
             adminAddress,
-            tokens.ipTokenDai.address
+            tokens.lpTokenDai.address
         );
         // we dont
         expect(balanceBefore).to.be.equal(ZERO);
         expect(balanceAfter).to.be.equal(ZERO);
     });
 
-    it("Should be able to stake ipToken(Dai)", async () => {
+    it("Should be able to stake lpToken(Dai)", async () => {
         // given
         const balanceBefore = await liquidityMining.balanceOf(
             userOneAddress,
-            tokens.ipTokenDai.address
+            tokens.lpTokenDai.address
         );
         // when
-        await liquidityMining.connect(userOne).stake(tokens.ipTokenDai.address, N1__0_18DEC);
+        await liquidityMining.connect(userOne).stake(tokens.lpTokenDai.address, N1__0_18DEC);
 
         // then
         const balanceAfter = await liquidityMining.balanceOf(
             userOneAddress,
-            tokens.ipTokenDai.address
+            tokens.lpTokenDai.address
         );
 
         expect(balanceBefore).to.be.equal(ZERO);
         expect(balanceAfter).to.be.equal(N1__0_18DEC);
     });
 
-    it("Should not be able to stake when IpToken(usdt) is deactivated", async () => {
+    it("Should not be able to stake when LpToken(usdt) is deactivated", async () => {
         // given
         const balanceBefore = await liquidityMining.balanceOf(
             userOneAddress,
-            tokens.ipTokenUsdc.address
+            tokens.lpTokenUsdc.address
         );
-        await liquidityMining.removeIpTokenAsset(tokens.ipTokenUsdt.address);
+        await liquidityMining.removeLpTokenAsset(tokens.lpTokenUsdt.address);
 
         // when
         await expect(
-            liquidityMining.connect(userOne).stake(tokens.ipTokenUsdt.address, N1__0_6DEC)
+            liquidityMining.connect(userOne).stake(tokens.lpTokenUsdt.address, N1__0_6DEC)
         ).to.be.revertedWith("IPOR_701");
 
         // then
         const balanceAfter = await liquidityMining.balanceOf(
             userOneAddress,
-            tokens.ipTokenUsdc.address
+            tokens.lpTokenUsdc.address
         );
 
         expect(balanceBefore).to.be.equal(ZERO);
@@ -142,18 +142,18 @@ describe("LiquidityMining Stake", () => {
         // given
         const balanceBefore = await liquidityMining.balanceOf(
             userOneAddress,
-            tokens.ipTokenUsdc.address
+            tokens.lpTokenUsdc.address
         );
         await liquidityMining.pause();
 
         // when
         await expect(
-            liquidityMining.connect(userOne).stake(tokens.ipTokenUsdt.address, N1__0_6DEC)
+            liquidityMining.connect(userOne).stake(tokens.lpTokenUsdt.address, N1__0_6DEC)
         ).to.be.revertedWith("Pausable: paused");
         // then
         const balanceAfter = await liquidityMining.balanceOf(
             userOneAddress,
-            tokens.ipTokenUsdc.address
+            tokens.lpTokenUsdc.address
         );
 
         expect(balanceBefore).to.be.equal(ZERO);
@@ -164,17 +164,17 @@ describe("LiquidityMining Stake", () => {
         // given
         const balanceBefore = await liquidityMining.balanceOf(
             userOneAddress,
-            tokens.ipTokenUsdc.address
+            tokens.lpTokenUsdc.address
         );
         // when
         await expect(
-            liquidityMining.connect(userOne).stake(tokens.ipTokenUsdt.address, ZERO)
+            liquidityMining.connect(userOne).stake(tokens.lpTokenUsdt.address, ZERO)
         ).to.be.revertedWith("IPOR_717");
 
         // then
         const balanceAfter = await liquidityMining.balanceOf(
             userOneAddress,
-            tokens.ipTokenUsdc.address
+            tokens.lpTokenUsdc.address
         );
 
         expect(balanceBefore).to.be.equal(ZERO);

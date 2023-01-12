@@ -15,25 +15,25 @@ library MiningCalculation {
 
     /// @notice Calculases Power Up Indicator specific for one account.
     /// @param accountPwIporAmount account's Power Ipor Tokens amount
-    /// @param accountIpTokenAmount account's IP Tokens Amount
+    /// @param accountLpTokenAmount account's IP Tokens Amount
     /// @param verticalShift preconfigured param, vertical shift used in equation which calculate account power up indicator
     /// @param horizontalShift preconfigured param, horizontal shift used in equation which calculate account power up indicator
     /// @return power up indicator for a given account
     function calculateAccountPowerUp(
         uint256 accountPwIporAmount,
-        uint256 accountIpTokenAmount,
+        uint256 accountLpTokenAmount,
         bytes16 verticalShift,
         bytes16 horizontalShift
     ) internal pure returns (uint256) {
-        if (accountIpTokenAmount < Constants.D18) {
+        if (accountLpTokenAmount < Constants.D18) {
             return 0;
         }
 
         bytes16 pwIporAmountQP = _toQuadruplePrecision(accountPwIporAmount, Constants.D18);
-        bytes16 ipTokenAmountQP = _toQuadruplePrecision(accountIpTokenAmount, Constants.D18);
+        bytes16 lpTokenAmountQP = _toQuadruplePrecision(accountLpTokenAmount, Constants.D18);
 
         bytes16 underLog = ABDKMathQuad.add(
-            ABDKMathQuad.div(pwIporAmountQP, ipTokenAmountQP),
+            ABDKMathQuad.div(pwIporAmountQP, lpTokenAmountQP),
             horizontalShift
         );
 
@@ -46,28 +46,28 @@ library MiningCalculation {
     /// @notice Calculates aggreagated power up. Aggregate Power-up is a synthetic summary of all power-ups across all users.
     /// It's used to calculate individual rewards in relation to the rest of the pool.
     /// @param accountPowerUp power up indicator calculated for a given account
-    /// @param accountIpTokenAmount IP Token amount for a given account
+    /// @param accountLpTokenAmount IP Token amount for a given account
     /// @param previousAccountPowerUp previous power up indicator for a given account
-    /// @param previousAccountIpTokenAmount previous IP Token amount for a given account
+    /// @param previousAccountLpTokenAmount previous IP Token amount for a given account
     /// @param previousAggregatedPowerUp previous aggregated power up indicator
     function calculateAggregatedPowerUp(
         uint256 accountPowerUp,
-        uint256 accountIpTokenAmount,
+        uint256 accountLpTokenAmount,
         uint256 previousAccountPowerUp,
-        uint256 previousAccountIpTokenAmount,
+        uint256 previousAccountLpTokenAmount,
         uint256 previousAggregatedPowerUp
     ) internal pure returns (uint256) {
         int256 apu = accountPowerUp.toInt256() *
-            accountIpTokenAmount.toInt256() -
+            accountLpTokenAmount.toInt256() -
             previousAccountPowerUp.toInt256() *
-            previousAccountIpTokenAmount.toInt256();
+            previousAccountLpTokenAmount.toInt256();
 
         uint256 newApu;
 
         if (apu < 0) {
             uint256 absApu = IporMath.division((-apu).toUint256(), Constants.D18);
 
-            /// @dev last unstake ipTokens we can have rounding error
+            /// @dev last unstake lpTokens we can have rounding error
             if (previousAggregatedPowerUp < absApu && previousAggregatedPowerUp + 10000 >= absApu) {
                 return 0;
             }
@@ -129,13 +129,13 @@ library MiningCalculation {
 
     /// @notice calculates account rewards represented in Ipor Tokens
     /// @dev Account rewards can be also interpreted as a value in Power Ipor Tokens, because ration between Ipor Tokens and Power Ipor Tokens is 1:1.
-    /// @param accountIpTokenAmount amount of ipToken for a given account
+    /// @param accountLpTokenAmount amount of lpToken for a given account
     /// @param accountPowerUp value of powerUp indicator for a given account
     /// @param accountCompMultiplierCumulativePrevBlock Account Composite Multiplier Cumulative for a Previous Block, value from last Account Indicator update of param Composite Multiplier Cumulative for a given account
     /// @param accruedCompMultiplierCumulativePrevBlock Accrued Composite Multiplier Cumulative for a Previous Block, accrued value (in a current block) of param Composite Multiplier Cumulative global
     /// @return rewards, amount of Ipor Tokens (or Power Ipor Tokens because are in 1:1 relation with Ipor Tokens), represented in 18 decimals
     function calculateAccountRewards(
-        uint256 accountIpTokenAmount,
+        uint256 accountLpTokenAmount,
         uint256 accountPowerUp,
         uint256 accountCompMultiplierCumulativePrevBlock,
         uint256 accruedCompMultiplierCumulativePrevBlock
@@ -145,7 +145,7 @@ library MiningCalculation {
             MiningErrors.ACCOUNT_COMPOSITE_MULTIPLIER_GT_COMPOSITE_MULTIPLIER
         );
 
-        uint256 accountIporTokenRewards = accountIpTokenAmount *
+        uint256 accountIporTokenRewards = accountLpTokenAmount *
             accountPowerUp *
             (accruedCompMultiplierCumulativePrevBlock - accountCompMultiplierCumulativePrevBlock);
 

@@ -3,7 +3,7 @@ pragma solidity 0.8.17;
 
 library MiningErrors {
     /// @notice Error appeared when  IP Token address is not supported
-    /// @dev List of supported IpTokens are in field {LiquidityMining._ipTokens}
+    /// @dev List of supported LpTokens are in field {LiquidityMining._lpTokens}
     string public constant IP_TOKEN_NOT_SUPPORTED = "IPOR_701";
     /// @notice Error appeared when caller / msgSender is not a Power Ipor smart contract
     string public constant CALLER_NOT_POWER_IPOR = "IPOR_702";

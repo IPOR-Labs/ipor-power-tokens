@@ -6,14 +6,14 @@ import "../libraries/math/MiningCalculation.sol";
 contract MockMiningCalculation {
     function calculateAccountPowerUp(
         uint256 pwIporAmount,
-        uint256 ipTokenAmount,
+        uint256 lpTokenAmount,
         bytes16 verticalShift,
         bytes16 horizontalShift
     ) public pure returns (uint256) {
         return
             MiningCalculation.calculateAccountPowerUp(
                 pwIporAmount,
-                ipTokenAmount,
+                lpTokenAmount,
                 verticalShift,
                 horizontalShift
             );
@@ -21,17 +21,17 @@ contract MockMiningCalculation {
 
     function calculateAggregatedPowerUp(
         uint256 userPowerUp,
-        uint256 userIpTokenAmount,
+        uint256 userLpTokenAmount,
         uint256 previousUserPowerUp,
-        uint256 previousUserIpTokenAmount,
+        uint256 previousUserLpTokenAmount,
         uint256 previousAggregatedPowerUp
     ) public pure returns (uint256) {
         return
             MiningCalculation.calculateAggregatedPowerUp(
                 userPowerUp,
-                userIpTokenAmount,
+                userLpTokenAmount,
                 previousUserPowerUp,
-                previousUserIpTokenAmount,
+                previousUserLpTokenAmount,
                 previousAggregatedPowerUp
             );
     }
@@ -60,14 +60,14 @@ contract MockMiningCalculation {
     }
 
     function calculateAccountRewards(
-        uint256 accountIpTokenAmount,
+        uint256 accountLpTokenAmount,
         uint256 accountPowerUp,
         uint256 accountCompositeMultiplier,
         uint256 compositeMultiplier
     ) public pure returns (uint256) {
         return
             MiningCalculation.calculateAccountRewards(
-                accountIpTokenAmount,
+                accountLpTokenAmount,
                 accountPowerUp,
                 accountCompositeMultiplier,
                 compositeMultiplier

@@ -51,14 +51,14 @@ describe("PowerIpor delegateAndStakeToLiquidityMining", () => {
         await iporToken.increaseAllowance(powerIpor.address, TOTAL_SUPPLY_18_DECIMALS);
         const LiquidityMining = await hre.ethers.getContractFactory("LiquidityMining");
         liquidityMining = (await upgrades.deployProxy(LiquidityMining, [
-            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address, tokens.ipTokenUsdt.address],
+            [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address, tokens.lpTokenUsdt.address],
             powerIpor.address,
             iporToken.address,
         ])) as LiquidityMining;
 
-        await liquidityMining.setRewardsPerBlock(tokens.ipTokenDai.address, N1__0_8DEC);
-        await liquidityMining.setRewardsPerBlock(tokens.ipTokenUsdc.address, N1__0_8DEC);
-        await liquidityMining.setRewardsPerBlock(tokens.ipTokenUsdt.address, N1__0_8DEC);
+        await liquidityMining.setRewardsPerBlock(tokens.lpTokenDai.address, N1__0_8DEC);
+        await liquidityMining.setRewardsPerBlock(tokens.lpTokenUsdc.address, N1__0_8DEC);
+        await liquidityMining.setRewardsPerBlock(tokens.lpTokenUsdt.address, N1__0_8DEC);
 
         await powerIpor.setLiquidityMining(liquidityMining.address);
     });
@@ -132,10 +132,10 @@ describe("PowerIpor delegateAndStakeToLiquidityMining", () => {
         ).to.be.revertedWith("IPOR_708");
     });
 
-    it("Should be able to delegate into one asset and no stake ipToken when pass one asset", async () => {
+    it("Should be able to delegate into one asset and no stake lpToken when pass one asset", async () => {
         //    given
 
-        const liquidityMiningIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(
+        const liquidityMiningIpDaiBalanceBefore = await tokens.lpTokenDai.balanceOf(
             liquidityMining.address
         );
         const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
@@ -148,40 +148,40 @@ describe("PowerIpor delegateAndStakeToLiquidityMining", () => {
 
         //    when
         await powerIpor.delegateAndStakeToLiquidityMining(
-            [tokens.ipTokenDai.address],
+            [tokens.lpTokenDai.address],
             [N0__1_18DEC],
             [ZERO]
         );
 
         //    then
 
-        const liquidityMiningIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(
+        const liquidityMiningIpDaiBalanceAfter = await tokens.lpTokenDai.balanceOf(
             liquidityMining.address
         );
         const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
         const delegatedBalanceAfter = await powerIpor.delegatedToLiquidityMiningBalanceOf(
             await admin.getAddress()
         );
-        const ipTokenBalanceAfter = await liquidityMining.balanceOf(
+        const lpTokenBalanceAfter = await liquidityMining.balanceOf(
             await admin.getAddress(),
-            tokens.ipTokenDai.address
+            tokens.lpTokenDai.address
         );
 
         expect(delegatedBalanceBefore).to.be.equal(ZERO);
         expect(delegatedBalanceAfter).to.be.equal(N0__1_18DEC);
-        expect(ipTokenBalanceAfter).to.be.equal(ZERO);
+        expect(lpTokenBalanceAfter).to.be.equal(ZERO);
         expect(liquidityMiningIpDaiBalanceAfter).to.be.equal(liquidityMiningIpDaiBalanceBefore);
         expect(powerIporIporTokenBalanceAfter).to.be.equal(
             powerIporIporTokenBalanceBefore.add(N1__0_18DEC)
         );
     });
 
-    it("Should be able to delegate into one asset and stake ipToken when pass one asset", async () => {
+    it("Should be able to delegate into one asset and stake lpToken when pass one asset", async () => {
         //    given
         const delegatePwTokenToLiquidityMining = N1__0_18DEC;
-        const stakeIpTokenToLiquidityMining = N1__0_18DEC;
+        const stakeLpTokenToLiquidityMining = N1__0_18DEC;
 
-        const liquidityMiningIpDaiBalanceBefore = await tokens.ipTokenDai.balanceOf(
+        const liquidityMiningIpDaiBalanceBefore = await tokens.lpTokenDai.balanceOf(
             liquidityMining.address
         );
         const powerIporIporTokenBalanceBefore = await iporToken.balanceOf(powerIpor.address);
@@ -190,41 +190,41 @@ describe("PowerIpor delegateAndStakeToLiquidityMining", () => {
         const delegatedBalanceBefore = await powerIpor.delegatedToLiquidityMiningBalanceOf(
             await admin.getAddress()
         );
-        await tokens.ipTokenDai.approve(liquidityMining.address, TOTAL_SUPPLY_18_DECIMALS);
+        await tokens.lpTokenDai.approve(liquidityMining.address, TOTAL_SUPPLY_18_DECIMALS);
         const globalIndicatorsBefore = await liquidityMining.getGlobalIndicators(
-            tokens.ipTokenDai.address
+            tokens.lpTokenDai.address
         );
         const accountIndicatorsBefore = await liquidityMining.getAccountIndicators(
             await admin.getAddress(),
-            tokens.ipTokenDai.address
+            tokens.lpTokenDai.address
         );
 
         //    when
         await powerIpor.delegateAndStakeToLiquidityMining(
-            [tokens.ipTokenDai.address],
+            [tokens.lpTokenDai.address],
             [delegatePwTokenToLiquidityMining],
-            [stakeIpTokenToLiquidityMining]
+            [stakeLpTokenToLiquidityMining]
         );
 
         //    then
 
-        const liquidityMiningIpDaiBalanceAfter = await tokens.ipTokenDai.balanceOf(
+        const liquidityMiningIpDaiBalanceAfter = await tokens.lpTokenDai.balanceOf(
             liquidityMining.address
         );
         const powerIporIporTokenBalanceAfter = await iporToken.balanceOf(powerIpor.address);
         const delegatedBalanceAfter = await powerIpor.delegatedToLiquidityMiningBalanceOf(
             await admin.getAddress()
         );
-        const ipTokenBalanceAfter = await liquidityMining.balanceOf(
+        const lpTokenBalanceAfter = await liquidityMining.balanceOf(
             await admin.getAddress(),
-            tokens.ipTokenDai.address
+            tokens.lpTokenDai.address
         );
         const globalIndicatorsAfter = await liquidityMining.getGlobalIndicators(
-            tokens.ipTokenDai.address
+            tokens.lpTokenDai.address
         );
         const accountIndicatorsAfter = await liquidityMining.getAccountIndicators(
             await admin.getAddress(),
-            tokens.ipTokenDai.address
+            tokens.lpTokenDai.address
         );
 
         expectGlobalIndicators(
@@ -262,9 +262,9 @@ describe("PowerIpor delegateAndStakeToLiquidityMining", () => {
         );
         expect(delegatedBalanceBefore).to.be.equal(ZERO);
         expect(delegatedBalanceAfter).to.be.equal(N1__0_18DEC);
-        expect(ipTokenBalanceAfter).to.be.equal(N1__0_18DEC);
+        expect(lpTokenBalanceAfter).to.be.equal(N1__0_18DEC);
         expect(liquidityMiningIpDaiBalanceAfter).to.be.equal(
-            liquidityMiningIpDaiBalanceBefore.add(stakeIpTokenToLiquidityMining)
+            liquidityMiningIpDaiBalanceBefore.add(stakeLpTokenToLiquidityMining)
         );
         expect(powerIporIporTokenBalanceAfter).to.be.equal(
             powerIporIporTokenBalanceBefore.add(delegatePwTokenToLiquidityMining)
@@ -275,29 +275,29 @@ describe("PowerIpor delegateAndStakeToLiquidityMining", () => {
         //    given
         const [admin] = accounts;
         await powerIpor.stake(N2__0_18DEC);
-        await tokens.ipTokenDai.approve(liquidityMining.address, TOTAL_SUPPLY_18_DECIMALS);
-        await tokens.ipTokenUsdc.approve(liquidityMining.address, TOTAL_SUPPLY_18_DECIMALS);
+        await tokens.lpTokenDai.approve(liquidityMining.address, TOTAL_SUPPLY_18_DECIMALS);
+        await tokens.lpTokenUsdc.approve(liquidityMining.address, TOTAL_SUPPLY_18_DECIMALS);
 
         const delegatedBalanceBefore = await powerIpor.delegatedToLiquidityMiningBalanceOf(
             await admin.getAddress()
         );
         const globalIndicatorsDaiBefore = await liquidityMining.getGlobalIndicators(
-            tokens.ipTokenDai.address
+            tokens.lpTokenDai.address
         );
         const accountIndicatorsDaiBefore = await liquidityMining.getAccountIndicators(
             await admin.getAddress(),
-            tokens.ipTokenDai.address
+            tokens.lpTokenDai.address
         );
         const globalIndicatorsUsdcBefore = await liquidityMining.getGlobalIndicators(
-            tokens.ipTokenUsdc.address
+            tokens.lpTokenUsdc.address
         );
         const accountIndicatorsUsdcBefore = await liquidityMining.getAccountIndicators(
             await admin.getAddress(),
-            tokens.ipTokenUsdc.address
+            tokens.lpTokenUsdc.address
         );
         //    when
         await powerIpor.delegateAndStakeToLiquidityMining(
-            [tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
+            [tokens.lpTokenDai.address, tokens.lpTokenUsdc.address],
             [N1__0_18DEC, N1__0_18DEC],
             [N1__0_18DEC, N1__0_18DEC]
         );
@@ -306,18 +306,18 @@ describe("PowerIpor delegateAndStakeToLiquidityMining", () => {
             await admin.getAddress()
         );
         const globalIndicatorsDaiAfter = await liquidityMining.getGlobalIndicators(
-            tokens.ipTokenDai.address
+            tokens.lpTokenDai.address
         );
         const accountIndicatorsDaiAfter = await liquidityMining.getAccountIndicators(
             await admin.getAddress(),
-            tokens.ipTokenDai.address
+            tokens.lpTokenDai.address
         );
         const globalIndicatorsUsdcAfter = await liquidityMining.getGlobalIndicators(
-            tokens.ipTokenUsdc.address
+            tokens.lpTokenUsdc.address
         );
         const accountIndicatorsUsdcAfter = await liquidityMining.getAccountIndicators(
             await admin.getAddress(),
-            tokens.ipTokenUsdc.address
+            tokens.lpTokenUsdc.address
         );
 
         expect(delegatedBalanceBefore).to.be.equal(ZERO);
@@ -390,33 +390,33 @@ describe("PowerIpor delegateAndStakeToLiquidityMining", () => {
         );
     });
 
-    it("Should be able to stake and delegate two asset and has the same values when one ipTokens is pass twice and the second once", async () => {
+    it("Should be able to stake and delegate two asset and has the same values when one lpTokens is pass twice and the second once", async () => {
         //    given
         const [admin] = accounts;
         await powerIpor.stake(N1__0_18DEC.mul(BigNumber.from("10")));
-        await tokens.ipTokenDai.approve(liquidityMining.address, TOTAL_SUPPLY_18_DECIMALS);
-        await tokens.ipTokenUsdc.approve(liquidityMining.address, TOTAL_SUPPLY_18_DECIMALS);
+        await tokens.lpTokenDai.approve(liquidityMining.address, TOTAL_SUPPLY_18_DECIMALS);
+        await tokens.lpTokenUsdc.approve(liquidityMining.address, TOTAL_SUPPLY_18_DECIMALS);
 
         const delegatedBalanceBefore = await powerIpor.delegatedToLiquidityMiningBalanceOf(
             await admin.getAddress()
         );
         const globalIndicatorsDaiBefore = await liquidityMining.getGlobalIndicators(
-            tokens.ipTokenDai.address
+            tokens.lpTokenDai.address
         );
         const accountIndicatorsDaiBefore = await liquidityMining.getAccountIndicators(
             await admin.getAddress(),
-            tokens.ipTokenDai.address
+            tokens.lpTokenDai.address
         );
         const globalIndicatorsUsdcBefore = await liquidityMining.getGlobalIndicators(
-            tokens.ipTokenUsdc.address
+            tokens.lpTokenUsdc.address
         );
         const accountIndicatorsUsdcBefore = await liquidityMining.getAccountIndicators(
             await admin.getAddress(),
-            tokens.ipTokenUsdc.address
+            tokens.lpTokenUsdc.address
         );
         //    when
         await powerIpor.delegateAndStakeToLiquidityMining(
-            [tokens.ipTokenDai.address, tokens.ipTokenDai.address, tokens.ipTokenUsdc.address],
+            [tokens.lpTokenDai.address, tokens.lpTokenDai.address, tokens.lpTokenUsdc.address],
             [N1__0_18DEC, N1__0_18DEC, N2__0_18DEC],
             [N1__0_18DEC, N1__0_18DEC, N2__0_18DEC]
         );
@@ -425,18 +425,18 @@ describe("PowerIpor delegateAndStakeToLiquidityMining", () => {
             await admin.getAddress()
         );
         const globalIndicatorsDaiAfter = await liquidityMining.getGlobalIndicators(
-            tokens.ipTokenDai.address
+            tokens.lpTokenDai.address
         );
         const accountIndicatorsDaiAfter = await liquidityMining.getAccountIndicators(
             await admin.getAddress(),
-            tokens.ipTokenDai.address
+            tokens.lpTokenDai.address
         );
         const globalIndicatorsUsdcAfter = await liquidityMining.getGlobalIndicators(
-            tokens.ipTokenUsdc.address
+            tokens.lpTokenUsdc.address
         );
         const accountIndicatorsUsdcAfter = await liquidityMining.getAccountIndicators(
             await admin.getAddress(),
-            tokens.ipTokenUsdc.address
+            tokens.lpTokenUsdc.address
         );
 
         expect(delegatedBalanceBefore).to.be.equal(ZERO);
@@ -494,8 +494,8 @@ describe("PowerIpor delegateAndStakeToLiquidityMining", () => {
         ).to.be.equal(
             extractAccountIndicators(accountIndicatorsUsdcBefore).delegatedPowerTokenBalance
         );
-        expect(extractAccountIndicators(accountIndicatorsDaiBefore).ipTokenBalance).to.be.equal(
-            extractAccountIndicators(accountIndicatorsUsdcBefore).ipTokenBalance
+        expect(extractAccountIndicators(accountIndicatorsDaiBefore).lpTokenBalance).to.be.equal(
+            extractAccountIndicators(accountIndicatorsUsdcBefore).lpTokenBalance
         );
 
         expect(extractAccountIndicators(accountIndicatorsDaiAfter).powerUp).to.be.equal(
@@ -513,8 +513,8 @@ describe("PowerIpor delegateAndStakeToLiquidityMining", () => {
         ).to.be.equal(
             extractAccountIndicators(accountIndicatorsUsdcAfter).delegatedPowerTokenBalance
         );
-        expect(extractAccountIndicators(accountIndicatorsDaiAfter).ipTokenBalance).to.be.equal(
-            extractAccountIndicators(accountIndicatorsUsdcAfter).ipTokenBalance
+        expect(extractAccountIndicators(accountIndicatorsDaiAfter).lpTokenBalance).to.be.equal(
+            extractAccountIndicators(accountIndicatorsUsdcAfter).lpTokenBalance
         );
     });
 });
