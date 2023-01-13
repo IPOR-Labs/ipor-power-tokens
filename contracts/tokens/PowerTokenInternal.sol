@@ -40,7 +40,7 @@ abstract contract PowerTokenInternal is
     /// @dev balance of Power Token delegated to LiquidityMining, information per account, balance represented with 18 decimals
     mapping(address => uint256) internal _delegatedToLiquidityMiningBalance;
     // account address -> {endTimestamp, amount}
-    mapping(address => PowerTokenTypes.PwTokenCoolDown) internal _coolDowns;
+    mapping(address => PowerTokenTypes.PwTokenCooldown) internal _cooldowns;
     uint256 internal _baseTotalSupply;
     uint256 internal _unstakeWithoutCooldownFee;
 
@@ -209,7 +209,7 @@ abstract contract PowerTokenInternal is
         return
             _calculateBaseAmountToPwToken(_baseBalance[account], exchangeRate) -
             _delegatedToLiquidityMiningBalance[account] -
-            _coolDowns[account].pwTokenAmount;
+            _cooldowns[account].pwTokenAmount;
     }
 
     function _balanceOf(address account) internal view returns (uint256) {

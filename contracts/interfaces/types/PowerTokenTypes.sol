@@ -3,7 +3,7 @@ pragma solidity 0.8.17;
 
 /// @title Struct used across Liquidity Mining.
 library PowerTokenTypes {
-    struct PwTokenCoolDown {
+    struct PwTokenCooldown {
         // @dev The timestamp when the account can redeem Power Tokens
         uint256 endTimestamp;
         // @dev The amount of Power Tokens which can be redeemed without fee when the cooldown reaches `endTimestamp`

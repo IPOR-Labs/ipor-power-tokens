@@ -91,7 +91,7 @@ describe("LiquidityMining event tests", () => {
         await powerToken.setLiquidityMining(liquidityMining.address);
     });
 
-    it("Should emit StakeLpTokens event", async () => {
+    it("Should emit LpTokensStaked event", async () => {
         //    given
         const stakeLpTokenAmount = N1__0_18DEC;
         const accountLpTokenBalanceBefore = (
@@ -102,7 +102,7 @@ describe("LiquidityMining event tests", () => {
         ).lpTokenBalance;
         //    when
         await expect(liquidityMining.stake(tokens.lpTokenDai.address, stakeLpTokenAmount))
-            .to.emit(liquidityMining, "StakeLpTokens")
+            .to.emit(liquidityMining, "LpTokensStaked")
             .withArgs(await admin.getAddress(), tokens.lpTokenDai.address, stakeLpTokenAmount);
         //    then
         const accountLpTokenBalanceAfter = (
@@ -117,7 +117,7 @@ describe("LiquidityMining event tests", () => {
         );
     });
 
-    it("Should emit UnstakeLpTokens event", async () => {
+    it("Should emit LpTokensUnstaked event", async () => {
         //    given
         const stakeLpTokenAmount = N1__0_18DEC;
         const unstakeLpTokenAmount = N0__5_18DEC;
@@ -132,7 +132,7 @@ describe("LiquidityMining event tests", () => {
 
         //    when
         await expect(liquidityMining.unstake(tokens.lpTokenDai.address, unstakeLpTokenAmount))
-            .to.emit(liquidityMining, "UnstakeLpTokens")
+            .to.emit(liquidityMining, "LpTokensUnstaked")
             .withArgs(await admin.getAddress(), tokens.lpTokenDai.address, unstakeLpTokenAmount);
 
         //    then
@@ -148,7 +148,7 @@ describe("LiquidityMining event tests", () => {
         );
     });
 
-    it("Should emit Claim and ReceiveRewards event", async () => {
+    it("Should emit Claim and RewardsReceived event", async () => {
         //    given
         const stakeLpTokenAmount = N1__0_18DEC;
         const rewards = N1__0_18DEC.mul(BigNumber.from("101"));
@@ -165,9 +165,9 @@ describe("LiquidityMining event tests", () => {
 
         //    when
         await expect(liquidityMining.claim(tokens.lpTokenDai.address))
-            .to.emit(liquidityMining, "Claim")
+            .to.emit(liquidityMining, "Claimed")
             .withArgs(await admin.getAddress(), tokens.lpTokenDai.address, rewards)
-            .to.be.emit(powerToken, "ReceiveRewards")
+            .to.be.emit(powerToken, "RewardsReceived")
             .withArgs(await admin.getAddress(), rewards);
 
         //    then
@@ -244,7 +244,7 @@ describe("LiquidityMining event tests", () => {
         expect(lpTokenSupportedAfter).to.be.false;
     });
 
-    it("Should emit DelegatePwToken event ", async () => {
+    it("Should emit PwTokenDelegated event ", async () => {
         //    given
         const stakeStakedTokenAmount = N1__0_18DEC;
         const delegatePwTokenAmount = N1__0_18DEC;
@@ -261,7 +261,7 @@ describe("LiquidityMining event tests", () => {
                 [delegatePwTokenAmount]
             )
         )
-            .to.emit(liquidityMining, "DelegatePwToken")
+            .to.emit(liquidityMining, "PwTokenDelegated")
             .withArgs(await admin.getAddress(), tokens.lpTokenDai.address, delegatePwTokenAmount);
         //    then
         const delegatedPwTokenBalanceAfter = (
@@ -275,7 +275,7 @@ describe("LiquidityMining event tests", () => {
         );
     });
 
-    it("Should emit DelegatePwTokenAndStakeLpToken event ", async () => {
+    it("Should emit PwTokenDelegatedAndLpTokenStaked event ", async () => {
         //    given
         const stakeStakedTokenAmount = N1__0_18DEC;
         const stakeLpTokenAmount = N1__0_18DEC;
@@ -298,7 +298,7 @@ describe("LiquidityMining event tests", () => {
                 [stakeLpTokenAmount]
             )
         )
-            .to.emit(liquidityMining, "DelegatePwTokenAndStakeLpToken")
+            .to.emit(liquidityMining, "PwTokenDelegatedAndLpTokenStaked")
             .withArgs(
                 await admin.getAddress(),
                 tokens.lpTokenDai.address,
@@ -323,7 +323,7 @@ describe("LiquidityMining event tests", () => {
         );
     });
 
-    it("Should emit UndelegatePwToken event ", async () => {
+    it("Should emit PwTokenUndelegated event ", async () => {
         //    given
         const stakeStakedTokenAmount = N1__0_18DEC;
         const delegatePwTokenAmount = N1__0_18DEC;
@@ -345,7 +345,7 @@ describe("LiquidityMining event tests", () => {
                 [undelegatePwTokenAmount]
             )
         )
-            .to.emit(liquidityMining, "UndelegatePwToken")
+            .to.emit(liquidityMining, "PwTokenUndelegated")
             .withArgs(await admin.getAddress(), tokens.lpTokenDai.address, undelegatePwTokenAmount);
         //    then
         const delegatedPwTokenBalanceAfter = (

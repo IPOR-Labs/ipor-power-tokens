@@ -53,7 +53,7 @@ describe("PowerToken token delegate", () => {
         const stakedTokenStakeBalanceBefore = await powerToken.balanceOf(await admin.getAddress());
         //    when
         await expect(powerToken.stake(stakeAmount))
-            .to.emit(powerToken, "Stake")
+            .to.emit(powerToken, "Staked")
             .withArgs(await admin.getAddress(), stakeAmount, internalExchangeRate, baseAmount);
         //    then
         const stakedTokenStakeBalanceAfter = await powerToken.balanceOf(await admin.getAddress());
@@ -72,7 +72,7 @@ describe("PowerToken token delegate", () => {
         const stakedTokenStakeBalanceBefore = await powerToken.balanceOf(await admin.getAddress());
         //    when
         await expect(powerToken.unstake(stakeAmount))
-            .to.emit(powerToken, "Unstake")
+            .to.emit(powerToken, "Unstaked")
             .withArgs(await admin.getAddress(), unstakeAmount, internalExchangeRate, fee);
         //    then
         const stakedTokenStakeBalanceAfter = await powerToken.balanceOf(await admin.getAddress());
@@ -97,7 +97,7 @@ describe("PowerToken token delegate", () => {
                 [delegatePwTokenAmount]
             )
         )
-            .to.emit(powerToken, "DelegateToLiquidityMining")
+            .to.emit(powerToken, "ToLiquidityMiningDelegated")
             .withArgs(
                 await admin.getAddress(),
                 [tokens.lpTokenDai.address],
@@ -115,7 +115,7 @@ describe("PowerToken token delegate", () => {
         );
     });
 
-    it("Should emit UndelegatePwToken event ", async () => {
+    it("Should emit PwTokenUndelegated event ", async () => {
         //    given
         const stakeStakedTokenAmount = N1__0_18DEC;
         const delegatePwTokenAmount = N1__0_18DEC;
@@ -137,7 +137,7 @@ describe("PowerToken token delegate", () => {
                 [undelegatePwTokenAmount]
             )
         )
-            .to.emit(powerToken, "UndelegateFromLiquidityMining")
+            .to.emit(powerToken, "FromLiquidityMiningUndelegated")
             .withArgs(
                 await admin.getAddress(),
                 [tokens.lpTokenDai.address],
@@ -155,25 +155,25 @@ describe("PowerToken token delegate", () => {
         );
     });
 
-    it("Should emit CoolDownChanged event when cooldown", async () => {
+    it("Should emit CooldownChanged event when cooldown", async () => {
         //    given
         const stakeStakedTokenAmount = N1__0_18DEC;
-        const coolDownAmount = N1__0_18DEC;
+        const cooldownAmount = N1__0_18DEC;
         const delegatePwTokenAmount = N1__0_18DEC;
         const undelegatePwTokenAmount = N1__0_18DEC;
         await powerToken.stake(stakeStakedTokenAmount);
         //    when
-        await expect(powerToken.coolDown(coolDownAmount)).to.emit(powerToken, "CoolDownChanged");
+        await expect(powerToken.cooldown(cooldownAmount)).to.emit(powerToken, "CooldownChanged");
         //    then
     });
-    it("Should emit CoolDownChanged event when cancelCoolDown", async () => {
+    it("Should emit CooldownChanged event when cancelCooldown", async () => {
         //    given
         const stakeStakedTokenAmount = N1__0_18DEC;
-        const coolDownAmount = N1__0_18DEC;
+        const cooldownAmount = N1__0_18DEC;
         await powerToken.stake(stakeStakedTokenAmount);
-        await powerToken.coolDown(coolDownAmount);
+        await powerToken.cooldown(cooldownAmount);
         //    when
-        await expect(powerToken.cancelCoolDown()).to.emit(powerToken, "CoolDownChanged");
+        await expect(powerToken.cancelCooldown()).to.emit(powerToken, "CooldownChanged");
         //    then
     });
 
@@ -181,7 +181,7 @@ describe("PowerToken token delegate", () => {
         // given
         const twoWeekesInSeconds = 2 * 7 * 24 * 60 * 60;
         await powerToken.stake(N1__0_18DEC);
-        await powerToken.coolDown(N0__5_18DEC);
+        await powerToken.cooldown(N0__5_18DEC);
 
         // when
         await hre.network.provider.send("evm_increaseTime", [twoWeekesInSeconds + 1]);
