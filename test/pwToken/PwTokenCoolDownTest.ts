@@ -57,40 +57,40 @@ describe("PowerToken unstake", () => {
         await powerToken.setLiquidityMining(liquidityMining.address);
     });
 
-    it("Should not be able coolDown when amount is zero", async () => {
+    it("Should not be able cooldown when amount is zero", async () => {
         // given
         await powerToken.stake(N1__0_18DEC);
 
-        const coolDownBefore = await powerToken.getActiveCoolDown(await accounts[0].getAddress());
+        const cooldownBefore = await powerToken.getActiveCooldown(await accounts[0].getAddress());
 
         // when
-        await expect(powerToken.coolDown(ZERO)).to.be.revertedWith("PT_717");
+        await expect(powerToken.cooldown(ZERO)).to.be.revertedWith("PT_717");
 
         // then
-        const coolDownAfter = await powerToken.getActiveCoolDown(await accounts[0].getAddress());
+        const cooldownAfter = await powerToken.getActiveCooldown(await accounts[0].getAddress());
 
-        expect(coolDownBefore.endTimestamp).to.be.equal(ZERO);
-        expect(coolDownBefore.pwTokenAmount).to.be.equal(ZERO);
-        expect(coolDownAfter.endTimestamp).to.be.equal(ZERO);
-        expect(coolDownAfter.pwTokenAmount).to.be.equal(ZERO);
+        expect(cooldownBefore.endTimestamp).to.be.equal(ZERO);
+        expect(cooldownBefore.pwTokenAmount).to.be.equal(ZERO);
+        expect(cooldownAfter.endTimestamp).to.be.equal(ZERO);
+        expect(cooldownAfter.pwTokenAmount).to.be.equal(ZERO);
     });
 
-    it("Should not be able coolDown when amount is to big", async () => {
+    it("Should not be able cooldown when amount is to big", async () => {
         // given
         await powerToken.stake(N1__0_18DEC);
 
-        const coolDownBefore = await powerToken.getActiveCoolDown(await accounts[0].getAddress());
+        const cooldownBefore = await powerToken.getActiveCooldown(await accounts[0].getAddress());
 
         // when
-        await expect(powerToken.coolDown(N2__0_18DEC)).to.be.revertedWith("PT_708");
+        await expect(powerToken.cooldown(N2__0_18DEC)).to.be.revertedWith("PT_708");
 
         // then
-        const coolDownAfter = await powerToken.getActiveCoolDown(await accounts[0].getAddress());
+        const cooldownAfter = await powerToken.getActiveCooldown(await accounts[0].getAddress());
 
-        expect(coolDownBefore.endTimestamp).to.be.equal(ZERO);
-        expect(coolDownBefore.pwTokenAmount).to.be.equal(ZERO);
-        expect(coolDownAfter.endTimestamp).to.be.equal(ZERO);
-        expect(coolDownAfter.pwTokenAmount).to.be.equal(ZERO);
+        expect(cooldownBefore.endTimestamp).to.be.equal(ZERO);
+        expect(cooldownBefore.pwTokenAmount).to.be.equal(ZERO);
+        expect(cooldownAfter.endTimestamp).to.be.equal(ZERO);
+        expect(cooldownAfter.pwTokenAmount).to.be.equal(ZERO);
     });
 
     it("Should be able cool down when amount is zero", async () => {
@@ -98,18 +98,18 @@ describe("PowerToken unstake", () => {
         const nowInSeconds = getTimeInSeconds();
         await powerToken.stake(N1__0_18DEC);
 
-        const coolDownBefore = await powerToken.getActiveCoolDown(await accounts[0].getAddress());
+        const cooldownBefore = await powerToken.getActiveCooldown(await accounts[0].getAddress());
 
         // when
-        await powerToken.coolDown(N0__5_18DEC);
+        await powerToken.cooldown(N0__5_18DEC);
 
         // then
-        const coolDownAfter = await powerToken.getActiveCoolDown(await accounts[0].getAddress());
+        const cooldownAfter = await powerToken.getActiveCooldown(await accounts[0].getAddress());
 
-        expect(coolDownBefore.endTimestamp).to.be.equal(ZERO);
-        expect(coolDownBefore.pwTokenAmount).to.be.equal(ZERO);
-        expect(coolDownAfter.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
-        expect(coolDownAfter.pwTokenAmount).to.be.equal(N0__5_18DEC);
+        expect(cooldownBefore.endTimestamp).to.be.equal(ZERO);
+        expect(cooldownBefore.pwTokenAmount).to.be.equal(ZERO);
+        expect(cooldownAfter.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
+        expect(cooldownAfter.pwTokenAmount).to.be.equal(N0__5_18DEC);
     });
 
     it("Should be able to override cool down when second time execute method ", async () => {
@@ -117,20 +117,20 @@ describe("PowerToken unstake", () => {
         const nowInSeconds = getTimeInSeconds();
         await powerToken.stake(N1__0_18DEC);
 
-        await powerToken.coolDown(N0__5_18DEC);
-        const coolDownBefore = await powerToken.getActiveCoolDown(await accounts[0].getAddress());
+        await powerToken.cooldown(N0__5_18DEC);
+        const cooldownBefore = await powerToken.getActiveCooldown(await accounts[0].getAddress());
         // when
 
-        await powerToken.coolDown(N0__6_18DEC);
+        await powerToken.cooldown(N0__6_18DEC);
 
         // then
-        const coolDownAfter = await powerToken.getActiveCoolDown(await accounts[0].getAddress());
+        const cooldownAfter = await powerToken.getActiveCooldown(await accounts[0].getAddress());
 
-        expect(coolDownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
-        expect(coolDownBefore.pwTokenAmount).to.be.equal(N0__5_18DEC);
+        expect(cooldownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
+        expect(cooldownBefore.pwTokenAmount).to.be.equal(N0__5_18DEC);
 
-        expect(coolDownAfter.endTimestamp.gt(coolDownBefore.endTimestamp)).to.be.true;
-        expect(coolDownAfter.pwTokenAmount).to.be.equal(N0__6_18DEC);
+        expect(cooldownAfter.endTimestamp.gt(cooldownBefore.endTimestamp)).to.be.true;
+        expect(cooldownAfter.pwTokenAmount).to.be.equal(N0__6_18DEC);
     });
 
     it("Should be able to cancel cool down", async () => {
@@ -138,20 +138,20 @@ describe("PowerToken unstake", () => {
         const nowInSeconds = getTimeInSeconds();
         await powerToken.stake(N1__0_18DEC);
 
-        await powerToken.coolDown(N0__5_18DEC);
-        const coolDownBefore = await powerToken.getActiveCoolDown(await accounts[0].getAddress());
+        await powerToken.cooldown(N0__5_18DEC);
+        const cooldownBefore = await powerToken.getActiveCooldown(await accounts[0].getAddress());
         // when
 
-        await powerToken.cancelCoolDown();
+        await powerToken.cancelCooldown();
 
         // then
-        const coolDownAfter = await powerToken.getActiveCoolDown(await accounts[0].getAddress());
+        const cooldownAfter = await powerToken.getActiveCooldown(await accounts[0].getAddress());
 
-        expect(coolDownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
-        expect(coolDownBefore.pwTokenAmount).to.be.equal(N0__5_18DEC);
+        expect(cooldownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
+        expect(cooldownBefore.pwTokenAmount).to.be.equal(N0__5_18DEC);
 
-        expect(coolDownAfter.endTimestamp).to.be.equal(ZERO);
-        expect(coolDownAfter.pwTokenAmount).to.be.equal(ZERO);
+        expect(cooldownAfter.endTimestamp).to.be.equal(ZERO);
+        expect(cooldownAfter.pwTokenAmount).to.be.equal(ZERO);
     });
 
     it("Should not be able to unstake when some amount is in cool down state", async () => {
@@ -160,22 +160,22 @@ describe("PowerToken unstake", () => {
         const nowInSeconds = getTimeInSeconds();
 
         await powerToken.stake(N1__0_18DEC);
-        await powerToken.coolDown(N0__8_18DEC);
+        await powerToken.cooldown(N0__8_18DEC);
 
-        const coolDownBefore = await powerToken.getActiveCoolDown(await accounts[0].getAddress());
+        const cooldownBefore = await powerToken.getActiveCooldown(await accounts[0].getAddress());
         const balanceBefore = await powerToken.balanceOf(adminAddress);
         // when
 
         await expect(powerToken.unstake(N0__5_18DEC)).to.be.revertedWith("PT_708");
 
         // then
-        const coolDownAfter = await powerToken.getActiveCoolDown(await accounts[0].getAddress());
+        const cooldownAfter = await powerToken.getActiveCooldown(await accounts[0].getAddress());
         const balanceAfter = await powerToken.balanceOf(adminAddress);
 
-        expect(coolDownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
-        expect(coolDownBefore.pwTokenAmount).to.be.equal(N0__8_18DEC);
-        expect(coolDownAfter.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
-        expect(coolDownAfter.pwTokenAmount).to.be.equal(N0__8_18DEC);
+        expect(cooldownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
+        expect(cooldownBefore.pwTokenAmount).to.be.equal(N0__8_18DEC);
+        expect(cooldownAfter.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
+        expect(cooldownAfter.pwTokenAmount).to.be.equal(N0__8_18DEC);
 
         expect(balanceBefore).to.be.equal(N1__0_18DEC);
         expect(balanceAfter).to.be.equal(N1__0_18DEC);
@@ -187,9 +187,9 @@ describe("PowerToken unstake", () => {
         const nowInSeconds = getTimeInSeconds();
 
         await powerToken.stake(N1__0_18DEC);
-        await powerToken.coolDown(N0__8_18DEC);
+        await powerToken.cooldown(N0__8_18DEC);
 
-        const coolDownBefore = await powerToken.getActiveCoolDown(await accounts[0].getAddress());
+        const cooldownBefore = await powerToken.getActiveCooldown(await accounts[0].getAddress());
         const balanceBefore = await powerToken.balanceOf(adminAddress);
         const delegatedBalanceBefore = await powerToken.delegatedToLiquidityMiningBalanceOf(
             adminAddress
@@ -201,16 +201,16 @@ describe("PowerToken unstake", () => {
         ).to.be.revertedWith("PT_708");
 
         // then
-        const coolDownAfter = await powerToken.getActiveCoolDown(await accounts[0].getAddress());
+        const cooldownAfter = await powerToken.getActiveCooldown(await accounts[0].getAddress());
         const balanceAfter = await powerToken.balanceOf(adminAddress);
         const delegatedBalanceAfter = await powerToken.delegatedToLiquidityMiningBalanceOf(
             adminAddress
         );
 
-        expect(coolDownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
-        expect(coolDownBefore.pwTokenAmount).to.be.equal(N0__8_18DEC);
-        expect(coolDownAfter.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
-        expect(coolDownAfter.pwTokenAmount).to.be.equal(N0__8_18DEC);
+        expect(cooldownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
+        expect(cooldownBefore.pwTokenAmount).to.be.equal(N0__8_18DEC);
+        expect(cooldownAfter.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
+        expect(cooldownAfter.pwTokenAmount).to.be.equal(N0__8_18DEC);
 
         expect(balanceBefore).to.be.equal(N1__0_18DEC);
         expect(balanceAfter).to.be.equal(N1__0_18DEC);
@@ -223,26 +223,26 @@ describe("PowerToken unstake", () => {
         const nowInSeconds = getTimeInSeconds();
         await powerToken.stake(N1__0_18DEC);
 
-        await powerToken.coolDown(N0__5_18DEC);
-        const coolDownBefore = await powerToken.getActiveCoolDown(await accounts[0].getAddress());
+        await powerToken.cooldown(N0__5_18DEC);
+        const cooldownBefore = await powerToken.getActiveCooldown(await accounts[0].getAddress());
         // when
 
         await expect(powerToken.redeem()).to.be.revertedWith("PT_710");
 
         // then
-        const coolDownAfter = await powerToken.getActiveCoolDown(await accounts[0].getAddress());
+        const cooldownAfter = await powerToken.getActiveCooldown(await accounts[0].getAddress());
 
-        expect(coolDownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
-        expect(coolDownBefore.pwTokenAmount).to.be.equal(N0__5_18DEC);
+        expect(cooldownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
+        expect(cooldownBefore.pwTokenAmount).to.be.equal(N0__5_18DEC);
 
-        expect(coolDownAfter.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
-        expect(coolDownAfter.pwTokenAmount).to.be.equal(N0__5_18DEC);
+        expect(cooldownAfter.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
+        expect(cooldownAfter.pwTokenAmount).to.be.equal(N0__5_18DEC);
     });
 
     it("Should be able to redeem cool down tokens when 2 weeks pass", async () => {
         // given
 
-        const expectedCoolDownPwTokenAmount = N0__5_18DEC;
+        const expectedCooldownPwTokenAmount = N0__5_18DEC;
         const powerTokenStakedTokenBalanceBefore = await stakedToken.balanceOf(powerToken.address);
         const twoWeekesInSeconds = 2 * 7 * 24 * 60 * 60;
         const adminAddress = await accounts[0].getAddress();
@@ -250,8 +250,8 @@ describe("PowerToken unstake", () => {
         await powerToken.stake(N1__0_18DEC);
         const pwBalanceBefore = await powerToken.balanceOf(adminAddress);
 
-        await powerToken.coolDown(N0__5_18DEC);
-        const coolDownBefore = await powerToken.getActiveCoolDown(await accounts[0].getAddress());
+        await powerToken.cooldown(N0__5_18DEC);
+        const cooldownBefore = await powerToken.getActiveCooldown(await accounts[0].getAddress());
         const exchangeRateBefore = await powerToken.calculateExchangeRate();
 
         // when
@@ -262,19 +262,19 @@ describe("PowerToken unstake", () => {
         const exchangeRateAfter = await powerToken.calculateExchangeRate();
 
         const powerTokenStakedTokenBalanceAfter = await stakedToken.balanceOf(powerToken.address);
-        const coolDownAfter = await powerToken.getActiveCoolDown(await accounts[0].getAddress());
+        const cooldownAfter = await powerToken.getActiveCooldown(await accounts[0].getAddress());
         const pwBalanceAfter = await powerToken.balanceOf(adminAddress);
 
-        expect(coolDownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
-        expect(coolDownBefore.pwTokenAmount).to.be.equal(expectedCoolDownPwTokenAmount);
+        expect(cooldownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
+        expect(cooldownBefore.pwTokenAmount).to.be.equal(expectedCooldownPwTokenAmount);
 
-        expect(coolDownAfter.endTimestamp).to.be.equal(ZERO);
-        expect(coolDownAfter.pwTokenAmount).to.be.equal(ZERO);
+        expect(cooldownAfter.endTimestamp).to.be.equal(ZERO);
+        expect(cooldownAfter.pwTokenAmount).to.be.equal(ZERO);
 
         expect(pwBalanceBefore).to.be.equal(N1__0_18DEC);
         expect(pwBalanceAfter).to.be.equal(N0__5_18DEC);
         expect(powerTokenStakedTokenBalanceAfter).to.be.equal(
-            powerTokenStakedTokenBalanceBefore.add(expectedCoolDownPwTokenAmount)
+            powerTokenStakedTokenBalanceBefore.add(expectedCooldownPwTokenAmount)
         );
         expect(exchangeRateBefore).to.be.equal(exchangeRateAfter);
     });
@@ -292,10 +292,10 @@ describe("PowerToken unstake", () => {
         await powerToken.stake(N1__0_18DEC);
         const pwBalanceBefore = await powerToken.balanceOf(adminAddress);
 
-        await powerToken.coolDown(N0__5_18DEC);
+        await powerToken.cooldown(N0__5_18DEC);
         await stakedToken.transfer(powerToken.address, N1__0_18DEC);
 
-        const coolDownBefore = await powerToken.getActiveCoolDown(await accounts[0].getAddress());
+        const cooldownBefore = await powerToken.getActiveCooldown(await accounts[0].getAddress());
         const PowerTokenBalanceBefore = await stakedToken.balanceOf(adminAddress);
         const exchangeRateBefore = await powerToken.calculateExchangeRate();
 
@@ -306,15 +306,15 @@ describe("PowerToken unstake", () => {
         // then
         const exchangeRateAfter = await powerToken.calculateExchangeRate();
         const powerTokenStakedTokenBalanceAfter = await stakedToken.balanceOf(powerToken.address);
-        const coolDownAfter = await powerToken.getActiveCoolDown(await accounts[0].getAddress());
+        const cooldownAfter = await powerToken.getActiveCooldown(await accounts[0].getAddress());
         const pwBalanceAfter = await powerToken.balanceOf(adminAddress);
         const stakedTokenBalanceAfter = await stakedToken.balanceOf(adminAddress);
 
-        expect(coolDownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
-        expect(coolDownBefore.pwTokenAmount).to.be.equal(N0__5_18DEC);
+        expect(cooldownBefore.endTimestamp.gt(nowInSeconds.add(COOLDOWN_SECONDS))).to.be.true;
+        expect(cooldownBefore.pwTokenAmount).to.be.equal(N0__5_18DEC);
 
-        expect(coolDownAfter.endTimestamp).to.be.equal(ZERO);
-        expect(coolDownAfter.pwTokenAmount).to.be.equal(ZERO);
+        expect(cooldownAfter.endTimestamp).to.be.equal(ZERO);
+        expect(cooldownAfter.pwTokenAmount).to.be.equal(ZERO);
 
         expect(pwBalanceBefore).to.be.equal(N1__0_18DEC);
         expect(pwBalanceAfter).to.be.equal(N1__0_18DEC.add(N0__5_18DEC));
