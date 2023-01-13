@@ -1,12 +1,12 @@
-// SPDX-License-Identifier: GPL-2.0-or-later
+// SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.17;
 
-/// @title Struct used across liquidity rewards.
+/// @title Struct used across Liquidity Mining.
 library PowerTokenTypes {
     struct PwTokenCooldown {
-        // @dev timestamp when account can redeem Pw Tokens
+        // @dev The timestamp when the account can redeem Power Tokens
         uint256 endTimestamp;
-        // @dev amount of Power Tokens which can be redeem without fee when cooldown reached `endTimestamp`
+        // @dev The amount of Power Tokens which can be redeemed without fee when the cooldown reaches `endTimestamp`
         uint256 pwTokenAmount;
     }
 }

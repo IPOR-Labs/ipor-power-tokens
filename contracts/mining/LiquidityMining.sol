@@ -4,9 +4,8 @@ pragma solidity 0.8.17;
 import "../interfaces/ILiquidityMining.sol";
 import "./LiquidityMiningInternal.sol";
 
-/// @title Smart contract responsible for distribution Staked token rewards across accounts contributed in Protocol
-/// by staking lpTokens and / or delegating Power Tokens to LiquidityMining. LpTokens can be staked directly to LiquidityMining,
-/// Power Tokens account can get stake Staked Tokens in PowerToken smart contract.
+/// @title Smart contract responsible for distribution of Power Token rewards across accounts contributing to Liquidity Mining
+/// by staking lpTokens and / or delegating Power Tokens. 
 contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
     using SafeCast for uint256;
     using SafeCast for int256;

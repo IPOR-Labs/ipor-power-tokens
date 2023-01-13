@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BUSL-1.1
+// SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
@@ -22,7 +22,7 @@ abstract contract PowerTokenInternal is
     MiningOwnableUpgradeable,
     IPowerTokenInternal
 {
-    /// @dev 2 weeks
+    /// @dev 14 days
     uint256 public constant COOL_DOWN_IN_SECONDS = 2 * 7 * 24 * 60 * 60;
 
     bytes32 internal constant _STAKED_TOKEN_ID =
@@ -34,10 +34,10 @@ abstract contract PowerTokenInternal is
     address internal _stakedToken;
     address internal _pauseManager;
 
-    /// @dev account address -> base amount, represented in 18 decimals
+    /// @dev account address -> base amount, represented with 18 decimals
     mapping(address => uint256) internal _baseBalance;
 
-    /// @dev balance of Power Token which are delegated to LiquidityMining, information per account, balance represented in 18 decimals
+    /// @dev balance of Power Token delegated to LiquidityMining, information per account, balance represented with 18 decimals
     mapping(address => uint256) internal _delegatedToLiquidityMiningBalance;
     // account address -> {endTimestamp, amount}
     mapping(address => PowerTokenTypes.PwTokenCooldown) internal _cooldowns;
@@ -136,7 +136,7 @@ abstract contract PowerTokenInternal is
         onlyLiquidityMining
     {
         address stakedTokenAddress = _stakedToken;
-        /// @dev We need this value before transfer tokens
+        /// @dev This value is needed before the tokens transfer
         uint256 exchangeRate = _calculateInternalExchangeRate(stakedTokenAddress);
         require(rewardsAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
