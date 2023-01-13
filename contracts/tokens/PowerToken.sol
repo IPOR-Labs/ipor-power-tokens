@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: BUSL-1.1
+// SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.17;
 
 import "../interfaces/ILiquidityMiningInternal.sol";
@@ -6,9 +6,8 @@ import "../interfaces/IPowerToken.sol";
 import "./PowerTokenInternal.sol";
 
 ///@title Smart contract responsible for managing Power Token.
-/// @notice Power Token is retrieved when account stake Staked Token.
-/// PowerToken smart contract allows you to stake, unstake Staked Token, deletage, undelegate to LiquidityMining Power Token.
-/// Interact with LiquidityMining smart contract.
+/// @notice Power Token is retrieved when the account stakes [Staked] Token.
+/// PowerToken smart contract allows staking, unstaking of [Staked] Token, delegating, undelegating of Power Token balance to LiquidityMining.
 contract PowerToken is PowerTokenInternal, IPowerToken {
     function name() external pure override returns (string memory) {
         return "Power IPOR";

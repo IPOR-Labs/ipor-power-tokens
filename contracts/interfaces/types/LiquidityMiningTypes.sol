@@ -1,13 +1,13 @@
-// SPDX-License-Identifier: GPL-2.0-or-later
+// SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.17;
 
-/// @title Structures used in LiquidityMining smart contract.
+/// @title Structures used in the LiquidityMining.
 library LiquidityMiningTypes {
-    /// @title Struct pair represented pwToken balance delegated
+    /// @title Struct pair representing delegated pwToken balance
     struct DelegatedPwTokenBalance {
         /// @notice lpToken address
         address lpToken;
-        /// @notice amount of Power Token which was delegated for given lpToken
+        /// @notice The amount of Power Token delegated to lpToken staking pool
         /// @dev value represented in 18 decimals
         uint256 pwTokenAmount;
     }
@@ -15,37 +15,36 @@ library LiquidityMiningTypes {
     /// @title Global indicators used in rewards calculation.
     struct GlobalRewardsIndicators {
         /// @notice powerUp indicator aggregated
-        /// @dev could be change many times per transaction, represended in 18 decimals
+        /// @dev It can be changed many times during transaction, represended with 18 decimals
         uint256 aggregatedPowerUp;
-        /// @notice composite multiplier in a given block described in field blockNumber
-        /// @dev could be change many times per transaction, represented in 27 decimals
+        /// @notice composite multiplier in a block described in field blockNumber
+        /// @dev It can be changed many times during transaction, represented with 27 decimals
         uint128 compositeMultiplierInTheBlock;
         /// @notice Composite multiplier updated in block {blockNumber} but calculated for PREVIOUS (!) block.
-        /// @dev could be changed one time per block, represented in 27 decimals
+        /// @dev It can be changed once per block, represented with 27 decimals
         uint128 compositeMultiplierCumulativePrevBlock;
-        /// @dev could be changed one time per block, Block number in which all others params in this structure are updated
+        /// @dev It can be changed once per block. Block number in which all other params of this structure are updated
         uint32 blockNumber;
-        /// @notice value describes how many rewards are per one block,
-        /// @dev could be changed at most one time per block, represented in 8 decimals
+        /// @notice value describing amount of rewards issued per block,
+        /// @dev It can be changed at most once per block, represented with 8 decimals
         uint32 rewardsPerBlock;
-        /// @notice amount of accrued rewards in all history
-        /// @dev could be changed at most one time per block, represented in 8 decimals
+        /// @notice amount of accrued rewards since inception
+        /// @dev It can be changed at most onece per block, represented with 8 decimals
         uint88 accruedRewards;
     }
 
-    /// @title Rewards params specified for one account. Params used in algorithm responsible for rewards distribution.
-    /// @dev Structure in storage is updated in moment when account interacts with LiquidityMining smart contract (stake, unstake, delegate, undelegate, claim)
+    /// @title Params recorded for a given account. These params are used by the algorithm responsible for rewards distribution.
+    /// @dev The structure in storage is updated when account interacts with the LiquidityMining smart contract (stake, unstake, delegate, undelegate, claim)
     struct AccountRewardsIndicators {
-        /// @notice composite multiplier cumulative calculated for previous block
+        /// @notice `composite multiplier cumulative` is calculated for previous block
         /// @dev represented in 27 decimals
         uint128 compositeMultiplierCumulativePrevBlock;
         /// @notice lpToken account's balance
         uint128 lpTokenBalance;
-        /// @notive PowerUp is a result of logarithmic equastion defined in documentation,
-        /// parameter used to recalculate composite multiplier.
+        /// @notive PowerUp is a result of logarithmic equastion,
         /// @dev  powerUp < 100 *10^18
         uint72 powerUp;
-        /// @notice balance of Power Tokens which are delegated to LiquidityMining
+        /// @notice balance of Power Tokens delegated to LiquidityMining
         /// @dev delegatedPwTokenBalance < 10^26 < 2^87
         uint96 delegatedPwTokenBalance;
     }
