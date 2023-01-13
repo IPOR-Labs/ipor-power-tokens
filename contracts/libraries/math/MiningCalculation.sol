@@ -151,9 +151,9 @@ library MiningCalculation {
         return Math.division(accountStakedTokenRewards, Constants.D45);
     }
 
-    /// @notice Calculates the accrued Composite Multiplier Cumulative for a previous block
+    /// @notice Calculates the accrued Composite Multiplier Cumulative for the previous block
     /// @param currentBlockNumber Current block number
-    /// @param globalIndBlockNumber Block number of last update of Global Indicators
+    /// @param globalIndBlockNumber Block number of the last update of the Global Indicators
     /// @param globalIndCompositeMultiplierInTheBlock Configuration param - Composite Multiplier for one block defined in Global Indicators
     /// @param globalIndCompositeMultiplierCumulativePrevBlock Compositne Multiplier Comulative for a previous block defined in Global Indicators structure.
     function calculateAccruedCompMultiplierCumulativePrevBlock(
@@ -175,7 +175,7 @@ library MiningCalculation {
         returns (bytes16)
     {
         if (number % decimals > 0) {
-            /// @dev during calculation this value is lost in conversion
+            /// @dev during calculation this value is lost in the conversion
             number += 1;
         }
         bytes16 nominator = ABDKMathQuad.fromUInt(number);
