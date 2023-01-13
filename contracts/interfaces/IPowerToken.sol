@@ -121,7 +121,7 @@ interface IPowerToken {
     );
 
     /// @notice Emitted when the account unstakes the Power Tokens
-    /// @param account address tjat executed the unstaking
+    /// @param account address that executed the unstaking
     /// @param pwTokenAmount amount of Power Tokens that were unstaked
     /// @param internalExchangeRate which was used to calculate the base amount
     /// @param fee amount subtracted from the pwTokenAmount

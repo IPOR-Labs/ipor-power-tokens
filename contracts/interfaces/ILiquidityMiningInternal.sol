@@ -26,7 +26,7 @@ interface ILiquidityMiningInternal {
         view
         returns (LiquidityMiningTypes.GlobalRewardsIndicators memory);
 
-    /// @notice Gsts the sender's rewards indicators for a given lpToken
+    /// @notice Gets the sender's rewards indicators for a given lpToken
     /// @param account account's address 
     /// @param lpToken lpToken address
     /// @return {LiquidityMiningTypes.AccountRewardsIndicators} structure with the sender rewards indicators used in rewards calculation.
@@ -74,7 +74,7 @@ interface ILiquidityMiningInternal {
     /// @param pwTokenAmount amount of the `rewards per block`, denominated in Power Token, represented with 8 decimals
     function setRewardsPerBlock(address lpToken, uint32 pwTokenAmount) external;
 
-    /// @notice Adds LiquidityMining's support for the newlpToken
+    /// @notice Adds LiquidityMining's support for a new lpToken
     /// @dev Can only be executed by the Owner
     /// @param lpToken address of the lpToken
     function addLpToken(address lpToken) external;
@@ -104,8 +104,8 @@ interface ILiquidityMiningInternal {
 
     /// @notice Emitted when the LiquidityMining's Owner changes the `rewards per block`
     /// @param changedBy address of account executing changes
-    /// @param oldPwTokenAmount old value of `rewards per block`, Denominated in Power Token amount, represented in 8 decimals
-    /// @param newPwTokenAmount new value of `rewards per block`, Denominated in Power Token amount, represented in 8 decimals
+    /// @param oldPwTokenAmount old value of `rewards per block`, denominated in Power Token, represented in 8 decimals
+    /// @param newPwTokenAmount new value of `rewards per block`, denominated in Power Token, represented in 8 decimals
     event RewardsPerBlockChanged(
         address indexed changedBy,
         uint256 oldPwTokenAmount,
@@ -117,7 +117,7 @@ interface ILiquidityMiningInternal {
     /// @param lpToken address of newly supported lpToken
     event LpTokenAdded(address account, address lpToken);
 
-    /// @notice Emitted when the LiquidityMining's Owner removessupport for lpToken
+    /// @notice Emitted when the LiquidityMining's Owner removes ssupport for lpToken
     /// @param account address of LiquidityMining's Owner
     /// @param lpToken address of dropped lpToken
     event LpTokenRemoved(address account, address lpToken);

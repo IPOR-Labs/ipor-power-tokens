@@ -29,7 +29,7 @@ library LiquidityMiningTypes {
         /// @dev It can be changed at most once per block, represented with 8 decimals
         uint32 rewardsPerBlock;
         /// @notice amount of accrued rewards since inception
-        /// @dev It can be changed at most onece per block, represented with 8 decimals
+        /// @dev It can be changed at most once per block, represented with 8 decimals
         uint88 accruedRewards;
     }
 

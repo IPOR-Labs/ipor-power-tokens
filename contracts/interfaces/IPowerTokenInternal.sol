@@ -52,10 +52,10 @@ interface IPowerTokenInternal {
     /// @dev Emits {Unpaused}.
     function unpause() external;
 
-    /// @notice Emitted when the user receives rewards from the liquidityMining
+    /// @notice Emitted when the user receives rewards from the LiquidityMining
     /// @dev Receiving rewards does not change Internal Exchange Rate of Power Tokens in PowerToken smart contract.
     /// @param account address
-    /// @param rewardsAmount amount of Power Tokens received from liquidityMining
+    /// @param rewardsAmount amount of Power Tokens received from LiquidityMining
     event RewardsReceived(address account, uint256 rewardsAmount);
 
     /// @notice Emitted when the fee for immediate unstaking is modified.

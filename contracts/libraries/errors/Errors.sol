@@ -2,7 +2,7 @@
 pragma solidity 0.8.17;
 
 library Errors {
-    /// @notice Error thrown when the  lpToken address is not supported
+    /// @notice Error thrown when the lpToken address is not supported
     /// @dev List of supported LpTokens are defined in {LiquidityMining._lpTokens}
     string public constant LP_TOKEN_NOT_SUPPORTED = "PT_701";
     /// @notice Error thrown when the caller / msgSender is not a PowerToken smart contract
