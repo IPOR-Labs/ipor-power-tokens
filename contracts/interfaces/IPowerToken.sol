@@ -45,14 +45,14 @@ interface IPowerToken {
     function getUnstakeWithoutCooldownFee() external view returns (uint256);
 
     /// @notice Gets state of active cool down for the sender.
-    /// @dev If PowerTokenTypes.PowerTokenCoolDown contains only zeros it represents no active cool down.
+    /// @dev If PowerTokenTypes.PowerTokenCooldown contains only zeros it represents no active cool down.
     /// Struct contain information when cooldown is ended and how many Power Tokens are locked.
     /// @param account account address which cooldown should be returned
-    /// @return Object PowerTokenTypes.PowerTokenCoolDown which represents active cool down, the moment of
-    function getActiveCoolDown(address account)
+    /// @return Object PowerTokenTypes.PowerTokenCooldown which represents active cool down, the moment of
+    function getActiveCooldown(address account)
         external
         view
-        returns (PowerTokenTypes.PwTokenCoolDown memory);
+        returns (PowerTokenTypes.PwTokenCooldown memory);
 
     /// @notice Stakes Staked Tokens and receives Power tokens (pwToken).
     /// @param stakedTokenAmount Staked tokens which sender want to stake to the PowerToken smart contract
@@ -97,15 +97,15 @@ interface IPowerToken {
     /// Unstake without coold down is configured in param `_unstakeWithoutCooldownFee`
     /// Power Tokens in cool down state allows sender to redeem Staked Tokens in relation 1:1 to Power Tokens.
     /// @param pwTokenAmount Power Token amount which sender wants to freeze
-    function coolDown(uint256 pwTokenAmount) external;
+    function cooldown(uint256 pwTokenAmount) external;
 
     /// @notice Cancel cool down.
     /// @dev When this method is executed then none of Power Tokens are in cool down state.
-    function cancelCoolDown() external;
+    function cancelCooldown() external;
 
     /// @notice The method allowed to redeem the Staked Token when cool down time finish.
     /// @dev Staked Tokens are in relation 1:1 to Power Tokens
-    /// @dev When sender execute `redeem` method then structure {PowerTokenTypes.PwTokenCoolDown} is cleared for a given sender in `_coolDowns` storage.
+    /// @dev When sender execute `redeem` method then structure {PowerTokenTypes.PwTokenCooldown} is cleared for a given sender in `_cooldowns` storage.
     function redeem() external;
 
     /// @notice Emitted when account stake Staked tokens
@@ -152,11 +152,11 @@ interface IPowerToken {
         uint256[] pwTokenAmounts
     );
 
-    /// @notice Emitted when sender setup coolDown
-    /// @param changedBy account address that has changed CoolDown rules
+    /// @notice Emitted when sender setup cooldown
+    /// @param changedBy account address that has changed Cooldown rules
     /// @param pwTokenAmount amount of pwToken which was freeze to unstake
     /// @param endTimestamp time when user will be able to redeem tokens without fee
-    event CoolDownChanged(address indexed changedBy, uint256 pwTokenAmount, uint256 endTimestamp);
+    event CooldownChanged(address indexed changedBy, uint256 pwTokenAmount, uint256 endTimestamp);
 
     /// @notice Emitted when sender redeem pwTokens after cool down
     /// @param account address who executes redeem

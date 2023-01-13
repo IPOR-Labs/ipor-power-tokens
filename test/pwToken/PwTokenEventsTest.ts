@@ -155,25 +155,25 @@ describe("PowerToken token delegate", () => {
         );
     });
 
-    it("Should emit CoolDownChanged event when cooldown", async () => {
+    it("Should emit CooldownChanged event when cooldown", async () => {
         //    given
         const stakeStakedTokenAmount = N1__0_18DEC;
-        const coolDownAmount = N1__0_18DEC;
+        const cooldownAmount = N1__0_18DEC;
         const delegatePwTokenAmount = N1__0_18DEC;
         const undelegatePwTokenAmount = N1__0_18DEC;
         await powerToken.stake(stakeStakedTokenAmount);
         //    when
-        await expect(powerToken.coolDown(coolDownAmount)).to.emit(powerToken, "CoolDownChanged");
+        await expect(powerToken.cooldown(cooldownAmount)).to.emit(powerToken, "CooldownChanged");
         //    then
     });
-    it("Should emit CoolDownChanged event when cancelCoolDown", async () => {
+    it("Should emit CooldownChanged event when cancelCooldown", async () => {
         //    given
         const stakeStakedTokenAmount = N1__0_18DEC;
-        const coolDownAmount = N1__0_18DEC;
+        const cooldownAmount = N1__0_18DEC;
         await powerToken.stake(stakeStakedTokenAmount);
-        await powerToken.coolDown(coolDownAmount);
+        await powerToken.cooldown(cooldownAmount);
         //    when
-        await expect(powerToken.cancelCoolDown()).to.emit(powerToken, "CoolDownChanged");
+        await expect(powerToken.cancelCooldown()).to.emit(powerToken, "CooldownChanged");
         //    then
     });
 
@@ -181,7 +181,7 @@ describe("PowerToken token delegate", () => {
         // given
         const twoWeekesInSeconds = 2 * 7 * 24 * 60 * 60;
         await powerToken.stake(N1__0_18DEC);
-        await powerToken.coolDown(N0__5_18DEC);
+        await powerToken.cooldown(N0__5_18DEC);
 
         // when
         await hre.network.provider.send("evm_increaseTime", [twoWeekesInSeconds + 1]);

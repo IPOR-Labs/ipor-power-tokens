@@ -51,12 +51,12 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         return _unstakeWithoutCooldownFee;
     }
 
-    function getActiveCoolDown(address account)
+    function getActiveCooldown(address account)
         external
         view
-        returns (PowerTokenTypes.PwTokenCoolDown memory)
+        returns (PowerTokenTypes.PwTokenCooldown memory)
     {
-        return _coolDowns[account];
+        return _cooldowns[account];
     }
 
     function stake(uint256 stakedTokenAmount) external override whenNotPaused nonReentrant {
@@ -220,7 +220,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         emit FromLiquidityMiningUndelegated(msgSender, lpTokens, pwTokenAmounts);
     }
 
-    function coolDown(uint256 pwTokenAmount) external override whenNotPaused nonReentrant {
+    function cooldown(uint256 pwTokenAmount) external override whenNotPaused nonReentrant {
         require(pwTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
         address msgSender = _msgSender();
@@ -235,31 +235,31 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
             Errors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW
         );
 
-        _coolDowns[msgSender] = PowerTokenTypes.PwTokenCoolDown(
+        _cooldowns[msgSender] = PowerTokenTypes.PwTokenCooldown(
             block.timestamp + COOL_DOWN_IN_SECONDS,
             pwTokenAmount
         );
-        emit CoolDownChanged(msgSender, pwTokenAmount, block.timestamp + COOL_DOWN_IN_SECONDS);
+        emit CooldownChanged(msgSender, pwTokenAmount, block.timestamp + COOL_DOWN_IN_SECONDS);
     }
 
-    function cancelCoolDown() external override whenNotPaused {
-        delete _coolDowns[_msgSender()];
-        emit CoolDownChanged(_msgSender(), 0, 0);
+    function cancelCooldown() external override whenNotPaused {
+        delete _cooldowns[_msgSender()];
+        emit CooldownChanged(_msgSender(), 0, 0);
     }
 
     function redeem() external override whenNotPaused nonReentrant {
         address msgSender = _msgSender();
 
-        PowerTokenTypes.PwTokenCoolDown memory accountCoolDown = _coolDowns[msgSender];
+        PowerTokenTypes.PwTokenCooldown memory accountCooldown = _cooldowns[msgSender];
 
-        require(block.timestamp >= accountCoolDown.endTimestamp, Errors.COOL_DOWN_NOT_FINISH);
-        require(accountCoolDown.pwTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(block.timestamp >= accountCooldown.endTimestamp, Errors.COOL_DOWN_NOT_FINISH);
+        require(accountCooldown.pwTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
         address stakedTokenAddress = _stakedToken;
 
         uint256 exchangeRate = _calculateInternalExchangeRate(stakedTokenAddress);
         uint256 baseAmountToUnstake = Math.division(
-            accountCoolDown.pwTokenAmount * Constants.D18,
+            accountCooldown.pwTokenAmount * Constants.D18,
             exchangeRate
         );
 
@@ -271,11 +271,11 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         _baseBalance[msgSender] -= baseAmountToUnstake;
         _baseTotalSupply -= baseAmountToUnstake;
 
-        delete _coolDowns[msgSender];
+        delete _cooldowns[msgSender];
 
         ///@dev We can transfer pwTokenAmount because it is in relation 1:1 to Staked Token
-        IERC20Upgradeable(stakedTokenAddress).transfer(msgSender, accountCoolDown.pwTokenAmount);
+        IERC20Upgradeable(stakedTokenAddress).transfer(msgSender, accountCooldown.pwTokenAmount);
 
-        emit Redeem(msgSender, accountCoolDown.pwTokenAmount);
+        emit Redeem(msgSender, accountCooldown.pwTokenAmount);
     }
 }
