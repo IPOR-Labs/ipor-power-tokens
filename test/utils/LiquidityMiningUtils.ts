@@ -2,7 +2,7 @@ import hre from "hardhat";
 import { BigNumber, Signer } from "ethers";
 import chai from "chai";
 
-import { MockTokenDai, MockTokenUsdc, MockTokenUsdt, MockIpToken } from "../../types";
+import { MockTokenDai, MockTokenUsdc, MockTokenUsdt, MockLpToken } from "../../types";
 
 import {
     USD_1_000_000,
@@ -18,9 +18,9 @@ export type Tokens = {
     tokenDai: MockTokenDai;
     tokenUsdc: MockTokenUsdc;
     tokenUsdt: MockTokenUsdt;
-    ipTokenDai: MockIpToken;
-    ipTokenUsdc: MockIpToken;
-    ipTokenUsdt: MockIpToken;
+    lpTokenDai: MockLpToken;
+    lpTokenUsdc: MockLpToken;
+    lpTokenUsdt: MockLpToken;
 };
 
 export type GlobalIndicators = {
@@ -35,7 +35,7 @@ export type GlobalIndicators = {
 export type UserParams = {
     powerUp: BigNumber;
     compositeMultiplierCumulativePrevBlock: BigNumber;
-    ipTokenBalance: BigNumber;
+    lpTokenBalance: BigNumber;
     delegatedPowerTokenBalance: BigNumber;
 };
 
@@ -44,7 +44,7 @@ export const getDeployedTokens = async (accounts: Signer[]): Promise<Tokens> => 
     const MockTokenUsdt = await hre.ethers.getContractFactory("MockTokenUsdt");
     const MockTokenUsdc = await hre.ethers.getContractFactory("MockTokenUsdc");
     const MockTokenDai = await hre.ethers.getContractFactory("MockTokenDai");
-    const MockIpToken = await hre.ethers.getContractFactory("MockIpToken");
+    const MockLpToken = await hre.ethers.getContractFactory("MockLpToken");
 
     const tokenDai = (await MockTokenDai.deploy(TOTAL_SUPPLY_18_DECIMALS)) as MockTokenDai;
     await tokenDai.deployed();
@@ -55,48 +55,48 @@ export const getDeployedTokens = async (accounts: Signer[]): Promise<Tokens> => 
     const tokenUsdt = (await MockTokenUsdt.deploy(TOTAL_SUPPLY_6_DECIMALS)) as MockTokenUsdt;
     await tokenUsdt.deployed();
 
-    const ipTokenDai = (await MockIpToken.deploy(
-        "IP Dai",
-        "ipDAI",
+    const lpTokenDai = (await MockLpToken.deploy(
+        "LP Dai",
+        "lpDAI",
         tokenDai.address
-    )) as MockIpToken;
-    const ipTokenUsdc = (await MockIpToken.deploy(
-        "IP USDC",
-        "ipUSDC",
+    )) as MockLpToken;
+    const lpTokenUsdc = (await MockLpToken.deploy(
+        "LP USDC",
+        "lpUSDC",
         tokenUsdc.address
-    )) as MockIpToken;
-    const ipTokenUsdt = (await MockIpToken.deploy(
-        "IP USDT",
-        "ipUSDT",
+    )) as MockLpToken;
+    const lpTokenUsdt = (await MockLpToken.deploy(
+        "LP USDT",
+        "lpUSDT",
         tokenUsdt.address
-    )) as MockIpToken;
+    )) as MockLpToken;
 
-    await ipTokenDai.setJoseph(await admin.getAddress());
-    await ipTokenUsdc.setJoseph(await admin.getAddress());
-    await ipTokenUsdt.setJoseph(await admin.getAddress());
+    await lpTokenDai.setJoseph(await admin.getAddress());
+    await lpTokenUsdc.setJoseph(await admin.getAddress());
+    await lpTokenUsdt.setJoseph(await admin.getAddress());
 
-    await ipTokenDai.mint(await admin.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
-    await ipTokenUsdc.mint(await admin.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
-    await ipTokenUsdt.mint(await admin.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
+    await lpTokenDai.mint(await admin.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
+    await lpTokenUsdc.mint(await admin.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
+    await lpTokenUsdt.mint(await admin.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
 
-    await ipTokenDai.mint(await userOne.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
-    await ipTokenUsdc.mint(await userOne.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
-    await ipTokenUsdt.mint(await userOne.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
+    await lpTokenDai.mint(await userOne.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
+    await lpTokenUsdc.mint(await userOne.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
+    await lpTokenUsdt.mint(await userOne.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
 
-    await ipTokenDai.mint(await userTwo.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
-    await ipTokenUsdc.mint(await userTwo.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
-    await ipTokenUsdt.mint(await userTwo.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
+    await lpTokenDai.mint(await userTwo.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
+    await lpTokenUsdc.mint(await userTwo.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
+    await lpTokenUsdt.mint(await userTwo.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
 
-    await ipTokenDai.mint(await userThree.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
-    await ipTokenUsdc.mint(await userThree.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
-    await ipTokenUsdt.mint(await userThree.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
+    await lpTokenDai.mint(await userThree.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
+    await lpTokenUsdc.mint(await userThree.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
+    await lpTokenUsdt.mint(await userThree.getAddress(), N1__0_18DEC.mul(USD_1_000_000));
     return {
         tokenDai,
         tokenUsdc,
         tokenUsdt,
-        ipTokenDai,
-        ipTokenUsdc,
-        ipTokenUsdt,
+        lpTokenDai,
+        lpTokenUsdc,
+        lpTokenUsdt,
     };
 };
 
@@ -143,27 +143,27 @@ export const expectAccountIndicators = (
     params: UserParams,
     powerUp: BigNumber,
     compositeMultiplierCumulativePrevBlock: BigNumber,
-    ipTokenBalance: BigNumber,
+    lpTokenBalance: BigNumber,
     delegatedPowerTokenBalance: BigNumber
 ): void => {
     expect(params.powerUp).to.be.equal(powerUp);
     expect(params.compositeMultiplierCumulativePrevBlock).to.be.equal(
         compositeMultiplierCumulativePrevBlock
     );
-    expect(params.ipTokenBalance).to.be.equal(ipTokenBalance);
+    expect(params.lpTokenBalance).to.be.equal(lpTokenBalance);
     expect(params.delegatedPowerTokenBalance).to.be.equal(delegatedPowerTokenBalance);
 };
 
 export const extractAccountIndicators = (value: any): UserParams => {
     const powerUp = value[2];
     const compositeMultiplierCumulativePrevBlock = value[0];
-    const ipTokenBalance = value[1];
+    const lpTokenBalance = value[1];
     const delegatedPowerTokenBalance = value[3];
 
     return {
         powerUp,
         compositeMultiplierCumulativePrevBlock,
-        ipTokenBalance,
+        lpTokenBalance,
         delegatedPowerTokenBalance,
     };
 };

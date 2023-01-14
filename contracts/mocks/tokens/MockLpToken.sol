@@ -4,7 +4,7 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract MockIpToken is ERC20, Ownable {
+contract MockLpToken is ERC20, Ownable {
     using SafeERC20 for IERC20;
 
     address private immutable _asset;
@@ -22,7 +22,7 @@ contract MockIpToken is ERC20, Ownable {
     );
 
     modifier onlyJoseph() {
-        require(_msgSender() == _joseph, "IPOR_327");
+        require(_msgSender() == _joseph, "PT_327");
         _;
     }
 
@@ -31,7 +31,7 @@ contract MockIpToken is ERC20, Ownable {
         string memory symbol,
         address asset
     ) ERC20(name, symbol) {
-        require(address(0) != asset, "IPOR_000");
+        require(address(0) != asset, "PT_000");
         _asset = asset;
         _decimals = 18;
     }
@@ -45,20 +45,20 @@ contract MockIpToken is ERC20, Ownable {
     }
 
     function setJoseph(address newJoseph) external onlyOwner {
-        require(newJoseph != address(0), "IPOR_000");
+        require(newJoseph != address(0), "PT_000");
         address oldJoseph = _joseph;
         _joseph = newJoseph;
         emit JosephChanged(_msgSender(), oldJoseph, newJoseph);
     }
 
     function mint(address account, uint256 amount) external onlyJoseph {
-        require(amount > 0, "IPOR_400");
+        require(amount > 0, "PT_400");
         _mint(account, amount);
         emit Mint(account, amount);
     }
 
     function burn(address account, uint256 amount) external onlyJoseph {
-        require(amount > 0, "IPOR_401");
+        require(amount > 0, "PT_401");
         _burn(account, amount);
         emit Burn(account, amount);
     }

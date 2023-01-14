@@ -2,20 +2,20 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "../libraries/errors/MiningErrors.sol";
+import "../libraries/errors/Errors.sol";
 
-contract IporOwnableUpgradeable is OwnableUpgradeable {
+contract MiningOwnableUpgradeable is OwnableUpgradeable {
     address private _appointedOwner;
 
     event AppointedToTransferOwnership(address indexed appointedOwner);
 
     modifier onlyAppointedOwner() {
-        require(_appointedOwner == _msgSender(), MiningErrors.SENDER_NOT_APPOINTED_OWNER);
+        require(_appointedOwner == _msgSender(), Errors.SENDER_NOT_APPOINTED_OWNER);
         _;
     }
 
     function transferOwnership(address appointedOwner) public override onlyOwner {
-        require(appointedOwner != address(0), MiningErrors.WRONG_ADDRESS);
+        require(appointedOwner != address(0), Errors.WRONG_ADDRESS);
         _appointedOwner = appointedOwner;
         emit AppointedToTransferOwnership(appointedOwner);
     }
