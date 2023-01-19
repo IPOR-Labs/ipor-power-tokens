@@ -1,7 +1,0 @@
-name: CD
-
-on:
-    push:
-        branches:
-            - main
-            - develop
