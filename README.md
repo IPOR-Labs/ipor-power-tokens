@@ -1,21 +1,23 @@
 # Ipor Power Token
 
+Detailed documentation can be found in [IPOR Gitbook](https://docs.ipor.io/tokenomics/power-token-liquidity-mining-for-developers)
+
 ## Usage
 
 ### Pre-run steps
 - Install `node` and `npm`.
 
-### How to build compile
+### How to compile
 - Run `npm install` to install all dependencies.
 - Run `npm run compile`.
 
-### How to run tests
+### How to run the tests
 - Run `npm run test`.
 
-### How to deploy to mainnet/terstnet
-You can use [hardhat](https://hardhat.org/tutorial/deploying-to-a-live-network) and modify script in `scripts/` 
-to deploy smart contracts to mainnet or testnet.
-### Steps required to deploy on any local network
+### How to deploy to mainnet/testnet
+You can use [hardhat](https://hardhat.org/tutorial/deploying-to-a-live-network) and modify the script in `scripts/` 
+to deploy the smart contracts to the mainnet or testnet.
+### Steps required to deploy on a local network
 - Deploy staked token contract
   ```solidity
         const StakedToken = await hre.ethers.getContractFactory("MockStakedToken");
@@ -64,7 +66,7 @@ to deploy smart contracts to mainnet or testnet.
     await powerToken.setLiquidityMiningAddress(liquidityMiningProxy.address);
   ```
   
-### How the reop is structured
+### Structure fo the repository
 - `contracts/` contains all the smart contracts.
   - `interfaces/` contains all the interfaces.
   - `libraries/` contains all the libraries.
@@ -75,7 +77,7 @@ to deploy smart contracts to mainnet or testnet.
 - `scripts/` contains all the scripts to deploy smart contracts.
 - `test/` contains all the tests.
 
-### How to verify contract with slither
+### Analyse the contracts with slither
 - Install [remixd](https://remix-ide.readthedocs.io/fr/latest/remixd.html)
 - Install [Slither](https://remix-ide.readthedocs.io/fr/latest/slither.html),  `remixd -i slither`  
 - Run `slither .` to verify contract
