@@ -27,7 +27,7 @@ to deploy the smart contracts to the mainnet or testnet.
             await admin.getAddress()
         )) as MockStakedToken;
   ```
-- Deploy LpTokens contracts
+- Deploy `LpTokens` contracts
   ```solidity
         const LpTokenDai = await hre.ethers.getContractFactory("MockLpToken");
         lpDai = (await LpToken.deploy(
@@ -42,7 +42,7 @@ to deploy the smart contracts to the mainnet or testnet.
             await admin.getAddress()
         )) as MockLpTokens;
   ```
-- Deploy PowerToken contract as proxy
+- Deploy `PowerToken` contract as proxy
   ```solidity
   const PowerToken = await hre.ethers.getContractFactory("PowerToken");
   powerToken = (await upgrades.deployProxy(PowerToken, [stakedToken.address], {
@@ -50,7 +50,7 @@ to deploy the smart contracts to the mainnet or testnet.
       kind: "uups",
       })) as PowerToken;
   ```
-- Deploy LiquidityMining contract as proxy 
+- Deploy `LiquidityMining` contract as proxy 
   ```solidity
     const LiquidityMiningFactory = await hre.ethers.getContractFactory("LiquidityMining");
     const liquidityMiningProxy = (await upgrades.deployProxy(LiquidityMiningFactory,
@@ -61,7 +61,7 @@ to deploy the smart contracts to the mainnet or testnet.
                   }
     )) as LiquidityMining;
   ```
-- Setup liquditymaining address in power token contract
+- Setup `LiquidityMining` address in power token contract
   ```solidity
     await powerToken.setLiquidityMiningAddress(liquidityMiningProxy.address);
   ```
