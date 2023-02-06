@@ -27,3 +27,5 @@ slither-report.json
 /types/
 
 package-lock.json
+out/
+
