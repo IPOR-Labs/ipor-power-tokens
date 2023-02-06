@@ -42,4 +42,6 @@ library Errors {
     string public constant INPUT_ARRAYS_LENGTH_MISMATCH = "PT_718";
     /// @notice msg.sender is not an appointed owner, it cannot confirm their ownership
     string public constant SENDER_NOT_APPOINTED_OWNER = "PT_719";
+    /// @notice No active cooldown for the account
+    string public constant ACC_COOLDOWN_IS_NOT_ACTIVE = "PT_720";
 }

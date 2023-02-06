@@ -35,7 +35,7 @@ interface IPowerToken {
 
     /// @notice Gets the delegated balance of the Power Tokens for a given account.
     /// Tokens are delegated from PowerToken to LiquidityMining smart contract (reponsible for rewards distribution).
-    /// @param account account address for which the balance of delegated Power Tokens is checked 
+    /// @param account account address for which the balance of delegated Power Tokens is checked
     /// @return  Returns the amount of the Power Tokens owned by the `account` and delegated to the LiquidityMining contracts.
     function delegatedToLiquidityMiningBalanceOf(address account) external view returns (uint256);
 
@@ -99,14 +99,19 @@ interface IPowerToken {
     /// @param pwTokenAmount Power Token amount to be set in the cooldown
     function cooldown(uint256 pwTokenAmount) external;
 
+    /// @notice Add Amount to the colldown of Power Tokens to the extends duration of cooldown.
+    /// @dev The new cooldown time is calculated as follow
+    /// newCooldownTime = (oldCooldownAmount * timeToEndCooldown +  pwTokenAmount * 2weeks)/ (oldCooldownAmount + pwTokenAmount).
+    /// @param pwTokenAmount Power Token amount to be set in the cooldown
+    function appendToCooldown(uint256 pwTokenAmount) external;
+
     /// @notice Cancel the cooldown.
     /// @dev When this method is executed, all Power Tokens are released.
     function cancelCooldown() external;
 
     /// @notice The method allowing redemption of Power Tokens for the Staked Token after cooldown has passed.
-    /// @dev Power Tokens are redeemable for Staked tokens at 1:1 ratio. 
+    /// @dev Power Tokens are redeemable for Staked tokens at 1:1 ratio.
     /// @dev When the sender executes `redeem` method then the structure {PowerTokenTypes.PwTokenCoolDown} is cleared for a given sender in `_coolDowns` storage.
-    
     function redeem() external;
 
     /// @notice Emitted when the account stakes [Staked] Tokens

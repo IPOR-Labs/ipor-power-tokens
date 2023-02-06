@@ -241,6 +241,45 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         emit CooldownChanged(msgSender, pwTokenAmount, block.timestamp + COOL_DOWN_IN_SECONDS);
     }
 
+    function appendToCooldown(uint256 pwTokenAmount) external override whenNotPaused nonReentrant {
+        require(pwTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
+        address msgSender = _msgSender();
+        uint256 timestamp = block.timestamp;
+
+        PowerTokenTypes.PwTokenCooldown memory activeCooldown = _cooldowns[msgSender];
+
+        require(activeCooldown.endTimestamp >= timestamp, Errors.ACC_COOLDOWN_IS_NOT_ACTIVE);
+
+        uint256 availablePwTokenAmount = _calculateBaseAmountToPwToken(
+            _baseBalance[msgSender],
+            _calculateInternalExchangeRate(_stakedToken)
+        ) -
+            _delegatedToLiquidityMiningBalance[msgSender] -
+            activeCooldown.pwTokenAmount;
+
+        require(
+            availablePwTokenAmount >= pwTokenAmount,
+            Errors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW
+        );
+
+        uint256 newTokenAmount = activeCooldown.pwTokenAmount + pwTokenAmount;
+
+        uint256 newCooldownEndTimestamp = Math.division(
+            (activeCooldown.endTimestamp - timestamp) *
+                activeCooldown.pwTokenAmount +
+                pwTokenAmount *
+                COOL_DOWN_IN_SECONDS,
+            newTokenAmount
+        ) + timestamp;
+
+        _cooldowns[msgSender] = PowerTokenTypes.PwTokenCooldown(
+            newCooldownEndTimestamp,
+            newTokenAmount
+        );
+
+        emit CooldownChanged(msgSender, newTokenAmount, newCooldownEndTimestamp);
+    }
+
     function cancelCooldown() external override whenNotPaused {
         delete _cooldowns[_msgSender()];
         emit CooldownChanged(_msgSender(), 0, 0);
