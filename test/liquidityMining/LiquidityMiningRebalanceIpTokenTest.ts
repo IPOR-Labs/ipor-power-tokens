@@ -196,9 +196,9 @@ describe("LiquidityMining Stake and balance", () => {
 
             expectGlobalIndicators(
                 extractGlobalIndicators(afterStakeLpTokensGPR),
-                BigNumber.from("198496250072115618100"),
+                BigNumber.from("272192809488736234700"),
                 ZERO,
-                BigNumber.from("5037878547512561444528052"),
+                BigNumber.from("3673866337168548782569648"),
                 ZERO,
                 -1,
                 100000000
@@ -206,7 +206,7 @@ describe("LiquidityMining Stake and balance", () => {
 
             expectAccountIndicators(
                 extractAccountIndicators(afterStakeLpTokensUPR),
-                BigNumber.from("1984962500721156181"),
+                BigNumber.from("2721928094887362347"),
                 ZERO,
                 stakedLpTokens,
                 delegatedStakedToken
@@ -389,19 +389,19 @@ describe("LiquidityMining Stake and balance", () => {
 
             expectGlobalIndicators(
                 globalIndicatorsBefore,
-                BigNumber.from("198496250072115618100"),
+                BigNumber.from("272192809488736234700"),
                 ZERO,
-                BigNumber.from("5037878547512561444528052"),
+                BigNumber.from("3673866337168548782569648"),
                 ZERO,
                 -1,
                 100000000
             );
             expectGlobalIndicators(
                 globalIndicatorsAfter,
-                BigNumber.from("198496250072115618100"),
+                BigNumber.from("272192809488736234700"),
                 BigNumber.from("101000000000000000000"),
                 ZERO,
-                BigNumber.from("508825733298768705897333252"),
+                BigNumber.from("371060500054023427039534448"),
                 -1,
                 0
             );

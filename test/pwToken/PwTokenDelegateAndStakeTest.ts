@@ -238,9 +238,9 @@ describe("PowerToken delegateAndStakeToLiquidityMining", () => {
         );
         expectGlobalIndicators(
             extractGlobalIndicators(globalIndicatorsAfter),
-            BigNumber.from("1984962500721156181"),
+            BigNumber.from("2721928094887362347"),
             ZERO,
-            BigNumber.from("503787854751256144452805236"),
+            BigNumber.from("367386633716854878256964830"),
             ZERO,
             -1,
             100000000
@@ -255,7 +255,7 @@ describe("PowerToken delegateAndStakeToLiquidityMining", () => {
         );
         expectAccountIndicators(
             extractAccountIndicators(accountIndicatorsAfter),
-            BigNumber.from("1984962500721156181"),
+            BigNumber.from("2721928094887362347"),
             ZERO,
             N1__0_18DEC,
             N1__0_18DEC
@@ -334,9 +334,9 @@ describe("PowerToken delegateAndStakeToLiquidityMining", () => {
         );
         expectGlobalIndicators(
             extractGlobalIndicators(globalIndicatorsDaiAfter),
-            BigNumber.from("1984962500721156181"),
+            BigNumber.from("2721928094887362347"),
             ZERO,
-            BigNumber.from("503787854751256144452805236"),
+            BigNumber.from("367386633716854878256964830"),
             ZERO,
             -1,
             100000000
@@ -353,9 +353,9 @@ describe("PowerToken delegateAndStakeToLiquidityMining", () => {
         );
         expectGlobalIndicators(
             extractGlobalIndicators(globalIndicatorsUsdcAfter),
-            BigNumber.from("1984962500721156181"),
+            BigNumber.from("2721928094887362347"),
             ZERO,
-            BigNumber.from("503787854751256144452805236"),
+            BigNumber.from("367386633716854878256964830"),
             ZERO,
             -1,
             100000000
@@ -369,7 +369,7 @@ describe("PowerToken delegateAndStakeToLiquidityMining", () => {
         );
         expectAccountIndicators(
             extractAccountIndicators(accountIndicatorsDaiAfter),
-            BigNumber.from("1984962500721156181"),
+            BigNumber.from("2721928094887362347"),
             ZERO,
             N1__0_18DEC,
             N1__0_18DEC
@@ -383,7 +383,7 @@ describe("PowerToken delegateAndStakeToLiquidityMining", () => {
         );
         expectAccountIndicators(
             extractAccountIndicators(accountIndicatorsUsdcAfter),
-            BigNumber.from("1984962500721156181"),
+            BigNumber.from("2721928094887362347"),
             ZERO,
             N1__0_18DEC,
             N1__0_18DEC
