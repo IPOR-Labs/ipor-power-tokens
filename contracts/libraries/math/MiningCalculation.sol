@@ -29,11 +29,14 @@ library MiningCalculation {
             return 0;
         }
 
-        bytes16 pwTokenAmountQP = _toQuadruplePrecision(accountPwTokenAmount, Constants.D18);
+        bytes16 pwTokenAmountWithModifierQP = ABDKMathQuad.mul(
+            _getPwTokenModifier(),
+            _toQuadruplePrecision(accountPwTokenAmount, Constants.D18)
+        );
         bytes16 lpTokenAmountQP = _toQuadruplePrecision(accountLpTokenAmount, Constants.D18);
 
         bytes16 underLog = ABDKMathQuad.add(
-            ABDKMathQuad.div(pwTokenAmountQP, lpTokenAmountQP),
+            ABDKMathQuad.div(pwTokenAmountWithModifierQP, lpTokenAmountQP),
             horizontalShift
         );
 
@@ -89,8 +92,8 @@ library MiningCalculation {
     }
 
     /// @notice Calculates the rewards from last rebalancing including block number given as a param.
-    /// @param blockNumber blok number for which the rewards calculation is executed 
-    /// @param lastRebalanceBlockNumber blok number when last rewards rebalance was executed
+    /// @param blockNumber block number for which the rewards calculation is executed
+    /// @param lastRebalanceBlockNumber block number when last rewards rebalance was executed
     /// @param rewardsPerBlock configuration param describing how many pwTokens are rewarded across all participants per one block, represendet with 8 decimals
     /// @param previousAccruedRewards number of previously cumulated/accrued rewards
     /// @return new accrued rewards, amount of Power Tokens accrued for given params
@@ -182,5 +185,10 @@ library MiningCalculation {
         bytes16 denominator = ABDKMathQuad.fromUInt(decimals);
         bytes16 fraction = ABDKMathQuad.div(nominator, denominator);
         return fraction;
+    }
+
+    /// @dev Quadruple precision, 128 bits
+    function _getPwTokenModifier() private pure returns (bytes16) {
+        return ABDKMathQuad.fromUInt(2);
     }
 }
