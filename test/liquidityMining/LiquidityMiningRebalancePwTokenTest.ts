@@ -191,9 +191,9 @@ describe("LiquidityMining - Rebalance on delegate pwToken", () => {
 
             expectGlobalIndicators(
                 extractGlobalIndicators(afterStakeLpTokensGPR),
-                BigNumber.from("198496250072115618100"),
+                BigNumber.from("272192809488736234700"),
                 BigNumber.from("1000000000000000000"),
-                BigNumber.from("5037878547512561444528052"),
+                BigNumber.from("3673866337168548782569648"),
                 BigNumber.from("25000000000000000062500000"),
                 -1,
                 100000000
@@ -201,7 +201,7 @@ describe("LiquidityMining - Rebalance on delegate pwToken", () => {
 
             expectAccountIndicators(
                 extractAccountIndicators(afterStakeLpTokensUPR),
-                BigNumber.from("1984962500721156181"),
+                BigNumber.from("2721928094887362347"),
                 BigNumber.from("25000000000000000062500000"),
                 stakedLpTokens,
                 delegatedStakedToken
@@ -281,7 +281,7 @@ describe("LiquidityMining - Rebalance on delegate pwToken", () => {
                 tokens.lpTokenDai.address
             );
             expect(rewardsAdmin.add(rewardsUserOne).add(rewardsUserTwo)).to.be.equal(
-                BigNumber.from("305740747726576365693")
+                BigNumber.from("305803426096899337147")
             );
             expect(liquidityMiningIpDaiBalanceAfter).to.be.equal(
                 liquidityMiningIpDaiBalanceBefore
@@ -294,7 +294,7 @@ describe("LiquidityMining - Rebalance on delegate pwToken", () => {
                     .add(delegatedStakedToken)
                     .add(delegatedStakedToken)
                     .add(delegatedStakedToken)
-                    .add(BigNumber.from("1259252273423634307"))
+                    .add(BigNumber.from("1196573903100662852"))
             );
         });
 
@@ -359,19 +359,19 @@ describe("LiquidityMining - Rebalance on delegate pwToken", () => {
 
             expectGlobalIndicators(
                 globalIndicatorsBefore,
-                BigNumber.from("198496250072115618100"),
+                BigNumber.from("272192809488736234700"),
                 BigNumber.from("1000000000000000000"),
-                BigNumber.from("5037878547512561444528052"),
+                BigNumber.from("3673866337168548782569648"),
                 BigNumber.from("25000000000000000062500000"),
                 -1,
                 100000000
             );
             expectGlobalIndicators(
                 globalIndicatorsAfter,
-                BigNumber.from("198496250072115618100"),
+                BigNumber.from("272192809488736234700"),
                 BigNumber.from("102000000000000000000"),
                 ZERO,
-                BigNumber.from("533825733298768705959833252"),
+                BigNumber.from("396060500054023427102034448"),
                 -1,
                 0
             );
