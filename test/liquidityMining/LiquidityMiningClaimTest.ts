@@ -309,7 +309,7 @@ describe("LiquidityMining claim", () => {
         expect(accruedRewardsBefore).to.be.equal(ZERO);
         expect(accountRewardsMiddle).to.be.equal(ZERO);
         expect(accruedRewardsMiddle).to.be.equal(ZERO);
-        expect(accountRewardsAfter).to.be.equal(expectedRewards.sub(BigNumber.from(1)));
+        expect(accountRewardsAfter).to.be.equal(expectedRewards);
         expect(accruedRewardsAfter).to.be.equal(expectedRewards);
         expect(userOneStakedTokenBalanceAfter).to.be.equal(
             userOneStakedTokenBalanceBefore.sub(stakeAmount)

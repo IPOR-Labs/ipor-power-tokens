@@ -118,7 +118,7 @@ describe("LiquidityMining Stake and balance", () => {
             horizontalShift
         );
         //    then
-        expect(result).to.be.equal(BigNumber.from("1400000000000000000"));
+        expect(result).to.be.equal(BigNumber.from("1984962500721156182"));
     });
 
     it("Should throw PT_711 - aggregate power up is negative", async () => {
@@ -204,32 +204,32 @@ describe("LiquidityMining Stake and balance", () => {
         {
             lpTokenAmount: N1__0_18DEC.toString(),
             pwTokenAmount: N1__0_18DEC.toString(),
-            result: "1400000000000000000",
+            result: "1984962500721156182",
         },
         {
             lpTokenAmount: N1__0_18DEC.toString(),
             pwTokenAmount: N2__0_18DEC.toString(),
-            result: "1984962500721156182",
+            result: "2721928094887362348",
         },
         {
             lpTokenAmount: N2__0_18DEC.toString(),
             pwTokenAmount: N1__0_18DEC.toString(),
-            result: "984962500721156182",
+            result: "1400000000000000000",
         },
         {
             lpTokenAmount: N1__0_18DEC.mul(BigNumber.from("10")).toString(),
             pwTokenAmount: N1__0_18DEC.toString(),
-            result: "537503523749934909",
+            result: "663034405833793834",
         },
         {
             lpTokenAmount: N1__0_18DEC.mul(BigNumber.from("10")).toString(),
             pwTokenAmount: N1__0_18DEC.mul(BigNumber.from("123")).toString(),
-            result: "4133354340613827254",
+            result: "5078071905112637653",
         },
         {
             lpTokenAmount: N1__0_18DEC.mul(BigNumber.from("33")).toString(),
             pwTokenAmount: N1__0_18DEC.mul(BigNumber.from("44")).toString(),
-            result: "1622392421336447926",
+            result: "2274469117916141075",
         },
     ];
 

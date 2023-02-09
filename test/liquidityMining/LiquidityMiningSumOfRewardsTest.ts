@@ -152,9 +152,9 @@ describe("LiquidityMining sum of rewards", () => {
 
         expectGlobalIndicators(
             extractGlobalIndicators(globalIndicatorsBefore),
-            BigNumber.from("198496250072115618100"),
+            BigNumber.from("272192809488736234700"),
             ZERO,
-            BigNumber.from("5037878547512561444528052"),
+            BigNumber.from("3673866337168548782569648"),
             ZERO,
             -1,
             100000000
@@ -164,14 +164,14 @@ describe("LiquidityMining sum of rewards", () => {
             ZERO,
             BigNumber.from("101000000000000000000"),
             ZERO,
-            BigNumber.from("508825733298768705897333252"),
+            BigNumber.from("371060500054023427039534448"),
             -1,
             100000000
         );
 
         expectAccountIndicators(
             extractAccountIndicators(userParamsBefore),
-            BigNumber.from("1984962500721156181"),
+            BigNumber.from("2721928094887362347"),
             ZERO,
             BigNumber.from("100000000000000000000"),
             BigNumber.from("100000000000000000000")
@@ -180,7 +180,7 @@ describe("LiquidityMining sum of rewards", () => {
         expectAccountIndicators(
             extractAccountIndicators(userParamsAfter),
             ZERO, //powerUp
-            BigNumber.from("508825733298768705897333252"), //Cumulative
+            BigNumber.from("371060500054023427039534448"), //Cumulative
             ZERO, // lpToken
             BigNumber.from("100000000000000000000") //pwToken
         );
@@ -243,7 +243,7 @@ describe("LiquidityMining sum of rewards", () => {
             ZERO,
             BigNumber.from("309000000000000000000"),
             ZERO,
-            BigNumber.from("955517631178215820645487196"),
+            BigNumber.from("696809981949634752427376537"),
             -1,
             100000000
         );
@@ -325,7 +325,7 @@ describe("LiquidityMining sum of rewards", () => {
             ZERO,
             BigNumber.from("307000000000000000000"),
             ZERO,
-            BigNumber.from("947960813356946978478695118"),
+            BigNumber.from("691299182443881929253522065"),
             -1,
             0
         );
@@ -455,7 +455,7 @@ describe("LiquidityMining sum of rewards", () => {
         expect(extractGlobalIndicators(globalIndicatorsAfter).aggregatedPowerUp).to.be.equal(ZERO);
         expect(liquidityMiningIpDaiBalanceAfter).to.be.equal(liquidityMiningIpDaiBalanceBefore);
         expect(powerTokenStakedTokenBalanceAfter).to.be.equal(
-            powerTokenStakedTokenBalanceBefore.add(BigNumber.from("813000000000000000001"))
+            powerTokenStakedTokenBalanceBefore.add(BigNumber.from("812999999999999999999"))
         );
     });
 
