@@ -5,7 +5,7 @@ import "../interfaces/ILiquidityMining.sol";
 import "./LiquidityMiningInternal.sol";
 
 /// @title Smart contract responsible for distribution of Power Token rewards across accounts contributing to Liquidity Mining
-/// by staking lpTokens and / or delegating Power Tokens. 
+/// by staking lpTokens and / or delegating Power Tokens.
 contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
     using SafeCast for uint256;
     using SafeCast for int256;
@@ -157,17 +157,10 @@ contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
 
         require(rewardsAmount > 0, Errors.NO_REWARDS_TO_CLAIM);
 
-        uint256 accountPowerUp = MiningCalculation.calculateAccountPowerUp(
-            accountIndicators.delegatedPwTokenBalance,
-            accountIndicators.lpTokenBalance,
-            _getVerticalShift(),
-            _getHorizontalShift()
-        );
-
         _accountIndicators[msgSender][lpToken] = LiquidityMiningTypes.AccountRewardsIndicators(
             accruedCompMultiplierCumulativePrevBlock.toUint128(),
             accountIndicators.lpTokenBalance,
-            accountPowerUp.toUint72(),
+            accountIndicators.powerUp,
             accountIndicators.delegatedPwTokenBalance
         );
 
