@@ -56,7 +56,7 @@ jobs:
         # from tag: v1.0.7
         uses: IPOR-Labs/foundry-toolchain@a5d3035dc16462ca4bbb6773e21a0e29d28412ae
         with:
-          version: nightly
+          version: nightly-b2baca32bd1a3b31b6f6ae2950a14c5bb8607cdb
 
       - name: Run Forge build
         run: |
