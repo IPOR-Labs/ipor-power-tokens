@@ -1,0 +1,38 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  notify:
+    uses: ./.github/workflows/notify-slack.yml
+    secrets:
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
+  build-sc:
+    needs: notify
+    uses: ./.github/workflows/build-smart-contracts.yml
+    secrets:
+      HARDHAT_FORKING_URL: ${{ secrets.HARDHAT_FORKING_URL }}
+
+  foundry-tests:
+    needs: notify
+    uses: ./.github/workflows/foundry-tests.yml
+    secrets:
+      FORK_URL: ${{ secrets.HARDHAT_FORKING_URL }}
+
+  report:
+    if: ${{ always() }}
+    needs:
+      - notify
+      - build-sc
+      - foundry-tests
+    uses: ./.github/workflows/report-slack.yml
+    secrets:
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+    with:
+      success: ${{ needs.build-sc.result == 'success' && needs.foundry-tests.result == 'success' }}
+      slack-status-msg-id: ${{ needs.notify.outputs.slack-status-msg-id }}
