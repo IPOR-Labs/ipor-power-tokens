@@ -21,6 +21,8 @@ jobs:
   foundry-tests:
     needs: notify
     uses: ./.github/workflows/foundry-tests.yml
+    with:
+      fork-test-enabled: false
     secrets:
       FORK_URL: ${{ secrets.FORK_URL }}
 
