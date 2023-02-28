@@ -4,7 +4,7 @@ on:
   workflow_call:
     secrets:
       FORK_URL:
-        required: true
+        required: false
 
     inputs:
 
@@ -14,14 +14,26 @@ on:
         default: 16.15.0
         required: false
 
+      test-enabled:
+        description: "Enable Forge tests"
+        type: boolean
+        default: true
+        required: false
+
+      fork-test-enabled:
+        description: "Enable Forge fork tests"
+        type: boolean
+        default: true
+        required: false
+
       test-options:
-        description: "TODO"
+        description: "Extra options in Forge test command"
         type: string
         default: ""
         required: false
 
       fork-test-options:
-        description: "TODO"
+        description: "Extra options in Forge fork test command"
         type: string
         default: ""
         required: false
@@ -65,11 +77,13 @@ jobs:
         id: build
 
       - name: Run Forge tests
+        if: inputs.test-enabled
         run: |
           forge test ${{ inputs.test-options }} -vvv
         id: test
 
       - name: Run Forge fork tests
+        if: inputs.fork-test-enabled
         run: |
           forge test ${{ inputs.fork-test-options }} --fork-url ${{ secrets.FORK_URL }} -vvv
         id: fork-test

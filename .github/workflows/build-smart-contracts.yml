@@ -15,7 +15,7 @@ on:
         required: false
 
       compile-command:
-        description: "NodeJS version"
+        description: "npm command used in compile step"
         type: string
         default: compile
         required: false
