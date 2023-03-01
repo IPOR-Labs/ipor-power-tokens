@@ -15,7 +15,7 @@ jobs:
     needs: notify
     uses: ./.github/workflows/build-smart-contracts.yml
     secrets:
-      HARDHAT_FORKING_URL: ${{ secrets.FORK_URL }}
+      PROVIDER_URL: ${{ secrets.PROVIDER_URL }}
 
   foundry-tests:
     needs: notify
@@ -23,7 +23,7 @@ jobs:
     with:
       fork-test-enabled: false
     secrets:
-      FORK_URL: ${{ secrets.FORK_URL }}
+      FORK_URL: ${{ secrets.PROVIDER_URL }}
 
   report:
     if: ${{ always() }}
