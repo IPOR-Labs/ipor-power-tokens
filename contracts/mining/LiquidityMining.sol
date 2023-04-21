@@ -90,6 +90,10 @@ contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
             LiquidityMiningTypes.GlobalRewardsIndicators
                 memory globalIndicators = _globalIndicators[lpToken];
 
+            if (accountIndicators.lpTokenBalance == 0) {
+                continue;
+            }
+
             (
                 uint256 rewardsAmount,
                 uint256 accruedCompMultiplierCumulativePrevBlock
