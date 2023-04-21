@@ -47,7 +47,7 @@ describe("LiquidityMining Stake and balance", () => {
             "0x3ffd99999999999999e36310e0e2a848",
             "0x3fff0000000000000000000000000000"
         );
-        const expectedResult = "400000000000000000";
+        const expectedResult = "200000000000000000";
 
         //    when
         const actualResult = await miningCalculation.calculateAccountPowerUp(
@@ -61,7 +61,7 @@ describe("LiquidityMining Stake and balance", () => {
         expect(actualResult).to.be.equal(expectedResult);
     });
 
-    it("Should return ~0.4 when pwTokenAmount  = 0 and HS~0.5 and VS~1.4", async () => {
+    it("Should return ~0.2 when pwTokenAmount  = 0 and HS~0.5 and VS~1.4", async () => {
         //    given
         const { pwTokenAmount, lpTokenAmount, verticalShift, horizontalShift } = getValues(
             "0",
@@ -69,7 +69,7 @@ describe("LiquidityMining Stake and balance", () => {
             "0x3fff6666666666666666666666666666",
             "0x3ffe0000000000000000000000000000"
         );
-        const expectedResult = "399999999999999999";
+        const expectedResult = "200000000000000000";
 
         //    when
         const actualResult = await miningCalculation.calculateAccountPowerUp(
