@@ -80,6 +80,38 @@ contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
         return rewardsAmount;
     }
 
+    function rebalanceIndicators(address account, address[] calldata lpTokens) external override {
+        require(account != address(0), Errors.WRONG_ADDRESS);
+        uint256 lpTokensLength = lpTokens.length;
+        for (uint256 i; i != lpTokensLength; ++i) {
+            address lpToken = lpTokens[i];
+            LiquidityMiningTypes.AccountRewardsIndicators
+                memory accountIndicators = _accountIndicators[account][lpToken];
+            LiquidityMiningTypes.GlobalRewardsIndicators
+                memory globalIndicators = _globalIndicators[lpToken];
+
+            (
+                uint256 rewardsAmount,
+                uint256 accruedCompMultiplierCumulativePrevBlock
+            ) = _calculateAccountRewards(globalIndicators, accountIndicators);
+
+            _rebalanceIndicators(
+                account,
+                lpToken,
+                accruedCompMultiplierCumulativePrevBlock,
+                globalIndicators,
+                accountIndicators,
+                accountIndicators.lpTokenBalance,
+                accountIndicators.delegatedPwTokenBalance
+            );
+
+            if (rewardsAmount > 0) {
+                _transferRewardsToPowerToken(account, rewardsAmount);
+            }
+            emit Rebalanced(account, lpToken);
+        }
+    }
+
     function stake(address lpToken, uint256 lpTokenAmount)
         external
         override
