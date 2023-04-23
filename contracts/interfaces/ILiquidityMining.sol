@@ -74,10 +74,10 @@ interface ILiquidityMining {
     /// @notice method allowed to claim the allocated rewards
     function claimAllocatedPwTokens() external;
 
-    /// @notice method allowing to rebalance the indicators per asset (lpToken).
-    /// @param account of which we should rebalance
-    /// @param lpTokens of the staking pools to rebalance
-    function rebalanceIndicators(address account, address[] calldata lpTokens) external;
+    /// @notice method allowing to update the indicators per asset (lpToken).
+    /// @param account of which we should update the indicators
+    /// @param lpTokens of the staking pools to update the indicators
+    function updateIndicators(address account, address[] calldata lpTokens) external;
 
     /// @notice Emitted when the account stakes the lpTokens
     /// @param account Account's address in the context of which the activities of staking of lpTokens are performed
@@ -96,8 +96,8 @@ interface ILiquidityMining {
     /// @param allocatedRewards Reward amount denominated in pwToken, represented in 18 decimals
     event AllocatedTokensClaimed(address account, uint256 allocatedRewards);
 
-    /// @notice Emitted when rebalanced was triggered for the account on the lpToken
-    /// @param account Account address to which the rebalanced was triggered
-    /// @param lpToken lpToken address to which the rebalanced was triggered
-    event Rebalanced(address account, address lpToken);
+    /// @notice Emitted when update was triggered for the account on the lpToken
+    /// @param account Account address to which the update was triggered
+    /// @param lpToken lpToken address to which the update was triggered
+    event IndicatorsUpdated(address account, address lpToken);
 }

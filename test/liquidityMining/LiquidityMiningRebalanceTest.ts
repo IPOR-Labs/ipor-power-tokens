@@ -130,9 +130,9 @@ describe("LiquidityMining rebalance", () => {
 
         //when
         await expect(
-            liquidityMining.rebalanceIndicators(userOne.getAddress(), [tokens.lpTokenDai.address])
+            liquidityMining.updateIndicators(userOne.getAddress(), [tokens.lpTokenDai.address])
         )
-            .to.emit(liquidityMining, "Rebalanced")
+            .to.emit(liquidityMining, "IndicatorsUpdated")
             .withArgs(await userOne.getAddress(), tokens.lpTokenDai.address);
 
         //then
@@ -205,17 +205,17 @@ describe("LiquidityMining rebalance", () => {
 
         //when
         await expect(
-            liquidityMining.rebalanceIndicators(userOne.getAddress(), [
+            liquidityMining.updateIndicators(userOne.getAddress(), [
                 tokens.lpTokenDai.address,
                 tokens.lpTokenUsdc.address,
                 tokens.lpTokenUsdt.address,
             ])
         )
-            .to.emit(liquidityMining, "Rebalanced")
+            .to.emit(liquidityMining, "IndicatorsUpdated")
             .withArgs(await userOne.getAddress(), tokens.lpTokenDai.address)
-            .to.emit(liquidityMining, "Rebalanced")
+            .to.emit(liquidityMining, "IndicatorsUpdated")
             .withArgs(await userOne.getAddress(), tokens.lpTokenUsdc.address)
-            .to.emit(liquidityMining, "Rebalanced")
+            .to.emit(liquidityMining, "IndicatorsUpdated")
             .withArgs(await userOne.getAddress(), tokens.lpTokenUsdt.address);
 
         //then
