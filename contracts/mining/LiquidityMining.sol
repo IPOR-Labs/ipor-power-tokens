@@ -80,7 +80,7 @@ contract LiquidityMining is LiquidityMiningInternal, ILiquidityMining {
         return rewardsAmount;
     }
 
-    function updateIndicators(address account, address[] calldata lpTokens) external override {
+    function updateIndicators(address account, address[] calldata lpTokens) external override nonReentrant whenNotPaused{
         require(account != address(0), Errors.WRONG_ADDRESS);
         uint256 lpTokensLength = lpTokens.length;
         uint256 rewardsAmountToTransfer;
