@@ -1,0 +1,89 @@
+name: Tests in foundry
+
+on:
+  workflow_call:
+    secrets:
+      FORK_URL:
+        required: false
+
+    inputs:
+
+      node-version:
+        description: "NodeJS version"
+        type: string
+        default: 16.15.0
+        required: false
+
+      test-enabled:
+        description: "Enable Forge tests"
+        type: boolean
+        default: true
+        required: false
+
+      fork-test-enabled:
+        description: "Enable Forge fork tests"
+        type: boolean
+        default: true
+        required: false
+
+      test-options:
+        description: "Extra options in Forge test command"
+        type: string
+        default: ""
+        required: false
+
+      fork-test-options:
+        description: "Extra options in Forge fork test command"
+        type: string
+        default: ""
+        required: false
+
+jobs:
+  foundry-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        # from tag: v3.5.0
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3
+        with:
+          submodules: recursive
+
+      - name: Setup node
+        # from tag: v3.6.0
+        uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Set up node_modules cache
+        # from tag: v3.3.1
+        uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Install
+        run: npm install
+
+      - name: Install Foundry
+        # from tag: v1.0.9-ipor-v1
+        uses: IPOR-Labs/foundry-toolchain@f3a099a91dbfb2e14eeb082c7e2f12df0a18bfe0
+        with:
+          version: nightly-5182f4309e07abb380f99aaa37b52b3bbba1c80a
+
+      - name: Run Forge build
+        run: |
+          forge --version
+          forge build
+        id: build
+
+      - name: Run Forge tests
+        if: inputs.test-enabled
+        run: |
+          forge test ${{ inputs.test-options }} -vvv
+        id: test
+
+      - name: Run Forge fork tests
+        if: inputs.fork-test-enabled
+        run: |
+          forge test ${{ inputs.fork-test-options }} --fork-url ${{ secrets.FORK_URL }} -vvv
+        id: fork-test

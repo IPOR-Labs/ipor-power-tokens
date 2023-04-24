@@ -174,16 +174,16 @@ describe("LiquidityMining - Rebalance on delegate pwToken", () => {
 
             expectGlobalIndicators(
                 extractGlobalIndicators(afterDelegatePwTokenGPR),
-                BigNumber.from("39999999999999999900"),
+                BigNumber.from("20000000000000000000"),
                 ZERO,
-                BigNumber.from("25000000000000000062500000"),
+                BigNumber.from("50000000000000000000000000"),
                 ZERO,
                 -1,
                 100000000
             );
             expectAccountIndicators(
                 extractAccountIndicators(afterDelegatePwTokenUPR),
-                BigNumber.from("399999999999999999"),
+                BigNumber.from("200000000000000000"), // 20 * 10^18
                 ZERO,
                 stakedLpTokens,
                 ZERO
@@ -194,7 +194,7 @@ describe("LiquidityMining - Rebalance on delegate pwToken", () => {
                 BigNumber.from("272192809488736234700"),
                 BigNumber.from("1000000000000000000"),
                 BigNumber.from("3673866337168548782569648"),
-                BigNumber.from("25000000000000000062500000"),
+                BigNumber.from("50000000000000000000000000"),
                 -1,
                 100000000
             );
@@ -202,7 +202,7 @@ describe("LiquidityMining - Rebalance on delegate pwToken", () => {
             expectAccountIndicators(
                 extractAccountIndicators(afterStakeLpTokensUPR),
                 BigNumber.from("2721928094887362347"),
-                BigNumber.from("25000000000000000062500000"),
+                BigNumber.from("50000000000000000000000000"),
                 stakedLpTokens,
                 delegatedStakedToken
             );
@@ -281,7 +281,7 @@ describe("LiquidityMining - Rebalance on delegate pwToken", () => {
                 tokens.lpTokenDai.address
             );
             expect(rewardsAdmin.add(rewardsUserOne).add(rewardsUserTwo)).to.be.equal(
-                BigNumber.from("305803426096899337147")
+                BigNumber.from("305896115281914761667")
             );
             expect(liquidityMiningIpDaiBalanceAfter).to.be.equal(
                 liquidityMiningIpDaiBalanceBefore
@@ -294,7 +294,7 @@ describe("LiquidityMining - Rebalance on delegate pwToken", () => {
                     .add(delegatedStakedToken)
                     .add(delegatedStakedToken)
                     .add(delegatedStakedToken)
-                    .add(BigNumber.from("1196573903100662852"))
+                    .add(BigNumber.from("1103884718085238333"))
             );
         });
 
@@ -362,7 +362,7 @@ describe("LiquidityMining - Rebalance on delegate pwToken", () => {
                 BigNumber.from("272192809488736234700"),
                 BigNumber.from("1000000000000000000"),
                 BigNumber.from("3673866337168548782569648"),
-                BigNumber.from("25000000000000000062500000"),
+                BigNumber.from("50000000000000000000000000"),
                 -1,
                 100000000
             );
@@ -371,7 +371,7 @@ describe("LiquidityMining - Rebalance on delegate pwToken", () => {
                 BigNumber.from("272192809488736234700"),
                 BigNumber.from("102000000000000000000"),
                 ZERO,
-                BigNumber.from("396060500054023427102034448"),
+                BigNumber.from("421060500054023427039534448"),
                 -1,
                 0
             );

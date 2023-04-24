@@ -212,7 +212,7 @@ describe("LiquidityMining Rewards per block", () => {
             globalIndicatorsAfterExtract.aggregatedPowerUp
         );
         expect(globalIndicatorsBeforeExtract.compositeMultiplierInTheBlock).to.be.equal(
-            BigNumber.from("1250000000000000003125000000")
+            BigNumber.from("2500000000000000000000000000")
         );
         expect(globalIndicatorsAfterExtract.compositeMultiplierInTheBlock).to.be.equal(ZERO);
     });
@@ -263,7 +263,7 @@ describe("LiquidityMining Rewards per block", () => {
             globalIndicatorsAfterExtract.aggregatedPowerUp
         );
         expect(globalIndicatorsAfterExtract.compositeMultiplierInTheBlock).to.be.equal(
-            BigNumber.from("1250000000000000003125000000")
+            BigNumber.from("2500000000000000000000000000")
         );
         expect(globalIndicatorsBeforeExtract.compositeMultiplierInTheBlock).to.be.equal(ZERO);
     });

@@ -73,4 +73,8 @@ contract MockMiningCalculation {
                 compositeMultiplier
             );
     }
+
+    function accountPowerUpStepFunction(bytes16 ratio) external pure returns (bytes16) {
+        return MiningCalculation.accountPowerUpStepFunction(ratio);
+    }
 }

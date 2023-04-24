@@ -101,6 +101,7 @@ describe("LiquidityMining claim", () => {
         //    when
         await expect(liquidityMining.claim(tokens.lpTokenDai.address)).to.be.revertedWith("PT_709");
     });
+
     it("Should not claimAllocatedPwTokens when no allocated pwTokens", async () => {
         //    given
         //    when
