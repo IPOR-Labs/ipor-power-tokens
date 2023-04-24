@@ -65,7 +65,7 @@ interface IPowerToken {
 
     /// @notice Delegates the Power Tokens to the LiquidityMining
     /// @param lpTokens - list of lpTokens to which Power Tokens are delegated
-    /// @param pwTokenAmounts - list of the amounts of Power Tokens delegated to correspondng lpTokens
+    /// @param pwTokenAmounts - list of the amounts of Power Tokens delegated to corresponding lpTokens
     function delegateToLiquidityMining(
         address[] calldata lpTokens,
         uint256[] calldata pwTokenAmounts

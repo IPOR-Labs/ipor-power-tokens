@@ -10,6 +10,28 @@ import "./Math.sol";
 
 /// @title Library containing the core logic used in the Liquidity Mining module.
 library MiningCalculation {
+    bytes16 constant N0_00 = 0x00000000000000000000000000000000;
+    bytes16 constant N0_01 = 0x3ff847ae147ae147b74da9ca30cfea4b; //0.01
+    bytes16 constant N0_02 = 0x3ff947ae147ae147b2b11255bc3eff63; // 0.02
+    bytes16 constant N0_03 = 0x3ff9eb851eb851eb89bb4fc6601609a0; // 0.03
+    bytes16 constant N0_04 = 0x3ffa47ae147ae147b062c69b81f689ee; // 0.04
+    bytes16 constant N0_05 = 0x3ffa9999999999999be7e553d3e20f0d; // 0.05
+
+    bytes16 constant SLOPE_1 = 0x40024000000000000000000000000000; //   10.0
+    bytes16 constant BASE_1 = 0x3ffc9999999999999a2d2c88282bb6f6; //    0.2
+
+    bytes16 constant SLOPE_2 = 0x40010000000000000000000000000000; //   4.0
+    bytes16 constant BASE_2 = 0x3ffd0a3d70a3d70a3dba6d4e51867f52; //    0.26
+
+    bytes16 constant SLOPE_3 = 0x40008000000000000000000000000000; //   3.0
+    bytes16 constant BASE_3 = 0x3ffd1eb851eb851eb89bb4fc6601609a; //    0.28
+
+    bytes16 constant SLOPE_4 = 0x40000000000000000000000000000000; //   2.0
+    bytes16 constant BASE_4 = 0x3ffd3d70a3d70a3d70eda08184b9b285; //    0.31
+
+    bytes16 constant SLOPE_5 = 0x3fff0000000000000000000000000000; //   2.0
+    bytes16 constant BASE_5 = 0x3ffd66666666666666b02fddadaf7514; //    0.31
+
     using SafeCast for uint256;
     using SafeCast for int256;
 
@@ -29,18 +51,26 @@ library MiningCalculation {
             return 0;
         }
 
-        bytes16 pwTokenAmountWithModifierQP = ABDKMathQuad.mul(
-            _getPwTokenModifier(),
-            _toQuadruplePrecision(accountPwTokenAmount, Constants.D18)
-        );
+        bytes16 accountPwTokenAmountQP = _toQuadruplePrecision(accountPwTokenAmount, Constants.D18);
         bytes16 lpTokenAmountQP = _toQuadruplePrecision(accountLpTokenAmount, Constants.D18);
+        bytes16 ratio = ABDKMathQuad.div(accountPwTokenAmountQP, lpTokenAmountQP);
 
-        bytes16 underLog = ABDKMathQuad.add(
-            ABDKMathQuad.div(pwTokenAmountWithModifierQP, lpTokenAmountQP),
-            horizontalShift
-        );
+        bytes16 result;
+        if (ABDKMathQuad.cmp(N0_05, ratio) >= 0) {
+            result = accountPowerUpStepFunction(ratio);
+        } else {
+            bytes16 pwTokenAmountWithModifierQP = ABDKMathQuad.mul(
+                _getPwTokenModifier(),
+                accountPwTokenAmountQP
+            );
 
-        bytes16 result = ABDKMathQuad.add(verticalShift, ABDKMathQuad.log_2(underLog));
+            bytes16 underLog = ABDKMathQuad.add(
+                ABDKMathQuad.div(pwTokenAmountWithModifierQP, lpTokenAmountQP),
+                horizontalShift
+            );
+
+            result = ABDKMathQuad.add(verticalShift, ABDKMathQuad.log_2(underLog));
+        }
         bytes16 resultD18 = ABDKMathQuad.mul(result, ABDKMathQuad.fromUInt(Constants.D18));
 
         return ABDKMathQuad.toUInt(resultD18);
@@ -169,6 +199,20 @@ library MiningCalculation {
             globalIndCompositeMultiplierCumulativePrevBlock +
             (currentBlockNumber - globalIndBlockNumber) *
             globalIndCompositeMultiplierInTheBlock;
+    }
+
+    function accountPowerUpStepFunction(bytes16 ratio) internal pure returns (bytes16) {
+        if (ABDKMathQuad.cmp(N0_01, ratio) > 0) {
+            return ABDKMathQuad.add(BASE_1, ABDKMathQuad.mul(SLOPE_1, ratio));
+        } else if (ABDKMathQuad.cmp(N0_02, ratio) > 0) {
+            return ABDKMathQuad.add(BASE_2, ABDKMathQuad.mul(SLOPE_2, ratio));
+        } else if (ABDKMathQuad.cmp(N0_03, ratio) > 0) {
+            return ABDKMathQuad.add(BASE_3, ABDKMathQuad.mul(SLOPE_3, ratio));
+        } else if (ABDKMathQuad.cmp(N0_04, ratio) > 0) {
+            return ABDKMathQuad.add(BASE_4, ABDKMathQuad.mul(SLOPE_4, ratio));
+        } else {
+            return ABDKMathQuad.add(BASE_5, ABDKMathQuad.mul(SLOPE_5, ratio));
+        }
     }
 
     /// @dev Quadruple precision, 128 bits

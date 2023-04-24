@@ -109,7 +109,7 @@ describe("LiquidityMining rebalance ", () => {
         ])) as LiquidityMiningForTests;
         await liquidityMiningInternal.setPowerToken(await admin.getAddress());
 
-        //    when
+        // when;
         await expect(
             liquidityMiningInternal.delegatePwToken(
                 await admin.getAddress(),
@@ -117,7 +117,7 @@ describe("LiquidityMining rebalance ", () => {
                 [N1__0_18DEC]
             )
         ).to.be.revertedWith("PT_701");
-        //    then
+        // then;
     });
 
     it("Should be able to delegate pwToken", async () => {

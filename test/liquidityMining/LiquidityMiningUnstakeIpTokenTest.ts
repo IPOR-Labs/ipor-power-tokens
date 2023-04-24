@@ -648,11 +648,11 @@ describe("LiquidityMining unstake lpToken", () => {
         expect(accruedRewardsAfter).to.be.equal(accruedRewardsBefore.add(N1__0_18DEC));
 
         expect(globalIndicatorsBeforeExtract.aggregatedPowerUp).to.be.equal(
-            BigNumber.from("799999999999999998")
+            BigNumber.from("400000000000000000")
         );
         expect(globalIndicatorsAfterExtract.aggregatedPowerUp).to.be.equal(ZERO);
         expect(globalIndicatorsBeforeExtract.compositeMultiplierInTheBlock).to.be.equal(
-            BigNumber.from("1250000000000000003125000000")
+            BigNumber.from("2500000000000000000000000000")
         );
         expect(globalIndicatorsAfterExtract.compositeMultiplierInTheBlock).to.be.equal(ZERO);
     });
