@@ -103,7 +103,7 @@ abstract contract LiquidityMiningInternal is
     }
 
     function getVersion() external pure override returns (uint256) {
-        return 2;
+        return 3;
     }
 
     function getPauseManager() external view override returns (address) {
