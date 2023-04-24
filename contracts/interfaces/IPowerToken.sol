@@ -99,12 +99,6 @@ interface IPowerToken {
     /// @param pwTokenAmount Power Token amount to be set in the cooldown
     function cooldown(uint256 pwTokenAmount) external;
 
-    /// @notice Add Amount to the colldown of Power Tokens to the extends proportionally duration of cooldown.
-    /// @dev The new cooldown time is calculated as follow
-    /// newCooldownTime = (oldCooldownAmount * timeToEndCooldown +  pwTokenAmount * 2weeks)/ (oldCooldownAmount + pwTokenAmount).
-    /// @param pwTokenAmount Power Token amount to be set in the cooldown
-    function appendToCooldown(uint256 pwTokenAmount) external;
-
     /// @notice Cancel the cooldown.
     /// @dev When this method is executed, all Power Tokens are released.
     function cancelCooldown() external;
