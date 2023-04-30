@@ -15,7 +15,7 @@ library LiquidityMiningTypes {
     /// @title Global indicators used in rewards calculation.
     struct GlobalRewardsIndicators {
         /// @notice powerUp indicator aggregated
-        /// @dev It can be changed many times during transaction, represended with 18 decimals
+        /// @dev It can be changed many times during transaction, represented with 18 decimals
         uint256 aggregatedPowerUp;
         /// @notice composite multiplier in a block described in field blockNumber
         /// @dev It can be changed many times during transaction, represented with 27 decimals

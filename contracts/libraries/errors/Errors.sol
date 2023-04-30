@@ -42,4 +42,8 @@ library Errors {
     string public constant INPUT_ARRAYS_LENGTH_MISMATCH = "PT_718";
     /// @notice msg.sender is not an appointed owner, it cannot confirm their ownership
     string public constant SENDER_NOT_APPOINTED_OWNER = "PT_719";
+    /// @notice msg.sender is not an appointed owner, it cannot confirm their ownership
+    string public constant ROUTER_INVALID_SIGNATURE = "PT_720";
+    string public constant INPUT_ARRAYS_EMPTY = "PT_721";
+    string public constant NOT_ROUTER = "PT_722";
 }
