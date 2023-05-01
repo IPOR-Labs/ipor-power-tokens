@@ -125,13 +125,17 @@ contract PowerTokensSystem is TestCommons {
     function _createServices() private {
         liquidityMiningLens = address(new LiquidityMiningLens(liquidityMining));
         stakeService = address(new StakeService(liquidityMining, powerToken));
-        miningService = address(new MiningService());
+        miningService = address(new MiningService(liquidityMining, iporToken));
     }
 
     function _updateLiquidityMiningImplementation() private {
         LiquidityMiningV2 implementation = new LiquidityMiningV2(router);
         vm.startPrank(owner);
         LiquidityMiningV2(liquidityMining).upgradeTo(address(implementation));
+        ILiquidityMiningInternalV2(liquidityMining).grantAllowanceForRouter(router, lpDai);
+        ILiquidityMiningInternalV2(liquidityMining).grantAllowanceForRouter(router, lpUsdc);
+        ILiquidityMiningInternalV2(liquidityMining).grantAllowanceForRouter(router, lpUsdt);
+        ILiquidityMiningInternalV2(liquidityMining).grantAllowanceForRouter(router, iporToken);
         vm.stopPrank();
     }
 

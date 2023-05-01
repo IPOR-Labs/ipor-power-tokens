@@ -59,10 +59,41 @@ contract StakeService is IStakeService {
         ILiquidityMiningV2(LIQUIDITY_MINING_ADDRESS).addLpTokens(updateLpTokens);
     }
 
-    /// @notice Unstakes the lpToken amount from the LiquidityMining.
-    /// @param lpToken address of the underlying asset
-    /// @param lpTokenAmount lpToken amount being unstaked, represented with 18 decimals
-    function unstake(address lpToken, uint256 lpTokenAmount) external {
-        revert("Not implemented");
+    function unstakeLpTokens(address[] calldata lpTokens, uint256[] calldata lpTokenAmounts)
+        external
+    {
+        uint256 lpTokensLength = lpTokens.length;
+        require(lpTokensLength == lpTokenAmounts.length, Errors.INPUT_ARRAYS_LENGTH_MISMATCH);
+        require(lpTokensLength > 0, Errors.INPUT_ARRAYS_EMPTY);
+        ILiquidityMiningV2.UpdateLpToken[]
+            memory updateLpTokens = new ILiquidityMiningV2.UpdateLpToken[](lpTokensLength);
+
+        for (uint256 i; i != lpTokensLength; ) {
+            require(lpTokens[i] != address(0), Errors.WRONG_ADDRESS);
+            require(lpTokenAmounts[i] > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
+
+            updateLpTokens[i] = ILiquidityMiningV2.UpdateLpToken(
+                msg.sender,
+                lpTokens[i],
+                transferAmount
+            );
+
+            unchecked {
+                ++i;
+            }
+        }
+
+        ILiquidityMiningV2(LIQUIDITY_MINING_ADDRESS).removeLpTokens(updateLpTokens);
+
+        for (uint256 i; i != lpTokensLength; ) {
+            IERC20(lpTokens[i]).safeTransferFrom(
+                LIQUIDITY_MINING_ADDRESS,
+                msg.sender,
+                lpTokenAmounts[i]
+            );
+            unchecked {
+                ++i;
+            }
+        }
     }
 }

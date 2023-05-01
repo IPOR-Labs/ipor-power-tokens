@@ -165,6 +165,10 @@ interface ILiquidityMiningV2 {
 
     function addLpTokens(UpdateLpToken[] memory updateLpToken) external;
 
+    function removeLpTokens(UpdateLpToken[] memory updateLpToken) external;
+
+    function claim(address[] lpTokens) external returns (uint256 rewardsAmountToTransfer);
+
     function getGlobalIndicators(address[] calldata lpTokens)
         external
         view

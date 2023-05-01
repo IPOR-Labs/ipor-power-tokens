@@ -206,6 +206,51 @@ contract LiquidityMiningV2 is LiquidityMiningInternalV2, ILiquidityMiningV2 {
     //    New implementation
     //    ----------------------------------------------
 
+    function claim(address[] lpTokens)
+        external
+        override
+        whenNotPaused
+        onlyRouter
+        returns (uint256 rewardsAmountToTransfer)
+    {
+        address msgSender = _msgSender();
+        uint256 lpTokensLength = lpTokens.length;
+        for (uint256 i; i != lpTokensLength; ) {
+            address lpToken = lpTokens[i];
+            LiquidityMiningTypes.AccountRewardsIndicators
+                memory accountIndicators = _accountIndicators[msgSender][lpToken];
+            LiquidityMiningTypes.GlobalRewardsIndicators
+                memory globalIndicators = _globalIndicators[lpToken];
+
+            (
+                uint256 rewardsAmount,
+                uint256 accruedCompMultiplierCumulativePrevBlock
+            ) = _calculateAccountRewards(globalIndicators, accountIndicators);
+
+            if (rewardsAmount > 0) {
+                _accountIndicators[msgSender][lpToken] = LiquidityMiningTypes
+                    .AccountRewardsIndicators(
+                        accruedCompMultiplierCumulativePrevBlock.toUint128(),
+                        accountIndicators.lpTokenBalance,
+                        accountIndicators.powerUp,
+                        accountIndicators.delegatedPwTokenBalance
+                    );
+                rewardsAmountToTransfer += rewardsAmount;
+            }
+
+            unchecked {
+                ++i;
+            }
+        }
+        uint256 allocatedRewards = _allocatedPwTokens[msgSender];
+        if (allocatedRewards > 0) {
+            _allocatedPwTokens[msgSender] = 0;
+            rewardsAmountToTransfer += allocatedRewards;
+        }
+        return rewardsAmountToTransfer;
+        // TODO add event
+    }
+
     function addLpTokens(ILiquidityMiningV2.UpdateLpToken[] memory updateLpToken)
         external
         override
@@ -235,6 +280,51 @@ contract LiquidityMiningV2 is LiquidityMiningInternalV2, ILiquidityMiningV2 {
                 globalIndicators,
                 accountIndicators,
                 accountIndicators.lpTokenBalance + update.lpTokenAmount,
+                accountIndicators.delegatedPwTokenBalance
+            );
+
+            if (rewardsAmount > 0) {
+                _allocatedPwTokens[update.onBehalfOf] += rewardsAmount;
+            }
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
+    function removeLpTokens(ILiquidityMiningV2.UpdateLpToken[] memory updateLpToken)
+        external
+        override
+        onlyRouter
+        whenNotPaused
+    {
+        uint256 length = updateLpToken.length;
+        for (uint256 i; i != length; ) {
+            UpdateLpToken memory update = updateLpToken[i];
+            require(update.lpTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
+
+            LiquidityMiningTypes.AccountRewardsIndicators
+                memory accountIndicators = _accountIndicators[update.onBehalfOf][update.lpToken];
+            LiquidityMiningTypes.GlobalRewardsIndicators
+                memory globalIndicators = _globalIndicators[update.lpToken];
+
+            require(
+                accountIndicators.lpTokenBalance >= update.lpTokenAmount,
+                Errors.ACCOUNT_LP_TOKEN_BALANCE_IS_TOO_LOW
+            );
+
+            (
+                uint256 rewardsAmount,
+                uint256 accruedCompMultiplierCumulativePrevBlock
+            ) = _calculateAccountRewards(globalIndicators, accountIndicators);
+
+            _rebalanceIndicators(
+                update.onBehalfOf,
+                update.lpToken,
+                accruedCompMultiplierCumulativePrevBlock,
+                globalIndicators,
+                accountIndicators,
+                accountIndicators.lpTokenBalance - update.lpTokenAmount,
                 accountIndicators.delegatedPwTokenBalance
             );
 

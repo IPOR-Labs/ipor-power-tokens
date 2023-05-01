@@ -81,6 +81,10 @@ interface ILiquidityMiningInternalV2 {
     // [ ] - sequence diagrams
     // [ ] - implemented
 
+    function grantAllowanceForRouter(address router, address erc20Token) external;
+
+    function revokeAllowanceForRouter(address router, address erc20Token) external;
+
     /// @notice Emitted when the account unstakes lpTokens
     /// @param account account unstaking tokens
     /// @param lpToken address of lpToken being unstaked

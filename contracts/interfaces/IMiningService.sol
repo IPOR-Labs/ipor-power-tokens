@@ -2,9 +2,7 @@
 pragma solidity 0.8.17;
 
 interface IMiningService {
-    /// @notice method allowing to claim the rewards per asset (lpToken)
-    /// @param lpToken of the staking pool from which to claim the rewards
-    function claim(address lpToken) external;
+    function claim(address[] lpTokens) external;
 
     // todo ClaimService
     // [x] - sequence diagrams

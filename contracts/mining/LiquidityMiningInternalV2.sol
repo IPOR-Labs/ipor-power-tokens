@@ -137,6 +137,30 @@ abstract contract LiquidityMiningInternalV2 is
         _unpause();
     }
 
+    function grantAllowanceForRouter(address router, address erc20Token)
+        external
+        override
+        onlyOwner
+    {
+        require(router != address(0), Errors.WRONG_ADDRESS);
+        require(erc20Token != address(0), Errors.WRONG_ADDRESS);
+
+        IERC20(erc20Token).approve(router, type(uint256).max);
+        // todo: emit event
+    }
+
+    function revokeAllowanceForRouter(address router, address erc20Token)
+        external
+        override
+        onlyOwner
+    {
+        require(router != address(0), Errors.WRONG_ADDRESS);
+        require(erc20Token != address(0), Errors.WRONG_ADDRESS);
+
+        IERC20(erc20Token).approve(router, 0);
+        // todo: emit event
+    }
+
     /// @dev Rebalance makes that rewards for account are reset in current block.
     function _rebalanceIndicators(
         address account,
