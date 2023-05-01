@@ -6,16 +6,23 @@ import "../libraries/errors/Errors.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "../interfaces/ILiquidityMiningV2.sol";
+import "../interfaces/IPowerTokenV2.sol";
 
 contract StakeService is IStakeService {
     using SafeERC20 for IERC20;
 
     address public immutable LIQUIDITY_MINING_ADDRESS;
     address public immutable POWER_TOKEN_ADDRESS;
+    address public immutable STAKED_TOKEN_ADDRESS;
 
-    constructor(address liquidityMiningAddress, address powerTokenAddress) {
+    constructor(
+        address liquidityMiningAddress,
+        address powerTokenAddress,
+        address stakedTokenAddress
+    ) {
         LIQUIDITY_MINING_ADDRESS = liquidityMiningAddress;
         POWER_TOKEN_ADDRESS = powerTokenAddress;
+        STAKED_TOKEN_ADDRESS = stakedTokenAddress;
     }
 
     /// @notice Stakes the lpToken amount into the LiquidityMining.
@@ -75,7 +82,7 @@ contract StakeService is IStakeService {
             updateLpTokens[i] = ILiquidityMiningV2.UpdateLpToken(
                 msg.sender,
                 lpTokens[i],
-                transferAmount
+                lpTokenAmounts[i]
             );
 
             unchecked {
@@ -95,5 +102,34 @@ contract StakeService is IStakeService {
                 ++i;
             }
         }
+    }
+
+    function stakeIporToken(address onBehalfOf, uint256 iporTokenAmount) external {
+        require(onBehalfOf != address(0), Errors.WRONG_ADDRESS);
+        require(iporTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
+
+        IERC20(STAKED_TOKEN_ADDRESS).safeTransferFrom(
+            msg.sender,
+            POWER_TOKEN_ADDRESS,
+            iporTokenAmount
+        );
+
+        IPowerTokenV2(POWER_TOKEN_ADDRESS).addStakedToken(
+            IPowerTokenV2.UpdateStakedToken(onBehalfOf, iporTokenAmount)
+        );
+    }
+
+    function unstakeIporToken(uint256 iporTokenAmount) external {
+        require(iporTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
+
+        IPowerTokenV2(POWER_TOKEN_ADDRESS).removeStakedTokenWithFee(
+            IPowerTokenV2.UpdateStakedToken(msg.sender, iporTokenAmount)
+        );
+
+        IERC20(STAKED_TOKEN_ADDRESS).safeTransferFrom(
+            POWER_TOKEN_ADDRESS,
+            msg.sender,
+            iporTokenAmount
+        );
     }
 }

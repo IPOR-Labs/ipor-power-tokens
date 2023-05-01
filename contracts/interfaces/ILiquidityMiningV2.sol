@@ -2,7 +2,6 @@
 pragma solidity 0.8.17;
 
 import "./types/LiquidityMiningTypes.sol";
-import "../mining/LiquidityMiningV2.sol";
 
 /// @title The interface for interaction with the LiquidityMining.
 /// LiquidityMining is responsible for the distribution of the Power Token rewards to accounts
@@ -13,19 +12,11 @@ interface ILiquidityMiningV2 {
     /// @return Returns an ID of the contract
     function getContractId() external pure returns (bytes32);
 
-    // todo LiquidityMiningLens
-    // [ ] - sequence diagrams
-    // [ ] - implemented
-
     /// @notice Returns the balance of staked lpTokens
     /// @param account the account's address
     /// @param lpToken the address of lpToken
     /// @return balance of the lpTokens staked by the sender
     function balanceOf(address account, address lpToken) external view returns (uint256);
-
-    // todo LiquidityMiningLens
-    // [ ] - sequence diagrams
-    // [ ] - implemented
 
     /// @notice It returns the balance of delegated Power Tokens for a given `account` and the list of lpToken addresses.
     /// @param account address for which to fetch the information about balance of delegated Power Tokens
@@ -36,28 +27,10 @@ interface ILiquidityMiningV2 {
         view
         returns (LiquidityMiningTypes.DelegatedPwTokenBalance[] memory balances);
 
-    // todo LiquidityMiningLens
-    // [ ] - sequence diagrams
-    // [ ] - implemented
-
-    /// @notice Gets the account's allocated rewards
-    /// @param account The address for which to fetch information about balance of allocated Power Tokens
-    /// @return allocatedPwTokens - The amount of the allocated rewards.
-    function balanceOfAllocatedPwTokens(address account)
-        external
-        view
-        returns (uint256 allocatedPwTokens);
-
-    // todo removed
-
     /// @notice Calculates the accrued rewards since the last rebalancing.
     /// @param lpToken the lpToken address
     /// @return rewards accrued since the last rebalancing, represented with 18 decimals.
     function calculateAccruedRewards(address lpToken) external view returns (uint256);
-
-    // todo LiquidityMiningLens
-    // [ ] - sequence diagrams
-    // [ ] - implemented
 
     /// @notice Calculates account's rewards based on the current state of the sender and global indicators.
     /// @dev Calculation does not consider rewards accrued for the current block
@@ -69,58 +42,10 @@ interface ILiquidityMiningV2 {
         view
         returns (uint256);
 
-    // todo LiquidityMiningLens
-    // [ ] - sequence diagrams
-    // [ ] - implemented
-
-    /// @notice Stakes the lpToken amount into the LiquidityMining.
-    /// @param lpToken address of the lpToken
-    /// @param lpTokenAmount lpToken amount being staked, represented with 18 decimals
-    function stake(address lpToken, uint256 lpTokenAmount) external;
-
-    // todo StakeService
-    // [x] - sequence diagrams
-    // [ ] - implemented
-
-    /// @notice Unstakes the lpToken amount from the LiquidityMining.
-    /// @param lpToken address of the underlying asset
-    /// @param lpTokenAmount lpToken amount being unstaked, represented with 18 decimals
-    function unstake(address lpToken, uint256 lpTokenAmount) external;
-
-    // todo StakeService
-    // [x] - sequence diagrams
-    // [ ] - implemented
-
-    /// @notice Unstakes the lpToken amount from LiquidityMining and allocates the rewards into storage.
-    /// This function can be used in the situation, when the are not enough rewards to cover claim and where
-    /// regular unstake of lpTokens would not be possible.
-    /// @param lpToken address of the underlying asset
-    /// @param lpTokenAmount lpToken amount being unstaked, represented with 18 decimals
-    function unstakeAndAllocatePwTokens(address lpToken, uint256 lpTokenAmount) external;
-
-    // todo removed
-
-    /// @notice method allowing to claim the rewards per asset (lpToken)
-    /// @param lpToken of the staking pool from which to claim the rewards
-    function claim(address lpToken) external;
-
-    // todo ClaimService
-    // [x] - sequence diagrams
-    // [ ] - implemented
-
-    /// @notice method allowed to claim the allocated rewards
-    function claimAllocatedPwTokens() external;
-
-    // todo removed
-
     /// @notice method allowing to update the indicators per asset (lpToken).
     /// @param account of which we should update the indicators
     /// @param lpTokens of the staking pools to update the indicators
     function updateIndicators(address account, address[] calldata lpTokens) external;
-
-    // todo MiningService
-    // [x] - sequence diagrams
-    // [ ] - implemented
 
     /// @notice Emitted when the account stakes the lpTokens
     /// @param account Account's address in the context of which the activities of staking of lpTokens are performed
@@ -153,6 +78,12 @@ interface ILiquidityMiningV2 {
         uint256 lpTokenAmount;
     }
 
+    struct UpdatePwToken {
+        address onBehalfOf;
+        address lpToken;
+        uint256 pwTokenAmount;
+    }
+
     struct AccountIndicatorsResult {
         address lpToken;
         LiquidityMiningTypes.AccountRewardsIndicators indicators;
@@ -165,9 +96,15 @@ interface ILiquidityMiningV2 {
 
     function addLpTokens(UpdateLpToken[] memory updateLpToken) external;
 
+    function addPwTokens(UpdatePwToken[] memory updatePwToken) external;
+
     function removeLpTokens(UpdateLpToken[] memory updateLpToken) external;
 
-    function claim(address[] lpTokens) external returns (uint256 rewardsAmountToTransfer);
+    function removePwTokens(UpdatePwToken[] memory updatePwToken) external;
+
+    function claim(address account, address[] calldata lpTokens)
+        external
+        returns (uint256 rewardsAmountToTransfer);
 
     function getGlobalIndicators(address[] calldata lpTokens)
         external

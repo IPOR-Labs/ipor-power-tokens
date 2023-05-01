@@ -42,7 +42,7 @@ interface ILiquidityMiningInternalV2 {
     /// @notice Adds LiquidityMining's support for a new lpToken
     /// @dev Can only be executed by the Owner
     /// @param lpToken address of the lpToken
-    function addLpToken(address lpToken) external;
+    function newSupportedLpToken(address lpToken) external;
 
     // todo GovernanceService
     // [ ] - sequence diagrams

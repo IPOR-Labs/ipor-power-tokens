@@ -11,16 +11,16 @@ import "../libraries/math/Math.sol";
 import "../libraries/Constants.sol";
 import "../interfaces/types/PowerTokenTypes.sol";
 import "../interfaces/IStakedToken.sol";
-import "../interfaces/IPowerTokenInternal.sol";
-import "../interfaces/ILiquidityMining.sol";
 import "../security/MiningOwnableUpgradeable.sol";
+import "../interfaces/IPowerTokenInternalV2.sol";
+import "../interfaces/ILiquidityMiningV2.sol";
 
-abstract contract PowerTokenInternal is
+abstract contract PowerTokenInternalV2 is
     PausableUpgradeable,
     UUPSUpgradeable,
     ReentrancyGuardUpgradeable,
     MiningOwnableUpgradeable,
-    IPowerTokenInternal
+    IPowerTokenInternalV2
 {
     /// @dev 14 days
     uint256 public constant COOL_DOWN_IN_SECONDS = 2 * 7 * 24 * 60 * 60;
@@ -52,11 +52,6 @@ abstract contract PowerTokenInternal is
     modifier onlyPauseManager() {
         require(_msgSender() == _pauseManager, Errors.CALLER_NOT_PAUSE_MANAGER);
         _;
-    }
-
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() {
-        _disableInitializers();
     }
 
     function initialize(address stakedToken) public initializer {
@@ -114,7 +109,7 @@ abstract contract PowerTokenInternal is
     function setLiquidityMining(address newLiquidityMiningAddr) external override onlyOwner {
         require(newLiquidityMiningAddr != address(0), Errors.WRONG_ADDRESS);
         require(
-            ILiquidityMining(newLiquidityMiningAddr).getContractId() == _LIQUIDITY_MINING_ID,
+            ILiquidityMiningV2(newLiquidityMiningAddr).getContractId() == _LIQUIDITY_MINING_ID,
             Errors.WRONG_CONTRACT_ID
         );
         address oldLiquidityMiningAddr = _liquidityMining;

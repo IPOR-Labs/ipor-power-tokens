@@ -6,7 +6,7 @@ import "./types/PowerTokenTypes.sol";
 /// @title The Interface for the interaction with the PowerToken - smart contract responsible
 /// for managing Power Token (pwToken), Swapping Staked Token for Power Tokens, and
 /// delegating Power Tokens to other components.
-interface IPowerToken {
+interface IPowerTokenV2 {
     /// @notice Gets the name of the Power Token
     /// @return Returns the name of the Power Token.
     function name() external pure returns (string memory);
@@ -53,43 +53,6 @@ interface IPowerToken {
         external
         view
         returns (PowerTokenTypes.PwTokenCooldown memory);
-
-    /// @notice Stakes [Staked] Tokens and mints Power Tokens (pwToken).
-    /// @param stakedTokenAmount Tokens that sender staked to mint the Power Tokens
-    function stake(uint256 stakedTokenAmount) external;
-
-    /// @notice Unstakes Staked Tokens in the amount specified.
-    /// @dev If the sender unstake tokens immediately (without the cooldown), then fee is applied by the PowerToken smart contract. See: `UnstakeWithoutCooldownFee`.
-    /// @param pwTokenAmount Power Tokens amount which will be unstake or a given sender
-    function unstake(uint256 pwTokenAmount) external;
-
-    /// @notice Delegates the Power Tokens to the LiquidityMining
-    /// @param lpTokens - list of lpTokens to which Power Tokens are delegated
-    /// @param pwTokenAmounts - list of the amounts of Power Tokens delegated to corresponding lpTokens
-    function delegateToLiquidityMining(
-        address[] calldata lpTokens,
-        uint256[] calldata pwTokenAmounts
-    ) external;
-
-    /// @notice Delegates Power Tokens and stakes lpTokens
-    /// @dev Power Token amounts can equal zero. lpToken amounts can qual zero.
-    /// @param lpTokens - list of lpTokens to which the sender delegates Power Tokens
-    /// @param pwTokenAmounts - list of the amounts of Power Tokens delegated to correspondng lpTokens
-    /// @param lpTokenAmounts - list of staked lpToken amounts
-    function delegateAndStakeToLiquidityMining(
-        address[] calldata lpTokens,
-        uint256[] calldata pwTokenAmounts,
-        uint256[] calldata lpTokenAmounts
-    ) external;
-
-    /// @notice Undelegates the Power Tokens from the LiquidityMining
-    /// @dev Power Token amounts have to be higher than zero, otherwise transaction is reverted.
-    /// @param lpTokens - list of the lpToken from which Power Tokens are undelegated
-    /// @param pwTokenAmounts - list of the undelegated amounts of the Power Tokens
-    function undelegateFromLiquidityMining(
-        address[] calldata lpTokens,
-        uint256[] calldata pwTokenAmounts
-    ) external;
 
     /// @notice Resets the colldown of Power Tokens to the set duration of 2 weeks.
     /// @dev Power Tokens in cooldown cannot be unstaked without fee,
@@ -162,4 +125,22 @@ interface IPowerToken {
     /// @param account address that executed the redeem function
     /// @param pwTokenAmount amount of the pwTokens that was transferred to the Power Token owner's address
     event Redeem(address indexed account, uint256 pwTokenAmount);
+
+    //    ----------------------------------------------
+    //    New implementation
+    //    ----------------------------------------------
+    struct UpdateStakedToken {
+        address onBehalfOf;
+        uint256 stakedTokenAmount;
+    }
+
+    function addStakedToken(UpdateStakedToken memory updateStakedToken) external;
+
+    function removeStakedTokenWithFee(UpdateStakedToken memory updateStakedToken)
+        external
+        returns (uint256 stakedTokenAmountToTransfer);
+
+    function delegate(address account, uint256 pwTokenAmount) external;
+
+    function undelegate(address account, uint256 pwTokenAmount) external;
 }

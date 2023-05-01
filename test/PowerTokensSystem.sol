@@ -7,10 +7,10 @@ import "../contracts/mocks/tokens/MockToken.sol";
 import "../contracts/mocks/tokens/MockLpToken.sol";
 import "./TestCommons.sol";
 import "../contracts/mining/LiquidityMiningV2.sol";
-import "../contracts/tokens/PowerToken.sol";
+import "../contracts/tokens/PowerTokenV2.sol";
 import "../contracts/lens/LiquidityMiningLens.sol";
 import "../contracts/services/StakeService.sol";
-import "../contracts/services/MiningService.sol";
+import "../contracts/services/FlowsService.sol";
 import "../contracts/router/PowerTokenRouter.sol";
 
 contract PowerTokensSystem is TestCommons {
@@ -32,7 +32,7 @@ contract PowerTokensSystem is TestCommons {
 
     address public liquidityMiningLens;
     address public stakeService;
-    address public miningService;
+    address public flowsService;
 
     constructor() {
         owner = vm.rememberKey(1);
@@ -90,7 +90,7 @@ contract PowerTokensSystem is TestCommons {
     }
 
     function _createPowerToken() private {
-        PowerToken implementation = new PowerToken();
+        PowerTokenV2 implementation = new PowerTokenV2(dao);
         vm.startPrank(owner);
         ERC1967Proxy proxy = new ERC1967Proxy(
             address(implementation),
@@ -124,8 +124,8 @@ contract PowerTokensSystem is TestCommons {
 
     function _createServices() private {
         liquidityMiningLens = address(new LiquidityMiningLens(liquidityMining));
-        stakeService = address(new StakeService(liquidityMining, powerToken));
-        miningService = address(new MiningService(liquidityMining, iporToken));
+        stakeService = address(new StakeService(liquidityMining, powerToken, iporToken));
+        flowsService = address(new FlowsService(liquidityMining, iporToken, powerToken));
     }
 
     function _updateLiquidityMiningImplementation() private {
@@ -139,6 +139,13 @@ contract PowerTokensSystem is TestCommons {
         vm.stopPrank();
     }
 
+    function _updatePowerTokenImplementation() private {
+        PowerTokenV2 implementation = new PowerTokenV2(router);
+        vm.startPrank(owner);
+        PowerTokenV2(powerToken).upgradeTo(address(implementation));
+        vm.stopPrank();
+    }
+
     function _createRouter() private {
         vm.startPrank(owner);
         PowerTokenRouter implementation = new PowerTokenRouter(
@@ -147,7 +154,7 @@ contract PowerTokensSystem is TestCommons {
                 powerTokenAddress: powerToken,
                 liquidityMiningLens: liquidityMiningLens,
                 stakeService: stakeService,
-                miningService: miningService
+                miningService: flowsService
             })
         );
 

@@ -4,7 +4,7 @@ pragma solidity 0.8.17;
 import "./types/PowerTokenTypes.sol";
 
 /// @title PowerToken smart contract interface
-interface IPowerTokenInternal {
+interface IPowerTokenInternalV2 {
     /// @notice Returns the current version of the PowerToken smart contract
     /// @return Current PowerToken smart contract version
     function getVersion() external pure returns (uint256);

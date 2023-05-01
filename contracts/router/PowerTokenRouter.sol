@@ -7,7 +7,7 @@ import "../libraries/errors/Errors.sol";
 
 import "../interfaces/ILiquidityMiningLens.sol";
 import "../interfaces/IStakeService.sol";
-import "../interfaces/IMiningService.sol";
+import "../interfaces/IFlowsService.sol";
 
 contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
     address public immutable LIQUIDITY_MINING_ADDRESS;
@@ -40,7 +40,12 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
     }
 
     function getRouterImplementation(bytes4 sig) public returns (address) {
-        if (sig == IStakeService.stakeLpTokens.selector) {
+        if (
+            sig == IStakeService.stakeLpTokens.selector ||
+            sig == IStakeService.unstakeLpTokens.selector ||
+            sig == IStakeService.stakeIporToken.selector ||
+            sig == IStakeService.unstakeIporToken.selector
+        ) {
             whenNotPaused();
             _reentrancyStatus = _ENTERED;
             return STAKE_SERVICE;

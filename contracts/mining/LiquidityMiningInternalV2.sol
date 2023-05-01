@@ -10,11 +10,9 @@ import "../libraries/errors/Errors.sol";
 import "../libraries/math/MiningCalculation.sol";
 import "../libraries/Constants.sol";
 import "../interfaces/types/LiquidityMiningTypes.sol";
-import "../interfaces/ILiquidityMining.sol";
 import "../interfaces/ILiquidityMiningInternalV2.sol";
-import "../interfaces/IPowerToken.sol";
 import "../interfaces/IStakedToken.sol";
-import "../interfaces/IPowerTokenInternal.sol";
+import "../interfaces/IPowerTokenV2.sol";
 import "../security/MiningOwnableUpgradeable.sol";
 
 abstract contract LiquidityMiningInternalV2 is
@@ -60,7 +58,7 @@ abstract contract LiquidityMiningInternalV2 is
 
         require(powerToken != address(0), Errors.WRONG_ADDRESS);
         require(
-            IPowerToken(powerToken).getContractId() == _POWER_TOKEN_ID,
+            IPowerTokenV2(powerToken).getContractId() == _POWER_TOKEN_ID,
             Errors.WRONG_CONTRACT_ID
         );
         require(stakedToken != address(0), Errors.WRONG_ADDRESS);
@@ -108,7 +106,7 @@ abstract contract LiquidityMiningInternalV2 is
         _setRewardsPerBlock(lpToken, pwTokenAmount);
     }
 
-    function addLpToken(address lpToken) external onlyOwner {
+    function newSupportedLpToken(address lpToken) external onlyOwner {
         require(lpToken != address(0), Errors.WRONG_ADDRESS);
         _lpTokens[lpToken] = true;
 
