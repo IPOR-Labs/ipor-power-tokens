@@ -6,17 +6,14 @@ import "../interfaces/ILiquidityMiningLens.sol";
 import "../interfaces/ILiquidityMiningV2.sol";
 
 contract LiquidityMiningLens is ILiquidityMiningLens {
-    address public immutable _liquidityMining;
+    address public immutable LIQUIDITY_MINING;
 
     constructor(address liquidityMining) {
-        _liquidityMining = liquidityMining;
+        LIQUIDITY_MINING = liquidityMining;
     }
 
-    /// @notice Contract ID. The keccak-256 hash of "io.ipor.LiquidityMining" decreased by 1
-    /// @return Returns an ID of the contract
-    function getContractId() external pure returns (bytes32) {
-        revert("Not implemented yet");
-        return 0x9b1f3aa590476fc9aa58d44ad1419ab53d34c344bd5ed46b12e4af7d27c38e06;
+    function getContractId() external view returns (bytes32) {
+        return ILiquidityMiningV2(LIQUIDITY_MINING).getContractId();
     }
 
     // todo LiquidityMiningLens
@@ -28,13 +25,8 @@ contract LiquidityMiningLens is ILiquidityMiningLens {
     /// @param lpToken the address of lpToken
     /// @return balance of the lpTokens staked by the sender
     function balanceOf(address account, address lpToken) external view returns (uint256) {
-        revert("Not implemented yet");
-        return 0;
+        return ILiquidityMiningV2(LIQUIDITY_MINING).balanceOf(account, lpToken);
     }
-
-    // todo LiquidityMiningLens
-    // [ ] - sequence diagrams
-    // [ ] - implemented
 
     /// @notice It returns the balance of delegated Power Tokens for a given `account` and the list of lpToken addresses.
     /// @param account address for which to fetch the information about balance of delegated Power Tokens
@@ -45,38 +37,25 @@ contract LiquidityMiningLens is ILiquidityMiningLens {
         view
         returns (LiquidityMiningTypes.DelegatedPwTokenBalance[] memory balances)
     {
-        revert("Not implemented yet");
-        return balances;
+        return ILiquidityMiningV2(LIQUIDITY_MINING).balanceOfDelegatedPwToken(account, lpTokens);
     }
 
-    // todo LiquidityMiningLens
-    // [ ] - sequence diagrams
-    // [ ] - implemented
-
-    /// @notice Calculates the accrued rewards since the last rebalancing.
-    /// @param lpToken the lpToken address
-    /// @return rewards accrued since the last rebalancing, represented with 18 decimals.
-    function calculateAccruedRewards(address lpToken) external view returns (uint256) {
-        revert("Not implemented yet");
-        return 0;
-    }
-
-    // todo LiquidityMiningLens
-    // [ ] - sequence diagrams
-    // [ ] - implemented
-
-    /// @notice Calculates account's rewards based on the current state of the sender and global indicators.
-    /// @dev Calculation does not consider rewards accrued for the current block
-    /// @param account address for which the rewards are calculated
-    /// @param lpToken address for which the rewards are calculated
-    /// @return Sender's rewards, represented with 18 decimals.
-    function calculateAccountRewards(address account, address lpToken)
+    function calculateAccruedRewards(address[] calldata lpTokens)
         external
         view
-        returns (uint256)
+        override
+        returns (ILiquidityMiningV2.AccruedRewardsResult[] memory result)
     {
-        revert("Not implemented yet");
-        return 0;
+        return ILiquidityMiningV2(LIQUIDITY_MINING).calculateAccruedRewards(lpTokens);
+    }
+
+    function calculateAccountRewards(address account, address[] calldata lpTokens)
+        external
+        view
+        override
+        returns (ILiquidityMiningV2.AccountRewardResult[] memory)
+    {
+        return ILiquidityMiningV2(LIQUIDITY_MINING).calculateAccountRewards(account, lpTokens);
     }
 
     // todo LiquidityMiningLens
@@ -89,7 +68,7 @@ contract LiquidityMiningLens is ILiquidityMiningLens {
         view
         returns (ILiquidityMiningV2.GlobalIndicatorsResult[] memory)
     {
-        return ILiquidityMiningV2(_liquidityMining).getGlobalIndicators(lpTokens);
+        return ILiquidityMiningV2(LIQUIDITY_MINING).getGlobalIndicators(lpTokens);
     }
 
     function getAccountIndicators(address account, address[] calldata lpTokens)
@@ -97,6 +76,6 @@ contract LiquidityMiningLens is ILiquidityMiningLens {
         view
         returns (ILiquidityMiningV2.AccountIndicatorsResult[] memory)
     {
-        return ILiquidityMiningV2(_liquidityMining).getAccountIndicators(account, lpTokens);
+        return ILiquidityMiningV2(LIQUIDITY_MINING).getAccountIndicators(account, lpTokens);
     }
 }

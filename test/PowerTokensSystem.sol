@@ -2,6 +2,7 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import "../contracts/mocks/tokens/MockStakedToken.sol";
 import "../contracts/mocks/tokens/MockToken.sol";
 import "../contracts/mocks/tokens/MockLpToken.sol";
@@ -14,6 +15,8 @@ import "../contracts/services/FlowsService.sol";
 import "../contracts/router/PowerTokenRouter.sol";
 
 contract PowerTokensSystem is TestCommons {
+    using SafeCast for uint256;
+
     address public dao;
     address public owner;
     address public iporToken;
@@ -43,6 +46,7 @@ contract PowerTokensSystem is TestCommons {
         _createServices();
         _createRouter();
         _updateLiquidityMiningImplementation();
+        _updatePowerTokenImplementation();
     }
 
     function mintStable(
@@ -64,11 +68,27 @@ contract PowerTokensSystem is TestCommons {
         vm.stopPrank();
     }
 
+    function setRewardsPerBlock(address lpToken, uint256 rewardsPerBlock) external {
+        vm.startPrank(owner);
+        ILiquidityMiningInternalV2(liquidityMining).setRewardsPerBlock(
+            lpToken,
+            rewardsPerBlock.toUint32()
+        );
+        vm.stopPrank();
+    }
+
+    function transferIporToken(address to, uint256 amount) external {
+        vm.startPrank(dao);
+        MockToken(iporToken).transfer(to, amount);
+        vm.stopPrank();
+    }
+
     function approveRouter(address account) external {
         vm.startPrank(account);
         MockLpToken(lpDai).approve(router, type(uint256).max);
         MockLpToken(lpUsdc).approve(router, type(uint256).max);
         MockLpToken(lpUsdt).approve(router, type(uint256).max);
+        MockStakedToken(iporToken).approve(router, type(uint256).max);
         vm.stopPrank();
     }
 

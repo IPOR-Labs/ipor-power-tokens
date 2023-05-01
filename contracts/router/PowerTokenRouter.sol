@@ -14,7 +14,7 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
     address public immutable POWER_TOKEN_ADDRESS;
     address public immutable LIQUIDITY_MINING_LENS;
     address public immutable STAKE_SERVICE;
-    address public immutable MINING_SERVICE;
+    address public immutable FLOWS_SERVICE;
 
     struct DeployedContracts {
         address liquidityMiningAddress;
@@ -27,7 +27,7 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
     constructor(DeployedContracts memory deployedContracts) {
         LIQUIDITY_MINING_LENS = deployedContracts.liquidityMiningLens;
         STAKE_SERVICE = deployedContracts.stakeService;
-        MINING_SERVICE = deployedContracts.miningService;
+        FLOWS_SERVICE = deployedContracts.miningService;
         LIQUIDITY_MINING_ADDRESS = deployedContracts.liquidityMiningAddress;
         POWER_TOKEN_ADDRESS = deployedContracts.powerTokenAddress;
         _disableInitializers();
@@ -52,9 +52,22 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
         }
         if (
             sig == ILiquidityMiningLens.getGlobalIndicators.selector ||
-            sig == ILiquidityMiningLens.getAccountIndicators.selector
+            sig == ILiquidityMiningLens.getAccountIndicators.selector ||
+            sig == ILiquidityMiningLens.getContractId.selector ||
+            sig == ILiquidityMiningLens.balanceOf.selector ||
+            sig == ILiquidityMiningLens.balanceOfDelegatedPwToken.selector ||
+            sig == ILiquidityMiningLens.calculateAccruedRewards.selector ||
+            sig == ILiquidityMiningLens.calculateAccountRewards.selector
         ) {
             return LIQUIDITY_MINING_LENS;
+        }
+        if (
+            sig == IFlowsService.delegate.selector ||
+            sig == IFlowsService.updateIndicators.selector ||
+            sig == IFlowsService.undelegate.selector ||
+            sig == IFlowsService.claim.selector
+        ) {
+            return FLOWS_SERVICE;
         }
         revert(Errors.ROUTER_INVALID_SIGNATURE);
     }

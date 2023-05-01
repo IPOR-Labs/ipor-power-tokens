@@ -21,11 +21,6 @@ interface IPowerTokenInternalV2 {
     /// @param unstakeWithoutCooldownFee fee percentage, represented with 18 decimals.
     function setUnstakeWithoutCooldownFee(uint256 unstakeWithoutCooldownFee) external;
 
-    /// @notice method allowing for claiming of the rewards
-    /// @param account - address of user claiming rewards
-    /// @param rewardsAmount - amount of rewards, represented with 18 decimals.
-    function receiveRewardsFromLiquidityMining(address account, uint256 rewardsAmount) external;
-
     /// @notice method returning address of liquidity rewards contract - the LiquidityMining
     function getLiquidityMining() external view returns (address);
 

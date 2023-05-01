@@ -124,31 +124,6 @@ abstract contract PowerTokenInternalV2 is
         emit PauseManagerChanged(_msgSender(), oldPauseManagerAddr, newPauseManagerAddr);
     }
 
-    function receiveRewardsFromLiquidityMining(address account, uint256 rewardsAmount)
-        external
-        override
-        whenNotPaused
-        onlyLiquidityMining
-    {
-        address stakedTokenAddress = _stakedToken;
-        /// @dev This value is needed before the tokens transfer
-        uint256 exchangeRate = _calculateInternalExchangeRate(stakedTokenAddress);
-        require(rewardsAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
-
-        IERC20Upgradeable(stakedTokenAddress).transferFrom(
-            _msgSender(),
-            address(this),
-            rewardsAmount
-        );
-
-        uint256 baseAmount = Math.division(rewardsAmount * Constants.D18, exchangeRate);
-
-        _baseBalance[account] += baseAmount;
-        _baseTotalSupply += baseAmount;
-
-        emit RewardsReceived(account, rewardsAmount);
-    }
-
     function pause() external override onlyPauseManager {
         _pause();
     }

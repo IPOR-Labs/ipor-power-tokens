@@ -7,21 +7,13 @@ import "./ILiquidityMiningV2.sol";
 interface ILiquidityMiningLens {
     /// @notice Contract ID. The keccak-256 hash of "io.ipor.LiquidityMining" decreased by 1
     /// @return Returns an ID of the contract
-    function getContractId() external pure returns (bytes32);
-
-    // todo LiquidityMiningLens
-    // [ ] - sequence diagrams
-    // [ ] - implemented
+    function getContractId() external view returns (bytes32);
 
     /// @notice Returns the balance of staked lpTokens
     /// @param account the account's address
     /// @param lpToken the address of lpToken
     /// @return balance of the lpTokens staked by the sender
     function balanceOf(address account, address lpToken) external view returns (uint256);
-
-    // todo LiquidityMiningLens
-    // [ ] - sequence diagrams
-    // [ ] - implemented
 
     /// @notice It returns the balance of delegated Power Tokens for a given `account` and the list of lpToken addresses.
     /// @param account address for which to fetch the information about balance of delegated Power Tokens
@@ -32,28 +24,15 @@ interface ILiquidityMiningLens {
         view
         returns (LiquidityMiningTypes.DelegatedPwTokenBalance[] memory balances);
 
-    // todo LiquidityMiningLens
-    // [ ] - sequence diagrams
-    // [ ] - implemented
-
-    /// @notice Calculates the accrued rewards since the last rebalancing.
-    /// @param lpToken the lpToken address
-    /// @return rewards accrued since the last rebalancing, represented with 18 decimals.
-    function calculateAccruedRewards(address lpToken) external view returns (uint256);
-
-    // todo LiquidityMiningLens
-    // [ ] - sequence diagrams
-    // [ ] - implemented
-
-    /// @notice Calculates account's rewards based on the current state of the sender and global indicators.
-    /// @dev Calculation does not consider rewards accrued for the current block
-    /// @param account address for which the rewards are calculated
-    /// @param lpToken address for which the rewards are calculated
-    /// @return Sender's rewards, represented with 18 decimals.
-    function calculateAccountRewards(address account, address lpToken)
+    function calculateAccruedRewards(address[] calldata lpTokens)
         external
         view
-        returns (uint256);
+        returns (ILiquidityMiningV2.AccruedRewardsResult[] memory result);
+
+    function calculateAccountRewards(address account, address[] calldata lpTokens)
+        external
+        view
+        returns (ILiquidityMiningV2.AccountRewardResult[] memory);
 
     // todo LiquidityMiningLens
     // [ ] - sequence diagrams

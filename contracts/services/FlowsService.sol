@@ -37,7 +37,10 @@ contract FlowsService is IFlowsService {
         IERC20(stakedToken).safeTransferFrom(liquidityMining, powerToken, rewardsAmountToTransfer);
     }
 
-    function updateIndicators(address account, address[] calldata lpTokens) external {}
+    function updateIndicators(address account, address[] calldata lpTokens) external {
+        require(lpTokens.length > 0, Errors.INPUT_ARRAYS_EMPTY);
+        ILiquidityMiningV2(liquidityMining).updateIndicators(account, lpTokens);
+    }
 
     function delegate(address[] calldata lpTokens, uint256[] calldata pwTokenAmounts) external {
         uint256 lpTokensLength = lpTokens.length;

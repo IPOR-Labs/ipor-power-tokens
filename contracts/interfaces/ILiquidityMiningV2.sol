@@ -27,20 +27,15 @@ interface ILiquidityMiningV2 {
         view
         returns (LiquidityMiningTypes.DelegatedPwTokenBalance[] memory balances);
 
-    /// @notice Calculates the accrued rewards since the last rebalancing.
-    /// @param lpToken the lpToken address
-    /// @return rewards accrued since the last rebalancing, represented with 18 decimals.
-    function calculateAccruedRewards(address lpToken) external view returns (uint256);
-
-    /// @notice Calculates account's rewards based on the current state of the sender and global indicators.
-    /// @dev Calculation does not consider rewards accrued for the current block
-    /// @param account address for which the rewards are calculated
-    /// @param lpToken address for which the rewards are calculated
-    /// @return Sender's rewards, represented with 18 decimals.
-    function calculateAccountRewards(address account, address lpToken)
+    function calculateAccruedRewards(address[] calldata lpTokens)
         external
         view
-        returns (uint256);
+        returns (AccruedRewardsResult[] memory result);
+
+    function calculateAccountRewards(address account, address[] calldata lpTokens)
+        external
+        view
+        returns (AccountRewardResult[] memory);
 
     /// @notice method allowing to update the indicators per asset (lpToken).
     /// @param account of which we should update the indicators
@@ -69,9 +64,6 @@ interface ILiquidityMiningV2 {
     /// @param lpToken lpToken address to which the update was triggered
     event IndicatorsUpdated(address account, address lpToken);
 
-    //    ----------------------------------------------
-    //    New implementation
-    //    ----------------------------------------------
     struct UpdateLpToken {
         address onBehalfOf;
         address lpToken;
@@ -82,6 +74,17 @@ interface ILiquidityMiningV2 {
         address onBehalfOf;
         address lpToken;
         uint256 pwTokenAmount;
+    }
+
+    struct AccruedRewardsResult {
+        address lpToken;
+        uint256 rewardsAmount;
+    }
+
+    struct AccountRewardResult {
+        address lpToken;
+        uint256 rewardsAmount;
+        uint256 allocatedPwTokens;
     }
 
     struct AccountIndicatorsResult {
