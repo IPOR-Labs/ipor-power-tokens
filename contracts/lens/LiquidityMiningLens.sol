@@ -44,7 +44,7 @@ contract LiquidityMiningLens is ILiquidityMiningLens {
         external
         view
         override
-        returns (ILiquidityMiningV2.AccruedRewardsResult[] memory result)
+        returns (LiquidityMiningTypes.AccruedRewardsResult[] memory result)
     {
         return ILiquidityMiningV2(LIQUIDITY_MINING).calculateAccruedRewards(lpTokens);
     }
@@ -53,7 +53,7 @@ contract LiquidityMiningLens is ILiquidityMiningLens {
         external
         view
         override
-        returns (ILiquidityMiningV2.AccountRewardResult[] memory)
+        returns (LiquidityMiningTypes.AccountRewardResult[] memory)
     {
         return ILiquidityMiningV2(LIQUIDITY_MINING).calculateAccountRewards(account, lpTokens);
     }
@@ -66,7 +66,7 @@ contract LiquidityMiningLens is ILiquidityMiningLens {
     function getGlobalIndicators(address[] memory lpTokens)
         external
         view
-        returns (ILiquidityMiningV2.GlobalIndicatorsResult[] memory)
+        returns (LiquidityMiningTypes.GlobalIndicatorsResult[] memory)
     {
         return ILiquidityMiningV2(LIQUIDITY_MINING).getGlobalIndicators(lpTokens);
     }
@@ -74,7 +74,7 @@ contract LiquidityMiningLens is ILiquidityMiningLens {
     function getAccountIndicators(address account, address[] calldata lpTokens)
         external
         view
-        returns (ILiquidityMiningV2.AccountIndicatorsResult[] memory)
+        returns (LiquidityMiningTypes.AccountIndicatorsResult[] memory)
     {
         return ILiquidityMiningV2(LIQUIDITY_MINING).getAccountIndicators(account, lpTokens);
     }

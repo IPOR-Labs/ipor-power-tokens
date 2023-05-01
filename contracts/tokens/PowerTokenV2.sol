@@ -134,7 +134,7 @@ contract PowerTokenV2 is PowerTokenInternalV2, IPowerTokenV2 {
     //    New implementation
     //    ----------------------------------------------
 
-    function addStakedToken(IPowerTokenV2.UpdateStakedToken memory updateStakedToken) external {
+    function addStakedToken(PowerTokenTypes.UpdateStakedToken memory updateStakedToken) external {
         require(updateStakedToken.stakedTokenAmount != 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
         address stakedTokenAddress = _stakedToken;
@@ -152,7 +152,7 @@ contract PowerTokenV2 is PowerTokenInternalV2, IPowerTokenV2 {
         //todo: Add event
     }
 
-    function removeStakedTokenWithFee(IPowerTokenV2.UpdateStakedToken memory updateStakedToken)
+    function removeStakedTokenWithFee(PowerTokenTypes.UpdateStakedToken memory updateStakedToken)
         external
         returns (uint256 stakedTokenAmountToTransfer)
     {

@@ -30,17 +30,39 @@ interface ILiquidityMiningV2 {
     function calculateAccruedRewards(address[] calldata lpTokens)
         external
         view
-        returns (AccruedRewardsResult[] memory result);
+        returns (LiquidityMiningTypes.AccruedRewardsResult[] memory result);
 
     function calculateAccountRewards(address account, address[] calldata lpTokens)
         external
         view
-        returns (AccountRewardResult[] memory);
+        returns (LiquidityMiningTypes.AccountRewardResult[] memory);
 
     /// @notice method allowing to update the indicators per asset (lpToken).
     /// @param account of which we should update the indicators
     /// @param lpTokens of the staking pools to update the indicators
     function updateIndicators(address account, address[] calldata lpTokens) external;
+
+    function addLpTokens(LiquidityMiningTypes.UpdateLpToken[] memory updateLpToken) external;
+
+    function addPwTokens(LiquidityMiningTypes.UpdatePwToken[] memory updatePwToken) external;
+
+    function removeLpTokens(LiquidityMiningTypes.UpdateLpToken[] memory updateLpToken) external;
+
+    function removePwTokens(LiquidityMiningTypes.UpdatePwToken[] memory updatePwToken) external;
+
+    function claim(address account, address[] calldata lpTokens)
+        external
+        returns (uint256 rewardsAmountToTransfer);
+
+    function getGlobalIndicators(address[] calldata lpTokens)
+        external
+        view
+        returns (LiquidityMiningTypes.GlobalIndicatorsResult[] memory);
+
+    function getAccountIndicators(address account, address[] calldata lpTokens)
+        external
+        view
+        returns (LiquidityMiningTypes.AccountIndicatorsResult[] memory);
 
     /// @notice Emitted when the account stakes the lpTokens
     /// @param account Account's address in the context of which the activities of staking of lpTokens are performed
@@ -63,59 +85,4 @@ interface ILiquidityMiningV2 {
     /// @param account Account address to which the update was triggered
     /// @param lpToken lpToken address to which the update was triggered
     event IndicatorsUpdated(address account, address lpToken);
-
-    struct UpdateLpToken {
-        address onBehalfOf;
-        address lpToken;
-        uint256 lpTokenAmount;
-    }
-
-    struct UpdatePwToken {
-        address onBehalfOf;
-        address lpToken;
-        uint256 pwTokenAmount;
-    }
-
-    struct AccruedRewardsResult {
-        address lpToken;
-        uint256 rewardsAmount;
-    }
-
-    struct AccountRewardResult {
-        address lpToken;
-        uint256 rewardsAmount;
-        uint256 allocatedPwTokens;
-    }
-
-    struct AccountIndicatorsResult {
-        address lpToken;
-        LiquidityMiningTypes.AccountRewardsIndicators indicators;
-    }
-
-    struct GlobalIndicatorsResult {
-        address lpToken;
-        LiquidityMiningTypes.GlobalRewardsIndicators indicators;
-    }
-
-    function addLpTokens(UpdateLpToken[] memory updateLpToken) external;
-
-    function addPwTokens(UpdatePwToken[] memory updatePwToken) external;
-
-    function removeLpTokens(UpdateLpToken[] memory updateLpToken) external;
-
-    function removePwTokens(UpdatePwToken[] memory updatePwToken) external;
-
-    function claim(address account, address[] calldata lpTokens)
-        external
-        returns (uint256 rewardsAmountToTransfer);
-
-    function getGlobalIndicators(address[] calldata lpTokens)
-        external
-        view
-        returns (GlobalIndicatorsResult[] memory);
-
-    function getAccountIndicators(address account, address[] calldata lpTokens)
-        external
-        view
-        returns (AccountIndicatorsResult[] memory);
 }

@@ -79,7 +79,7 @@ contract SmokeTest is TestCommons {
 
         // WHEN
 
-        ILiquidityMiningV2.AccruedRewardsResult[] memory result = ILiquidityMiningLens(_router)
+        LiquidityMiningTypes.AccruedRewardsResult[] memory result = ILiquidityMiningLens(_router)
             .calculateAccruedRewards(stakedTokens);
         vm.stopPrank();
 
@@ -101,7 +101,7 @@ contract SmokeTest is TestCommons {
 
         // WHEN
 
-        ILiquidityMiningV2.AccountRewardResult[] memory result = ILiquidityMiningLens(_router)
+        LiquidityMiningTypes.AccountRewardResult[] memory result = ILiquidityMiningLens(_router)
             .calculateAccountRewards(_userOne, stakedTokens);
         vm.stopPrank();
 

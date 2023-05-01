@@ -9,4 +9,9 @@ library PowerTokenTypes {
         // @dev The amount of Power Tokens which can be redeemed without fee when the cooldown reaches `endTimestamp`
         uint256 pwTokenAmount;
     }
+
+    struct UpdateStakedToken {
+        address onBehalfOf;
+        uint256 stakedTokenAmount;
+    }
 }

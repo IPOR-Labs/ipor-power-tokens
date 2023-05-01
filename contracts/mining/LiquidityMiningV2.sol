@@ -62,15 +62,19 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
         external
         view
         override
-        returns (AccruedRewardsResult[] memory result)
+        returns (LiquidityMiningTypes.AccruedRewardsResult[] memory result)
     {
         uint256 lpTokensLength = lpTokens.length;
-        AccruedRewardsResult[] memory rewards = new AccruedRewardsResult[](lpTokensLength);
+        LiquidityMiningTypes.AccruedRewardsResult[]
+            memory rewards = new LiquidityMiningTypes.AccruedRewardsResult[](lpTokensLength);
         for (uint256 i; i != lpTokensLength; ++i) {
             LiquidityMiningTypes.GlobalRewardsIndicators
                 memory globalIndicators = _globalIndicators[lpTokens[i]];
             if (globalIndicators.aggregatedPowerUp == 0) {
-                rewards[i] = AccruedRewardsResult(lpTokens[i], globalIndicators.accruedRewards);
+                rewards[i] = LiquidityMiningTypes.AccruedRewardsResult(
+                    lpTokens[i],
+                    globalIndicators.accruedRewards
+                );
             }
 
             uint256 reward = MiningCalculation.calculateAccruedRewards(
@@ -79,7 +83,7 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
                 globalIndicators.rewardsPerBlock,
                 globalIndicators.accruedRewards
             );
-            rewards[i] = AccruedRewardsResult(lpTokens[i], reward);
+            rewards[i] = LiquidityMiningTypes.AccruedRewardsResult(lpTokens[i], reward);
         }
         return rewards;
     }
@@ -88,11 +92,11 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
         external
         view
         override
-        returns (ILiquidityMiningV2.AccountRewardResult[] memory)
+        returns (LiquidityMiningTypes.AccountRewardResult[] memory)
     {
         uint256 lpTokensLength = lpTokens.length;
-        ILiquidityMiningV2.AccountRewardResult[]
-            memory rewards = new ILiquidityMiningV2.AccountRewardResult[](lpTokensLength);
+        LiquidityMiningTypes.AccountRewardResult[]
+            memory rewards = new LiquidityMiningTypes.AccountRewardResult[](lpTokensLength);
         for (uint256 i; i != lpTokensLength; ) {
             LiquidityMiningTypes.GlobalRewardsIndicators
                 memory globalIndicators = _globalIndicators[lpTokens[i]];
@@ -102,7 +106,7 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
                 globalIndicators,
                 accountIndicators
             );
-            rewards[i] = ILiquidityMiningV2.AccountRewardResult(
+            rewards[i] = LiquidityMiningTypes.AccountRewardResult(
                 lpTokens[i],
                 rewardsAmount,
                 _allocatedPwTokens[lpTokens[i]]
@@ -199,7 +203,7 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
         // TODO add event
     }
 
-    function addLpTokens(ILiquidityMiningV2.UpdateLpToken[] memory updateLpToken)
+    function addLpTokens(LiquidityMiningTypes.UpdateLpToken[] memory updateLpToken)
         external
         override
         onlyRouter
@@ -209,7 +213,7 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
         LiquidityMiningTypes.AccountRewardsIndicators memory accountIndicators;
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators;
         for (uint256 i; i != length; ) {
-            UpdateLpToken memory update = updateLpToken[i];
+            LiquidityMiningTypes.UpdateLpToken memory update = updateLpToken[i];
             require(update.lpTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
             require(_lpTokens[update.lpToken], Errors.LP_TOKEN_NOT_SUPPORTED);
 
@@ -240,7 +244,11 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
         }
     }
 
-    function addPwTokens(UpdatePwToken[] memory updatePwTokens) external onlyRouter whenNotPaused {
+    function addPwTokens(LiquidityMiningTypes.UpdatePwToken[] memory updatePwTokens)
+        external
+        onlyRouter
+        whenNotPaused
+    {
         uint256 rewards;
         uint256 lpTokensLength = updatePwTokens.length;
         uint256 rewardsIteration;
@@ -249,7 +257,7 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators;
 
         for (uint256 i; i != lpTokensLength; ) {
-            UpdatePwToken memory update = updatePwTokens[i];
+            LiquidityMiningTypes.UpdatePwToken memory update = updatePwTokens[i];
             require(_lpTokens[update.lpToken], Errors.LP_TOKEN_NOT_SUPPORTED);
 
             accountIndicators = _accountIndicators[update.onBehalfOf][update.lpToken];
@@ -295,7 +303,7 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
         }
     }
 
-    function removePwTokens(UpdatePwToken[] memory updatePwTokens)
+    function removePwTokens(LiquidityMiningTypes.UpdatePwToken[] memory updatePwTokens)
         external
         onlyRouter
         whenNotPaused
@@ -308,7 +316,7 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators;
 
         for (uint256 i; i != length; ) {
-            UpdatePwToken memory update = updatePwTokens[i];
+            LiquidityMiningTypes.UpdatePwToken memory update = updatePwTokens[i];
             require(_lpTokens[update.lpToken], Errors.LP_TOKEN_NOT_SUPPORTED);
 
             accountIndicators = _accountIndicators[update.onBehalfOf][update.lpToken];
@@ -348,7 +356,7 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
         }
     }
 
-    function removeLpTokens(ILiquidityMiningV2.UpdateLpToken[] memory updateLpToken)
+    function removeLpTokens(LiquidityMiningTypes.UpdateLpToken[] memory updateLpToken)
         external
         override
         onlyRouter
@@ -356,7 +364,7 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
     {
         uint256 length = updateLpToken.length;
         for (uint256 i; i != length; ) {
-            UpdateLpToken memory update = updateLpToken[i];
+            LiquidityMiningTypes.UpdateLpToken memory update = updateLpToken[i];
             require(update.lpTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
             LiquidityMiningTypes.AccountRewardsIndicators
@@ -397,15 +405,15 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
         external
         view
         override
-        returns (ILiquidityMiningV2.GlobalIndicatorsResult[] memory)
+        returns (LiquidityMiningTypes.GlobalIndicatorsResult[] memory)
     {
         uint256 length = lpTokens.length;
 
-        ILiquidityMiningV2.GlobalIndicatorsResult[]
-            memory accountIndicators = new ILiquidityMiningV2.GlobalIndicatorsResult[](length);
+        LiquidityMiningTypes.GlobalIndicatorsResult[]
+            memory accountIndicators = new LiquidityMiningTypes.GlobalIndicatorsResult[](length);
 
         for (uint256 i; i != length; ) {
-            accountIndicators[i] = ILiquidityMiningV2.GlobalIndicatorsResult(
+            accountIndicators[i] = LiquidityMiningTypes.GlobalIndicatorsResult(
                 lpTokens[i],
                 _globalIndicators[lpTokens[i]]
             );
@@ -420,15 +428,15 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
         external
         view
         override
-        returns (ILiquidityMiningV2.AccountIndicatorsResult[] memory)
+        returns (LiquidityMiningTypes.AccountIndicatorsResult[] memory)
     {
         uint256 length = lpTokens.length;
 
-        ILiquidityMiningV2.AccountIndicatorsResult[]
-            memory accountIndicators = new ILiquidityMiningV2.AccountIndicatorsResult[](length);
+        LiquidityMiningTypes.AccountIndicatorsResult[]
+            memory accountIndicators = new LiquidityMiningTypes.AccountIndicatorsResult[](length);
 
         for (uint256 i; i != length; ) {
-            accountIndicators[i] = ILiquidityMiningV2.AccountIndicatorsResult(
+            accountIndicators[i] = LiquidityMiningTypes.AccountIndicatorsResult(
                 lpTokens[i],
                 _accountIndicators[account][lpTokens[i]]
             );

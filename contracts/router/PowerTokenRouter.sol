@@ -47,6 +47,7 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
             sig == IStakeService.unstakeIporToken.selector
         ) {
             whenNotPaused();
+            nonReentrant();
             _reentrancyStatus = _ENTERED;
             return STAKE_SERVICE;
         }
@@ -67,6 +68,9 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
             sig == IFlowsService.undelegate.selector ||
             sig == IFlowsService.claim.selector
         ) {
+            whenNotPaused();
+            nonReentrant();
+            _reentrancyStatus = _ENTERED;
             return FLOWS_SERVICE;
         }
         revert(Errors.ROUTER_INVALID_SIGNATURE);
@@ -79,6 +83,7 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
     /// @dev Delegates the current call to `implementation`.
     /// This function does not return to its internal call site, it will return directly to the external caller.
     function _delegate(address implementation) private {
+        bytes memory result;
         // solhint-disable-next-line no-inline-assembly
         assembly {
             // Copy msg.data. We take full control of memory in this inline assembly
@@ -88,11 +93,16 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
 
             // Call the implementation.
             // out and outsize are 0 because we don't know the size yet.
-            let result := delegatecall(gas(), implementation, 0, calldatasize(), 0, 0)
+            result := delegatecall(gas(), implementation, 0, calldatasize(), 0, 0)
 
             // Copy the returned data.
             returndatacopy(0, 0, returndatasize())
-
+        }
+        //todo: convert into assembly
+        if (_reentrancyStatus == _ENTERED) {
+            _reentrancyStatus = _NOT_ENTERED;
+        }
+        assembly {
             switch result
             // delegatecall returns 0 on error.
             case 0 {
@@ -101,10 +111,6 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
             default {
                 return(0, returndatasize())
             }
-        }
-
-        if (_reentrancyStatus == _ENTERED) {
-            _reentrancyStatus = _NOT_ENTERED;
         }
     }
 

@@ -32,7 +32,7 @@ contract FlowsService is IFlowsService {
         );
         require(rewardsAmountToTransfer > 0, Errors.NO_REWARDS_TO_CLAIM);
         IPowerTokenV2(powerToken).addStakedToken(
-            IPowerTokenV2.UpdateStakedToken(msg.sender, rewardsAmountToTransfer)
+            PowerTokenTypes.UpdateStakedToken(msg.sender, rewardsAmountToTransfer)
         );
         IERC20(stakedToken).safeTransferFrom(liquidityMining, powerToken, rewardsAmountToTransfer);
     }
@@ -48,11 +48,11 @@ contract FlowsService is IFlowsService {
         require(lpTokensLength > 0, Errors.INPUT_ARRAYS_EMPTY);
         uint256 totalStakedTokenAmount;
         address account = msg.sender;
-        ILiquidityMiningV2.UpdatePwToken[]
-            memory updatePwTokens = new ILiquidityMiningV2.UpdatePwToken[](lpTokensLength);
+        LiquidityMiningTypes.UpdatePwToken[]
+            memory updatePwTokens = new LiquidityMiningTypes.UpdatePwToken[](lpTokensLength);
         for (uint256 i; i != lpTokensLength; ) {
             totalStakedTokenAmount += pwTokenAmounts[i];
-            updatePwTokens[i] = ILiquidityMiningV2.UpdatePwToken(
+            updatePwTokens[i] = LiquidityMiningTypes.UpdatePwToken(
                 account,
                 lpTokens[i],
                 pwTokenAmounts[i]
@@ -72,11 +72,11 @@ contract FlowsService is IFlowsService {
         require(length > 0, Errors.INPUT_ARRAYS_EMPTY);
         uint256 totalStakedTokenAmount;
         address account = msg.sender;
-        ILiquidityMiningV2.UpdatePwToken[]
-            memory updatePwTokens = new ILiquidityMiningV2.UpdatePwToken[](length);
+        LiquidityMiningTypes.UpdatePwToken[]
+            memory updatePwTokens = new LiquidityMiningTypes.UpdatePwToken[](length);
         for (uint256 i; i != length; ) {
             totalStakedTokenAmount += pwTokenAmounts[i];
-            updatePwTokens[i] = ILiquidityMiningV2.UpdatePwToken(
+            updatePwTokens[i] = LiquidityMiningTypes.UpdatePwToken(
                 account,
                 lpTokens[i],
                 pwTokenAmounts[i]

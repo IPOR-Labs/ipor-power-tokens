@@ -9,77 +9,41 @@ interface ILiquidityMiningInternalV2 {
     /// @return Current LiquidityMining (Liquidity Rewards) version
     function getVersion() external pure returns (uint256);
 
-    // todo Lens
-    // [ ] - sequence diagrams
-    // [ ] - implemented
-
     /// @notice Gets the Pause Manager's address
     /// @return Pause Manager's address
     function getPauseManager() external view returns (address);
-
-    // todo Lens
-    // [ ] - sequence diagrams
-    // [ ] - implemented
 
     /// @notice Checks if lpToken is supported by the liquidity mining module.
     /// @param lpToken lpToken address
     /// @return returns true if lpToken is supported by the LiquidityMining, false otherwise
     function isLpTokenSupported(address lpToken) external view returns (bool);
 
-    // todo Lens
-    // [ ] - sequence diagrams
-    // [ ] - implemented
-
     /// @notice Sets the global configuration indicator - rewardsPerBlock for a given lpToken
     /// @param lpToken address for which to setup `rewards per block`
     /// @param pwTokenAmount amount of the `rewards per block`, denominated in Power Token, represented with 8 decimals
     function setRewardsPerBlock(address lpToken, uint32 pwTokenAmount) external;
-
-    // todo GovernanceService
-    // [ ] - sequence diagrams
-    // [ ] - implemented
 
     /// @notice Adds LiquidityMining's support for a new lpToken
     /// @dev Can only be executed by the Owner
     /// @param lpToken address of the lpToken
     function newSupportedLpToken(address lpToken) external;
 
-    // todo GovernanceService
-    // [ ] - sequence diagrams
-    // [ ] - implemented
-
     /// @notice Deprecation lpToken from the list of tokens supported by the LiquidityMining contract
     /// @dev Can be executed only by the Owner. Note! That when lpToken is removed, the rewards cannot be claimed. To restore claiming, run function {addLpToken()} and {setRewardsPerBlock()}
     /// @param lpToken address of the lpToken
     function phasingOutLpToken(address lpToken) external;
 
-    // todo GovernanceService
-    // [ ] - sequence diagrams
-    // [ ] - implemented
-
     /// @notice Sets the new Pause Manager address
     /// @param newPauseManagerAddr - new address of Pause Manager
     function setPauseManager(address newPauseManagerAddr) external;
-
-    // todo GovernanceService
-    // [ ] - sequence diagrams
-    // [ ] - implemented
 
     /// @notice Pauses current smart contract, it can only be executed by the Owner
     /// @dev Emits {Paused} event.
     function pause() external;
 
-    // todo GovernanceService
-    // [ ] - sequence diagrams
-    // [ ] - implemented
-
     /// @notice Unpauses current smart contract, it can only be executed by the Owner
     /// @dev Emits {Unpaused}.
     function unpause() external;
-
-    // todo GovernanceService
-    // [ ] - sequence diagrams
-    // [ ] - implemented
 
     function grantAllowanceForRouter(address router, address erc20Token) external;
 

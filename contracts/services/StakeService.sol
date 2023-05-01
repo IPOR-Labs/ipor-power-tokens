@@ -37,8 +37,8 @@ contract StakeService is IStakeService {
         require(lpTokensLength == lpTokenAmounts.length, Errors.INPUT_ARRAYS_LENGTH_MISMATCH);
         require(lpTokensLength > 0, Errors.INPUT_ARRAYS_EMPTY);
         require(onBehalfOf != address(0), Errors.WRONG_ADDRESS);
-        ILiquidityMiningV2.UpdateLpToken[]
-            memory updateLpTokens = new ILiquidityMiningV2.UpdateLpToken[](lpTokensLength);
+        LiquidityMiningTypes.UpdateLpToken[]
+            memory updateLpTokens = new LiquidityMiningTypes.UpdateLpToken[](lpTokensLength);
         for (uint256 i; i != lpTokensLength; ) {
             require(lpTokens[i] != address(0), Errors.WRONG_ADDRESS);
             require(lpTokenAmounts[i] > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
@@ -52,7 +52,7 @@ contract StakeService is IStakeService {
                 LIQUIDITY_MINING_ADDRESS,
                 transferAmount
             );
-            updateLpTokens[i] = ILiquidityMiningV2.UpdateLpToken(
+            updateLpTokens[i] = LiquidityMiningTypes.UpdateLpToken(
                 onBehalfOf,
                 lpTokens[i],
                 transferAmount
@@ -72,14 +72,14 @@ contract StakeService is IStakeService {
         uint256 lpTokensLength = lpTokens.length;
         require(lpTokensLength == lpTokenAmounts.length, Errors.INPUT_ARRAYS_LENGTH_MISMATCH);
         require(lpTokensLength > 0, Errors.INPUT_ARRAYS_EMPTY);
-        ILiquidityMiningV2.UpdateLpToken[]
-            memory updateLpTokens = new ILiquidityMiningV2.UpdateLpToken[](lpTokensLength);
+        LiquidityMiningTypes.UpdateLpToken[]
+            memory updateLpTokens = new LiquidityMiningTypes.UpdateLpToken[](lpTokensLength);
 
         for (uint256 i; i != lpTokensLength; ) {
             require(lpTokens[i] != address(0), Errors.WRONG_ADDRESS);
             require(lpTokenAmounts[i] > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
-            updateLpTokens[i] = ILiquidityMiningV2.UpdateLpToken(
+            updateLpTokens[i] = LiquidityMiningTypes.UpdateLpToken(
                 msg.sender,
                 lpTokens[i],
                 lpTokenAmounts[i]
@@ -115,7 +115,7 @@ contract StakeService is IStakeService {
         );
 
         IPowerTokenV2(POWER_TOKEN_ADDRESS).addStakedToken(
-            IPowerTokenV2.UpdateStakedToken(onBehalfOf, iporTokenAmount)
+            PowerTokenTypes.UpdateStakedToken(onBehalfOf, iporTokenAmount)
         );
     }
 
@@ -123,7 +123,7 @@ contract StakeService is IStakeService {
         require(iporTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
         IPowerTokenV2(POWER_TOKEN_ADDRESS).removeStakedTokenWithFee(
-            IPowerTokenV2.UpdateStakedToken(msg.sender, iporTokenAmount)
+            PowerTokenTypes.UpdateStakedToken(msg.sender, iporTokenAmount)
         );
 
         IERC20(STAKED_TOKEN_ADDRESS).safeTransferFrom(

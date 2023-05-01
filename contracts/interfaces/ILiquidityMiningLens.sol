@@ -27,25 +27,20 @@ interface ILiquidityMiningLens {
     function calculateAccruedRewards(address[] calldata lpTokens)
         external
         view
-        returns (ILiquidityMiningV2.AccruedRewardsResult[] memory result);
+        returns (LiquidityMiningTypes.AccruedRewardsResult[] memory result);
 
     function calculateAccountRewards(address account, address[] calldata lpTokens)
         external
         view
-        returns (ILiquidityMiningV2.AccountRewardResult[] memory);
+        returns (LiquidityMiningTypes.AccountRewardResult[] memory);
 
-    // todo LiquidityMiningLens
-    // [ ] - sequence diagrams
-    // [ ] - implemented
-
-    // -----------------------------
     function getGlobalIndicators(address[] memory lpTokens)
         external
         view
-        returns (ILiquidityMiningV2.GlobalIndicatorsResult[] memory);
+        returns (LiquidityMiningTypes.GlobalIndicatorsResult[] memory);
 
     function getAccountIndicators(address account, address[] memory lpTokens)
         external
         view
-        returns (ILiquidityMiningV2.AccountIndicatorsResult[] memory);
+        returns (LiquidityMiningTypes.AccountIndicatorsResult[] memory);
 }

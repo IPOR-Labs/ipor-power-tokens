@@ -71,6 +71,16 @@ interface IPowerTokenV2 {
     /// @dev When the sender executes `redeem` method then the structure {PowerTokenTypes.PwTokenCoolDown} is cleared for a given sender in `_coolDowns` storage.
     function redeem() external;
 
+    function addStakedToken(PowerTokenTypes.UpdateStakedToken memory updateStakedToken) external;
+
+    function removeStakedTokenWithFee(PowerTokenTypes.UpdateStakedToken memory updateStakedToken)
+        external
+        returns (uint256 stakedTokenAmountToTransfer);
+
+    function delegate(address account, uint256 pwTokenAmount) external;
+
+    function undelegate(address account, uint256 pwTokenAmount) external;
+
     /// @notice Emitted when the account stakes [Staked] Tokens
     /// @param account account address that executed the staking
     /// @param stakedTokenAmount of Staked Token amount being staked into PowerToken contract
@@ -125,22 +135,4 @@ interface IPowerTokenV2 {
     /// @param account address that executed the redeem function
     /// @param pwTokenAmount amount of the pwTokens that was transferred to the Power Token owner's address
     event Redeem(address indexed account, uint256 pwTokenAmount);
-
-    //    ----------------------------------------------
-    //    New implementation
-    //    ----------------------------------------------
-    struct UpdateStakedToken {
-        address onBehalfOf;
-        uint256 stakedTokenAmount;
-    }
-
-    function addStakedToken(UpdateStakedToken memory updateStakedToken) external;
-
-    function removeStakedTokenWithFee(UpdateStakedToken memory updateStakedToken)
-        external
-        returns (uint256 stakedTokenAmountToTransfer);
-
-    function delegate(address account, uint256 pwTokenAmount) external;
-
-    function undelegate(address account, uint256 pwTokenAmount) external;
 }

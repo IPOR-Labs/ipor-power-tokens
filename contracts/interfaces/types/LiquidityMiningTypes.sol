@@ -48,4 +48,37 @@ library LiquidityMiningTypes {
         /// @dev delegatedPwTokenBalance < 10^26 < 2^87
         uint96 delegatedPwTokenBalance;
     }
+
+    struct UpdateLpToken {
+        address onBehalfOf;
+        address lpToken;
+        uint256 lpTokenAmount;
+    }
+
+    struct UpdatePwToken {
+        address onBehalfOf;
+        address lpToken;
+        uint256 pwTokenAmount;
+    }
+
+    struct AccruedRewardsResult {
+        address lpToken;
+        uint256 rewardsAmount;
+    }
+
+    struct AccountRewardResult {
+        address lpToken;
+        uint256 rewardsAmount;
+        uint256 allocatedPwTokens;
+    }
+
+    struct AccountIndicatorsResult {
+        address lpToken;
+        LiquidityMiningTypes.AccountRewardsIndicators indicators;
+    }
+
+    struct GlobalIndicatorsResult {
+        address lpToken;
+        LiquidityMiningTypes.GlobalRewardsIndicators indicators;
+    }
 }
