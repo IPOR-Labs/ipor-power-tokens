@@ -14,4 +14,10 @@ interface IStakeService {
     function stakeIporToken(address onBehalfOf, uint256 iporTokenAmount) external;
 
     function unstakeIporToken(uint256 iporTokenAmount) external;
+
+    function cooldown(address account, uint256 pwTokenAmount) external;
+
+    function cancelCooldown(address account) external;
+
+    function redeem() external;
 }

@@ -54,22 +54,11 @@ interface IPowerTokenV2 {
         view
         returns (PowerTokenTypes.PwTokenCooldown memory);
 
-    /// @notice Resets the colldown of Power Tokens to the set duration of 2 weeks.
-    /// @dev Power Tokens in cooldown cannot be unstaked without fee,
-    /// when the cooldown is elapsed then Power Tokens can be unstaked without fee.
-    /// Fee for immediate unstaking (without cooldown) is configured in param `_unstakeWithoutCooldownFee`
-    /// Power Tokens can be redeemed for Staked Tokens in relation of 1:1.
-    /// @param pwTokenAmount Power Token amount to be set in the cooldown
-    function cooldown(uint256 pwTokenAmount) external;
+    function cooldown(address account, uint256 pwTokenAmount) external;
 
-    /// @notice Cancel the cooldown.
-    /// @dev When this method is executed, all Power Tokens are released.
-    function cancelCooldown() external;
+    function cancelCooldown(address account) external;
 
-    /// @notice The method allowing redemption of Power Tokens for the Staked Token after cooldown has passed.
-    /// @dev Power Tokens are redeemable for Staked tokens at 1:1 ratio.
-    /// @dev When the sender executes `redeem` method then the structure {PowerTokenTypes.PwTokenCoolDown} is cleared for a given sender in `_coolDowns` storage.
-    function redeem() external;
+    function redeem(address account) external returns (uint256 transferAmount);
 
     function addStakedToken(PowerTokenTypes.UpdateStakedToken memory updateStakedToken) external;
 

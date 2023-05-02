@@ -13,6 +13,7 @@ import "../contracts/lens/LiquidityMiningLens.sol";
 import "../contracts/services/StakeService.sol";
 import "../contracts/services/FlowsService.sol";
 import "../contracts/router/PowerTokenRouter.sol";
+import "../contracts/lens/PowerTokenLens.sol";
 
 contract PowerTokensSystem is TestCommons {
     using SafeCast for uint256;
@@ -34,6 +35,7 @@ contract PowerTokensSystem is TestCommons {
     address public router;
 
     address public liquidityMiningLens;
+    address public powerTokenLens;
     address public stakeService;
     address public flowsService;
 
@@ -144,6 +146,7 @@ contract PowerTokensSystem is TestCommons {
 
     function _createServices() private {
         liquidityMiningLens = address(new LiquidityMiningLens(liquidityMining));
+        powerTokenLens = address(new PowerTokenLens(powerToken));
         stakeService = address(new StakeService(liquidityMining, powerToken, iporToken));
         flowsService = address(new FlowsService(liquidityMining, iporToken, powerToken));
     }
@@ -174,7 +177,8 @@ contract PowerTokensSystem is TestCommons {
                 powerTokenAddress: powerToken,
                 liquidityMiningLens: liquidityMiningLens,
                 stakeService: stakeService,
-                miningService: flowsService
+                miningService: flowsService,
+                powerTokenLens: powerTokenLens
             })
         );
 

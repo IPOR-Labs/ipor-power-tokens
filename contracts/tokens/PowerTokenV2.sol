@@ -9,7 +9,7 @@ import "./PowerTokenInternalV2.sol";
 /// @notice Power Token is retrieved when the account stakes [Staked] Token.
 /// PowerToken smart contract allows staking, unstaking of [Staked] Token, delegating, undelegating of Power Token balance to LiquidityMining.
 contract PowerTokenV2 is PowerTokenInternalV2, IPowerTokenV2 {
-    address internal immutable ROUTER_ADDRESS; // Router address
+    address public immutable ROUTER_ADDRESS;
 
     constructor(address routerAddress) {
         require(routerAddress != address(0), Errors.WRONG_ADDRESS);
@@ -71,70 +71,68 @@ contract PowerTokenV2 is PowerTokenInternalV2, IPowerTokenV2 {
         return _cooldowns[account];
     }
 
-    function cooldown(uint256 pwTokenAmount) external override whenNotPaused nonReentrant {
-        require(pwTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
-
-        address msgSender = _msgSender();
-
+    function cooldown(address account, uint256 pwTokenAmount)
+        external
+        override
+        whenNotPaused
+        onlyRouter
+    {
         uint256 availablePwTokenAmount = _calculateBaseAmountToPwToken(
-            _baseBalance[msgSender],
+            _baseBalance[account],
             _calculateInternalExchangeRate(_stakedToken)
-        ) - _delegatedToLiquidityMiningBalance[msgSender];
+        ) - _delegatedToLiquidityMiningBalance[account];
 
         require(
             availablePwTokenAmount >= pwTokenAmount,
             Errors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW
         );
 
-        _cooldowns[msgSender] = PowerTokenTypes.PwTokenCooldown(
+        _cooldowns[account] = PowerTokenTypes.PwTokenCooldown(
             block.timestamp + COOL_DOWN_IN_SECONDS,
             pwTokenAmount
         );
-        emit CooldownChanged(msgSender, pwTokenAmount, block.timestamp + COOL_DOWN_IN_SECONDS);
+        emit CooldownChanged(account, pwTokenAmount, block.timestamp + COOL_DOWN_IN_SECONDS);
     }
 
-    function cancelCooldown() external override whenNotPaused {
-        delete _cooldowns[_msgSender()];
-        emit CooldownChanged(_msgSender(), 0, 0);
+    function cancelCooldown(address account) external override whenNotPaused onlyRouter {
+        delete _cooldowns[account];
+        emit CooldownChanged(account, 0, 0);
     }
 
-    function redeem() external override whenNotPaused nonReentrant {
-        address msgSender = _msgSender();
-
-        PowerTokenTypes.PwTokenCooldown memory accountCooldown = _cooldowns[msgSender];
-
+    function redeem(address account)
+        external
+        override
+        whenNotPaused
+        onlyRouter
+        returns (uint256 transferAmount)
+    {
+        PowerTokenTypes.PwTokenCooldown memory accountCooldown = _cooldowns[account];
+        transferAmount = accountCooldown.pwTokenAmount;
         require(block.timestamp >= accountCooldown.endTimestamp, Errors.COOL_DOWN_NOT_FINISH);
-        require(accountCooldown.pwTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(transferAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
         address stakedTokenAddress = _stakedToken;
 
         uint256 exchangeRate = _calculateInternalExchangeRate(stakedTokenAddress);
-        uint256 baseAmountToUnstake = Math.division(
-            accountCooldown.pwTokenAmount * Constants.D18,
-            exchangeRate
-        );
+        uint256 baseAmountToUnstake = Math.division(transferAmount * Constants.D18, exchangeRate);
 
         require(
-            _baseBalance[msgSender] >= baseAmountToUnstake,
+            _baseBalance[account] >= baseAmountToUnstake,
             Errors.ACCOUNT_BASE_BALANCE_IS_TOO_LOW
         );
 
-        _baseBalance[msgSender] -= baseAmountToUnstake;
+        _baseBalance[account] -= baseAmountToUnstake;
         _baseTotalSupply -= baseAmountToUnstake;
 
-        delete _cooldowns[msgSender];
+        delete _cooldowns[account];
 
-        ///@dev We can transfer pwTokenAmount because it is in relation 1:1 to Staked Token
-        IERC20Upgradeable(stakedTokenAddress).transfer(msgSender, accountCooldown.pwTokenAmount);
-
-        emit Redeem(msgSender, accountCooldown.pwTokenAmount);
+        emit Redeem(account, transferAmount);
     }
 
-    //    ----------------------------------------------
-    //    New implementation
-    //    ----------------------------------------------
-
-    function addStakedToken(PowerTokenTypes.UpdateStakedToken memory updateStakedToken) external {
+    function addStakedToken(PowerTokenTypes.UpdateStakedToken memory updateStakedToken)
+        external
+        onlyRouter
+    {
         require(updateStakedToken.stakedTokenAmount != 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
         address stakedTokenAddress = _stakedToken;
@@ -154,6 +152,7 @@ contract PowerTokenV2 is PowerTokenInternalV2, IPowerTokenV2 {
 
     function removeStakedTokenWithFee(PowerTokenTypes.UpdateStakedToken memory updateStakedToken)
         external
+        onlyRouter
         returns (uint256 stakedTokenAmountToTransfer)
     {
         require(updateStakedToken.stakedTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);

@@ -132,4 +132,25 @@ contract StakeService is IStakeService {
             iporTokenAmount
         );
     }
+
+    function cooldown(address account, uint256 pwTokenAmount) external {
+        require(account != address(0), Errors.WRONG_ADDRESS);
+        require(pwTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
+        IPowerTokenV2(POWER_TOKEN_ADDRESS).cooldown(account, pwTokenAmount);
+    }
+
+    function cancelCooldown(address account) external {
+        require(account != address(0), Errors.WRONG_ADDRESS);
+        IPowerTokenV2(POWER_TOKEN_ADDRESS).cancelCooldown(account);
+    }
+
+    function redeem() external {
+        uint256 transferAmount = IPowerTokenV2(POWER_TOKEN_ADDRESS).redeem(msg.sender);
+        ///@dev We can transfer pwTokenAmount because it is in relation 1:1 to Staked Token
+        IERC20(STAKED_TOKEN_ADDRESS).safeTransferFrom(
+            POWER_TOKEN_ADDRESS,
+            msg.sender,
+            transferAmount
+        );
+    }
 }

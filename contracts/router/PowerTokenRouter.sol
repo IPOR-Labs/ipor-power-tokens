@@ -6,6 +6,7 @@ import "./AccessControl.sol";
 import "../libraries/errors/Errors.sol";
 
 import "../interfaces/ILiquidityMiningLens.sol";
+import "../interfaces/IPowerTokenLens.sol";
 import "../interfaces/IStakeService.sol";
 import "../interfaces/IFlowsService.sol";
 
@@ -13,6 +14,7 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
     address public immutable LIQUIDITY_MINING_ADDRESS;
     address public immutable POWER_TOKEN_ADDRESS;
     address public immutable LIQUIDITY_MINING_LENS;
+    address public immutable POWER_TOKEN_LENS;
     address public immutable STAKE_SERVICE;
     address public immutable FLOWS_SERVICE;
 
@@ -22,6 +24,7 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
         address liquidityMiningLens;
         address stakeService;
         address miningService;
+        address powerTokenLens;
     }
 
     constructor(DeployedContracts memory deployedContracts) {
@@ -30,6 +33,7 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
         FLOWS_SERVICE = deployedContracts.miningService;
         LIQUIDITY_MINING_ADDRESS = deployedContracts.liquidityMiningAddress;
         POWER_TOKEN_ADDRESS = deployedContracts.powerTokenAddress;
+        POWER_TOKEN_LENS = deployedContracts.powerTokenLens;
         _disableInitializers();
     }
 
@@ -44,23 +48,15 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
             sig == IStakeService.stakeLpTokens.selector ||
             sig == IStakeService.unstakeLpTokens.selector ||
             sig == IStakeService.stakeIporToken.selector ||
-            sig == IStakeService.unstakeIporToken.selector
+            sig == IStakeService.unstakeIporToken.selector ||
+            sig == IStakeService.cooldown.selector ||
+            sig == IStakeService.cancelCooldown.selector ||
+            sig == IStakeService.redeem.selector
         ) {
             whenNotPaused();
             nonReentrant();
             _reentrancyStatus = _ENTERED;
             return STAKE_SERVICE;
-        }
-        if (
-            sig == ILiquidityMiningLens.getGlobalIndicators.selector ||
-            sig == ILiquidityMiningLens.getAccountIndicators.selector ||
-            sig == ILiquidityMiningLens.getContractId.selector ||
-            sig == ILiquidityMiningLens.balanceOf.selector ||
-            sig == ILiquidityMiningLens.balanceOfDelegatedPwToken.selector ||
-            sig == ILiquidityMiningLens.calculateAccruedRewards.selector ||
-            sig == ILiquidityMiningLens.calculateAccountRewards.selector
-        ) {
-            return LIQUIDITY_MINING_LENS;
         }
         if (
             sig == IFlowsService.delegate.selector ||
@@ -73,6 +69,32 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
             _reentrancyStatus = _ENTERED;
             return FLOWS_SERVICE;
         }
+
+        if (
+            sig == ILiquidityMiningLens.getGlobalIndicators.selector ||
+            sig == ILiquidityMiningLens.getAccountIndicators.selector ||
+            sig == ILiquidityMiningLens.getContractId.selector ||
+            sig == ILiquidityMiningLens.balanceOf.selector ||
+            sig == ILiquidityMiningLens.balanceOfDelegatedPwToken.selector ||
+            sig == ILiquidityMiningLens.calculateAccruedRewards.selector ||
+            sig == ILiquidityMiningLens.calculateAccountRewards.selector
+        ) {
+            return LIQUIDITY_MINING_LENS;
+        }
+
+        if (
+            sig == IPowerTokenLens.powerTokenName.selector ||
+            sig == IPowerTokenLens.getPowerTokenContractId.selector ||
+            sig == IPowerTokenLens.powerTokenSymbol.selector ||
+            sig == IPowerTokenLens.powerTokenDecimals.selector ||
+            sig == IPowerTokenLens.powerTokenTotalSupply.selector ||
+            sig == IPowerTokenLens.powerTokenBalanceOf.selector ||
+            sig == IPowerTokenLens.delegatedToLiquidityMiningBalanceOf.selector ||
+            sig == IPowerTokenLens.getActiveCooldown.selector
+        ) {
+            return POWER_TOKEN_LENS;
+        }
+
         revert(Errors.ROUTER_INVALID_SIGNATURE);
     }
 
