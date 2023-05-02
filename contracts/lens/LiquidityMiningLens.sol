@@ -12,19 +12,15 @@ contract LiquidityMiningLens is ILiquidityMiningLens {
         LIQUIDITY_MINING = liquidityMining;
     }
 
-    function getContractId() external view returns (bytes32) {
+    function getLiquidityMiningContractId() external view returns (bytes32) {
         return ILiquidityMiningV2(LIQUIDITY_MINING).getContractId();
     }
 
-    // todo LiquidityMiningLens
-    // [ ] - sequence diagrams
-    // [ ] - implemented
-
-    /// @notice Returns the balance of staked lpTokens
-    /// @param account the account's address
-    /// @param lpToken the address of lpToken
-    /// @return balance of the lpTokens staked by the sender
-    function balanceOf(address account, address lpToken) external view returns (uint256) {
+    function liquidityMiningBalanceOf(address account, address lpToken)
+        external
+        view
+        returns (uint256)
+    {
         return ILiquidityMiningV2(LIQUIDITY_MINING).balanceOf(account, lpToken);
     }
 
@@ -58,11 +54,6 @@ contract LiquidityMiningLens is ILiquidityMiningLens {
         return ILiquidityMiningV2(LIQUIDITY_MINING).calculateAccountRewards(account, lpTokens);
     }
 
-    // todo LiquidityMiningLens
-    // [ ] - sequence diagrams
-    // [ ] - implemented
-
-    //--------------------
     function getGlobalIndicators(address[] memory lpTokens)
         external
         view

@@ -21,7 +21,7 @@ contract SmokeTest is TestCommons {
     }
 
     function testGetContractId() public {
-        bytes32 id = ILiquidityMiningLens(_router).getContractId();
+        bytes32 id = ILiquidityMiningLens(_router).getLiquidityMiningContractId();
         assertEq(id, 0x9b1f3aa590476fc9aa58d44ad1419ab53d34c344bd5ed46b12e4af7d27c38e06);
     }
 
@@ -36,7 +36,7 @@ contract SmokeTest is TestCommons {
         IStakeService(_router).stakeLpTokens(_userOne, stakedTokens, stakedAmounts);
 
         // WHEN
-        uint256 balance = ILiquidityMiningLens(_router).balanceOf(
+        uint256 balance = ILiquidityMiningLens(_router).liquidityMiningBalanceOf(
             _userOne,
             _powerTokensSystem.lpDai()
         );

@@ -71,12 +71,12 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
         }
 
         if (
-            sig == ILiquidityMiningLens.getGlobalIndicators.selector ||
-            sig == ILiquidityMiningLens.getAccountIndicators.selector ||
-            sig == ILiquidityMiningLens.getContractId.selector ||
-            sig == ILiquidityMiningLens.balanceOf.selector ||
+            sig == ILiquidityMiningLens.getLiquidityMiningContractId.selector ||
+            sig == ILiquidityMiningLens.liquidityMiningBalanceOf.selector ||
             sig == ILiquidityMiningLens.balanceOfDelegatedPwToken.selector ||
             sig == ILiquidityMiningLens.calculateAccruedRewards.selector ||
+            sig == ILiquidityMiningLens.getAccountIndicators.selector ||
+            sig == ILiquidityMiningLens.getGlobalIndicators.selector ||
             sig == ILiquidityMiningLens.calculateAccountRewards.selector
         ) {
             return LIQUIDITY_MINING_LENS;
@@ -135,6 +135,8 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
             }
         }
     }
+
+    // todo Add batchExecutor
 
     //solhint-disable no-empty-blocks
     function _authorizeUpgrade(address) internal override {
