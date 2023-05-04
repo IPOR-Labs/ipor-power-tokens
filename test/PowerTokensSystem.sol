@@ -112,11 +112,23 @@ contract PowerTokensSystem is TestCommons {
     }
 
     function _createPowerToken() private {
+        // address in constructor will be replaced
         PowerTokenV2 implementation = new PowerTokenV2(dao);
         vm.startPrank(owner);
         ERC1967Proxy proxy = new ERC1967Proxy(
             address(implementation),
             abi.encodeWithSignature("initialize(address)", address(iporToken))
+        );
+        powerToken = address(proxy);
+        vm.stopPrank();
+    }
+
+    function createPowerToken(address iporTokenAddress, address router) public {
+        PowerTokenV2 implementation = new PowerTokenV2(router);
+        vm.startPrank(owner);
+        ERC1967Proxy proxy = new ERC1967Proxy(
+            address(implementation),
+            abi.encodeWithSignature("initialize(address)", address(iporTokenAddress))
         );
         powerToken = address(proxy);
         vm.stopPrank();
