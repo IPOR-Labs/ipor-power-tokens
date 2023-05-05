@@ -123,8 +123,8 @@ contract PowerTokensSystem is TestCommons {
         vm.stopPrank();
     }
 
-    function createPowerToken(address iporTokenAddress, address router) public {
-        PowerTokenV2 implementation = new PowerTokenV2(router);
+    function createPowerToken(address iporTokenAddress, address routerAddress) public {
+        PowerTokenV2 implementation = new PowerTokenV2(routerAddress);
         vm.startPrank(owner);
         ERC1967Proxy proxy = new ERC1967Proxy(
             address(implementation),
@@ -171,6 +171,7 @@ contract PowerTokensSystem is TestCommons {
         ILiquidityMiningInternalV2(liquidityMining).grantAllowanceForRouter(router, lpUsdc);
         ILiquidityMiningInternalV2(liquidityMining).grantAllowanceForRouter(router, lpUsdt);
         ILiquidityMiningInternalV2(liquidityMining).grantAllowanceForRouter(router, iporToken);
+        IPowerTokenInternalV2(powerToken).grantAllowanceForRouter(router, iporToken);
         vm.stopPrank();
     }
 
@@ -199,6 +200,18 @@ contract PowerTokensSystem is TestCommons {
             abi.encodeWithSignature("initialize(uint256)", 0)
         );
         router = address(proxy);
+        vm.stopPrank();
+    }
+
+    function makeAllApprovals(address account) external {
+        vm.startPrank(account);
+        MockToken(dai).approve(router, type(uint256).max);
+        MockToken(usdc).approve(router, type(uint256).max);
+        MockToken(usdt).approve(router, type(uint256).max);
+        MockLpToken(lpDai).approve(router, type(uint256).max);
+        MockLpToken(lpUsdc).approve(router, type(uint256).max);
+        MockLpToken(lpUsdt).approve(router, type(uint256).max);
+        MockStakedToken(iporToken).approve(router, type(uint256).max);
         vm.stopPrank();
     }
 }

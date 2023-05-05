@@ -132,6 +132,18 @@ abstract contract PowerTokenInternalV2 is
         _unpause();
     }
 
+    function grantAllowanceForRouter(address router, address erc20Token)
+        external
+        override
+        onlyOwner
+    {
+        require(router != address(0), Errors.WRONG_ADDRESS);
+        require(erc20Token != address(0), Errors.WRONG_ADDRESS);
+
+        IERC20(erc20Token).approve(router, type(uint256).max);
+        // todo: emit event
+    }
+
     function _calculateInternalExchangeRate(address stakedTokenAddress)
         internal
         view

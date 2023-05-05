@@ -47,6 +47,8 @@ interface IPowerTokenInternalV2 {
     /// @dev Emits {Unpaused}.
     function unpause() external;
 
+    function grantAllowanceForRouter(address router, address erc20Token) external;
+
     /// @notice Emitted when the user receives rewards from the LiquidityMining
     /// @dev Receiving rewards does not change Internal Exchange Rate of Power Tokens in PowerToken smart contract.
     /// @param account address

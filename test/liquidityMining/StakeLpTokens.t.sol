@@ -74,9 +74,6 @@ contract StakeLpTokensTest is TestCommons {
             _powerTokensSystem.liquidityMining()
         );
         uint256 userBalanceBefore = ERC20(_activeLpToken).balanceOf(_userOne);
-        LiquidityMiningTypes.GlobalIndicatorsResult[]
-            memory globalRewardsIndicatorsBefore = ILiquidityMiningLens(_powerTokensSystem.router())
-                .getGlobalIndicators(stakedTokens);
         LiquidityMiningTypes.AccountIndicatorsResult[]
             memory accountIndicatorsBefore = ILiquidityMiningLens(_powerTokensSystem.router())
                 .getAccountIndicators(_userOne, stakedTokens);
@@ -91,9 +88,6 @@ contract StakeLpTokensTest is TestCommons {
             _powerTokensSystem.liquidityMining()
         );
         uint256 userBalanceAfter = ERC20(_activeLpToken).balanceOf(_userOne);
-        LiquidityMiningTypes.GlobalIndicatorsResult[]
-            memory globalRewardsIndicatorsAfter = ILiquidityMiningLens(_powerTokensSystem.router())
-                .getGlobalIndicators(stakedTokens);
         LiquidityMiningTypes.AccountIndicatorsResult[]
             memory accountIndicatorsAfter = ILiquidityMiningLens(_powerTokensSystem.router())
                 .getAccountIndicators(_userOne, stakedTokens);
@@ -195,7 +189,6 @@ contract StakeLpTokensTest is TestCommons {
         stakedAmounts[0] = stakeAmount;
         _powerTokensSystem.mintLpTokens(_activeLpToken, _userOne, mintAmount);
         _powerTokensSystem.approveRouter(_userOne);
-        address liquidityMining = _powerTokensSystem.liquidityMining();
 
         // WHEN
         vm.expectRevert(bytes(Errors.VALUE_NOT_GREATER_THAN_ZERO));

@@ -15,9 +15,9 @@ interface IStakeService {
 
     function unstakeIporToken(uint256 iporTokenAmount) external;
 
-    function cooldown(address account, uint256 pwTokenAmount) external;
+    function cooldown(uint256 pwTokenAmount) external;
 
-    function cancelCooldown(address account) external;
+    function cancelCooldown() external;
 
     function redeem() external;
 }

@@ -141,7 +141,6 @@ contract PwTokenConfigurationTest is TestCommons {
     function testShouldNotBeAbleToPauseContractWhenNoPauseManager() external {
         // given
         address user2 = _getUserAddress(2);
-        address owner = _powerTokensSystem.owner();
         address powerToken = _powerTokensSystem.powerToken();
         bool pausedBefore = PausableUpgradeable(powerToken).paused();
 

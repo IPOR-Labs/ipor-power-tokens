@@ -133,15 +133,13 @@ contract StakeService is IStakeService {
         );
     }
 
-    function cooldown(address account, uint256 pwTokenAmount) external {
-        require(account != address(0), Errors.WRONG_ADDRESS);
+    function cooldown(uint256 pwTokenAmount) external {
         require(pwTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
-        IPowerTokenV2(POWER_TOKEN_ADDRESS).cooldown(account, pwTokenAmount);
+        IPowerTokenV2(POWER_TOKEN_ADDRESS).cooldown(msg.sender, pwTokenAmount);
     }
 
-    function cancelCooldown(address account) external {
-        require(account != address(0), Errors.WRONG_ADDRESS);
-        IPowerTokenV2(POWER_TOKEN_ADDRESS).cancelCooldown(account);
+    function cancelCooldown() external {
+        IPowerTokenV2(POWER_TOKEN_ADDRESS).cancelCooldown(msg.sender);
     }
 
     function redeem() external {
