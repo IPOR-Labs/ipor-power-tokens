@@ -85,6 +85,7 @@ contract FlowsService is IFlowsService {
                 ++i;
             }
         }
+        require(totalStakedTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
         ILiquidityMiningV2(liquidityMining).removePwTokens(updatePwTokens);
         IPowerTokenV2(powerToken).undelegate(account, totalStakedTokenAmount);
         //todo add event
