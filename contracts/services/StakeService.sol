@@ -122,14 +122,15 @@ contract StakeService is IStakeService {
     function unstakeIporToken(uint256 iporTokenAmount) external {
         require(iporTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
-        IPowerTokenV2(POWER_TOKEN_ADDRESS).removeStakedTokenWithFee(
-            PowerTokenTypes.UpdateStakedToken(msg.sender, iporTokenAmount)
-        );
+        uint256 stakedTokenAmountToTransfer = IPowerTokenV2(POWER_TOKEN_ADDRESS)
+            .removeStakedTokenWithFee(
+                PowerTokenTypes.UpdateStakedToken(msg.sender, iporTokenAmount)
+            );
 
         IERC20(STAKED_TOKEN_ADDRESS).safeTransferFrom(
             POWER_TOKEN_ADDRESS,
             msg.sender,
-            iporTokenAmount
+            stakedTokenAmountToTransfer
         );
     }
 
