@@ -3,6 +3,7 @@ pragma solidity 0.8.17;
 
 import "../TestCommons.sol";
 import "../PowerTokensSystem.sol";
+import "../../contracts/interfaces/IPowerTokenInternalV2.sol";
 
 contract PwTokenConfigurationTest is TestCommons {
     PowerTokensSystem internal _powerTokensSystem;
@@ -39,6 +40,11 @@ contract PwTokenConfigurationTest is TestCommons {
             18,
             PowerTokenLens(router).powerTokenDecimals(),
             "PowerToken decimals should be 18"
+        );
+        assertEq(
+            1e18,
+            IPowerTokenInternalV2(powerToken).calculateExchangeRate(),
+            "Exchange rate should be 1"
         );
     }
 

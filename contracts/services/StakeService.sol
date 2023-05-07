@@ -108,14 +108,14 @@ contract StakeService is IStakeService {
         require(onBehalfOf != address(0), Errors.WRONG_ADDRESS);
         require(iporTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
+        IPowerTokenV2(POWER_TOKEN_ADDRESS).addStakedToken(
+            PowerTokenTypes.UpdateStakedToken(onBehalfOf, iporTokenAmount)
+        );
+
         IERC20(STAKED_TOKEN_ADDRESS).safeTransferFrom(
             msg.sender,
             POWER_TOKEN_ADDRESS,
             iporTokenAmount
-        );
-
-        IPowerTokenV2(POWER_TOKEN_ADDRESS).addStakedToken(
-            PowerTokenTypes.UpdateStakedToken(onBehalfOf, iporTokenAmount)
         );
     }
 
