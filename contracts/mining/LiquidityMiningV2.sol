@@ -109,7 +109,7 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
             rewards[i] = LiquidityMiningTypes.AccountRewardResult(
                 lpTokens[i],
                 rewardsAmount,
-                _allocatedPwTokens[lpTokens[i]]
+                _allocatedPwTokens[account]
             );
             unchecked {
                 ++i;
@@ -234,7 +234,6 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
                 accountIndicators.lpTokenBalance + update.lpTokenAmount,
                 accountIndicators.delegatedPwTokenBalance
             );
-
             if (rewardsAmount > 0) {
                 _allocatedPwTokens[update.onBehalfOf] += rewardsAmount;
             }
