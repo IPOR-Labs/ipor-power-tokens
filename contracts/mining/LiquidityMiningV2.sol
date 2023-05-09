@@ -16,7 +16,7 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
     address internal immutable ROUTER_ADDRESS; // Router address
 
     modifier onlyRouter() {
-        require(_msgSender() == ROUTER_ADDRESS, Errors.NOT_ROUTER);
+        require(_msgSender() == ROUTER_ADDRESS, Errors.CALLER_NOT_ROUTER);
         _;
     }
 

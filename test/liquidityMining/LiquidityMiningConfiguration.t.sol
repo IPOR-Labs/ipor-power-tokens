@@ -372,4 +372,136 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         assertTrue(isPausedBefore, "should be paused before");
         assertTrue(isPausedAfter, "should be paused after");
     }
+
+    function testShouldHasZeroBalanceWhenContractWasDeployed() external {
+        // given
+        address router = _powerTokensSystem.router();
+        address userOne = _getUserAddress(10);
+        address lpDai = _powerTokensSystem.lpDai();
+        address lpUsdc = _powerTokensSystem.lpUsdc();
+        address lpUsdt = _powerTokensSystem.lpUsdt();
+        address[] memory lpTokens = new address[](3);
+        lpTokens[0] = lpDai;
+        lpTokens[1] = lpUsdc;
+        lpTokens[2] = lpUsdt;
+
+        // when
+        LiquidityMiningTypes.DelegatedPwTokenBalance[] memory balances = ILiquidityMiningLens(
+            router
+        ).balanceOfDelegatedPwToken(userOne, lpTokens);
+
+        // then
+
+        assertTrue(balances.length == 3, "should be 3");
+        assertTrue(balances[0].pwTokenAmount == 0, "lpDai should be 0");
+        assertTrue(balances[1].pwTokenAmount == 0, "lpUsdc should be 0");
+        assertTrue(balances[2].pwTokenAmount == 0, "lpUsdt should be 0");
+    }
+
+    function testShouldNotBeAbleToAddLpTokensWhenNotRouter() external {
+        // given
+        LiquidityMiningTypes.UpdateLpToken[]
+            memory updateLpToken = new LiquidityMiningTypes.UpdateLpToken[](1);
+        updateLpToken[0].lpToken = _powerTokensSystem.lpDai();
+        updateLpToken[0].lpTokenAmount = 100;
+        updateLpToken[0].onBehalfOf = address(this);
+
+        address liquidityMining = _powerTokensSystem.liquidityMining();
+
+        // when
+        vm.expectRevert(bytes(Errors.CALLER_NOT_ROUTER));
+        ILiquidityMiningV2(liquidityMining).addLpTokens(updateLpToken);
+    }
+
+    function testShouldNotBeAbleToRemoveLpTokensWhenNotRouter() external {
+        // given
+        LiquidityMiningTypes.UpdateLpToken[]
+            memory updateLpToken = new LiquidityMiningTypes.UpdateLpToken[](1);
+        updateLpToken[0].lpToken = _powerTokensSystem.lpDai();
+        updateLpToken[0].lpTokenAmount = 100;
+        updateLpToken[0].onBehalfOf = address(this);
+
+        address liquidityMining = _powerTokensSystem.liquidityMining();
+
+        // when
+        vm.expectRevert(bytes(Errors.CALLER_NOT_ROUTER));
+        ILiquidityMiningV2(liquidityMining).removeLpTokens(updateLpToken);
+    }
+
+    function testShouldNotBeAbleToAddPwTokensWhenNotRouter() external {
+        // given
+        LiquidityMiningTypes.UpdatePwToken[]
+            memory updateLpToken = new LiquidityMiningTypes.UpdatePwToken[](1);
+        updateLpToken[0].lpToken = _powerTokensSystem.lpDai();
+        updateLpToken[0].pwTokenAmount = 100;
+        updateLpToken[0].onBehalfOf = address(this);
+
+        address liquidityMining = _powerTokensSystem.liquidityMining();
+
+        // when
+        vm.expectRevert(bytes(Errors.CALLER_NOT_ROUTER));
+        ILiquidityMiningV2(liquidityMining).addPwTokens(updateLpToken);
+    }
+
+    function testShouldNotBeAbleToRemovePwTokensWhenNotRouter() external {
+        // given
+        LiquidityMiningTypes.UpdatePwToken[]
+            memory updateLpToken = new LiquidityMiningTypes.UpdatePwToken[](1);
+        updateLpToken[0].lpToken = _powerTokensSystem.lpDai();
+        updateLpToken[0].pwTokenAmount = 100;
+        updateLpToken[0].onBehalfOf = address(this);
+
+        address liquidityMining = _powerTokensSystem.liquidityMining();
+
+        // when
+        vm.expectRevert(bytes(Errors.CALLER_NOT_ROUTER));
+        ILiquidityMiningV2(liquidityMining).removePwTokens(updateLpToken);
+    }
+
+    function testShouldNotBeAbleToDelegatePwTokenWhenContractIsPause() external {
+        // given
+        address[] memory lpTokens = new address[](1);
+        lpTokens[0] = _powerTokensSystem.lpDai();
+        uint256[] memory pwTokenAmounts = new uint256[](1);
+        pwTokenAmounts[0] = 1_000e18;
+        address router = _powerTokensSystem.router();
+        address liquidityMining = _powerTokensSystem.liquidityMining();
+        address userOne = _getUserAddress(10);
+        address owner = _powerTokensSystem.owner();
+        _powerTokensSystem.transferIporToken(userOne, 10_000e18);
+        _powerTokensSystem.approveRouter(userOne);
+
+        vm.prank(owner);
+        LiquidityMiningInternalV2(liquidityMining).pause();
+
+        vm.prank(userOne);
+        IStakeService(router).stakeIporToken(userOne, 1_000e18);
+
+        // when
+        vm.prank(userOne);
+        vm.expectRevert(bytes("Pausable: paused"));
+        IFlowsService(router).delegate(lpTokens, pwTokenAmounts);
+    }
+
+    function testShouldNotBeAbleToDelegatePwTokenWhenLpTokenIsNotSupported() external {
+        // given
+        address[] memory lpTokens = new address[](1);
+        lpTokens[0] = _powerTokensSystem.dai();
+        uint256[] memory pwTokenAmounts = new uint256[](1);
+        pwTokenAmounts[0] = 1_000e18;
+        address router = _powerTokensSystem.router();
+        address liquidityMining = _powerTokensSystem.liquidityMining();
+        address userOne = _getUserAddress(10);
+        address owner = _powerTokensSystem.owner();
+        _powerTokensSystem.transferIporToken(userOne, 10_000e18);
+        _powerTokensSystem.approveRouter(userOne);
+
+        vm.prank(userOne);
+        IStakeService(router).stakeIporToken(userOne, 1_000e18);
+
+        // when
+        vm.prank(userOne);
+        vm.expectRevert(bytes(Errors.LP_TOKEN_NOT_SUPPORTED));
+        IFlowsService(router).delegate(lpTokens, pwTokenAmounts);
+    }
 }

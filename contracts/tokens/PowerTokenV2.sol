@@ -18,7 +18,7 @@ contract PowerTokenV2 is PowerTokenInternalV2, IPowerTokenV2 {
     }
 
     modifier onlyRouter() {
-        require(_msgSender() == ROUTER_ADDRESS, Errors.NOT_ROUTER);
+        require(_msgSender() == ROUTER_ADDRESS, Errors.CALLER_NOT_ROUTER);
         _;
     }
 
