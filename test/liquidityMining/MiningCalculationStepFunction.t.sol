@@ -3,12 +3,11 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "../TestCommons.sol";
-import "../../contracts/mocks/MockMiningCalculation.sol";
+import "../../contracts/libraries/math/MiningCalculation.sol";
 import "abdk-libraries-solidity/ABDKMathQuad.sol";
 
 contract MiningCalculationStepFunctionTest is TestCommons {
     TestData private _testData;
-    MockMiningCalculation internal _calculation;
 
     struct TestData {
         uint256 inputRatio;
@@ -23,16 +22,12 @@ contract MiningCalculationStepFunctionTest is TestCommons {
         }
     }
 
-    function setUp() public {
-        _calculation = new MockMiningCalculation();
-    }
-
     function testShouldCalculateProperAccountPowerUp() public parameterizedTest(getDataForTest()) {
         // given
         bytes16 ratio = _toQuadruplePrecision(_testData.inputRatio, Constants.D18);
 
         // when
-        bytes16 result = _calculation.accountPowerUpStepFunction(ratio);
+        bytes16 result = MiningCalculation.accountPowerUpStepFunction(ratio);
 
         // then
 
