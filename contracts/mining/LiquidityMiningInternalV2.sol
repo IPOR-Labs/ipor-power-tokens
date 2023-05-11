@@ -26,11 +26,9 @@ abstract contract LiquidityMiningInternalV2 is
     using SafeCast for uint256;
     using SafeCast for int256;
 
-    bytes32 internal constant _STAKED_TOKEN_ID =
-        0xdba05ed67d0251facfcab8345f27ccd3e72b5a1da8cebfabbcccf4316e6d053c;
-    bytes32 internal constant _POWER_TOKEN_ID =
-        0xbd22bf01cb7daed462db61de31bb111aabcdae27adc748450fb9a9ea1c419cce;
+    address public immutable ROUTER_ADDRESS; // Router address
 
+    // @deprecated do not use this
     address internal _powerToken;
     address internal _pauseManager;
 
@@ -42,37 +40,28 @@ abstract contract LiquidityMiningInternalV2 is
     mapping(address => mapping(address => LiquidityMiningTypes.AccountRewardsIndicators))
         internal _accountIndicators;
 
+    constructor(address routerAddress) {
+        ROUTER_ADDRESS = routerAddress;
+    }
+
     modifier onlyPauseManager() {
         require(_msgSender() == _pauseManager, Errors.CALLER_NOT_PAUSE_MANAGER);
         _;
     }
 
-    function initialize(
-        address[] calldata lpTokens,
-        address powerToken,
-        address stakedToken
-    ) public initializer {
+    modifier onlyRouter() {
+        require(_msgSender() == ROUTER_ADDRESS, Errors.CALLER_NOT_ROUTER);
+        _;
+    }
+
+    function initialize(address[] calldata lpTokens) public initializer {
         __Pausable_init_unchained();
         __Ownable_init_unchained();
         __UUPSUpgradeable_init_unchained();
 
-        require(powerToken != address(0), Errors.WRONG_ADDRESS);
-        require(
-            IPowerTokenV2(powerToken).getContractId() == _POWER_TOKEN_ID,
-            Errors.WRONG_CONTRACT_ID
-        );
-        require(stakedToken != address(0), Errors.WRONG_ADDRESS);
-        require(
-            IStakedToken(stakedToken).getContractId() == _STAKED_TOKEN_ID,
-            Errors.WRONG_CONTRACT_ID
-        );
-
         uint256 lpTokensLength = lpTokens.length;
 
-        _powerToken = powerToken;
         _pauseManager = _msgSender();
-
-        IStakedToken(stakedToken).approve(powerToken, Constants.MAX_VALUE);
 
         for (uint256 i; i != lpTokensLength; ++i) {
             require(lpTokens[i] != address(0), Errors.WRONG_ADDRESS);
@@ -91,7 +80,7 @@ abstract contract LiquidityMiningInternalV2 is
     }
 
     function getVersion() external pure override returns (uint256) {
-        return 3;
+        return 2_001;
     }
 
     function getPauseManager() external view override returns (address) {
@@ -110,14 +99,14 @@ abstract contract LiquidityMiningInternalV2 is
         require(lpToken != address(0), Errors.WRONG_ADDRESS);
         _lpTokens[lpToken] = true;
 
-        emit LpTokenAdded(_msgSender(), lpToken);
+        //        TODO Add event
     }
 
     function phasingOutLpToken(address lpToken) external override onlyOwner {
         require(lpToken != address(0), Errors.WRONG_ADDRESS);
         _setRewardsPerBlock(lpToken, 0);
         _lpTokens[lpToken] = false;
-        emit LpTokenRemoved(_msgSender(), lpToken);
+        //        TODO Add event
     }
 
     function setPauseManager(address newPauseManagerAddr) external override onlyOwner {
@@ -135,27 +124,17 @@ abstract contract LiquidityMiningInternalV2 is
         _unpause();
     }
 
-    function grantAllowanceForRouter(address router, address erc20Token)
-        external
-        override
-        onlyOwner
-    {
-        require(router != address(0), Errors.WRONG_ADDRESS);
+    function grantAllowanceForRouter(address erc20Token) external override onlyOwner {
         require(erc20Token != address(0), Errors.WRONG_ADDRESS);
 
-        IERC20(erc20Token).approve(router, type(uint256).max);
+        IERC20(erc20Token).approve(ROUTER_ADDRESS, type(uint256).max);
         // todo: emit event
     }
 
-    function revokeAllowanceForRouter(address router, address erc20Token)
-        external
-        override
-        onlyOwner
-    {
-        require(router != address(0), Errors.WRONG_ADDRESS);
+    function revokeAllowanceForRouter(address erc20Token) external override onlyOwner {
         require(erc20Token != address(0), Errors.WRONG_ADDRESS);
 
-        IERC20(erc20Token).approve(router, 0);
+        IERC20(erc20Token).approve(ROUTER_ADDRESS, 0);
         // todo: emit event
     }
 
@@ -305,10 +284,6 @@ abstract contract LiquidityMiningInternalV2 is
     /// @return vertical shift - value represented in bytes16, quadruple precision, 128 bits, it takes into consideration 18 decimals
     function _getVerticalShift() internal pure virtual returns (bytes16) {
         return 0x3fff6666666666666666666666666666;
-    }
-
-    function _getPowerToken() internal view returns (address) {
-        return _powerToken;
     }
 
     //solhint-disable no-empty-blocks

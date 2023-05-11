@@ -10,19 +10,12 @@ import "./LiquidityMiningInternalV2.sol";
 contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
     using SafeCast for uint256;
     using SafeCast for int256;
+
     //    ----------------------------------------------
     //    New implementation
     //    ----------------------------------------------
-    address internal immutable ROUTER_ADDRESS; // Router address
 
-    modifier onlyRouter() {
-        require(_msgSender() == ROUTER_ADDRESS, Errors.CALLER_NOT_ROUTER);
-        _;
-    }
-
-    constructor(address routerAddress) {
-        require(routerAddress != address(0), Errors.WRONG_ADDRESS);
-        ROUTER_ADDRESS = routerAddress;
+    constructor(address routerAddress) LiquidityMiningInternalV2(routerAddress) {
         _disableInitializers();
     }
 
@@ -240,6 +233,7 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
             unchecked {
                 ++i;
             }
+            //        TODO add event
         }
     }
 
@@ -291,10 +285,10 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
                 accountIndicators.lpTokenBalance,
                 accountIndicators.delegatedPwTokenBalance + update.pwTokenAmount
             );
-            emit PwTokenDelegated(update.onBehalfOf, update.lpToken, update.pwTokenAmount);
             unchecked {
                 ++i;
             }
+            //        TODO add event
         }
 
         if (rewards > 0) {
@@ -344,10 +338,10 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
                 accountIndicators.delegatedPwTokenBalance - update.pwTokenAmount
             );
 
-            emit PwTokenUndelegated(update.onBehalfOf, update.lpToken, update.pwTokenAmount);
             unchecked {
                 ++i;
             }
+            //        TODO add event
         }
 
         if (rewards > 0) {
@@ -397,6 +391,7 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
             unchecked {
                 ++i;
             }
+            //        TODO add event
         }
     }
 

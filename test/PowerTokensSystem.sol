@@ -113,22 +113,22 @@ contract PowerTokensSystem is TestCommons {
 
     function _createPowerToken() private {
         // address in constructor will be replaced
-        PowerTokenV2 implementation = new PowerTokenV2(dao);
+        PowerTokenV2 implementation = new PowerTokenV2(dao, address(iporToken));
         vm.startPrank(owner);
         ERC1967Proxy proxy = new ERC1967Proxy(
             address(implementation),
-            abi.encodeWithSignature("initialize(address)", address(iporToken))
+            abi.encodeWithSignature("initialize()")
         );
         powerToken = address(proxy);
         vm.stopPrank();
     }
 
     function createPowerToken(address iporTokenAddress, address routerAddress) public {
-        PowerTokenV2 implementation = new PowerTokenV2(routerAddress);
+        PowerTokenV2 implementation = new PowerTokenV2(routerAddress, address(iporTokenAddress));
         vm.startPrank(owner);
         ERC1967Proxy proxy = new ERC1967Proxy(
             address(implementation),
-            abi.encodeWithSignature("initialize(address)", address(iporTokenAddress))
+            abi.encodeWithSignature("initialize()")
         );
         powerToken = address(proxy);
         vm.stopPrank();
@@ -145,12 +145,7 @@ contract PowerTokensSystem is TestCommons {
         lpTokewns[2] = lpUsdt;
         ERC1967Proxy proxy = new ERC1967Proxy(
             address(implementation),
-            abi.encodeWithSignature(
-                "initialize(address[],address,address)",
-                lpTokewns,
-                powerToken,
-                iporToken
-            )
+            abi.encodeWithSignature("initialize(address[])", lpTokewns)
         );
         liquidityMining = address(proxy);
         vm.stopPrank();
@@ -167,16 +162,16 @@ contract PowerTokensSystem is TestCommons {
         LiquidityMiningV2 implementation = new LiquidityMiningV2(router);
         vm.startPrank(owner);
         LiquidityMiningV2(liquidityMining).upgradeTo(address(implementation));
-        ILiquidityMiningInternalV2(liquidityMining).grantAllowanceForRouter(router, lpDai);
-        ILiquidityMiningInternalV2(liquidityMining).grantAllowanceForRouter(router, lpUsdc);
-        ILiquidityMiningInternalV2(liquidityMining).grantAllowanceForRouter(router, lpUsdt);
-        ILiquidityMiningInternalV2(liquidityMining).grantAllowanceForRouter(router, iporToken);
+        ILiquidityMiningInternalV2(liquidityMining).grantAllowanceForRouter(lpDai);
+        ILiquidityMiningInternalV2(liquidityMining).grantAllowanceForRouter(lpUsdc);
+        ILiquidityMiningInternalV2(liquidityMining).grantAllowanceForRouter(lpUsdt);
+        ILiquidityMiningInternalV2(liquidityMining).grantAllowanceForRouter(iporToken);
         IPowerTokenInternalV2(powerToken).grantAllowanceForRouter(router, iporToken);
         vm.stopPrank();
     }
 
     function _updatePowerTokenImplementation() private {
-        PowerTokenV2 implementation = new PowerTokenV2(router);
+        PowerTokenV2 implementation = new PowerTokenV2(router, address(iporToken));
         vm.startPrank(owner);
         PowerTokenV2(powerToken).upgradeTo(address(implementation));
         vm.stopPrank();

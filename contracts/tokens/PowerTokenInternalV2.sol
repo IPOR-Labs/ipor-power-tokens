@@ -24,6 +24,7 @@ abstract contract PowerTokenInternalV2 is
 {
     /// @dev 14 days
     uint256 public constant COOL_DOWN_IN_SECONDS = 2 * 7 * 24 * 60 * 60;
+    address public immutable ROUTER_ADDRESS;
 
     bytes32 internal constant _STAKED_TOKEN_ID =
         0xdba05ed67d0251facfcab8345f27ccd3e72b5a1da8cebfabbcccf4316e6d053c;
@@ -31,7 +32,9 @@ abstract contract PowerTokenInternalV2 is
         0x9b1f3aa590476fc9aa58d44ad1419ab53d34c344bd5ed46b12e4af7d27c38e06;
 
     address internal _liquidityMining;
+    // @dev @deprecated use _STAKED_TOKEN_ADDRESS instead
     address internal _stakedToken;
+    address internal immutable _STAKED_TOKEN_ADDRESS;
     address internal _pauseManager;
 
     /// @dev account address -> base amount, represented with 18 decimals
@@ -44,9 +47,16 @@ abstract contract PowerTokenInternalV2 is
     uint256 internal _baseTotalSupply;
     uint256 internal _unstakeWithoutCooldownFee;
 
-    modifier onlyLiquidityMining() {
-        require(_msgSender() == _liquidityMining, Errors.CALLER_NOT_LIQUIDITY_MINING);
-        _;
+    constructor(address routerAddress, address stakedTokenAddress) {
+        require(routerAddress != address(0), Errors.WRONG_ADDRESS);
+        require(stakedTokenAddress != address(0), Errors.WRONG_ADDRESS);
+        require(
+            IStakedToken(stakedTokenAddress).getContractId() == _STAKED_TOKEN_ID,
+            Errors.WRONG_CONTRACT_ID
+        );
+        //TODO Add tests for this
+        _STAKED_TOKEN_ADDRESS = stakedTokenAddress;
+        ROUTER_ADDRESS = routerAddress;
     }
 
     modifier onlyPauseManager() {
@@ -54,22 +64,17 @@ abstract contract PowerTokenInternalV2 is
         _;
     }
 
-    function initialize(address stakedToken) public initializer {
+    function initialize() public initializer {
         __Pausable_init_unchained();
         __Ownable_init_unchained();
         __UUPSUpgradeable_init_unchained();
-        require(stakedToken != address(0), Errors.WRONG_ADDRESS);
-        require(
-            IStakedToken(stakedToken).getContractId() == _STAKED_TOKEN_ID,
-            Errors.WRONG_CONTRACT_ID
-        );
-        _stakedToken = stakedToken;
+
         _pauseManager = _msgSender();
         _unstakeWithoutCooldownFee = Constants.D17 * 5;
     }
 
     function getVersion() external pure override returns (uint256) {
-        return 1;
+        return 2_001;
     }
 
     function totalSupplyBase() external view override returns (uint256) {
@@ -77,15 +82,11 @@ abstract contract PowerTokenInternalV2 is
     }
 
     function calculateExchangeRate() external view override returns (uint256) {
-        return _calculateInternalExchangeRate(_stakedToken);
-    }
-
-    function getLiquidityMining() external view override returns (address) {
-        return _liquidityMining;
+        return _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS);
     }
 
     function getStakedToken() external view override returns (address) {
-        return _stakedToken;
+        return _STAKED_TOKEN_ADDRESS;
     }
 
     function getPauseManager() external view override returns (address) {
@@ -104,17 +105,6 @@ abstract contract PowerTokenInternalV2 is
         uint256 oldValue = _unstakeWithoutCooldownFee;
         _unstakeWithoutCooldownFee = unstakeWithoutCooldownFee;
         emit UnstakeWithoutCooldownFeeChanged(_msgSender(), oldValue, unstakeWithoutCooldownFee);
-    }
-
-    function setLiquidityMining(address newLiquidityMiningAddr) external override onlyOwner {
-        require(newLiquidityMiningAddr != address(0), Errors.WRONG_ADDRESS);
-        require(
-            ILiquidityMiningV2(newLiquidityMiningAddr).getContractId() == _LIQUIDITY_MINING_ID,
-            Errors.WRONG_CONTRACT_ID
-        );
-        address oldLiquidityMiningAddr = _liquidityMining;
-        _liquidityMining = newLiquidityMiningAddr;
-        emit LiquidityMiningChanged(_msgSender(), oldLiquidityMiningAddr, newLiquidityMiningAddr);
     }
 
     function setPauseManager(address newPauseManagerAddr) external override onlyOwner {
@@ -198,7 +188,7 @@ abstract contract PowerTokenInternalV2 is
         return
             _calculateBaseAmountToPwToken(
                 _baseBalance[account],
-                _calculateInternalExchangeRate(_stakedToken)
+                _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS)
             );
     }
 

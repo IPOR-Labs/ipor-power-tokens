@@ -24,58 +24,12 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         LiquidityMiningV2 implementation = new LiquidityMiningV2(_powerTokensSystem.dao());
         ERC1967Proxy proxy = new ERC1967Proxy(
             address(implementation),
-            abi.encodeWithSignature(
-                "initialize(address[],address,address)",
-                lpTokewns,
-                _powerTokensSystem.powerToken(),
-                _powerTokensSystem.iporToken()
-            )
+            abi.encodeWithSignature("initialize(address[])", lpTokewns)
         );
 
         // then
 
         assertTrue(address(proxy) != address(0), "Proxy address should not be zero");
-    }
-
-    function testShouldNotBeAbleToDeployContractWhenPowerTokenAddressIsZero() external {
-        // given
-        address[] memory lpTokewns = new address[](0);
-        address powerToken = address(0x00);
-        address iporToken = _powerTokensSystem.iporToken();
-
-        // when
-        LiquidityMiningV2 implementation = new LiquidityMiningV2(_powerTokensSystem.dao());
-        vm.expectRevert(bytes(Errors.WRONG_ADDRESS));
-        new ERC1967Proxy(
-            address(implementation),
-            abi.encodeWithSignature(
-                "initialize(address[],address,address)",
-                lpTokewns,
-                powerToken,
-                iporToken
-            )
-        );
-    }
-
-    function testShouldNotBeAbleToDeployContractWhenAddressIsNotStakedToken() external {
-        // given
-        address[] memory lpTokewns = new address[](0);
-        address powerToken = _powerTokensSystem.powerToken();
-        address iporToken = _powerTokensSystem.powerToken();
-        // not staked token
-
-        // when
-        LiquidityMiningV2 implementation = new LiquidityMiningV2(_powerTokensSystem.dao());
-        vm.expectRevert(bytes(Errors.WRONG_CONTRACT_ID));
-        new ERC1967Proxy(
-            address(implementation),
-            abi.encodeWithSignature(
-                "initialize(address[],address,address)",
-                lpTokewns,
-                powerToken,
-                iporToken
-            )
-        );
     }
 
     function testShouldDeployContractWith3Assets() external {
@@ -115,12 +69,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         LiquidityMiningV2 implementation = new LiquidityMiningV2(_powerTokensSystem.dao());
         ERC1967Proxy proxy = new ERC1967Proxy(
             address(implementation),
-            abi.encodeWithSignature(
-                "initialize(address[],address,address)",
-                lpTokewns,
-                _powerTokensSystem.powerToken(),
-                _powerTokensSystem.iporToken()
-            )
+            abi.encodeWithSignature("initialize(address[])", lpTokewns)
         );
 
         // then

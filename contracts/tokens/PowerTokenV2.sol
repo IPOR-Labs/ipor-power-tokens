@@ -9,11 +9,9 @@ import "./PowerTokenInternalV2.sol";
 /// @notice Power Token is retrieved when the account stakes [Staked] Token.
 /// PowerToken smart contract allows staking, unstaking of [Staked] Token, delegating, undelegating of Power Token balance to LiquidityMining.
 contract PowerTokenV2 is PowerTokenInternalV2, IPowerTokenV2 {
-    address public immutable ROUTER_ADDRESS;
-
-    constructor(address routerAddress) {
-        require(routerAddress != address(0), Errors.WRONG_ADDRESS);
-        ROUTER_ADDRESS = routerAddress;
+    constructor(address routerAddress, address stakedTokenAddress)
+        PowerTokenInternalV2(routerAddress, stakedTokenAddress)
+    {
         _disableInitializers();
     }
 
@@ -41,7 +39,7 @@ contract PowerTokenV2 is PowerTokenInternalV2, IPowerTokenV2 {
     function totalSupply() external view override returns (uint256) {
         return
             Math.division(
-                _baseTotalSupply * _calculateInternalExchangeRate(_stakedToken),
+                _baseTotalSupply * _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS),
                 Constants.D18
             );
     }
@@ -79,7 +77,7 @@ contract PowerTokenV2 is PowerTokenInternalV2, IPowerTokenV2 {
     {
         uint256 availablePwTokenAmount = _calculateBaseAmountToPwToken(
             _baseBalance[account],
-            _calculateInternalExchangeRate(_stakedToken)
+            _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS)
         ) - _delegatedToLiquidityMiningBalance[account];
 
         require(
@@ -111,9 +109,7 @@ contract PowerTokenV2 is PowerTokenInternalV2, IPowerTokenV2 {
         require(block.timestamp >= accountCooldown.endTimestamp, Errors.COOL_DOWN_NOT_FINISH);
         require(transferAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
-        address stakedTokenAddress = _stakedToken;
-
-        uint256 exchangeRate = _calculateInternalExchangeRate(stakedTokenAddress);
+        uint256 exchangeRate = _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS);
         uint256 baseAmountToUnstake = Math.division(transferAmount * Constants.D18, exchangeRate);
 
         require(
@@ -135,9 +131,7 @@ contract PowerTokenV2 is PowerTokenInternalV2, IPowerTokenV2 {
     {
         require(updateStakedToken.stakedTokenAmount != 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
-        address stakedTokenAddress = _stakedToken;
-
-        uint256 exchangeRate = _calculateInternalExchangeRate(stakedTokenAddress);
+        uint256 exchangeRate = _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS);
 
         uint256 baseAmount = Math.division(
             updateStakedToken.stakedTokenAmount * Constants.D18,
@@ -157,10 +151,9 @@ contract PowerTokenV2 is PowerTokenInternalV2, IPowerTokenV2 {
     {
         require(updateStakedToken.stakedTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
-        address stakedTokenAddress = _stakedToken;
         address account = updateStakedToken.onBehalfOf;
 
-        uint256 exchangeRate = _calculateInternalExchangeRate(stakedTokenAddress);
+        uint256 exchangeRate = _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS);
         uint256 availablePwTokenAmount = _getAvailablePwTokenAmount(account, exchangeRate);
 
         require(
@@ -196,8 +189,10 @@ contract PowerTokenV2 is PowerTokenInternalV2, IPowerTokenV2 {
         onlyRouter
     {
         require(
-            _getAvailablePwTokenAmount(account, _calculateInternalExchangeRate(_stakedToken)) >=
-                pwTokenAmount,
+            _getAvailablePwTokenAmount(
+                account,
+                _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS)
+            ) >= pwTokenAmount,
             Errors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW
         );
 

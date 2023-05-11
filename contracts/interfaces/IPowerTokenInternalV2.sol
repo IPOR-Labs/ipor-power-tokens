@@ -21,19 +21,12 @@ interface IPowerTokenInternalV2 {
     /// @param unstakeWithoutCooldownFee fee percentage, represented with 18 decimals.
     function setUnstakeWithoutCooldownFee(uint256 unstakeWithoutCooldownFee) external;
 
-    /// @notice method returning address of liquidity rewards contract - the LiquidityMining
-    function getLiquidityMining() external view returns (address);
-
     /// @notice method returning address of the Staked Token
     function getStakedToken() external view returns (address);
 
     /// @notice Gets the Pause Manager's address
     /// @return Pause Manager's address
     function getPauseManager() external view returns (address);
-
-    /// @notice method for setting up the address of LiquidityMining
-    /// @param liquidityMining - the new address of the LiquidityMining contract
-    function setLiquidityMining(address liquidityMining) external;
 
     /// @notice Sets the new Pause Manager address
     /// @param newPauseManagerAddr - new Pause Manager's address
