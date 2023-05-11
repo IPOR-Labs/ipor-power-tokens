@@ -432,4 +432,42 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         assertEq(rewardsAfter[0].rewardsAmount, 0, "rewardsAfter - rewardsAmount");
         assertEq(rewardsAfter[0].allocatedPwTokens, 100e18, "rewardsAfter - allocatedPwTokens");
     }
+
+    function testShouldCountProperRewardsWhenOneAccountDelegatePwTokenTokensTwice() external {
+        // given
+        address[] memory tokens = new address[](1);
+        tokens[0] = _powerTokensSystem.lpDai();
+        uint256[] memory amountsLpTokens = new uint256[](1);
+        amountsLpTokens[0] = 1_000e18;
+        uint256[] memory amountsPwTokens = new uint256[](1);
+        amountsPwTokens[0] = 400e18;
+
+        vm.startPrank(_userOne);
+        IStakeService(_router).stakeLpTokens(_userOne, tokens, amountsLpTokens);
+        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IFlowsService(_router).delegate(tokens, amountsPwTokens);
+        vm.stopPrank();
+
+        vm.roll(block.number + 100);
+        LiquidityMiningTypes.AccountRewardResult[] memory rewardsBefore = ILiquidityMiningLens(
+            _router
+        ).calculateAccountRewards(_userOne, tokens);
+
+        // when
+
+        vm.prank(_userOne);
+        IFlowsService(_router).delegate(tokens, amountsPwTokens);
+        vm.roll(block.number + 100);
+
+        // then
+        LiquidityMiningTypes.AccountRewardResult[] memory rewardsAfter = ILiquidityMiningLens(
+            _router
+        ).calculateAccountRewards(_userOne, tokens);
+
+        assertEq(rewardsBefore[0].rewardsAmount, 100e18, "rewardsBefore - rewardsAmount");
+        assertEq(rewardsBefore[0].allocatedPwTokens, 0, "rewardsBefore - allocatedPwTokens");
+
+        assertEq(rewardsAfter[0].rewardsAmount, 100e18, "rewardsAfter - rewardsAmount");
+        assertEq(rewardsAfter[0].allocatedPwTokens, 100e18, "rewardsAfter - allocatedPwTokens");
+    }
 }
