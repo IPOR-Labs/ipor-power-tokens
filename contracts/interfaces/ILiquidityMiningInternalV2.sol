@@ -68,12 +68,12 @@ interface ILiquidityMiningInternalV2 {
     /// @notice Emitted when the LiquidityMining's Owner adds support for lpToken
     /// @param account address of LiquidityMining's Owner
     /// @param lpToken address of newly supported lpToken
-    event LpTokenAdded(address account, address lpToken);
+    event NewLpTokenSupported(address account, address lpToken);
 
     /// @notice Emitted when the LiquidityMining's Owner removes ssupport for lpToken
     /// @param account address of LiquidityMining's Owner
     /// @param lpToken address of dropped lpToken
-    event LpTokenRemoved(address account, address lpToken);
+    event LpTokenSupportRemoved(address account, address lpToken);
 
     /// @notice Emitted when the account delegates Power Tokens to the LiquidityMining
     /// @param account performing delegation
@@ -108,4 +108,14 @@ interface ILiquidityMiningInternalV2 {
         address indexed oldPauseManager,
         address indexed newPauseManager
     );
+
+    /// @notice Emitted when owner grants allowance for router
+    /// @param erc20Token address of ERC20 token
+    /// @param router address of router
+    event AllowanceGranted(address indexed erc20Token, address indexed router);
+
+    /// @notice Emitted when owner revokes allowance for router
+    /// @param erc20Token address of ERC20 token
+    /// @param router address of router
+    event AllowanceRevoked(address indexed erc20Token, address indexed router);
 }

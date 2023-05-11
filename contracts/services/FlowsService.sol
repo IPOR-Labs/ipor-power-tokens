@@ -63,7 +63,6 @@ contract FlowsService is IFlowsService {
         }
         IPowerTokenV2(powerToken).delegate(account, totalStakedTokenAmount);
         ILiquidityMiningV2(liquidityMining).addPwTokens(updatePwTokens);
-        //todo add event
     }
 
     function undelegate(address[] calldata lpTokens, uint256[] calldata pwTokenAmounts) external {
@@ -88,6 +87,5 @@ contract FlowsService is IFlowsService {
         require(totalStakedTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
         ILiquidityMiningV2(liquidityMining).removePwTokens(updatePwTokens);
         IPowerTokenV2(powerToken).undelegate(account, totalStakedTokenAmount);
-        //todo add event
     }
 }

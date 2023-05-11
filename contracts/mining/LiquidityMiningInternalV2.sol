@@ -99,14 +99,14 @@ abstract contract LiquidityMiningInternalV2 is
         require(lpToken != address(0), Errors.WRONG_ADDRESS);
         _lpTokens[lpToken] = true;
 
-        //        TODO Add event
+        emit NewLpTokenSupported(msg.sender, lpToken);
     }
 
     function phasingOutLpToken(address lpToken) external override onlyOwner {
         require(lpToken != address(0), Errors.WRONG_ADDRESS);
         _setRewardsPerBlock(lpToken, 0);
         _lpTokens[lpToken] = false;
-        //        TODO Add event
+        emit LpTokenSupportRemoved(msg.sender, lpToken);
     }
 
     function setPauseManager(address newPauseManagerAddr) external override onlyOwner {
@@ -128,14 +128,14 @@ abstract contract LiquidityMiningInternalV2 is
         require(erc20Token != address(0), Errors.WRONG_ADDRESS);
 
         IERC20(erc20Token).approve(ROUTER_ADDRESS, type(uint256).max);
-        // todo: emit event
+        emit AllowanceGranted(erc20Token, ROUTER_ADDRESS);
     }
 
     function revokeAllowanceForRouter(address erc20Token) external override onlyOwner {
         require(erc20Token != address(0), Errors.WRONG_ADDRESS);
 
         IERC20(erc20Token).approve(ROUTER_ADDRESS, 0);
-        // todo: emit event
+        emit AllowanceRevoked(erc20Token, ROUTER_ADDRESS);
     }
 
     /// @dev Rebalance makes that rewards for account are reset in current block.

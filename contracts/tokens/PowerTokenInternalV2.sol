@@ -64,6 +64,11 @@ abstract contract PowerTokenInternalV2 is
         _;
     }
 
+    modifier onlyRouter() {
+        require(_msgSender() == ROUTER_ADDRESS, Errors.CALLER_NOT_ROUTER);
+        _;
+    }
+
     function initialize() public initializer {
         __Pausable_init_unchained();
         __Ownable_init_unchained();
@@ -122,16 +127,18 @@ abstract contract PowerTokenInternalV2 is
         _unpause();
     }
 
-    function grantAllowanceForRouter(address router, address erc20Token)
-        external
-        override
-        onlyOwner
-    {
-        require(router != address(0), Errors.WRONG_ADDRESS);
+    function grantAllowanceForRouter(address erc20Token) external override onlyOwner {
         require(erc20Token != address(0), Errors.WRONG_ADDRESS);
 
-        IERC20(erc20Token).approve(router, type(uint256).max);
-        // todo: emit event
+        IERC20(erc20Token).approve(ROUTER_ADDRESS, type(uint256).max);
+        emit AllowanceGranted(_msgSender(), erc20Token);
+    }
+
+    function revokeAllowanceForRouter(address erc20Token) external override onlyOwner {
+        require(erc20Token != address(0), Errors.WRONG_ADDRESS);
+
+        IERC20(erc20Token).approve(ROUTER_ADDRESS, 0);
+        emit AllowanceRevoked(erc20Token, ROUTER_ADDRESS);
     }
 
     function _calculateInternalExchangeRate(address stakedTokenAddress)

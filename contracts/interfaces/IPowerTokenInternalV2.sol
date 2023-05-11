@@ -40,7 +40,13 @@ interface IPowerTokenInternalV2 {
     /// @dev Emits {Unpaused}.
     function unpause() external;
 
-    function grantAllowanceForRouter(address router, address erc20Token) external;
+    /// @notice Method for granting allowance to the Router
+    /// @param erc20Token address of the ERC20 token
+    function grantAllowanceForRouter(address erc20Token) external;
+
+    /// @notice Method for revoking allowance to the Router
+    /// @param erc20Token address of the ERC20 token
+    function revokeAllowanceForRouter(address erc20Token) external;
 
     /// @notice Emitted when the user receives rewards from the LiquidityMining
     /// @dev Receiving rewards does not change Internal Exchange Rate of Power Tokens in PowerToken smart contract.
@@ -77,4 +83,14 @@ interface IPowerTokenInternalV2 {
         address indexed oldPauseManager,
         address indexed newPauseManager
     );
+
+    /// @notice Emitted when owner grants allowance for router
+    /// @param erc20Token address of ERC20 token
+    /// @param router address of router
+    event AllowanceGranted(address indexed erc20Token, address indexed router);
+
+    /// @notice Emitted when owner revokes allowance for router
+    /// @param erc20Token address of ERC20 token
+    /// @param router address of router
+    event AllowanceRevoked(address indexed erc20Token, address indexed router);
 }

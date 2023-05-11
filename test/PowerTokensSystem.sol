@@ -166,7 +166,7 @@ contract PowerTokensSystem is TestCommons {
         ILiquidityMiningInternalV2(liquidityMining).grantAllowanceForRouter(lpUsdc);
         ILiquidityMiningInternalV2(liquidityMining).grantAllowanceForRouter(lpUsdt);
         ILiquidityMiningInternalV2(liquidityMining).grantAllowanceForRouter(iporToken);
-        IPowerTokenInternalV2(powerToken).grantAllowanceForRouter(router, iporToken);
+        IPowerTokenInternalV2(powerToken).grantAllowanceForRouter(iporToken);
         vm.stopPrank();
     }
 
@@ -174,6 +174,7 @@ contract PowerTokensSystem is TestCommons {
         PowerTokenV2 implementation = new PowerTokenV2(router, address(iporToken));
         vm.startPrank(owner);
         PowerTokenV2(powerToken).upgradeTo(address(implementation));
+        IPowerTokenInternalV2(powerToken).grantAllowanceForRouter(iporToken);
         vm.stopPrank();
     }
 

@@ -70,12 +70,12 @@ interface IPowerTokenV2 {
 
     function undelegate(address account, uint256 pwTokenAmount) external;
 
-    /// @notice Emitted when the account stakes [Staked] Tokens
+    /// @notice Emitted when the account stake/add [Staked] Tokens
     /// @param account account address that executed the staking
     /// @param stakedTokenAmount of Staked Token amount being staked into PowerToken contract
     /// @param internalExchangeRate internal exchange rate used to calculate the base amount
     /// @param baseAmount value calculated based on the stakedTokenAmount and the internalExchangeRate
-    event Staked(
+    event StakedTokenAdded(
         address indexed account,
         uint256 stakedTokenAmount,
         uint256 internalExchangeRate,
@@ -87,7 +87,7 @@ interface IPowerTokenV2 {
     /// @param pwTokenAmount amount of Power Tokens that were unstaked
     /// @param internalExchangeRate which was used to calculate the base amount
     /// @param fee amount subtracted from the pwTokenAmount
-    event Unstaked(
+    event StakedTokenRemovedWithFee(
         address indexed account,
         uint256 pwTokenAmount,
         uint256 internalExchangeRate,
@@ -96,23 +96,13 @@ interface IPowerTokenV2 {
 
     /// @notice Emitted when the sender delegates the Power Tokens to the LiquidityMining contract
     /// @param account address delegating the Power Tokens
-    /// @param lpTokens list of the tokens representing staking pools
     /// @param pwTokenAmounts amounts of Power Tokens delegated to respective lpTokens
-    event ToLiquidityMiningDelegated(
-        address indexed account,
-        address[] lpTokens,
-        uint256[] pwTokenAmounts
-    );
+    event Delegated(address indexed account, uint256 pwTokenAmounts);
 
     /// @notice Emitted when the sender undelegates Power Tokens from the LiquidityMining
     /// @param account address undelegating Power Tokens
-    /// @param lpTokens list of the tokens representing staking pools
     /// @param pwTokenAmounts amounts of Power Tokens undelegated form respective lpTokens
-    event FromLiquidityMiningUndelegated(
-        address indexed account,
-        address[] lpTokens,
-        uint256[] pwTokenAmounts
-    );
+    event Undelegated(address indexed account, uint256 pwTokenAmounts);
 
     /// @notice Emitted when the sender sets the cooldown on Power Tokens
     /// @param changedBy account address that has changed the cooldown rules

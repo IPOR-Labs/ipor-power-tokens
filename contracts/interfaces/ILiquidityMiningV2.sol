@@ -72,9 +72,9 @@ interface ILiquidityMiningV2 {
 
     /// @notice Emitted when the account claims the rewards
     /// @param account Account's address in the context of which activities of claiming are performed
-    /// @param lpToken The address of the lpToken
+    /// @param lpTokens The addresses of the lpTokens for which the rewards are claimed
     /// @param rewardsAmount Reward amount denominated in pwToken, represented with 18 decimals
-    event Claimed(address account, address lpToken, uint256 rewardsAmount);
+    event Claimed(address account, address[] lpTokens, uint256 rewardsAmount);
 
     /// @notice Emitted when the account claims the allocated rewards
     /// @param account Account address in the context of which activities of claiming are performed
@@ -85,4 +85,28 @@ interface ILiquidityMiningV2 {
     /// @param account Account address to which the update was triggered
     /// @param lpToken lpToken address to which the update was triggered
     event IndicatorsUpdated(address account, address lpToken);
+
+    /// @notice Emitted when the lpToken is added to the LiquidityMining
+    /// @param onBehalfOf Account address on behalf of which the lpToken is added
+    /// @param lpToken lpToken address which is added
+    /// @param lpTokenAmount Amount of lpTokens added, represented with 18 decimals
+    event LpTokenAdded(address onBehalfOf, address lpToken, uint256 lpTokenAmount);
+
+    /// @notice Emitted when the lpToken is removed from the LiquidityMining
+    /// @param account address on behalf of which the lpToken is removed
+    /// @param lpToken lpToken address which is removed
+    /// @param lpTokenAmount Amount of lpTokens removed, represented with 18 decimals
+    event LpTokensRemoved(address account, address lpToken, uint256 lpTokenAmount);
+
+    /// @notice Emitted when the PwTokens is added to lpToken pool
+    /// @param onBehalfOf Account address on behalf of which the PwToken is added
+    /// @param lpToken lpToken address to which the PwToken is added
+    /// @param pwTokenAmount Amount of PwTokens added, represented with 18 decimals
+    event PwTokensAdded(address onBehalfOf, address lpToken, uint256 pwTokenAmount);
+
+    /// @notice Emitted when the PwTokens is removed from lpToken pool
+    /// @param account Account address on behalf of which the PwToken is removed
+    /// @param lpToken lpToken address from which the PwToken is removed
+    /// @param pwTokenAmount Amount of PwTokens removed, represented with 18 decimals
+    event PwTokensRemoved(address account, address lpToken, uint256 pwTokenAmount);
 }

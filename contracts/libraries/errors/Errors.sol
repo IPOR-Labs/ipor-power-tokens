@@ -5,10 +5,6 @@ library Errors {
     /// @notice Error thrown when the lpToken address is not supported
     /// @dev List of supported LpTokens are defined in {LiquidityMining._lpTokens}
     string public constant LP_TOKEN_NOT_SUPPORTED = "PT_701";
-    /// @notice Error thrown when the caller / msgSender is not a PowerToken smart contract
-    string public constant CALLER_NOT_POWER_TOKEN = "PT_702";
-    /// @notice Error thrown when the caller / msgSender is not a LiquidityMining smart contract
-    string public constant CALLER_NOT_LIQUIDITY_MINING = "PT_703";
     /// @notice Error thrown when the caller / msgSender is not a Pause Manager address.
     /// @dev Pause Manager can be defined by smart contract's Onwer
     string public constant CALLER_NOT_PAUSE_MANAGER = "PT_704";

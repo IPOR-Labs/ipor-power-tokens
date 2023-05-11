@@ -15,11 +15,6 @@ contract PowerTokenV2 is PowerTokenInternalV2, IPowerTokenV2 {
         _disableInitializers();
     }
 
-    modifier onlyRouter() {
-        require(_msgSender() == ROUTER_ADDRESS, Errors.CALLER_NOT_ROUTER);
-        _;
-    }
-
     function name() external pure override returns (string memory) {
         return "Power IPOR";
     }
@@ -141,7 +136,12 @@ contract PowerTokenV2 is PowerTokenInternalV2, IPowerTokenV2 {
         _baseBalance[updateStakedToken.onBehalfOf] += baseAmount;
         _baseTotalSupply += baseAmount;
 
-        //todo: Add event
+        emit StakedTokenAdded(
+            updateStakedToken.onBehalfOf,
+            updateStakedToken.stakedTokenAmount,
+            exchangeRate,
+            baseAmount
+        );
     }
 
     function removeStakedTokenWithFee(PowerTokenTypes.UpdateStakedToken memory updateStakedToken)
@@ -179,7 +179,12 @@ contract PowerTokenV2 is PowerTokenInternalV2, IPowerTokenV2 {
             exchangeRate
         );
 
-        //todo add event
+        emit StakedTokenRemovedWithFee(
+            account,
+            updateStakedToken.stakedTokenAmount,
+            exchangeRate,
+            updateStakedToken.stakedTokenAmount - stakedTokenAmountToTransfer
+        );
     }
 
     function delegate(address account, uint256 pwTokenAmount)
@@ -197,7 +202,7 @@ contract PowerTokenV2 is PowerTokenInternalV2, IPowerTokenV2 {
         );
 
         _delegatedToLiquidityMiningBalance[account] += pwTokenAmount;
-        // todo add event
+        emit Delegated(account, pwTokenAmount);
     }
 
     function undelegate(address account, uint256 pwTokenAmount)
@@ -212,7 +217,6 @@ contract PowerTokenV2 is PowerTokenInternalV2, IPowerTokenV2 {
         );
 
         _delegatedToLiquidityMiningBalance[account] -= pwTokenAmount;
-
-        //        todo add event
+        emit Undelegated(account, pwTokenAmount);
     }
 }

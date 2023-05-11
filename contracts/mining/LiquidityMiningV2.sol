@@ -192,8 +192,8 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
             _allocatedPwTokens[account] = 0;
             rewardsAmountToTransfer += allocatedRewards;
         }
+        emit Claimed(account, lpTokens, rewardsAmountToTransfer);
         return rewardsAmountToTransfer;
-        // TODO add event
     }
 
     function addLpTokens(LiquidityMiningTypes.UpdateLpToken[] memory updateLpToken)
@@ -233,7 +233,7 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
             unchecked {
                 ++i;
             }
-            //        TODO add event
+            emit LpTokenAdded(update.onBehalfOf, update.lpToken, update.lpTokenAmount);
         }
     }
 
@@ -288,7 +288,7 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
             unchecked {
                 ++i;
             }
-            //        TODO add event
+            emit PwTokensAdded(update.onBehalfOf, update.lpToken, update.pwTokenAmount);
         }
 
         if (rewards > 0) {
@@ -341,7 +341,7 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
             unchecked {
                 ++i;
             }
-            //        TODO add event
+            emit PwTokensRemoved(update.onBehalfOf, update.lpToken, update.pwTokenAmount);
         }
 
         if (rewards > 0) {
@@ -391,7 +391,7 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
             unchecked {
                 ++i;
             }
-            //        TODO add event
+            emit LpTokensRemoved(update.onBehalfOf, update.lpToken, update.lpTokenAmount);
         }
     }
 

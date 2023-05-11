@@ -203,8 +203,3 @@ contract StakeLpTokensTest is TestCommons {
         assertEq(miningBalanceBefore, miningBalanceAfter, "miningBalance should not change");
     }
 }
-
-// todo: test on array of lp tokens
-// todo: test stake on behalf of
-// todo: stake 3 lpTokens at ones
-// todo: pause router and try to stake
