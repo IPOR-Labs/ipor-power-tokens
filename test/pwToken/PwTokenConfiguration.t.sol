@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.17;
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../TestCommons.sol";
 import "../PowerTokensSystem.sol";
 import "../../contracts/interfaces/IPowerTokenInternalV2.sol";
@@ -232,5 +233,22 @@ contract PwTokenConfigurationTest is TestCommons {
             IPowerTokenInternalV2(powerToken).getPauseManager(),
             "Pause manager should be user2"
         );
+    }
+
+    function testShouldRevokeAllowanceForRouter() external {
+        // given
+        address owner = _powerTokensSystem.owner();
+        address iporToken = _powerTokensSystem.iporToken();
+        address powerToken = _powerTokensSystem.powerToken();
+        address router = _powerTokensSystem.router();
+        uint256 allowanceBefore = IERC20(iporToken).allowance(powerToken, router);
+
+        // when
+        vm.prank(owner);
+        IPowerTokenInternalV2(powerToken).revokeAllowanceForRouter(iporToken);
+
+        // then
+        assertEq(0, IERC20(iporToken).allowance(powerToken, router), "Allowance should be 0");
+        assertEq(allowanceBefore, type(uint256).max, "Allowance should be max");
     }
 }

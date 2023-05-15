@@ -9,6 +9,8 @@ import "../../contracts/interfaces/IPowerTokenLens.sol";
 import "../../contracts/tokens/PowerTokenInternalV2.sol";
 
 contract PwTokenUndelegateTest is TestCommons {
+    event Claimed(address account, address[] lpTokens, uint256 rewardsAmount);
+
     PowerTokensSystem internal _powerTokensSystem;
     address internal _router;
     address _userOne;
@@ -81,6 +83,8 @@ contract PwTokenUndelegateTest is TestCommons {
 
         // when
         vm.prank(_userOne);
+        vm.expectEmit(true, true, true, true);
+        emit Claimed(_userOne, tokens, 300e18);
         IFlowsService(_router).claim(tokens);
 
         // then

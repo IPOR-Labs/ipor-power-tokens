@@ -8,6 +8,8 @@ import "../../contracts/interfaces/IPowerTokenLens.sol";
 import "../../contracts/tokens/PowerTokenInternalV2.sol";
 
 contract PwTokenDelegateTest is TestCommons {
+    event Delegated(address indexed account, uint256 pwTokenAmounts);
+
     PowerTokensSystem internal _powerTokensSystem;
     address internal _router;
     address _userOne;
@@ -109,6 +111,8 @@ contract PwTokenDelegateTest is TestCommons {
 
         //  when
         vm.prank(_userOne);
+        vm.expectEmit(true, true, true, true);
+        emit Delegated(_userOne, 500e18);
         IFlowsService(_router).delegate(tokens, amounts);
 
         //  then

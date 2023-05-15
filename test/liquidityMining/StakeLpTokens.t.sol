@@ -6,6 +6,8 @@ import "../PowerTokensSystem.sol";
 import "../../contracts/interfaces/ILiquidityMiningV2.sol";
 
 contract StakeLpTokensTest is TestCommons {
+    event LpTokenAdded(address onBehalfOf, address lpToken, uint256 lpTokenAmount);
+
     PowerTokensSystem internal _powerTokensSystem;
     address[] internal _lpTokens;
     address internal _userOne;
@@ -19,10 +21,6 @@ contract StakeLpTokensTest is TestCommons {
         _lpTokens = lpTokensTemp;
 
         _userOne = _getUserAddress(10);
-    }
-
-    function testStakeLpTokens() public {
-        assertTrue(true);
     }
 
     function testShouldNotBeAbleToStakeWhenInsufficientAllowanceOnLpToken()
@@ -81,6 +79,8 @@ contract StakeLpTokensTest is TestCommons {
         // WHEN
 
         vm.prank(_userOne);
+        vm.expectEmit(true, true, true, true);
+        emit LpTokenAdded(_userOne, _activeLpToken, stakeAmount);
         IStakeService(router).stakeLpTokens(_userOne, stakedTokens, stakedAmounts);
 
         // THEN

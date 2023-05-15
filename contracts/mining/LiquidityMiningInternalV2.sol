@@ -265,7 +265,12 @@ abstract contract LiquidityMiningInternalV2 is
             accruedRewards.toUint88()
         );
 
-        emit RewardsPerBlockChanged(_msgSender(), globalIndicators.rewardsPerBlock, pwTokenAmount);
+        emit RewardsPerBlockChanged(
+            _msgSender(),
+            lpToken,
+            globalIndicators.rewardsPerBlock,
+            pwTokenAmount
+        );
     }
 
     /// @notice Gets Horizontal shift param used in Liquidity Mining equations.

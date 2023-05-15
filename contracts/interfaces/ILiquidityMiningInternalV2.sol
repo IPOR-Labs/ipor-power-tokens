@@ -57,10 +57,12 @@ interface ILiquidityMiningInternalV2 {
 
     /// @notice Emitted when the LiquidityMining's Owner changes the `rewards per block`
     /// @param changedBy address of account executing changes
+    /// @param lpToken address of lpToken for which the `rewards per block` is changed
     /// @param oldPwTokenAmount old value of `rewards per block`, denominated in Power Token, represented in 8 decimals
     /// @param newPwTokenAmount new value of `rewards per block`, denominated in Power Token, represented in 8 decimals
     event RewardsPerBlockChanged(
         address indexed changedBy,
+        address lpToken,
         uint256 oldPwTokenAmount,
         uint256 newPwTokenAmount
     );
@@ -80,18 +82,6 @@ interface ILiquidityMiningInternalV2 {
     /// @param lpToken address of lpToken to which Power Token are delegated
     /// @param pwTokenAmount amount of Power Tokens delegated, represented with 18 decimals
     event PwTokenDelegated(address account, address lpToken, uint256 pwTokenAmount);
-
-    /// @notice Emitted when the account delegates Power Tokens and stakes lpTokens to the LiquidityMining
-    /// @param account account delegating Power Tokens and staking lpTokens
-    /// @param lpToken address of lpToken staked
-    /// @param pwTokenAmount of Power Token delegated, represented with 18 decimals
-    /// @param lpTokenAmount of lpTokens to stake, represented with 18 decimals
-    event PwTokenDelegatedAndLpTokenStaked(
-        address account,
-        address lpToken,
-        uint256 pwTokenAmount,
-        uint256 lpTokenAmount
-    );
 
     /// @notice Emitted when the account undelegates Power Tokens from the LiquidityMining
     /// @param account undelegating

@@ -8,6 +8,9 @@ import "../../contracts/interfaces/IPowerTokenLens.sol";
 import "../../contracts/tokens/PowerTokenInternalV2.sol";
 
 contract PwTokenCoolDown is TestCommons {
+    event CooldownChanged(address indexed changedBy, uint256 pwTokenAmount, uint256 endTimestamp);
+    event Redeem(address indexed account, uint256 pwTokenAmount);
+
     PowerTokensSystem internal _powerTokensSystem;
     address internal _router;
     address _userOne;
@@ -75,6 +78,7 @@ contract PwTokenCoolDown is TestCommons {
 
         // when
         vm.prank(_userOne);
+        emit CooldownChanged(_userOne, 500e18, block.timestamp + 2 * 7 * 24 * 60 * 60);
         IStakeService(_router).cooldown(500e18);
 
         // then
@@ -266,6 +270,8 @@ contract PwTokenCoolDown is TestCommons {
 
         // when
         vm.prank(_userOne);
+        vm.expectEmit(true, true, true, true);
+        emit Redeem(_userOne, 500e18);
         IStakeService(_router).redeem();
 
         // then

@@ -9,6 +9,18 @@ import "../../contracts/interfaces/IPowerTokenInternalV2.sol";
 import "../../contracts/tokens/PowerTokenInternalV2.sol";
 
 contract PwTokenUnstakeTest is TestCommons {
+    event UnstakeWithoutCooldownFeeChanged(
+        address indexed changedBy,
+        uint256 oldFee,
+        uint256 newFee
+    );
+    event StakedTokenRemovedWithFee(
+        address indexed account,
+        uint256 pwTokenAmount,
+        uint256 internalExchangeRate,
+        uint256 fee
+    );
+
     PowerTokensSystem internal _powerTokensSystem;
     address internal _router;
     address _userOne;
@@ -75,6 +87,8 @@ contract PwTokenUnstakeTest is TestCommons {
 
         // when
         vm.prank(_userOne);
+        vm.expectEmit(true, true, true, true);
+        emit StakedTokenRemovedWithFee(_userOne, 1_000e18, 1e18, 500e18);
         IStakeService(_router).unstakeIporToken(1_000e18);
 
         // then
@@ -232,6 +246,7 @@ contract PwTokenUnstakeTest is TestCommons {
         lpTokens[0] = _powerTokensSystem.lpDai();
         uint256[] memory amounts = new uint256[](1);
         amounts[0] = 300e18;
+        address owner = _powerTokensSystem.owner();
 
         vm.startPrank(_userOne);
         IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
@@ -246,7 +261,9 @@ contract PwTokenUnstakeTest is TestCommons {
             .getUnstakeWithoutCooldownFee();
 
         // when
-        vm.prank(_powerTokensSystem.owner());
+        vm.prank(owner);
+        vm.expectEmit(true, true, true, true);
+        emit UnstakeWithoutCooldownFeeChanged(owner, 5e17, 1e17);
         IPowerTokenInternalV2(powerTokenAddress).setUnstakeWithoutCooldownFee(1e17);
         vm.prank(_userOne);
         IStakeService(_router).unstakeIporToken(500e18);

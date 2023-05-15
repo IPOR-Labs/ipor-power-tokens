@@ -8,6 +8,13 @@ import "../../contracts/interfaces/IPowerTokenLens.sol";
 import "../../contracts/tokens/PowerTokenInternalV2.sol";
 
 contract PwTokenStakeTest is TestCommons {
+    event StakedTokenAdded(
+        address indexed account,
+        uint256 stakedTokenAmount,
+        uint256 internalExchangeRate,
+        uint256 baseAmount
+    );
+
     PowerTokensSystem internal _powerTokensSystem;
     address internal _router;
     address _userOne;
@@ -55,6 +62,8 @@ contract PwTokenStakeTest is TestCommons {
 
         // when
         vm.prank(_userOne);
+        vm.expectEmit(true, true, true, true);
+        emit StakedTokenAdded(_userOne, 10_000e18, 1e18, 10_000e18);
         IStakeService(_router).stakeIporToken(_userOne, 10_000e18);
 
         // then

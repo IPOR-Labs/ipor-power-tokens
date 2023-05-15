@@ -10,6 +10,13 @@ import "../../contracts/interfaces/IStakeService.sol";
 import "../../contracts/tokens/PowerTokenInternalV2.sol";
 
 contract LiquidityMiningRewardsPerBlockTest is TestCommons {
+    event RewardsPerBlockChanged(
+        address indexed changedBy,
+        address lpToken,
+        uint256 oldPwTokenAmount,
+        uint256 newPwTokenAmount
+    );
+
     PowerTokensSystem internal _powerTokensSystem;
     address internal _router;
     address _userOne;
@@ -51,6 +58,8 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
 
         // when
         vm.prank(_owner);
+        vm.expectEmit(true, true, true, true);
+        emit RewardsPerBlockChanged(_owner, _lpDai, 0, 2e8);
         ILiquidityMiningInternalV2(_miningAddress).setRewardsPerBlock(_lpDai, 2e8);
 
         // then

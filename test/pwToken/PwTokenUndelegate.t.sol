@@ -8,6 +8,7 @@ import "../../contracts/interfaces/IPowerTokenLens.sol";
 import "../../contracts/tokens/PowerTokenInternalV2.sol";
 
 contract PwTokenUndelegateTest is TestCommons {
+    event Undelegated(address indexed account, uint256 pwTokenAmounts);
     PowerTokensSystem internal _powerTokensSystem;
     address internal _router;
     address _userOne;
@@ -175,6 +176,8 @@ contract PwTokenUndelegateTest is TestCommons {
 
         //  when
         vm.prank(_userOne);
+        vm.expectEmit(true, true, true, true);
+        emit Undelegated(_userOne, 1_000e18);
         IFlowsService(_router).undelegate(tokens, amounts);
 
         //  then

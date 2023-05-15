@@ -10,6 +10,8 @@ import "../../contracts/interfaces/IStakeService.sol";
 import "../../contracts/tokens/PowerTokenInternalV2.sol";
 
 contract PwTokenUnstakeLpTokensTest is TestCommons {
+    event LpTokensRemoved(address account, address lpToken, uint256 lpTokenAmount);
+    event LpTokenSupportRemoved(address account, address lpToken);
     PowerTokensSystem internal _powerTokensSystem;
     address internal _router;
     address _userOne;
@@ -88,6 +90,8 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         ).calculateAccountRewards(_userOne, lpTokens);
 
         vm.prank(_userOne);
+        vm.expectEmit(true, true, true, true);
+        emit LpTokensRemoved(_userOne, lpDai, lpTokenAmountsToUnstake[0]);
         IStakeService(_router).unstakeLpTokens(lpTokens, lpTokenAmountsToUnstake);
 
         // then
@@ -185,6 +189,8 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         ).calculateAccountRewards(_userOne, lpTokens);
 
         vm.prank(owner);
+        vm.expectEmit(true, true, true, true);
+        emit LpTokenSupportRemoved(owner, lpDai);
         ILiquidityMiningInternalV2(liquidityMining).phasingOutLpToken(lpDai);
 
         vm.prank(_userOne);
