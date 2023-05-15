@@ -154,7 +154,5 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
     }
 
     //solhint-disable no-empty-blocks
-    function _authorizeUpgrade(address) internal view override {
-        onlyOwner();
-    }
+    function _authorizeUpgrade(address) internal view override onlyOwner {}
 }

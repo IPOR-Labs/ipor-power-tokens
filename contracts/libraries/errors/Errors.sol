@@ -42,4 +42,5 @@ library Errors {
     string public constant ROUTER_INVALID_SIGNATURE = "PT_720";
     string public constant INPUT_ARRAYS_EMPTY = "PT_721";
     string public constant CALLER_NOT_ROUTER = "PT_722";
+    string public constant CALLER_NOT_GUARDIAN = "PT_723";
 }
