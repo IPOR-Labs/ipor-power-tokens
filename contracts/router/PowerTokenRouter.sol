@@ -2,6 +2,7 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 import "./AccessControl.sol";
 import "../libraries/errors/Errors.sol";
 
@@ -17,6 +18,8 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
     address public immutable POWER_TOKEN_LENS;
     address public immutable STAKE_SERVICE;
     address public immutable FLOWS_SERVICE;
+
+    using Address for address;
 
     struct DeployedContracts {
         address liquidityMiningAddress;
@@ -136,7 +139,20 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
         }
     }
 
-    // todo Add batchExecutor
+    function batchExecutor(bytes[] calldata calls) external {
+        uint256 length = calls.length;
+        for (uint256 i; i != length; ) {
+            bytes4 sig = bytes4(calls[i][:4]);
+            address implementation = getRouterImplementation(sig);
+            implementation.functionDelegateCall(calls[i]);
+            if (_reentrancyStatus == _ENTERED) {
+                _reentrancyStatus = _NOT_ENTERED;
+            }
+            unchecked {
+                ++i;
+            }
+        }
+    }
 
     //solhint-disable no-empty-blocks
     function _authorizeUpgrade(address) internal view override {
