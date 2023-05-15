@@ -451,9 +451,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         uint256[] memory pwTokenAmounts = new uint256[](1);
         pwTokenAmounts[0] = 1_000e18;
         address router = _powerTokensSystem.router();
-        address liquidityMining = _powerTokensSystem.liquidityMining();
         address userOne = _getUserAddress(10);
-        address owner = _powerTokensSystem.owner();
         _powerTokensSystem.transferIporToken(userOne, 10_000e18);
         _powerTokensSystem.approveRouter(userOne);
 

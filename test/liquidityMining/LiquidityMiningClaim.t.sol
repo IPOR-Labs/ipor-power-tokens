@@ -75,12 +75,6 @@ contract PwTokenUndelegateTest is TestCommons {
 
         vm.roll(blockNumber + 100);
 
-        LiquidityMiningTypes.AccountRewardResult[]
-            memory rewards100BlocksAfter = ILiquidityMiningLens(_router).calculateAccountRewards(
-                _userOne,
-                tokens
-            );
-
         // when
         vm.prank(_userOne);
         vm.expectEmit(true, true, true, true);
@@ -151,12 +145,6 @@ contract PwTokenUndelegateTest is TestCommons {
         uint256 pwTokensBefore = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
 
         vm.roll(block.number + 100);
-
-        LiquidityMiningTypes.AccountRewardResult[]
-            memory rewards100BlocksAfter = ILiquidityMiningLens(_router).calculateAccountRewards(
-                _userOne,
-                tokens
-            );
 
         // when
         vm.prank(_userOne);

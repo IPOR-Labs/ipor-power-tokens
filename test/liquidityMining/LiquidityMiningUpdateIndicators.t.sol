@@ -103,14 +103,6 @@ contract LiquidityMiningUpdateIndicatorsTest is TestCommons {
             accountIndicatorsBefore[0].indicators.powerUp ==
                 accountIndicatorsAfter[0].indicators.powerUp
         );
-        console2.log(
-            "accountRewardsBefore[0].rewardsAmount",
-            accountRewardsBefore[0].rewardsAmount
-        );
-        console2.log(
-            "accountRewardsAfter[0].allocatedPwTokens",
-            accountRewardsAfter[0].allocatedPwTokens
-        );
         assertEq(0, accountRewardsBefore[0].rewardsAmount);
         assertEq(100e18, accountRewardsAfter[0].allocatedPwTokens);
         assertEq(0, accountRewardsAfter[0].rewardsAmount);

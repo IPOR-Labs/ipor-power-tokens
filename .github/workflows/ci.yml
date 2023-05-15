@@ -11,12 +11,6 @@ jobs:
     secrets:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
-  build-sc:
-    needs: notify
-    uses: ./.github/workflows/build-smart-contracts.yml
-    secrets:
-      PROVIDER_URL: ${{ secrets.PROVIDER_URL }}
-
   foundry-tests:
     needs: notify
     uses: ./.github/workflows/foundry-tests.yml

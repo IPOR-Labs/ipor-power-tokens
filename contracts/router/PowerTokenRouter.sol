@@ -5,7 +5,6 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "./AccessControl.sol";
 import "../libraries/errors/Errors.sol";
-
 import "../interfaces/ILiquidityMiningLens.sol";
 import "../interfaces/IPowerTokenLens.sol";
 import "../interfaces/IStakeService.sol";

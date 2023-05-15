@@ -34,7 +34,6 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         address lpDai = _powerTokensSystem.lpDai();
         address lpUsdc = _powerTokensSystem.lpUsdc();
         address lpUsdt = _powerTokensSystem.lpUsdt();
-        address iporToken = _powerTokensSystem.iporToken();
 
         vm.startPrank(_powerTokensSystem.owner());
         ILiquidityMiningInternalV2(miningAddress).setRewardsPerBlock(lpDai, 1e8);
@@ -322,7 +321,6 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         lpTokens[0] = lpDai;
         uint256[] memory lpTokenAmounts = new uint256[](1);
         lpTokenAmounts[0] = 100e18;
-        uint256[] memory lpTokenAmountsToUnstake = new uint256[](1);
         vm.startPrank(_userOne);
         IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
         IStakeService(_router).stakeLpTokens(_userOne, lpTokens, lpTokenAmounts);

@@ -135,8 +135,6 @@ contract PwTokenCoolDown is TestCommons {
 
     function testShouldBeAbleToCancelCooldown() external {
         // given
-        uint256 cooldownTime = PowerTokenInternalV2(_powerTokensSystem.powerToken())
-            .COOL_DOWN_IN_SECONDS();
 
         vm.prank(_userOne);
         IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
@@ -223,8 +221,6 @@ contract PwTokenCoolDown is TestCommons {
 
     function testShouldNotBeAbleToRedeemCooldownTokensWhenTimeNotPass() external {
         // given
-        uint256 cooldownTime = PowerTokenInternalV2(_powerTokensSystem.powerToken())
-            .COOL_DOWN_IN_SECONDS();
 
         vm.prank(_userOne);
         IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
