@@ -45,8 +45,17 @@ interface ILiquidityMiningInternalV2 {
     /// @dev Emits {Unpaused}.
     function unpause() external;
 
+    /// @notice Grants maximum allowance for a specified ERC20 token to the Router contract.
+    /// @param erc20Token The address of the ERC20 token for which the allowance is granted.
+    /// @dev This function grants maximum allowance (type(uint256).max) for the specified ERC20 token to the
+    /// Router contract.
+    /// @dev Reverts if the `erc20Token` address is zero.
     function grantAllowanceForRouter(address erc20Token) external;
 
+    /// @notice Revokes the allowance for a specified ERC20 token from the Router contract.
+    /// @param erc20Token The address of the ERC20 token for which the allowance is to be revoked.
+    /// @dev This function revokes the allowance for the specified ERC20 token from the Router contract by setting the allowance to zero.
+    /// @dev Reverts if the `erc20Token` address is zero.
     function revokeAllowanceForRouter(address erc20Token) external;
 
     /// @notice Emitted when the account unstakes lpTokens
