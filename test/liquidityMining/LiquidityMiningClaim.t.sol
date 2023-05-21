@@ -381,7 +381,7 @@ contract PwTokenUndelegateTest is TestCommons {
 
         // when
         vm.prank(_userOne);
-        IStakeService(_router).unstakeLpTokens(tokens, amountsLpTokens);
+        IStakeService(_router).unstakeLpTokens(_userOne, tokens, amountsLpTokens);
 
         vm.roll(block.number + 100);
 

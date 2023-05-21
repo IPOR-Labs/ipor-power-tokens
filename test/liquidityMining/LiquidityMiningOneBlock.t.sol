@@ -123,9 +123,9 @@ contract LiquidityMiningOneBlockTest is TestCommons {
 
         // when
         vm.prank(_userOne);
-        IStakeService(_router).unstakeLpTokens(lpTokens, lpTokenAmounts);
+        IStakeService(_router).unstakeLpTokens(_userOne, lpTokens, lpTokenAmounts);
         vm.prank(_userTwo);
-        IStakeService(_router).unstakeLpTokens(lpTokens, lpTokenAmounts);
+        IStakeService(_router).unstakeLpTokens(_userTwo, lpTokens, lpTokenAmounts);
 
         // then
 
@@ -167,14 +167,14 @@ contract LiquidityMiningOneBlockTest is TestCommons {
         vm.prank(_userOne);
         IStakeService(_router).stakeLpTokens(_userOne, lpTokens, lpTokenAmounts);
         vm.prank(_userOne);
-        IStakeService(_router).unstakeLpTokens(lpTokens, lpTokenAmounts);
+        IStakeService(_router).unstakeLpTokens(_userOne, lpTokens, lpTokenAmounts);
 
         vm.roll(block.number + 100);
 
         vm.prank(_userOne);
         IStakeService(_router).stakeLpTokens(_userOne, lpTokens, lpTokenAmounts);
         vm.prank(_userOne);
-        IStakeService(_router).unstakeLpTokens(lpTokens, lpTokenAmounts);
+        IStakeService(_router).unstakeLpTokens(_userOne, lpTokens, lpTokenAmounts);
 
         vm.roll(block.number + 100);
 
@@ -203,7 +203,7 @@ contract LiquidityMiningOneBlockTest is TestCommons {
         vm.prank(_userOne);
         IStakeService(_router).stakeLpTokens(_userOne, lpTokens, lpTokenAmounts);
         vm.prank(_userOne);
-        IStakeService(_router).unstakeLpTokens(lpTokens, lpTokenAmounts);
+        IStakeService(_router).unstakeLpTokens(_userOne, lpTokens, lpTokenAmounts);
         vm.prank(_userTwo);
         IStakeService(_router).stakeLpTokens(_userTwo, lpTokens, lpTokenAmounts);
 
@@ -256,14 +256,14 @@ contract LiquidityMiningOneBlockTest is TestCommons {
 
         // when
         vm.prank(_userOne);
-        IStakeService(_router).unstakeLpTokens(lpDai, lpAmount);
+        IStakeService(_router).unstakeLpTokens(_userOne, lpDai, lpAmount);
         vm.prank(_userTwo);
-        IStakeService(_router).unstakeLpTokens(lpDai, lpAmount);
+        IStakeService(_router).unstakeLpTokens(_userTwo, lpDai, lpAmount);
 
         vm.prank(_userTwo);
-        IStakeService(_router).unstakeLpTokens(lpUsdc, lpAmount);
+        IStakeService(_router).unstakeLpTokens(_userTwo, lpUsdc, lpAmount);
         vm.prank(_userOne);
-        IStakeService(_router).unstakeLpTokens(lpUsdc, lpAmount);
+        IStakeService(_router).unstakeLpTokens(_userOne, lpUsdc, lpAmount);
 
         vm.roll(block.number + 100);
 

@@ -8,8 +8,11 @@ interface IStakeService {
         uint256[] calldata lpTokenAmounts
     ) external;
 
-    function unstakeLpTokens(address[] calldata lpTokens, uint256[] calldata lpTokenAmounts)
-        external;
+    function unstakeLpTokens(
+        address transferTo,
+        address[] calldata lpTokens,
+        uint256[] calldata lpTokenAmounts
+    ) external;
 
     function stakeProtocolToken(address onBehalfOf, uint256 iporTokenAmount) external;
 

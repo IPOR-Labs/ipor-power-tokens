@@ -66,9 +66,11 @@ contract StakeService is IStakeService {
         ILiquidityMiningV2(LIQUIDITY_MINING_ADDRESS).addLpTokens(updateLpTokens);
     }
 
-    function unstakeLpTokens(address[] calldata lpTokens, uint256[] calldata lpTokenAmounts)
-        external
-    {
+    function unstakeLpTokens(
+        address transferTo,
+        address[] calldata lpTokens,
+        uint256[] calldata lpTokenAmounts
+    ) external {
         uint256 lpTokensLength = lpTokens.length;
         require(lpTokensLength == lpTokenAmounts.length, Errors.INPUT_ARRAYS_LENGTH_MISMATCH);
         require(lpTokensLength > 0, Errors.INPUT_ARRAYS_EMPTY);

@@ -91,7 +91,7 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         vm.prank(_userOne);
         vm.expectEmit(true, true, true, true);
         emit LpTokensRemoved(_userOne, lpDai, lpTokenAmountsToUnstake[0]);
-        IStakeService(_router).unstakeLpTokens(lpTokens, lpTokenAmountsToUnstake);
+        IStakeService(_router).unstakeLpTokens(_userOne, lpTokens, lpTokenAmountsToUnstake);
 
         // then
 
@@ -193,7 +193,7 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         ILiquidityMiningInternalV2(liquidityMining).phasingOutLpToken(lpDai);
 
         vm.prank(_userOne);
-        IStakeService(_router).unstakeLpTokens(lpTokens, lpTokenAmountsToUnstake);
+        IStakeService(_router).unstakeLpTokens(_userOne, lpTokens, lpTokenAmountsToUnstake);
 
         // then
 
@@ -280,11 +280,11 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
 
         // then
         vm.prank(_userOne);
-        IStakeService(_router).unstakeLpTokens(lpTokens, lpTokenAmountsToUnstake);
+        IStakeService(_router).unstakeLpTokens(_userOne, lpTokens, lpTokenAmountsToUnstake);
         vm.prank(_userTwo);
-        IStakeService(_router).unstakeLpTokens(lpTokens, lpTokenAmountsToUnstake);
+        IStakeService(_router).unstakeLpTokens(_userTwo, lpTokens, lpTokenAmountsToUnstake);
         vm.prank(_userThree);
-        IStakeService(_router).unstakeLpTokens(lpTokens, lpTokenAmountsToUnstake);
+        IStakeService(_router).unstakeLpTokens(_userThree, lpTokens, lpTokenAmountsToUnstake);
 
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsUserOne = ILiquidityMiningLens(
             _router
@@ -341,7 +341,7 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
 
         // when
         vm.prank(_userOne);
-        IStakeService(_router).unstakeLpTokens(lpTokens, lpTokenAmounts);
+        IStakeService(_router).unstakeLpTokens(_userOne, lpTokens, lpTokenAmounts);
 
         // then
         LiquidityMiningTypes.AccountIndicatorsResult[]
@@ -421,7 +421,7 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
 
         // when
         vm.prank(_userOne);
-        IStakeService(_router).unstakeLpTokens(tokens, amountsLpTokens);
+        IStakeService(_router).unstakeLpTokens(_userOne, tokens, amountsLpTokens);
 
         vm.roll(block.number + 100);
 
