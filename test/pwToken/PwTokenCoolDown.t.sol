@@ -26,7 +26,7 @@ contract PwTokenCoolDown is TestCommons {
     function testShouldNotBeAbleCooldownWhenAmountIsZero() external {
         // given
         vm.prank(_userOne);
-        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
         PowerTokenTypes.PwTokenCooldown memory cooldownBefore = IPowerTokenLens(_router)
             .getActiveCooldown(_userOne);
 
@@ -49,7 +49,7 @@ contract PwTokenCoolDown is TestCommons {
     function testShouldNotBeAbleCooldownWhenAmountIsToBig() external {
         // given
         vm.prank(_userOne);
-        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
         PowerTokenTypes.PwTokenCooldown memory cooldownBefore = IPowerTokenLens(_router)
             .getActiveCooldown(_userOne);
 
@@ -72,7 +72,7 @@ contract PwTokenCoolDown is TestCommons {
     function testShouldBeAbleCooldownWhenAmountIsNotZero() external {
         // given
         vm.prank(_userOne);
-        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
         PowerTokenTypes.PwTokenCooldown memory cooldownBefore = IPowerTokenLens(_router)
             .getActiveCooldown(_userOne);
 
@@ -99,7 +99,7 @@ contract PwTokenCoolDown is TestCommons {
     function testShouldBeAbleToOverrideCooldownWhenSecondTimeExecuteMethod() external {
         // given
         vm.prank(_userOne);
-        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
 
         vm.prank(_userOne);
         IStakeService(_router).cooldown(500e18);
@@ -137,7 +137,7 @@ contract PwTokenCoolDown is TestCommons {
         // given
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
 
         vm.prank(_userOne);
         IStakeService(_router).cooldown(500e18);
@@ -163,7 +163,7 @@ contract PwTokenCoolDown is TestCommons {
     function testShouldNotBeAbleToUnstakeWhenSomeAmountIsInCooldownState() external {
         // given
         vm.prank(_userOne);
-        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
 
         vm.prank(_userOne);
         IStakeService(_router).cooldown(800e18);
@@ -192,7 +192,7 @@ contract PwTokenCoolDown is TestCommons {
         lpTokens[0] = _powerTokensSystem.lpDai();
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
 
         vm.prank(_userOne);
         IStakeService(_router).cooldown(800e18);
@@ -223,7 +223,7 @@ contract PwTokenCoolDown is TestCommons {
         // given
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
 
         vm.prank(_userOne);
         IStakeService(_router).cooldown(500e18);
@@ -254,7 +254,7 @@ contract PwTokenCoolDown is TestCommons {
             .COOL_DOWN_IN_SECONDS();
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
 
         vm.prank(_userOne);
         IStakeService(_router).cooldown(500e18);
@@ -286,7 +286,7 @@ contract PwTokenCoolDown is TestCommons {
             .COOL_DOWN_IN_SECONDS();
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
 
         vm.prank(_userOne);
         IStakeService(_router).cooldown(500e18);

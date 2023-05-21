@@ -436,7 +436,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         LiquidityMiningInternalV2(liquidityMining).pause();
 
         vm.prank(userOne);
-        IStakeService(router).stakeIporToken(userOne, 1_000e18);
+        IStakeService(router).stakeProtocolToken(userOne, 1_000e18);
 
         // when
         vm.prank(userOne);
@@ -456,7 +456,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         _powerTokensSystem.approveRouter(userOne);
 
         vm.prank(userOne);
-        IStakeService(router).stakeIporToken(userOne, 1_000e18);
+        IStakeService(router).stakeProtocolToken(userOne, 1_000e18);
 
         // when
         vm.prank(userOne);

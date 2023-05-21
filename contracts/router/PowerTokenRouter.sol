@@ -49,7 +49,7 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
         if (
             sig == IStakeService.stakeLpTokens.selector ||
             sig == IStakeService.unstakeLpTokens.selector ||
-            sig == IStakeService.stakeIporToken.selector ||
+            sig == IStakeService.stakeProtocolToken.selector ||
             sig == IStakeService.unstakeIporToken.selector ||
             sig == IStakeService.cooldown.selector ||
             sig == IStakeService.cancelCooldown.selector ||

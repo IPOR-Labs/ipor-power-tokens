@@ -52,7 +52,7 @@ contract SmokeTest is TestCommons {
         stakedAmounts[0] = 500e18;
 
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
         IFlowsService(_router).delegate(stakedTokens, stakedAmounts);
 
         // WHEN

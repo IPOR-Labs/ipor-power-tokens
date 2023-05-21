@@ -295,7 +295,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         ILiquidityMiningInternalV2(_miningAddress).setRewardsPerBlock(_lpDai, 2e8);
 
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeIporToken(_userOne, 2_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 2_000e18);
         IFlowsService(_router).delegate(lpTokens, amounts);
         IStakeService(_router).stakeLpTokens(_userOne, lpTokens, amounts);
         vm.stopPrank();
@@ -332,7 +332,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         ILiquidityMiningInternalV2(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
 
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeIporToken(_userOne, 2_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 2_000e18);
         IFlowsService(_router).delegate(lpTokens, amounts);
         IStakeService(_router).stakeLpTokens(_userOne, lpTokens, amounts);
         vm.stopPrank();

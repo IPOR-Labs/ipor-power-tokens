@@ -309,7 +309,7 @@ contract PwTokenUndelegateTest is TestCommons {
         ).calculateAccountRewards(_userOne, tokens);
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
 
         // when
         vm.prank(_userOne);
@@ -367,7 +367,7 @@ contract PwTokenUndelegateTest is TestCommons {
 
         vm.startPrank(_userOne);
         IStakeService(_router).stakeLpTokens(_userOne, tokens, amountsLpTokens);
-        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
         vm.stopPrank();
 
         vm.roll(block.number + 100);

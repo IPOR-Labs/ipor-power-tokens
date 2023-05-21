@@ -44,7 +44,7 @@ contract PwTokenDelegateTest is TestCommons {
         tokens[0] = _powerTokensSystem.dai();
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
 
         uint256 balancePwTokenBefore = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
 
@@ -71,7 +71,7 @@ contract PwTokenDelegateTest is TestCommons {
         tokens[1] = _powerTokensSystem.usdc();
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
 
         uint256 balancePwTokenBefore = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
         uint256 balanceOfDelegateBefore = IPowerTokenLens(_router)
@@ -103,7 +103,7 @@ contract PwTokenDelegateTest is TestCommons {
         tokens[0] = _powerTokensSystem.lpDai();
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
 
         uint256 balancePwTokenBefore = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
         uint256 balanceOfDelegateBefore = IPowerTokenLens(_router)
@@ -138,7 +138,7 @@ contract PwTokenDelegateTest is TestCommons {
         tokens[1] = _powerTokensSystem.lpUsdc();
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
 
         uint256 balancePwTokenBefore = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
         uint256 balanceOfDelegateBefore = IPowerTokenLens(_router)

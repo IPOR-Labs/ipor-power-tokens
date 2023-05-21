@@ -30,12 +30,12 @@ contract BatchExecutorTest is TestCommons {
     function testShouldStakeIporTokensWhenStakeForTwoUsers() external {
         // given
         bytes memory calldataUserTwo = abi.encodeWithSignature(
-            "stakeIporToken(address,uint256)",
+            "stakeProtocolToken(address,uint256)",
             _userTwo,
             2_000e18
         );
         bytes memory calldataUserThree = abi.encodeWithSignature(
-            "stakeIporToken(address,uint256)",
+            "stakeProtocolToken(address,uint256)",
             _userThree,
             3_000e18
         );
@@ -90,7 +90,7 @@ contract BatchExecutorTest is TestCommons {
 
     function testShouldStakeIporTokenLpTokensDelegate() external {
         bytes memory stakeIpor = abi.encodeWithSignature(
-            "stakeIporToken(address,uint256)",
+            "stakeProtocolToken(address,uint256)",
             _userOne,
             3_000e18
         );

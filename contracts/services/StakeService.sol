@@ -104,7 +104,7 @@ contract StakeService is IStakeService {
         }
     }
 
-    function stakeIporToken(address onBehalfOf, uint256 iporTokenAmount) external {
+    function stakeProtocolToken(address onBehalfOf, uint256 iporTokenAmount) external {
         require(onBehalfOf != address(0), Errors.WRONG_ADDRESS);
         require(iporTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 

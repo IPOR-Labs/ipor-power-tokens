@@ -56,7 +56,7 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         uint256[] memory lpTokenAmountsToUnstake = new uint256[](1);
         lpTokenAmountsToUnstake[0] = 50_000e18;
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
         IFlowsService(_router).delegate(lpTokens, lpTokenAmounts);
         vm.stopPrank();
 
@@ -155,7 +155,7 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         uint256[] memory lpTokenAmountsToUnstake = new uint256[](1);
         lpTokenAmountsToUnstake[0] = 50_000e18;
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
         IFlowsService(_router).delegate(lpTokens, lpTokenAmounts);
         vm.stopPrank();
 
@@ -255,15 +255,15 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         uint256[] memory lpTokenAmountsToUnstake = new uint256[](1);
         lpTokenAmountsToUnstake[0] = 50_000e18;
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
         IFlowsService(_router).delegate(lpTokens, lpTokenAmounts);
         vm.stopPrank();
         vm.startPrank(_userTwo);
-        IStakeService(_router).stakeIporToken(_userTwo, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userTwo, 1_000e18);
         IFlowsService(_router).delegate(lpTokens, lpTokenAmounts);
         vm.stopPrank();
         vm.startPrank(_userThree);
-        IStakeService(_router).stakeIporToken(_userThree, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userThree, 1_000e18);
         IFlowsService(_router).delegate(lpTokens, lpTokenAmounts);
         vm.stopPrank();
 
@@ -322,7 +322,7 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         uint256[] memory lpTokenAmounts = new uint256[](1);
         lpTokenAmounts[0] = 100e18;
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
         IStakeService(_router).stakeLpTokens(_userOne, lpTokens, lpTokenAmounts);
         IFlowsService(_router).delegate(lpTokens, lpTokenAmounts);
         vm.stopPrank();
@@ -411,7 +411,7 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
 
         vm.startPrank(_userOne);
         IStakeService(_router).stakeLpTokens(_userOne, tokens, amountsLpTokens);
-        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
         vm.stopPrank();
 
         vm.roll(block.number + 100);
@@ -448,7 +448,7 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
 
         vm.startPrank(_userOne);
         IStakeService(_router).stakeLpTokens(_userOne, tokens, amountsLpTokens);
-        IStakeService(_router).stakeIporToken(_userOne, 1_000e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
         IFlowsService(_router).delegate(tokens, amountsPwTokens);
         vm.stopPrank();
 

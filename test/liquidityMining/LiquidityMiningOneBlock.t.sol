@@ -299,7 +299,7 @@ contract LiquidityMiningOneBlockTest is TestCommons {
         vm.roll(block.number + 1);
 
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeIporToken(_userOne, 100e18);
+        IStakeService(_router).stakeProtocolToken(_userOne, 100e18);
         IFlowsService(_router).delegate(lpTokens, lpTokenAmounts);
         IStakeService(_router).stakeLpTokens(_userOne, lpTokens, lpTokenAmounts);
         vm.stopPrank();
@@ -307,7 +307,7 @@ contract LiquidityMiningOneBlockTest is TestCommons {
         vm.roll(block.number + 2);
 
         vm.startPrank(_userTwo);
-        IStakeService(_router).stakeIporToken(_userTwo, 100e18);
+        IStakeService(_router).stakeProtocolToken(_userTwo, 100e18);
         IFlowsService(_router).delegate(lpTokens, lpTokenAmounts);
         IStakeService(_router).stakeLpTokens(_userTwo, lpTokens, lpTokenAmounts);
         vm.stopPrank();
@@ -315,7 +315,7 @@ contract LiquidityMiningOneBlockTest is TestCommons {
         vm.roll(block.number + 2);
 
         vm.startPrank(_userThree);
-        IStakeService(_router).stakeIporToken(_userThree, 100e18);
+        IStakeService(_router).stakeProtocolToken(_userThree, 100e18);
         IFlowsService(_router).delegate(lpTokens, lpTokenAmounts);
         lpTokenAmounts[0] = 300e18;
         IStakeService(_router).stakeLpTokens(_userThree, lpTokens, lpTokenAmounts);
