@@ -54,20 +54,55 @@ interface IPowerTokenV2 {
         view
         returns (PowerTokenTypes.PwTokenCooldown memory);
 
+    /// @notice Initiates a cooldown for the specified account.
+    /// @dev This function allows an account to initiate a cooldown period for a specified amount of Power Tokens.
+    ///      During the cooldown period, the specified amount of Power Tokens cannot be redeemed or transferred.
+    /// @param account The account address for which the cooldown is initiated.
+    /// @param pwTokenAmount The amount of Power Tokens to be put on cooldown.
     function cooldown(address account, uint256 pwTokenAmount) external;
 
+    /// @notice Cancels the cooldown for the specified account.
+    /// @dev This function allows an account to cancel the active cooldown period for their Power Tokens,
+    ///      enabling them to freely redeem or transfer their Power Tokens.
+    /// @param account The account address for which the cooldown is to be canceled.
     function cancelCooldown(address account) external;
 
+    /// @notice Redeems Power Tokens for the specified account.
+    /// @dev This function allows an account to redeem their Power Tokens, transferring the specified
+    ///      amount of Power Tokens back to the account's staked token balance.
+    ///      The redemption is subject to the cooldown period, and the account must wait for the cooldown
+    ///      period to finish before being able to redeem the Power Tokens.
+    /// @param account The account address for which Power Tokens are to be redeemed.
+    /// @return transferAmount The amount of Power Tokens that have been redeemed and transferred back to the staked token balance.
     function redeem(address account) external returns (uint256 transferAmount);
 
+    /// @notice Adds staked tokens to the specified account.
+    /// @dev This function allows the specified account to add staked tokens to their Power Token balance.
+    ///      The staked tokens are converted to Power Tokens based on the internal exchange rate.
+    /// @param updateStakedToken An object of type PowerTokenTypes.UpdateStakedToken containing the details of the staked token update.
     function addStakedToken(PowerTokenTypes.UpdateStakedToken memory updateStakedToken) external;
 
+    /// @notice Removes staked tokens from the specified account, applying a fee.
+    /// @dev This function allows the specified account to remove staked tokens from their Power Token balance,
+    ///      while deducting a fee from the staked token amount. The fee is determined based on the cooldown period.
+    /// @param updateStakedToken An object of type PowerTokenTypes.UpdateStakedToken containing the details of the staked token update.
+    /// @return stakedTokenAmountToTransfer The amount of staked tokens to be transferred after applying the fee.
     function removeStakedTokenWithFee(PowerTokenTypes.UpdateStakedToken memory updateStakedToken)
         external
         returns (uint256 stakedTokenAmountToTransfer);
 
+    /// @notice Delegates a specified amount of Power Tokens from the caller's balance to the Liquidity Mining contract.
+    /// @dev This function allows the caller to delegate a specified amount of Power Tokens to the Liquidity Mining contract,
+    ///      enabling them to participate in liquidity mining and earn rewards.
+    /// @param account The address of the account delegating the Power Tokens.
+    /// @param pwTokenAmount The amount of Power Tokens to delegate.
     function delegate(address account, uint256 pwTokenAmount) external;
 
+    /// @notice Undelegates a specified amount of Power Tokens from the Liquidity Mining contract back to the caller's balance.
+    /// @dev This function allows the caller to undelegate a specified amount of Power Tokens from the Liquidity Mining contract,
+    ///      effectively removing them from participation in liquidity mining and stopping the earning of rewards.
+    /// @param account The address of the account to undelegate the Power Tokens from.
+    /// @param pwTokenAmount The amount of Power Tokens to undelegate.
     function undelegate(address account, uint256 pwTokenAmount) external;
 
     /// @notice Emitted when the account stake/add [Staked] Tokens

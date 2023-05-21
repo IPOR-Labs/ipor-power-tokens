@@ -10,17 +10,9 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
     using SafeCast for uint256;
     using SafeCast for int256;
 
-    //    ----------------------------------------------
-    //    New implementation
-    //    ----------------------------------------------
-
     constructor(address routerAddress) LiquidityMiningInternalV2(routerAddress) {
         _disableInitializers();
     }
-
-    //    ----------------------------------------------
-    //    New implementation
-    //    ----------------------------------------------
 
     function getContractId() external pure returns (bytes32) {
         return 0x9b1f3aa590476fc9aa58d44ad1419ab53d34c344bd5ed46b12e4af7d27c38e06;

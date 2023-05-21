@@ -24,10 +24,6 @@ contract LiquidityMiningLens is ILiquidityMiningLens {
         return ILiquidityMiningV2(LIQUIDITY_MINING).balanceOf(account, lpToken);
     }
 
-    /// @notice It returns the balance of delegated Power Tokens for a given `account` and the list of lpToken addresses.
-    /// @param account address for which to fetch the information about balance of delegated Power Tokens
-    /// @param lpTokens list of lpTokens addresses(lpTokens)
-    /// @return balances list of {LiquidityMiningTypes.DelegatedPwTokenBalance} structure, with information how much Power Token is delegated per lpToken address.
     function balanceOfDelegatedPwToken(address account, address[] memory lpTokens)
         external
         view
