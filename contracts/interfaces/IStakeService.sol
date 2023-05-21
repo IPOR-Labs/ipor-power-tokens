@@ -22,5 +22,5 @@ interface IStakeService {
 
     function cancelCooldown() external;
 
-    function redeem() external;
+    function redeem(address transferTo) external;
 }

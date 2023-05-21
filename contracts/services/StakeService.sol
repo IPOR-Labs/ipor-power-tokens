@@ -97,7 +97,7 @@ contract StakeService is IStakeService {
         for (uint256 i; i != lpTokensLength; ) {
             IERC20(lpTokens[i]).safeTransferFrom(
                 LIQUIDITY_MINING_ADDRESS,
-                msg.sender,
+                transferTo,
                 lpTokenAmounts[i]
             );
             unchecked {
@@ -145,12 +145,12 @@ contract StakeService is IStakeService {
         IPowerTokenV2(POWER_TOKEN_ADDRESS).cancelCooldown(msg.sender);
     }
 
-    function redeem() external {
+    function redeem(address transferTo) external {
         uint256 transferAmount = IPowerTokenV2(POWER_TOKEN_ADDRESS).redeem(msg.sender);
         ///@dev We can transfer pwTokenAmount because it is in relation 1:1 to Staked Token
         IERC20(STAKED_TOKEN_ADDRESS).safeTransferFrom(
             POWER_TOKEN_ADDRESS,
-            msg.sender,
+            transferTo,
             transferAmount
         );
     }

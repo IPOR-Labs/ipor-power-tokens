@@ -236,7 +236,7 @@ contract PwTokenCoolDown is TestCommons {
         // when
         vm.prank(_userOne);
         vm.expectRevert(bytes(Errors.COOL_DOWN_NOT_FINISH));
-        IStakeService(_router).redeem();
+        IStakeService(_router).redeem(_userOne);
 
         // then
         PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)
@@ -268,7 +268,7 @@ contract PwTokenCoolDown is TestCommons {
         vm.prank(_userOne);
         vm.expectEmit(true, true, true, true);
         emit Redeem(_userOne, 500e18);
-        IStakeService(_router).redeem();
+        IStakeService(_router).redeem(_userOne);
 
         // then
         PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)
@@ -310,7 +310,7 @@ contract PwTokenCoolDown is TestCommons {
 
         // when
         vm.prank(_userOne);
-        IStakeService(_router).redeem();
+        IStakeService(_router).redeem(_userOne);
 
         // then
         uint256 userBalanceERC20AfterRedeem = IERC20(iporToken).balanceOf(_userOne);
