@@ -9,6 +9,10 @@ contract LiquidityMiningLens is ILiquidityMiningLens {
     address public immutable LIQUIDITY_MINING;
 
     constructor(address liquidityMining) {
+        require(
+            liquidityMining != address(0),
+            string.concat(Errors.WRONG_ADDRESS, " liquidityMining")
+        );
         LIQUIDITY_MINING = liquidityMining;
     }
 

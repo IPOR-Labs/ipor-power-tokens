@@ -41,6 +41,7 @@ abstract contract LiquidityMiningInternalV2 is
         internal _accountIndicators;
 
     constructor(address routerAddress) {
+        require(routerAddress != address(0), string.concat(Errors.WRONG_ADDRESS, " routerAddress"));
         ROUTER_ADDRESS = routerAddress;
     }
 

@@ -30,6 +30,30 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
     }
 
     constructor(DeployedContracts memory deployedContracts) {
+        require(
+            deployedContracts.liquidityMiningAddress != address(0),
+            string.concat(Errors.WRONG_ADDRESS, " liquidityMiningAddress")
+        );
+        require(
+            deployedContracts.powerTokenAddress != address(0),
+            string.concat(Errors.WRONG_ADDRESS, " powerTokenAddress")
+        );
+        require(
+            deployedContracts.liquidityMiningLens != address(0),
+            string.concat(Errors.WRONG_ADDRESS, " liquidityMiningLens")
+        );
+        require(
+            deployedContracts.stakeService != address(0),
+            string.concat(Errors.WRONG_ADDRESS, " stakeService")
+        );
+        require(
+            deployedContracts.miningService != address(0),
+            string.concat(Errors.WRONG_ADDRESS, " miningService")
+        );
+        require(
+            deployedContracts.powerTokenLens != address(0),
+            string.concat(Errors.WRONG_ADDRESS, " powerTokenLens")
+        );
         LIQUIDITY_MINING_LENS = deployedContracts.liquidityMiningLens;
         STAKE_SERVICE = deployedContracts.stakeService;
         FLOWS_SERVICE = deployedContracts.miningService;
@@ -45,7 +69,11 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
         _paused = paused;
     }
 
-    function getRouterImplementation(bytes4 sig) public returns (address) {
+    /// @notice Determines the implementation address based on the provided function signature.
+    /// @dev This function is internal and used by the fallback function to delegate the current call to the appropriate implementation.
+    /// @param sig The function signature for which the implementation address needs to be determined.
+    /// @return The address of the implementation contract.
+    function getRouterImplementation(bytes4 sig) internal returns (address) {
         if (
             sig == IStakeService.stakeLpTokens.selector ||
             sig == IStakeService.unstakeLpTokens.selector ||
@@ -92,7 +120,8 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
             sig == IPowerTokenLens.powerTokenTotalSupply.selector ||
             sig == IPowerTokenLens.powerTokenBalanceOf.selector ||
             sig == IPowerTokenLens.delegatedToLiquidityMiningBalanceOf.selector ||
-            sig == IPowerTokenLens.getActiveCooldown.selector
+            sig == IPowerTokenLens.getActiveCooldown.selector ||
+            sig == IPowerTokenLens.getUnstakeWithoutCooldownFee.selector
         ) {
             return POWER_TOKEN_LENS;
         }
@@ -100,6 +129,10 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
         revert(Errors.ROUTER_INVALID_SIGNATURE);
     }
 
+    /// @notice Fallback function that delegates the current call to the appropriate implementation.
+    /// @dev This function is triggered when a function is called on the contract that doesn't match any specific function signature.
+    ///      It delegates the call to the implementation contract based on the function signature using the getRouterImplementation() internal function.
+    ///      The implementation contract is responsible for executing the actual logic of the function call.
     fallback() external {
         _delegate(getRouterImplementation(msg.sig));
     }
@@ -138,6 +171,9 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
         }
     }
 
+    /// @notice Executes a batch of calls to different contracts.
+    /// @dev Allows executing multiple function calls in a single transaction to different contracts.
+    /// @param calls An array of encoded function calls, where each element represents the encoded data of a single function call.
     function batchExecutor(bytes[] calldata calls) external {
         uint256 length = calls.length;
         for (uint256 i; i != length; ) {
@@ -151,6 +187,21 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
                 ++i;
             }
         }
+    }
+
+    /// @notice Retrieves the addresses of the deployed contracts.
+    /// @dev Returns a `DeployedContracts` struct containing the addresses of the deployed contracts.
+    /// @return A `DeployedContracts` struct containing the addresses of the deployed contracts.
+    function getImplementations() external view returns (DeployedContracts memory) {
+        return
+            DeployedContracts(
+                LIQUIDITY_MINING_ADDRESS,
+                POWER_TOKEN_ADDRESS,
+                LIQUIDITY_MINING_LENS,
+                STAKE_SERVICE,
+                FLOWS_SERVICE,
+                POWER_TOKEN_LENS
+            );
     }
 
     //solhint-disable no-empty-blocks

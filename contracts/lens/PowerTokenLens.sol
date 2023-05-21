@@ -9,7 +9,7 @@ contract PowerTokenLens is IPowerTokenLens {
     address public immutable POWER_TOKEN;
 
     constructor(address powerToken) {
-        require(powerToken != address(0), Errors.WRONG_ADDRESS);
+        require(powerToken != address(0), string.concat(Errors.WRONG_ADDRESS, " powerToken"));
         POWER_TOKEN = powerToken;
     }
 

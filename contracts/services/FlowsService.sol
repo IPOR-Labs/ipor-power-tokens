@@ -19,6 +19,18 @@ contract FlowsService is IFlowsService {
         address stakedTokenAddress,
         address powerTokenAddress
     ) {
+        require(
+            liquidityMiningAddress != address(0),
+            string.concat(Errors.WRONG_ADDRESS, " liquidityMiningAddress")
+        );
+        require(
+            stakedTokenAddress != address(0),
+            string.concat(Errors.WRONG_ADDRESS, " stakedTokenAddress")
+        );
+        require(
+            powerTokenAddress != address(0),
+            string.concat(Errors.WRONG_ADDRESS, " powerTokenAddress")
+        );
         liquidityMining = liquidityMiningAddress;
         stakedToken = stakedTokenAddress;
         powerToken = powerTokenAddress;
