@@ -64,7 +64,7 @@ contract PwTokenUnstakeTest is TestCommons {
         // when
         vm.prank(_userOne);
         vm.expectRevert(bytes(Errors.VALUE_NOT_GREATER_THAN_ZERO));
-        IStakeService(_router).unstakeIporToken(0);
+        IStakeService(_router).unstakeProtocolToken(_userOne, 0);
 
         // then
         uint256 iporTokenBalanceAfter = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
@@ -89,7 +89,7 @@ contract PwTokenUnstakeTest is TestCommons {
         vm.prank(_userOne);
         vm.expectEmit(true, true, true, true);
         emit StakedTokenRemovedWithFee(_userOne, 1_000e18, 1e18, 500e18);
-        IStakeService(_router).unstakeIporToken(1_000e18);
+        IStakeService(_router).unstakeProtocolToken(_userOne, 1_000e18);
 
         // then
         uint256 iporTokenBalanceAfter = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
@@ -123,7 +123,7 @@ contract PwTokenUnstakeTest is TestCommons {
 
         // when
         vm.prank(_userOne);
-        IStakeService(_router).unstakeIporToken(500e18);
+        IStakeService(_router).unstakeProtocolToken(_userOne, 500e18);
 
         // then
         uint256 iporTokenBalanceAfter = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
@@ -170,7 +170,7 @@ contract PwTokenUnstakeTest is TestCommons {
 
         // when
         vm.expectRevert(bytes(Errors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW));
-        IStakeService(_router).unstakeIporToken(1_000e18);
+        IStakeService(_router).unstakeProtocolToken(_userOne, 1_000e18);
 
         // then
         uint256 iporTokenBalanceAfter = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
@@ -214,7 +214,7 @@ contract PwTokenUnstakeTest is TestCommons {
 
         // when
         vm.prank(_userOne);
-        IStakeService(_router).unstakeIporToken(500e18);
+        IStakeService(_router).unstakeProtocolToken(_userOne, 500e18);
 
         // then
         uint256 iporTokenBalanceAfter = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
@@ -266,7 +266,7 @@ contract PwTokenUnstakeTest is TestCommons {
         emit UnstakeWithoutCooldownFeeChanged(owner, 5e17, 1e17);
         IPowerTokenInternalV2(powerTokenAddress).setUnstakeWithoutCooldownFee(1e17);
         vm.prank(_userOne);
-        IStakeService(_router).unstakeIporToken(500e18);
+        IStakeService(_router).unstakeProtocolToken(_userOne, 500e18);
 
         // then
         uint256 iporTokenBalanceAfter = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);

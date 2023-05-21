@@ -174,7 +174,7 @@ contract PwTokenCoolDown is TestCommons {
         // when
         vm.prank(_userOne);
         vm.expectRevert(bytes(Errors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW));
-        IStakeService(_router).unstakeIporToken(300e18);
+        IStakeService(_router).unstakeProtocolToken(_userOne, 300e18);
 
         // then
         PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)

@@ -119,7 +119,7 @@ contract StakeService is IStakeService {
         );
     }
 
-    function unstakeIporToken(uint256 iporTokenAmount) external {
+    function unstakeProtocolToken(address transferTo, uint256 iporTokenAmount) external {
         require(iporTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
         uint256 stakedTokenAmountToTransfer = IPowerTokenV2(POWER_TOKEN_ADDRESS)
@@ -129,7 +129,7 @@ contract StakeService is IStakeService {
 
         IERC20(STAKED_TOKEN_ADDRESS).safeTransferFrom(
             POWER_TOKEN_ADDRESS,
-            msg.sender,
+            transferTo,
             stakedTokenAmountToTransfer
         );
     }
