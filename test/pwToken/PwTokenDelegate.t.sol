@@ -2,7 +2,7 @@
 pragma solidity 0.8.17;
 
 import "../TestCommons.sol";
-import "../PowerTokensSystem.sol";
+import "../PowerTokensTestsSystem.sol";
 import "../../contracts/interfaces/types/PowerTokenTypes.sol";
 import "../../contracts/interfaces/IPowerTokenLens.sol";
 import "../../contracts/tokens/PowerTokenInternalV2.sol";
@@ -10,12 +10,12 @@ import "../../contracts/tokens/PowerTokenInternalV2.sol";
 contract PwTokenDelegateTest is TestCommons {
     event Delegated(address indexed account, uint256 pwTokenAmounts);
 
-    PowerTokensSystem internal _powerTokensSystem;
+    PowerTokensTestsSystem internal _powerTokensSystem;
     address internal _router;
     address _userOne;
 
     function setUp() external {
-        _powerTokensSystem = new PowerTokensSystem();
+        _powerTokensSystem = new PowerTokensTestsSystem();
         _router = _powerTokensSystem.router();
         _userOne = _getUserAddress(1);
         _powerTokensSystem.makeAllApprovals(_userOne);

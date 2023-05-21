@@ -15,7 +15,7 @@ import "../contracts/services/FlowsService.sol";
 import "../contracts/router/PowerTokenRouter.sol";
 import "../contracts/lens/PowerTokenLens.sol";
 
-contract PowerTokensSystem is TestCommons {
+contract PowerTokensTestsSystem is TestCommons {
     using SafeCast for uint256;
 
     address public dao;

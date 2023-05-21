@@ -3,14 +3,14 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../TestCommons.sol";
-import "../PowerTokensSystem.sol";
+import "../PowerTokensTestsSystem.sol";
 import "../../contracts/interfaces/IPowerTokenInternalV2.sol";
 
 contract PwTokenConfigurationTest is TestCommons {
-    PowerTokensSystem internal _powerTokensSystem;
+    PowerTokensTestsSystem internal _powerTokensSystem;
 
     function setUp() external {
-        _powerTokensSystem = new PowerTokensSystem();
+        _powerTokensSystem = new PowerTokensTestsSystem();
     }
 
     function testShouldDeployContract() external {

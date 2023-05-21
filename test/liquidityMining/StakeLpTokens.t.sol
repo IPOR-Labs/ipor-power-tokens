@@ -2,18 +2,18 @@
 pragma solidity 0.8.17;
 
 import "../TestCommons.sol";
-import "../PowerTokensSystem.sol";
+import "../PowerTokensTestsSystem.sol";
 import "../../contracts/interfaces/ILiquidityMiningV2.sol";
 
 contract StakeLpTokensTest is TestCommons {
     event LpTokenAdded(address onBehalfOf, address lpToken, uint256 lpTokenAmount);
 
-    PowerTokensSystem internal _powerTokensSystem;
+    PowerTokensTestsSystem internal _powerTokensSystem;
     address[] internal _lpTokens;
     address internal _userOne;
 
     function setUp() public {
-        _powerTokensSystem = new PowerTokensSystem();
+        _powerTokensSystem = new PowerTokensTestsSystem();
         address[] memory lpTokensTemp = new address[](3);
         lpTokensTemp[0] = _powerTokensSystem.lpDai();
         lpTokensTemp[1] = _powerTokensSystem.lpUsdc();

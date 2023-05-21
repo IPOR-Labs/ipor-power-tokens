@@ -2,7 +2,7 @@
 pragma solidity 0.8.17;
 
 import "../TestCommons.sol";
-import "../PowerTokensSystem.sol";
+import "../PowerTokensTestsSystem.sol";
 import "../../contracts/interfaces/types/PowerTokenTypes.sol";
 import "../../contracts/interfaces/ILiquidityMiningLens.sol";
 import "../../contracts/interfaces/IPowerTokenLens.sol";
@@ -12,14 +12,14 @@ import "../../contracts/tokens/PowerTokenInternalV2.sol";
 contract PwTokenUnstakeLpTokensTest is TestCommons {
     event LpTokensRemoved(address account, address lpToken, uint256 lpTokenAmount);
     event LpTokenSupportRemoved(address account, address lpToken);
-    PowerTokensSystem internal _powerTokensSystem;
+    PowerTokensTestsSystem internal _powerTokensSystem;
     address internal _router;
     address _userOne;
     address _userTwo;
     address _userThree;
 
     function setUp() external {
-        _powerTokensSystem = new PowerTokensSystem();
+        _powerTokensSystem = new PowerTokensTestsSystem();
         _router = _powerTokensSystem.router();
         _userOne = _getUserAddress(1);
         _userTwo = _getUserAddress(2);

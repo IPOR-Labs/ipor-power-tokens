@@ -3,7 +3,7 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "../TestCommons.sol";
-import "../PowerTokensSystem.sol";
+import "../PowerTokensTestsSystem.sol";
 import "../../contracts/interfaces/types/PowerTokenTypes.sol";
 import "../../contracts/interfaces/ILiquidityMiningLens.sol";
 import "../../contracts/interfaces/IPowerTokenLens.sol";
@@ -18,10 +18,10 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         address indexed newPauseManager
     );
 
-    PowerTokensSystem internal _powerTokensSystem;
+    PowerTokensTestsSystem internal _powerTokensSystem;
 
     function setUp() external {
-        _powerTokensSystem = new PowerTokensSystem();
+        _powerTokensSystem = new PowerTokensTestsSystem();
     }
 
     function testShouldDeployContractWithoutAssets() external {
@@ -43,7 +43,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
     function testShouldDeployContractWith3Assets() external {
         // given
         // when
-        PowerTokensSystem powerTokensSystem = new PowerTokensSystem();
+        PowerTokensTestsSystem powerTokensSystem = new PowerTokensTestsSystem();
         address liquidityMining = powerTokensSystem.liquidityMining();
 
         // then
