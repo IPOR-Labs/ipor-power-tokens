@@ -3,6 +3,7 @@ pragma solidity 0.8.17;
 
 import "../interfaces/IPowerTokenLens.sol";
 import "../interfaces/IPowerTokenV2.sol";
+import "../interfaces/IPowerTokenInternalV2.sol";
 import "../libraries/errors/Errors.sol";
 
 contract PowerTokenLens is IPowerTokenLens {
@@ -56,5 +57,13 @@ contract PowerTokenLens is IPowerTokenLens {
         returns (PowerTokenTypes.PwTokenCooldown memory)
     {
         return IPowerTokenV2(POWER_TOKEN).getActiveCooldown(account);
+    }
+
+    function COOL_DOWN_IN_SECONDS()
+        external
+        view
+        returns (uint256)
+    {
+        return IPowerTokenInternalV2(POWER_TOKEN).COOL_DOWN_IN_SECONDS();
     }
 }

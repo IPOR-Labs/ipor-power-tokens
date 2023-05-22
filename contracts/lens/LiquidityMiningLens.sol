@@ -4,6 +4,7 @@ pragma solidity 0.8.17;
 import "../interfaces/types/LiquidityMiningTypes.sol";
 import "../interfaces/ILiquidityMiningLens.sol";
 import "../interfaces/ILiquidityMiningV2.sol";
+import "../libraries/errors/Errors.sol";
 
 contract LiquidityMiningLens is ILiquidityMiningLens {
     address public immutable LIQUIDITY_MINING;

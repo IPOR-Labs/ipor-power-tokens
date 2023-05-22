@@ -48,6 +48,13 @@ interface IPowerTokenInternalV2 {
     /// @param erc20Token address of the ERC20 token
     function revokeAllowanceForRouter(address erc20Token) external;
 
+    /// @notice Gets the power token cool down time in seconds.
+    /// @return uint256 cool down time in seconds
+    function COOL_DOWN_IN_SECONDS()
+        external
+        view
+        returns (uint256);
+
     /// @notice Emitted when the user receives rewards from the LiquidityMining
     /// @dev Receiving rewards does not change Internal Exchange Rate of Power Tokens in PowerToken smart contract.
     /// @param account address

@@ -33,8 +33,7 @@ interface ILiquidityMiningV2 {
     function calculateAccruedRewards(address[] calldata lpTokens)
         external
         view
-        override
-        returns (LiquidityMiningTypes.AccruedRewardsResult[] memory result);
+        returns (LiquidityMiningTypes.AccruedRewardsResult[] memory);
 
     /// @notice Calculates the rewards earned by an account for multiple LP tokens.
     /// @param account The address of the account for which to calculate rewards.
@@ -43,7 +42,6 @@ interface ILiquidityMiningV2 {
     function calculateAccountRewards(address account, address[] calldata lpTokens)
         external
         view
-        override
         returns (LiquidityMiningTypes.AccountRewardResult[] memory);
 
     /// @notice method allowing to update the indicators per asset (lpToken).

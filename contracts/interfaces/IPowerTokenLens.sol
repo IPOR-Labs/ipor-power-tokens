@@ -49,4 +49,11 @@ interface IPowerTokenLens {
         external
         view
         returns (PowerTokenTypes.PwTokenCooldown memory);
+
+    /// @notice Gets the power token cool down time in seconds.
+    /// @return uint256 cool down time in seconds
+    function COOL_DOWN_IN_SECONDS()
+        external
+        view
+        returns (uint256);
 }
