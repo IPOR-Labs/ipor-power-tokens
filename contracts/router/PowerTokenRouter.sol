@@ -121,7 +121,8 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
             sig == IPowerTokenLens.powerTokenBalanceOf.selector ||
             sig == IPowerTokenLens.delegatedToLiquidityMiningBalanceOf.selector ||
             sig == IPowerTokenLens.getActiveCooldown.selector ||
-            sig == IPowerTokenLens.getUnstakeWithoutCooldownFee.selector
+            sig == IPowerTokenLens.getUnstakeWithoutCooldownFee.selector ||
+            sig == IPowerTokenLens.COOL_DOWN_IN_SECONDS.selector
         ) {
             return POWER_TOKEN_LENS;
         }

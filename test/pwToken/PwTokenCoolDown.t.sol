@@ -333,4 +333,20 @@ contract PwTokenCoolDown is TestCommons {
             "User balance should be 0"
         );
     }
+
+    function testShouldPowerTokenLensReturnCoolDownInSeconds() external {
+        // given
+        IPowerTokenLens powerTokenLens = IPowerTokenLens(_router);
+
+        // when
+        uint256 cool_down_in_secounds = powerTokenLens.COOL_DOWN_IN_SECONDS();
+
+        // then
+        PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)
+        .getActiveCooldown(_userOne);
+
+        uint256 userBalanceAfter = IERC20(_powerTokensSystem.iporToken()).balanceOf(_userOne);
+
+        assertEq(2 * 7 * 24 * 60 * 60, cool_down_in_secounds, "Cooldown should be 2 weeks");
+    }
 }
