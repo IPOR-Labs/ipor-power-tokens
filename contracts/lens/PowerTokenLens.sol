@@ -59,11 +59,11 @@ contract PowerTokenLens is IPowerTokenLens {
         return IPowerTokenV2(POWER_TOKEN).getActiveCooldown(account);
     }
 
-    function COOL_DOWN_IN_SECONDS()
-        external
-        view
-        returns (uint256)
-    {
+    function COOL_DOWN_IN_SECONDS() external view returns (uint256) {
         return IPowerTokenInternalV2(POWER_TOKEN).COOL_DOWN_IN_SECONDS();
+    }
+
+    function calculateExchangeRate() external view returns (uint256) {
+        return IPowerTokenInternalV2(POWER_TOKEN).calculateExchangeRate();
     }
 }
