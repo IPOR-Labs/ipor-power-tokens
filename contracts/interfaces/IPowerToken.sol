@@ -6,7 +6,7 @@ import "./types/PowerTokenTypes.sol";
 /// @title The Interface for the interaction with the PowerToken - smart contract responsible
 /// for managing Power Token (pwToken), Swapping Staked Token for Power Tokens, and
 /// delegating Power Tokens to other components.
-interface IPowerTokenV2 {
+interface IPowerToken {
     /// @notice Gets the name of the Power Token
     /// @return Returns the name of the Power Token.
     function name() external pure returns (string memory);

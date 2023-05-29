@@ -2,7 +2,7 @@
 pragma solidity 0.8.17;
 
 import "./types/LiquidityMiningTypes.sol";
-import "./ILiquidityMiningV2.sol";
+import "./ILiquidityMining.sol";
 
 interface ILiquidityMiningLens {
     /// @notice Contract ID. The keccak-256 hash of "io.ipor.LiquidityMining" decreased by 1

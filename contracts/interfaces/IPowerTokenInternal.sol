@@ -4,7 +4,7 @@ pragma solidity 0.8.17;
 import "./types/PowerTokenTypes.sol";
 
 /// @title PowerToken smart contract interface
-interface IPowerTokenInternalV2 {
+interface IPowerTokenInternal {
     /// @notice Returns the current version of the PowerToken smart contract
     /// @return Current PowerToken smart contract version
     function getVersion() external pure returns (uint256);
@@ -50,10 +50,7 @@ interface IPowerTokenInternalV2 {
 
     /// @notice Gets the power token cool down time in seconds.
     /// @return uint256 cool down time in seconds
-    function COOL_DOWN_IN_SECONDS()
-        external
-        view
-        returns (uint256);
+    function COOL_DOWN_IN_SECONDS() external view returns (uint256);
 
     /// @notice Emitted when the user receives rewards from the LiquidityMining
     /// @dev Receiving rewards does not change Internal Exchange Rate of Power Tokens in PowerToken smart contract.

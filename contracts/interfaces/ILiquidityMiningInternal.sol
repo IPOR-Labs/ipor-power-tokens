@@ -4,7 +4,7 @@ pragma solidity 0.8.17;
 import "./types/LiquidityMiningTypes.sol";
 
 /// @title The interface for interaction with the LiquidityMining contract. Contains mainly technical methods or methods used by PowerToken smart contract.
-interface ILiquidityMiningInternalV2 {
+interface ILiquidityMiningInternal {
     /// @notice Returns the current version of the LiquidityMining contract
     /// @return Current LiquidityMining (Liquidity Rewards) version
     function getVersion() external pure returns (uint256);

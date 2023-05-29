@@ -10,18 +10,18 @@ import "../libraries/errors/Errors.sol";
 import "../libraries/math/MiningCalculation.sol";
 import "../libraries/Constants.sol";
 import "../interfaces/types/LiquidityMiningTypes.sol";
-import "../interfaces/ILiquidityMiningInternalV2.sol";
+import "../interfaces/ILiquidityMiningInternal.sol";
 import "../interfaces/IStakedToken.sol";
-import "../interfaces/IPowerTokenV2.sol";
+import "../interfaces/IPowerToken.sol";
 import "../security/MiningOwnableUpgradeable.sol";
 
-abstract contract LiquidityMiningInternalV2 is
+abstract contract LiquidityMiningInternal is
     Initializable,
     PausableUpgradeable,
     UUPSUpgradeable,
     MiningOwnableUpgradeable,
     ReentrancyGuardUpgradeable,
-    ILiquidityMiningInternalV2
+    ILiquidityMiningInternal
 {
     using SafeCast for uint256;
     using SafeCast for int256;

@@ -7,7 +7,7 @@ import "../../contracts/interfaces/types/PowerTokenTypes.sol";
 import "../../contracts/interfaces/ILiquidityMiningLens.sol";
 import "../../contracts/interfaces/IPowerTokenLens.sol";
 import "../../contracts/interfaces/IStakeService.sol";
-import "../../contracts/tokens/PowerTokenInternalV2.sol";
+import "../../contracts/tokens/PowerTokenInternal.sol";
 
 contract PwTokenUnstakeLpTokensTest is TestCommons {
     event LpTokensRemoved(address account, address lpToken, uint256 lpTokenAmount);
@@ -36,9 +36,9 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         address lpUsdt = _powerTokensSystem.lpUsdt();
 
         vm.startPrank(_powerTokensSystem.owner());
-        ILiquidityMiningInternalV2(miningAddress).setRewardsPerBlock(lpDai, 1e8);
-        ILiquidityMiningInternalV2(miningAddress).setRewardsPerBlock(lpUsdc, 1e8);
-        ILiquidityMiningInternalV2(miningAddress).setRewardsPerBlock(lpUsdt, 1e8);
+        ILiquidityMiningInternal(miningAddress).setRewardsPerBlock(lpDai, 1e8);
+        ILiquidityMiningInternal(miningAddress).setRewardsPerBlock(lpUsdc, 1e8);
+        ILiquidityMiningInternal(miningAddress).setRewardsPerBlock(lpUsdt, 1e8);
         vm.stopPrank();
 
         _powerTokensSystem.mintLpTokens(lpDai, _userOne, 100_000e18);
@@ -190,7 +190,7 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         vm.prank(owner);
         vm.expectEmit(true, true, true, true);
         emit LpTokenSupportRemoved(owner, lpDai);
-        ILiquidityMiningInternalV2(liquidityMining).phasingOutLpToken(lpDai);
+        ILiquidityMiningInternal(liquidityMining).phasingOutLpToken(lpDai);
 
         vm.prank(_userOne);
         IStakeService(_router).unstakeLpTokens(_userOne, lpTokens, lpTokenAmountsToUnstake);

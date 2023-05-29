@@ -5,8 +5,8 @@ import "../TestCommons.sol";
 import "../PowerTokensTestsSystem.sol";
 import "../../contracts/interfaces/types/PowerTokenTypes.sol";
 import "../../contracts/interfaces/IPowerTokenLens.sol";
-import "../../contracts/interfaces/IPowerTokenInternalV2.sol";
-import "../../contracts/tokens/PowerTokenInternalV2.sol";
+import "../../contracts/interfaces/IPowerTokenInternal.sol";
+import "../../contracts/tokens/PowerTokenInternal.sol";
 
 contract PwTokenUnstakeTest is TestCommons {
     event UnstakeWithoutCooldownFeeChanged(
@@ -42,7 +42,7 @@ contract PwTokenUnstakeTest is TestCommons {
         // when
         vm.prank(_powerTokensSystem.owner());
         vm.expectRevert(bytes(Errors.UNSTAKE_WITHOUT_COOLDOWN_FEE_IS_TO_HIGH));
-        IPowerTokenInternalV2(powerTokenAddress).setUnstakeWithoutCooldownFee(1e18 + 1);
+        IPowerTokenInternal(powerTokenAddress).setUnstakeWithoutCooldownFee(1e18 + 1);
 
         // then
         uint256 unstakeWithoutCooldownFeeAfter = IPowerTokenLens(powerTokenAddress)
@@ -82,7 +82,7 @@ contract PwTokenUnstakeTest is TestCommons {
         IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
         uint256 iporTokenBalanceBefore = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
         uint256 userErc20BalanceBefore = IERC20(_powerTokensSystem.iporToken()).balanceOf(_userOne);
-        uint256 exchangeRateBefore = IPowerTokenInternalV2(_powerTokensSystem.powerToken())
+        uint256 exchangeRateBefore = IPowerTokenInternal(_powerTokensSystem.powerToken())
             .calculateExchangeRate();
 
         // when
@@ -94,7 +94,7 @@ contract PwTokenUnstakeTest is TestCommons {
         // then
         uint256 iporTokenBalanceAfter = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
         uint256 userErc20BalanceAfter = IERC20(_powerTokensSystem.iporToken()).balanceOf(_userOne);
-        uint256 exchangeRateAfter = IPowerTokenInternalV2(_powerTokensSystem.powerToken())
+        uint256 exchangeRateAfter = IPowerTokenInternal(_powerTokensSystem.powerToken())
             .calculateExchangeRate();
 
         assertEq(
@@ -117,7 +117,7 @@ contract PwTokenUnstakeTest is TestCommons {
         IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
         uint256 iporTokenBalanceBefore = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
         uint256 userErc20BalanceBefore = IERC20(_powerTokensSystem.iporToken()).balanceOf(_userOne);
-        uint256 exchangeRateBefore = IPowerTokenInternalV2(_powerTokensSystem.powerToken())
+        uint256 exchangeRateBefore = IPowerTokenInternal(_powerTokensSystem.powerToken())
             .calculateExchangeRate();
         uint256 totalSupplyBefore = IPowerTokenLens(_router).powerTokenTotalSupply();
 
@@ -128,7 +128,7 @@ contract PwTokenUnstakeTest is TestCommons {
         // then
         uint256 iporTokenBalanceAfter = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
         uint256 userErc20BalanceAfter = IERC20(_powerTokensSystem.iporToken()).balanceOf(_userOne);
-        uint256 exchangeRateAfter = IPowerTokenInternalV2(_powerTokensSystem.powerToken())
+        uint256 exchangeRateAfter = IPowerTokenInternal(_powerTokensSystem.powerToken())
             .calculateExchangeRate();
         uint256 totalSupplyAfter = IPowerTokenLens(_router).powerTokenTotalSupply();
 
@@ -165,7 +165,7 @@ contract PwTokenUnstakeTest is TestCommons {
 
         uint256 iporTokenBalanceBefore = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
         uint256 userErc20BalanceBefore = IERC20(_powerTokensSystem.iporToken()).balanceOf(_userOne);
-        uint256 exchangeRateBefore = IPowerTokenInternalV2(_powerTokensSystem.powerToken())
+        uint256 exchangeRateBefore = IPowerTokenInternal(_powerTokensSystem.powerToken())
             .calculateExchangeRate();
 
         // when
@@ -175,7 +175,7 @@ contract PwTokenUnstakeTest is TestCommons {
         // then
         uint256 iporTokenBalanceAfter = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
         uint256 userErc20BalanceAfter = IERC20(_powerTokensSystem.iporToken()).balanceOf(_userOne);
-        uint256 exchangeRateAfter = IPowerTokenInternalV2(_powerTokensSystem.powerToken())
+        uint256 exchangeRateAfter = IPowerTokenInternal(_powerTokensSystem.powerToken())
             .calculateExchangeRate();
 
         assertEq(
@@ -209,7 +209,7 @@ contract PwTokenUnstakeTest is TestCommons {
 
         uint256 iporTokenBalanceBefore = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
         uint256 userErc20BalanceBefore = IERC20(_powerTokensSystem.iporToken()).balanceOf(_userOne);
-        uint256 exchangeRateBefore = IPowerTokenInternalV2(_powerTokensSystem.powerToken())
+        uint256 exchangeRateBefore = IPowerTokenInternal(_powerTokensSystem.powerToken())
             .calculateExchangeRate();
 
         // when
@@ -219,7 +219,7 @@ contract PwTokenUnstakeTest is TestCommons {
         // then
         uint256 iporTokenBalanceAfter = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
         uint256 userErc20BalanceAfter = IERC20(_powerTokensSystem.iporToken()).balanceOf(_userOne);
-        uint256 exchangeRateAfter = IPowerTokenInternalV2(_powerTokensSystem.powerToken())
+        uint256 exchangeRateAfter = IPowerTokenInternal(_powerTokensSystem.powerToken())
             .calculateExchangeRate();
 
         assertEq(
@@ -255,8 +255,7 @@ contract PwTokenUnstakeTest is TestCommons {
 
         uint256 iporTokenBalanceBefore = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
         uint256 userErc20BalanceBefore = IERC20(_powerTokensSystem.iporToken()).balanceOf(_userOne);
-        uint256 exchangeRateBefore = IPowerTokenInternalV2(powerTokenAddress)
-            .calculateExchangeRate();
+        uint256 exchangeRateBefore = IPowerTokenInternal(powerTokenAddress).calculateExchangeRate();
         uint256 unstakeWithoutCooldownFeeBefore = IPowerTokenLens(powerTokenAddress)
             .getUnstakeWithoutCooldownFee();
 
@@ -264,15 +263,14 @@ contract PwTokenUnstakeTest is TestCommons {
         vm.prank(owner);
         vm.expectEmit(true, true, true, true);
         emit UnstakeWithoutCooldownFeeChanged(owner, 5e17, 1e17);
-        IPowerTokenInternalV2(powerTokenAddress).setUnstakeWithoutCooldownFee(1e17);
+        IPowerTokenInternal(powerTokenAddress).setUnstakeWithoutCooldownFee(1e17);
         vm.prank(_userOne);
         IStakeService(_router).unstakeProtocolToken(_userOne, 500e18);
 
         // then
         uint256 iporTokenBalanceAfter = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
         uint256 userErc20BalanceAfter = IERC20(_powerTokensSystem.iporToken()).balanceOf(_userOne);
-        uint256 exchangeRateAfter = IPowerTokenInternalV2(powerTokenAddress)
-            .calculateExchangeRate();
+        uint256 exchangeRateAfter = IPowerTokenInternal(powerTokenAddress).calculateExchangeRate();
         uint256 unstakeWithoutCooldownFeeAfter = IPowerTokenLens(powerTokenAddress)
             .getUnstakeWithoutCooldownFee();
 

@@ -5,9 +5,9 @@ import "../TestCommons.sol";
 import "../PowerTokensTestsSystem.sol";
 import "../../contracts/interfaces/types/PowerTokenTypes.sol";
 import "../../contracts/interfaces/ILiquidityMiningLens.sol";
-import "../../contracts/interfaces/ILiquidityMiningInternalV2.sol";
+import "../../contracts/interfaces/ILiquidityMiningInternal.sol";
 import "../../contracts/interfaces/IStakeService.sol";
-import "../../contracts/tokens/PowerTokenInternalV2.sol";
+import "../../contracts/tokens/PowerTokenInternal.sol";
 
 contract LiquidityMiningRewardsPerBlockTest is TestCommons {
     event RewardsPerBlockChanged(
@@ -60,7 +60,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         vm.prank(_owner);
         vm.expectEmit(true, true, true, true);
         emit RewardsPerBlockChanged(_owner, _lpDai, 0, 2e8);
-        ILiquidityMiningInternalV2(_miningAddress).setRewardsPerBlock(_lpDai, 2e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 2e8);
 
         // then
         LiquidityMiningTypes.GlobalIndicatorsResult[]
@@ -83,7 +83,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
 
         // when
         vm.prank(_owner);
-        ILiquidityMiningInternalV2(_miningAddress).setRewardsPerBlock(_lpDai, 2e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 2e8);
 
         // then
         LiquidityMiningTypes.GlobalIndicatorsResult[]
@@ -108,9 +108,9 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
 
         // when
         vm.startPrank(_owner);
-        ILiquidityMiningInternalV2(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
-        ILiquidityMiningInternalV2(_miningAddress).setRewardsPerBlock(_lpUsdc, 2e8);
-        ILiquidityMiningInternalV2(_miningAddress).setRewardsPerBlock(_lpUsdt, 1e7);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpUsdc, 2e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpUsdt, 1e7);
         vm.stopPrank();
 
         // then
@@ -139,7 +139,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
 
         // when
         vm.expectRevert(bytes("Ownable: caller is not the owner"));
-        ILiquidityMiningInternalV2(_miningAddress).setRewardsPerBlock(_lpDai, 2e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 2e8);
 
         // then
 
@@ -161,7 +161,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         amounts[0] = 1_000e18;
 
         vm.prank(_owner);
-        ILiquidityMiningInternalV2(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
 
         vm.prank(_userOne);
         IStakeService(_router).stakeLpTokens(_userOne, lpTokens, amounts);
@@ -174,7 +174,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
 
         // when
         vm.prank(_owner);
-        ILiquidityMiningInternalV2(_miningAddress).setRewardsPerBlock(_lpDai, 0);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 0);
 
         vm.roll(block.number + 100);
 
@@ -196,7 +196,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         amounts[0] = 1_000e18;
 
         vm.prank(_owner);
-        ILiquidityMiningInternalV2(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
 
         vm.prank(_userOne);
         IStakeService(_router).stakeLpTokens(_userOne, lpTokens, amounts);
@@ -204,7 +204,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         vm.roll(block.number + 100);
 
         vm.prank(_owner);
-        ILiquidityMiningInternalV2(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
 
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsBefore = ILiquidityMiningLens(
             _miningAddress
@@ -212,7 +212,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
 
         // when
         vm.prank(_owner);
-        ILiquidityMiningInternalV2(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
 
         vm.roll(block.number + 100);
 
@@ -234,7 +234,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         amounts[0] = 1_000e18;
 
         vm.prank(_owner);
-        ILiquidityMiningInternalV2(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
 
         vm.prank(_userOne);
         IStakeService(_router).stakeLpTokens(_userOne, lpTokens, amounts);
@@ -247,7 +247,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
 
         // when
         vm.prank(_owner);
-        ILiquidityMiningInternalV2(_miningAddress).setRewardsPerBlock(_lpDai, 2e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 2e8);
 
         // then
         LiquidityMiningTypes.GlobalIndicatorsResult[]
@@ -280,7 +280,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         //when
         vm.prank(_owner);
         vm.expectRevert(bytes(Errors.LP_TOKEN_NOT_SUPPORTED));
-        ILiquidityMiningInternalV2(_miningAddress).setRewardsPerBlock(dai, 1e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(dai, 1e8);
     }
 
     function testShouldProperCalculateRewardWhenBlockRewardsDecrease() external {
@@ -292,7 +292,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         amounts[0] = 1_000e18;
 
         vm.prank(_owner);
-        ILiquidityMiningInternalV2(_miningAddress).setRewardsPerBlock(_lpDai, 2e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 2e8);
 
         vm.startPrank(_userOne);
         IStakeService(_router).stakeProtocolToken(_userOne, 2_000e18);
@@ -307,7 +307,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
 
         // when
         vm.prank(_owner);
-        ILiquidityMiningInternalV2(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
 
         vm.roll(block.number + 100);
 
@@ -329,7 +329,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         amounts[0] = 1_000e18;
 
         vm.prank(_owner);
-        ILiquidityMiningInternalV2(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
 
         vm.startPrank(_userOne);
         IStakeService(_router).stakeProtocolToken(_userOne, 2_000e18);
@@ -344,7 +344,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
 
         // when
         vm.prank(_owner);
-        ILiquidityMiningInternalV2(_miningAddress).setRewardsPerBlock(_lpDai, 2e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 2e8);
 
         vm.roll(block.number + 100);
 

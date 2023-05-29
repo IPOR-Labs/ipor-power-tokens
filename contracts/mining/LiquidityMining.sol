@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.17;
 
-import "../interfaces/ILiquidityMiningV2.sol";
-import "./LiquidityMiningInternalV2.sol";
+import "../interfaces/ILiquidityMining.sol";
+import "./LiquidityMiningInternal.sol";
 
 /// @title Smart contract responsible for distribution of Power Token rewards across accounts contributing to Liquidity Mining
 /// by staking lpTokens and / or delegating Power Tokens.
-contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
+contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
     using SafeCast for uint256;
     using SafeCast for int256;
 
-    constructor(address routerAddress) LiquidityMiningInternalV2(routerAddress) {
+    constructor(address routerAddress) LiquidityMiningInternal(routerAddress) {
         _disableInitializers();
     }
 

@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.17;
 
-import "../interfaces/ILiquidityMiningInternalV2.sol";
-import "../interfaces/IPowerTokenV2.sol";
-import "./PowerTokenInternalV2.sol";
+import "../interfaces/ILiquidityMiningInternal.sol";
+import "../interfaces/IPowerToken.sol";
+import "./PowerTokenInternal.sol";
 
 ///@title Smart contract responsible for managing Power Token.
 /// @notice Power Token is retrieved when the account stakes [Staked] Token.
 /// PowerToken smart contract allows staking, unstaking of [Staked] Token, delegating, undelegating of Power Token balance to LiquidityMining.
-contract PowerTokenV2 is PowerTokenInternalV2, IPowerTokenV2 {
+contract PowerToken is PowerTokenInternal, IPowerToken {
     constructor(address routerAddress, address stakedTokenAddress)
-        PowerTokenInternalV2(routerAddress, stakedTokenAddress)
+        PowerTokenInternal(routerAddress, stakedTokenAddress)
     {
         _disableInitializers();
     }

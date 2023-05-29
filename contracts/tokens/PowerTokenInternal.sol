@@ -12,15 +12,15 @@ import "../libraries/Constants.sol";
 import "../interfaces/types/PowerTokenTypes.sol";
 import "../interfaces/IStakedToken.sol";
 import "../security/MiningOwnableUpgradeable.sol";
-import "../interfaces/IPowerTokenInternalV2.sol";
-import "../interfaces/ILiquidityMiningV2.sol";
+import "../interfaces/IPowerTokenInternal.sol";
+import "../interfaces/ILiquidityMining.sol";
 
-abstract contract PowerTokenInternalV2 is
+abstract contract PowerTokenInternal is
     PausableUpgradeable,
     UUPSUpgradeable,
     ReentrancyGuardUpgradeable,
     MiningOwnableUpgradeable,
-    IPowerTokenInternalV2
+    IPowerTokenInternal
 {
     /// @dev 14 days
     uint256 public constant COOL_DOWN_IN_SECONDS = 2 * 7 * 24 * 60 * 60;

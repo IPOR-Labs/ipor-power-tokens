@@ -7,8 +7,8 @@ import "../contracts/mocks/tokens/MockStakedToken.sol";
 import "../contracts/mocks/tokens/MockToken.sol";
 import "../contracts/mocks/tokens/MockLpToken.sol";
 import "./TestCommons.sol";
-import "../contracts/mining/LiquidityMiningV2.sol";
-import "../contracts/tokens/PowerTokenV2.sol";
+import "../contracts/mining/LiquidityMining.sol";
+import "../contracts/tokens/PowerToken.sol";
 import "../contracts/lens/LiquidityMiningLens.sol";
 import "../contracts/services/StakeService.sol";
 import "../contracts/services/FlowsService.sol";
@@ -72,7 +72,7 @@ contract PowerTokensTestsSystem is TestCommons {
 
     function setRewardsPerBlock(address lpToken, uint256 rewardsPerBlock) external {
         vm.startPrank(owner);
-        ILiquidityMiningInternalV2(liquidityMining).setRewardsPerBlock(
+        ILiquidityMiningInternal(liquidityMining).setRewardsPerBlock(
             lpToken,
             rewardsPerBlock.toUint32()
         );
@@ -113,7 +113,7 @@ contract PowerTokensTestsSystem is TestCommons {
 
     function _createPowerToken() private {
         // address in constructor will be replaced
-        PowerTokenV2 implementation = new PowerTokenV2(dao, address(iporToken));
+        PowerToken implementation = new PowerToken(dao, address(iporToken));
         vm.startPrank(owner);
         ERC1967Proxy proxy = new ERC1967Proxy(
             address(implementation),
@@ -124,7 +124,7 @@ contract PowerTokensTestsSystem is TestCommons {
     }
 
     function createPowerToken(address iporTokenAddress, address routerAddress) public {
-        PowerTokenV2 implementation = new PowerTokenV2(routerAddress, address(iporTokenAddress));
+        PowerToken implementation = new PowerToken(routerAddress, address(iporTokenAddress));
         vm.startPrank(owner);
         ERC1967Proxy proxy = new ERC1967Proxy(
             address(implementation),
@@ -136,7 +136,7 @@ contract PowerTokensTestsSystem is TestCommons {
 
     function _createLiquidityMining() private {
         // address in constructor will be replaced
-        LiquidityMiningV2 implementation = new LiquidityMiningV2(dao);
+        LiquidityMining implementation = new LiquidityMining(dao);
 
         vm.startPrank(owner);
         address[] memory lpTokewns = new address[](3);
@@ -159,22 +159,22 @@ contract PowerTokensTestsSystem is TestCommons {
     }
 
     function _updateLiquidityMiningImplementation() private {
-        LiquidityMiningV2 implementation = new LiquidityMiningV2(router);
+        LiquidityMining implementation = new LiquidityMining(router);
         vm.startPrank(owner);
-        LiquidityMiningV2(liquidityMining).upgradeTo(address(implementation));
-        ILiquidityMiningInternalV2(liquidityMining).grantAllowanceForRouter(lpDai);
-        ILiquidityMiningInternalV2(liquidityMining).grantAllowanceForRouter(lpUsdc);
-        ILiquidityMiningInternalV2(liquidityMining).grantAllowanceForRouter(lpUsdt);
-        ILiquidityMiningInternalV2(liquidityMining).grantAllowanceForRouter(iporToken);
-        IPowerTokenInternalV2(powerToken).grantAllowanceForRouter(iporToken);
+        LiquidityMining(liquidityMining).upgradeTo(address(implementation));
+        ILiquidityMiningInternal(liquidityMining).grantAllowanceForRouter(lpDai);
+        ILiquidityMiningInternal(liquidityMining).grantAllowanceForRouter(lpUsdc);
+        ILiquidityMiningInternal(liquidityMining).grantAllowanceForRouter(lpUsdt);
+        ILiquidityMiningInternal(liquidityMining).grantAllowanceForRouter(iporToken);
+        IPowerTokenInternal(powerToken).grantAllowanceForRouter(iporToken);
         vm.stopPrank();
     }
 
     function _updatePowerTokenImplementation() private {
-        PowerTokenV2 implementation = new PowerTokenV2(router, address(iporToken));
+        PowerToken implementation = new PowerToken(router, address(iporToken));
         vm.startPrank(owner);
-        PowerTokenV2(powerToken).upgradeTo(address(implementation));
-        IPowerTokenInternalV2(powerToken).grantAllowanceForRouter(iporToken);
+        PowerToken(powerToken).upgradeTo(address(implementation));
+        IPowerTokenInternal(powerToken).grantAllowanceForRouter(iporToken);
         vm.stopPrank();
     }
 

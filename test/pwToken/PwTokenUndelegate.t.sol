@@ -5,7 +5,7 @@ import "../TestCommons.sol";
 import "../PowerTokensTestsSystem.sol";
 import "../../contracts/interfaces/types/PowerTokenTypes.sol";
 import "../../contracts/interfaces/IPowerTokenLens.sol";
-import "../../contracts/tokens/PowerTokenInternalV2.sol";
+import "../../contracts/tokens/PowerTokenInternal.sol";
 
 contract PwTokenUndelegateTest is TestCommons {
     event Undelegated(address indexed account, uint256 pwTokenAmounts);
@@ -171,7 +171,7 @@ contract PwTokenUndelegateTest is TestCommons {
 
         uint256 balanseOfDelegateBefore = IPowerTokenLens(_router)
             .delegatedToLiquidityMiningBalanceOf(_userOne);
-        uint256 exchangeRateBefore = IPowerTokenInternalV2(_powerTokensSystem.powerToken())
+        uint256 exchangeRateBefore = IPowerTokenInternal(_powerTokensSystem.powerToken())
             .calculateExchangeRate();
 
         //  when
@@ -184,7 +184,7 @@ contract PwTokenUndelegateTest is TestCommons {
         uint256 balanseOfDelegateAfter = IPowerTokenLens(_router)
             .delegatedToLiquidityMiningBalanceOf(_userOne);
 
-        uint256 exchangeRateAfter = IPowerTokenInternalV2(_powerTokensSystem.powerToken())
+        uint256 exchangeRateAfter = IPowerTokenInternal(_powerTokensSystem.powerToken())
             .calculateExchangeRate();
 
         assertEq(

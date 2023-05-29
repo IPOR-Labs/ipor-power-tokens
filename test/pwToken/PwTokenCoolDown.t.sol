@@ -5,7 +5,7 @@ import "../TestCommons.sol";
 import "../PowerTokensTestsSystem.sol";
 import "../../contracts/interfaces/types/PowerTokenTypes.sol";
 import "../../contracts/interfaces/IPowerTokenLens.sol";
-import "../../contracts/tokens/PowerTokenInternalV2.sol";
+import "../../contracts/tokens/PowerTokenInternal.sol";
 
 contract PwTokenCoolDown is TestCommons {
     event CooldownChanged(address indexed changedBy, uint256 pwTokenAmount, uint256 endTimestamp);
@@ -90,7 +90,7 @@ contract PwTokenCoolDown is TestCommons {
 
         assertEq(
             block.timestamp +
-                PowerTokenInternalV2(_powerTokensSystem.powerToken()).COOL_DOWN_IN_SECONDS(),
+                PowerTokenInternal(_powerTokensSystem.powerToken()).COOL_DOWN_IN_SECONDS(),
             cooldownAfter.endTimestamp,
             "Cooldown end time should be 14 days from now"
         );
@@ -127,7 +127,7 @@ contract PwTokenCoolDown is TestCommons {
 
         assertEq(
             block.timestamp +
-                PowerTokenInternalV2(_powerTokensSystem.powerToken()).COOL_DOWN_IN_SECONDS(),
+                PowerTokenInternal(_powerTokensSystem.powerToken()).COOL_DOWN_IN_SECONDS(),
             cooldownAfter.endTimestamp,
             "Cooldown end time should be 14 days from now"
         );
@@ -250,7 +250,7 @@ contract PwTokenCoolDown is TestCommons {
 
     function testShouldBeAbleToRedeemCooldownTokensWhen2WeeksPass() external {
         // given
-        uint256 cooldownTime = PowerTokenInternalV2(_powerTokensSystem.powerToken())
+        uint256 cooldownTime = PowerTokenInternal(_powerTokensSystem.powerToken())
             .COOL_DOWN_IN_SECONDS();
 
         vm.prank(_userOne);
@@ -282,7 +282,7 @@ contract PwTokenCoolDown is TestCommons {
 
     function testShouldBeAbleToRedeemCooldownTokensWhen2WeeksPassAndExchangeRateChanged() external {
         // given
-        uint256 cooldownTime = PowerTokenInternalV2(_powerTokensSystem.powerToken())
+        uint256 cooldownTime = PowerTokenInternal(_powerTokensSystem.powerToken())
             .COOL_DOWN_IN_SECONDS();
 
         vm.prank(_userOne);
@@ -343,7 +343,7 @@ contract PwTokenCoolDown is TestCommons {
 
         // then
         PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)
-        .getActiveCooldown(_userOne);
+            .getActiveCooldown(_userOne);
 
         uint256 userBalanceAfter = IERC20(_powerTokensSystem.iporToken()).balanceOf(_userOne);
 

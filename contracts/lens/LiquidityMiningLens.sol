@@ -3,7 +3,7 @@ pragma solidity 0.8.17;
 
 import "../interfaces/types/LiquidityMiningTypes.sol";
 import "../interfaces/ILiquidityMiningLens.sol";
-import "../interfaces/ILiquidityMiningV2.sol";
+import "../interfaces/ILiquidityMining.sol";
 import "../libraries/errors/Errors.sol";
 
 contract LiquidityMiningLens is ILiquidityMiningLens {
@@ -18,7 +18,7 @@ contract LiquidityMiningLens is ILiquidityMiningLens {
     }
 
     function getLiquidityMiningContractId() external view returns (bytes32) {
-        return ILiquidityMiningV2(LIQUIDITY_MINING).getContractId();
+        return ILiquidityMining(LIQUIDITY_MINING).getContractId();
     }
 
     function liquidityMiningBalanceOf(address account, address lpToken)
@@ -26,7 +26,7 @@ contract LiquidityMiningLens is ILiquidityMiningLens {
         view
         returns (uint256)
     {
-        return ILiquidityMiningV2(LIQUIDITY_MINING).balanceOf(account, lpToken);
+        return ILiquidityMining(LIQUIDITY_MINING).balanceOf(account, lpToken);
     }
 
     function balanceOfDelegatedPwToken(address account, address[] memory lpTokens)
@@ -34,7 +34,7 @@ contract LiquidityMiningLens is ILiquidityMiningLens {
         view
         returns (LiquidityMiningTypes.DelegatedPwTokenBalance[] memory balances)
     {
-        return ILiquidityMiningV2(LIQUIDITY_MINING).balanceOfDelegatedPwToken(account, lpTokens);
+        return ILiquidityMining(LIQUIDITY_MINING).balanceOfDelegatedPwToken(account, lpTokens);
     }
 
     function calculateAccruedRewards(address[] calldata lpTokens)
@@ -43,7 +43,7 @@ contract LiquidityMiningLens is ILiquidityMiningLens {
         override
         returns (LiquidityMiningTypes.AccruedRewardsResult[] memory result)
     {
-        return ILiquidityMiningV2(LIQUIDITY_MINING).calculateAccruedRewards(lpTokens);
+        return ILiquidityMining(LIQUIDITY_MINING).calculateAccruedRewards(lpTokens);
     }
 
     function calculateAccountRewards(address account, address[] calldata lpTokens)
@@ -52,7 +52,7 @@ contract LiquidityMiningLens is ILiquidityMiningLens {
         override
         returns (LiquidityMiningTypes.AccountRewardResult[] memory)
     {
-        return ILiquidityMiningV2(LIQUIDITY_MINING).calculateAccountRewards(account, lpTokens);
+        return ILiquidityMining(LIQUIDITY_MINING).calculateAccountRewards(account, lpTokens);
     }
 
     function getGlobalIndicators(address[] memory lpTokens)
@@ -60,7 +60,7 @@ contract LiquidityMiningLens is ILiquidityMiningLens {
         view
         returns (LiquidityMiningTypes.GlobalIndicatorsResult[] memory)
     {
-        return ILiquidityMiningV2(LIQUIDITY_MINING).getGlobalIndicators(lpTokens);
+        return ILiquidityMining(LIQUIDITY_MINING).getGlobalIndicators(lpTokens);
     }
 
     function getAccountIndicators(address account, address[] calldata lpTokens)
@@ -68,6 +68,6 @@ contract LiquidityMiningLens is ILiquidityMiningLens {
         view
         returns (LiquidityMiningTypes.AccountIndicatorsResult[] memory)
     {
-        return ILiquidityMiningV2(LIQUIDITY_MINING).getAccountIndicators(account, lpTokens);
+        return ILiquidityMining(LIQUIDITY_MINING).getAccountIndicators(account, lpTokens);
     }
 }

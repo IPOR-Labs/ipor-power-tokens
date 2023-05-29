@@ -5,7 +5,7 @@ import "../TestCommons.sol";
 import "../PowerTokensTestsSystem.sol";
 import "../../contracts/interfaces/types/PowerTokenTypes.sol";
 import "../../contracts/interfaces/IPowerTokenLens.sol";
-import "../../contracts/tokens/PowerTokenInternalV2.sol";
+import "../../contracts/tokens/PowerTokenInternal.sol";
 
 contract PwTokenStakeTest is TestCommons {
     event StakedTokenAdded(
@@ -94,7 +94,7 @@ contract PwTokenStakeTest is TestCommons {
         vm.prank(_userOne);
         IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
 
-        uint256 exchangeRateBefore = IPowerTokenInternalV2(_powerTokensSystem.powerToken())
+        uint256 exchangeRateBefore = IPowerTokenInternal(_powerTokensSystem.powerToken())
             .calculateExchangeRate();
 
         // when
@@ -104,7 +104,7 @@ contract PwTokenStakeTest is TestCommons {
         // then
         uint256 iporTokenBalanceAfter = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
         uint256 userErc20BalanceAfter = ERC20(_powerTokensSystem.iporToken()).balanceOf(_userOne);
-        uint256 exchangeRateAfter = IPowerTokenInternalV2(_powerTokensSystem.powerToken())
+        uint256 exchangeRateAfter = IPowerTokenInternal(_powerTokensSystem.powerToken())
             .calculateExchangeRate();
 
         assertEq(
@@ -147,7 +147,7 @@ contract PwTokenStakeTest is TestCommons {
         uint256 userTwoErc20BalanceBefore = ERC20(_powerTokensSystem.iporToken()).balanceOf(
             _userTwo
         );
-        uint256 exchangeRateBefore = IPowerTokenInternalV2(_powerTokensSystem.powerToken())
+        uint256 exchangeRateBefore = IPowerTokenInternal(_powerTokensSystem.powerToken())
             .calculateExchangeRate();
 
         // when
@@ -168,7 +168,7 @@ contract PwTokenStakeTest is TestCommons {
         uint256 userTwoErc20BalanceAfter = ERC20(_powerTokensSystem.iporToken()).balanceOf(
             _userTwo
         );
-        uint256 exchangeRateAfter = IPowerTokenInternalV2(_powerTokensSystem.powerToken())
+        uint256 exchangeRateAfter = IPowerTokenInternal(_powerTokensSystem.powerToken())
             .calculateExchangeRate();
 
         assertEq(

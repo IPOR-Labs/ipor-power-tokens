@@ -4,7 +4,7 @@ pragma solidity 0.8.17;
 interface IFlowsService {
     /// @notice Claims rewards for the caller by transferring them from the LiquidityMining contract to the PowerToken contract.
     /// @param lpTokens An array of LP tokens for which the rewards are to be claimed.
-    /// @dev This function calls the `claim` function of the `ILiquidityMiningV2` contract to retrieve the rewards amount to transfer.
+    /// @dev This function calls the `claim` function of the `ILiquidityMining` contract to retrieve the rewards amount to transfer.
     /// It then adds the staked tokens to the `powerToken` contract and transfers the rewards from the `liquidityMining` contract to the `powerToken` contract.
     /// @dev Reverts if the `lpTokens` array is empty.
     /// @dev Reverts if there are no rewards to claim.
@@ -13,7 +13,7 @@ interface IFlowsService {
     /// @notice Updates the indicators for a given account and LP tokens.
     /// @param account The account address for which the indicators are to be updated.
     /// @param lpTokens An array of LP tokens for which the indicators are to be updated.
-    /// @dev This function calls the `updateIndicators` function of the `ILiquidityMiningV2` contract to update the indicators.
+    /// @dev This function calls the `updateIndicators` function of the `ILiquidityMining` contract to update the indicators.
     /// @dev Reverts if the `lpTokens` array is empty.
     function updateIndicators(address account, address[] calldata lpTokens) external;
 

@@ -7,7 +7,7 @@ import "../PowerTokensTestsSystem.sol";
 import "../../contracts/interfaces/types/PowerTokenTypes.sol";
 import "../../contracts/interfaces/ILiquidityMiningLens.sol";
 import "../../contracts/interfaces/IPowerTokenLens.sol";
-import "../../contracts/tokens/PowerTokenInternalV2.sol";
+import "../../contracts/tokens/PowerTokenInternal.sol";
 
 contract LiquidityMiningUpdateIndicatorsTest is TestCommons {
     PowerTokensTestsSystem internal _powerTokensSystem;
@@ -27,9 +27,9 @@ contract LiquidityMiningUpdateIndicatorsTest is TestCommons {
         address iporToken = _powerTokensSystem.iporToken();
 
         vm.startPrank(_powerTokensSystem.owner());
-        ILiquidityMiningInternalV2(miningAddress).setRewardsPerBlock(lpDai, 1e8);
-        ILiquidityMiningInternalV2(miningAddress).setRewardsPerBlock(lpUsdc, 1e8);
-        ILiquidityMiningInternalV2(miningAddress).setRewardsPerBlock(lpUsdt, 1e8);
+        ILiquidityMiningInternal(miningAddress).setRewardsPerBlock(lpDai, 1e8);
+        ILiquidityMiningInternal(miningAddress).setRewardsPerBlock(lpUsdc, 1e8);
+        ILiquidityMiningInternal(miningAddress).setRewardsPerBlock(lpUsdt, 1e8);
         vm.stopPrank();
         vm.prank(_powerTokensSystem.dao());
         ERC20(iporToken).transfer(miningAddress, 10_000e18);

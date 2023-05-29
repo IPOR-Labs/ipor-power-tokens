@@ -3,8 +3,8 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "../interfaces/ILiquidityMiningV2.sol";
-import "../interfaces/IPowerTokenV2.sol";
+import "../interfaces/ILiquidityMining.sol";
+import "../interfaces/IPowerToken.sol";
 import "../interfaces/IStakeService.sol";
 import "../libraries/errors/Errors.sol";
 
@@ -61,7 +61,7 @@ contract StakeService is IStakeService {
             }
         }
 
-        ILiquidityMiningV2(LIQUIDITY_MINING_ADDRESS).addLpTokens(updateLpTokens);
+        ILiquidityMining(LIQUIDITY_MINING_ADDRESS).addLpTokens(updateLpTokens);
     }
 
     function unstakeLpTokens(
@@ -90,7 +90,7 @@ contract StakeService is IStakeService {
             }
         }
 
-        ILiquidityMiningV2(LIQUIDITY_MINING_ADDRESS).removeLpTokens(updateLpTokens);
+        ILiquidityMining(LIQUIDITY_MINING_ADDRESS).removeLpTokens(updateLpTokens);
 
         for (uint256 i; i != lpTokensLength; ) {
             IERC20(lpTokens[i]).safeTransferFrom(
@@ -108,7 +108,7 @@ contract StakeService is IStakeService {
         require(onBehalfOf != address(0), Errors.WRONG_ADDRESS);
         require(iporTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
-        IPowerTokenV2(POWER_TOKEN_ADDRESS).addStakedToken(
+        IPowerToken(POWER_TOKEN_ADDRESS).addStakedToken(
             PowerTokenTypes.UpdateStakedToken(onBehalfOf, iporTokenAmount)
         );
 
@@ -122,7 +122,7 @@ contract StakeService is IStakeService {
     function unstakeProtocolToken(address transferTo, uint256 iporTokenAmount) external {
         require(iporTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
-        uint256 stakedTokenAmountToTransfer = IPowerTokenV2(POWER_TOKEN_ADDRESS)
+        uint256 stakedTokenAmountToTransfer = IPowerToken(POWER_TOKEN_ADDRESS)
             .removeStakedTokenWithFee(
                 PowerTokenTypes.UpdateStakedToken(msg.sender, iporTokenAmount)
             );
@@ -136,15 +136,15 @@ contract StakeService is IStakeService {
 
     function cooldown(uint256 pwTokenAmount) external {
         require(pwTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
-        IPowerTokenV2(POWER_TOKEN_ADDRESS).cooldown(msg.sender, pwTokenAmount);
+        IPowerToken(POWER_TOKEN_ADDRESS).cooldown(msg.sender, pwTokenAmount);
     }
 
     function cancelCooldown() external {
-        IPowerTokenV2(POWER_TOKEN_ADDRESS).cancelCooldown(msg.sender);
+        IPowerToken(POWER_TOKEN_ADDRESS).cancelCooldown(msg.sender);
     }
 
     function redeem(address transferTo) external {
-        uint256 transferAmount = IPowerTokenV2(POWER_TOKEN_ADDRESS).redeem(msg.sender);
+        uint256 transferAmount = IPowerToken(POWER_TOKEN_ADDRESS).redeem(msg.sender);
         ///@dev We can transfer pwTokenAmount because it is in relation 1:1 to Staked Token
         IERC20(STAKED_TOKEN_ADDRESS).safeTransferFrom(
             POWER_TOKEN_ADDRESS,

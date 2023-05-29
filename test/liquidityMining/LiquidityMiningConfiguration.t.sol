@@ -7,7 +7,7 @@ import "../PowerTokensTestsSystem.sol";
 import "../../contracts/interfaces/types/PowerTokenTypes.sol";
 import "../../contracts/interfaces/ILiquidityMiningLens.sol";
 import "../../contracts/interfaces/IPowerTokenLens.sol";
-import "../../contracts/tokens/PowerTokenInternalV2.sol";
+import "../../contracts/tokens/PowerTokenInternal.sol";
 
 contract LiquidityMiningConfigurationTest is TestCommons {
     event LpTokenSupportRemoved(address account, address lpToken);
@@ -29,7 +29,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         address[] memory lpTokewns = new address[](0);
 
         // when
-        LiquidityMiningV2 implementation = new LiquidityMiningV2(_powerTokensSystem.dao());
+        LiquidityMining implementation = new LiquidityMining(_powerTokensSystem.dao());
         ERC1967Proxy proxy = new ERC1967Proxy(
             address(implementation),
             abi.encodeWithSignature("initialize(address[])", lpTokewns)
@@ -49,21 +49,15 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         // then
 
         assertTrue(
-            LiquidityMiningInternalV2(liquidityMining).isLpTokenSupported(
-                powerTokensSystem.lpDai()
-            ),
+            LiquidityMiningInternal(liquidityMining).isLpTokenSupported(powerTokensSystem.lpDai()),
             "should support lpDAI"
         );
         assertTrue(
-            LiquidityMiningInternalV2(liquidityMining).isLpTokenSupported(
-                powerTokensSystem.lpUsdc()
-            ),
+            LiquidityMiningInternal(liquidityMining).isLpTokenSupported(powerTokensSystem.lpUsdc()),
             "should support lpUSDC"
         );
         assertTrue(
-            LiquidityMiningInternalV2(liquidityMining).isLpTokenSupported(
-                powerTokensSystem.lpUsdt()
-            ),
+            LiquidityMiningInternal(liquidityMining).isLpTokenSupported(powerTokensSystem.lpUsdt()),
             "should support lpUSDT"
         );
     }
@@ -74,7 +68,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         lpTokewns[0] = _powerTokensSystem.lpDai();
 
         // when
-        LiquidityMiningV2 implementation = new LiquidityMiningV2(_powerTokensSystem.dao());
+        LiquidityMining implementation = new LiquidityMining(_powerTokensSystem.dao());
         ERC1967Proxy proxy = new ERC1967Proxy(
             address(implementation),
             abi.encodeWithSignature("initialize(address[])", lpTokewns)
@@ -84,9 +78,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
 
         assertTrue(address(proxy) != address(0), "Proxy address should not be zero");
         assertTrue(
-            LiquidityMiningInternalV2(address(proxy)).isLpTokenSupported(
-                _powerTokensSystem.lpDai()
-            ),
+            LiquidityMiningInternal(address(proxy)).isLpTokenSupported(_powerTokensSystem.lpDai()),
             "should support lpDAI"
         );
     }
@@ -97,16 +89,16 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         address owner = _powerTokensSystem.owner();
         address dai = _powerTokensSystem.dai();
 
-        bool isSupportedBefore = LiquidityMiningInternalV2(liquidityMining).isLpTokenSupported(dai);
+        bool isSupportedBefore = LiquidityMiningInternal(liquidityMining).isLpTokenSupported(dai);
 
         // when
         vm.prank(owner);
         vm.expectEmit(true, true, true, true);
         emit NewLpTokenSupported(owner, dai);
-        LiquidityMiningInternalV2(liquidityMining).newSupportedLpToken(dai);
+        LiquidityMiningInternal(liquidityMining).newSupportedLpToken(dai);
 
         // then
-        bool isSupportedAfter = LiquidityMiningInternalV2(liquidityMining).isLpTokenSupported(dai);
+        bool isSupportedAfter = LiquidityMiningInternal(liquidityMining).isLpTokenSupported(dai);
 
         assertTrue(!isSupportedBefore, "should not support DAI before");
         assertTrue(isSupportedAfter, "should support DAI after");
@@ -118,15 +110,15 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         address user = _getUserAddress(10);
         address dai = _powerTokensSystem.dai();
 
-        bool isSupportedBefore = LiquidityMiningInternalV2(liquidityMining).isLpTokenSupported(dai);
+        bool isSupportedBefore = LiquidityMiningInternal(liquidityMining).isLpTokenSupported(dai);
 
         // when
         vm.prank(user);
         vm.expectRevert(bytes("Ownable: caller is not the owner"));
-        LiquidityMiningInternalV2(liquidityMining).newSupportedLpToken(dai);
+        LiquidityMiningInternal(liquidityMining).newSupportedLpToken(dai);
 
         // then
-        bool isSupportedAfter = LiquidityMiningInternalV2(liquidityMining).isLpTokenSupported(dai);
+        bool isSupportedAfter = LiquidityMiningInternal(liquidityMining).isLpTokenSupported(dai);
 
         assertTrue(!isSupportedBefore, "should not support DAI before");
         assertTrue(!isSupportedAfter, "should not support DAI after");
@@ -184,7 +176,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
 
         // when
         vm.prank(owner);
-        LiquidityMiningInternalV2(liquidityMining).pause();
+        LiquidityMiningInternal(liquidityMining).pause();
 
         // then
         bool isPausedAfter = PausableUpgradeable(liquidityMining).paused();
@@ -202,13 +194,13 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         vm.prank(owner);
         vm.expectEmit(true, true, true, true);
         emit PauseManagerChanged(owner, owner, newPauseManager);
-        ILiquidityMiningInternalV2(liquidityMining).setPauseManager(newPauseManager);
+        ILiquidityMiningInternal(liquidityMining).setPauseManager(newPauseManager);
 
         bool isPausedBefore = PausableUpgradeable(liquidityMining).paused();
 
         // when
         vm.prank(newPauseManager);
-        LiquidityMiningInternalV2(liquidityMining).pause();
+        LiquidityMiningInternal(liquidityMining).pause();
 
         // then
         bool isPausedAfter = PausableUpgradeable(liquidityMining).paused();
@@ -224,14 +216,14 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         address newPauseManager = _getUserAddress(10);
 
         vm.prank(owner);
-        ILiquidityMiningInternalV2(liquidityMining).setPauseManager(newPauseManager);
+        ILiquidityMiningInternal(liquidityMining).setPauseManager(newPauseManager);
 
         bool isPausedBefore = PausableUpgradeable(liquidityMining).paused();
 
         // when
         vm.prank(owner);
         vm.expectRevert(bytes(Errors.CALLER_NOT_PAUSE_MANAGER));
-        LiquidityMiningInternalV2(liquidityMining).pause();
+        LiquidityMiningInternal(liquidityMining).pause();
 
         // then
         bool isPausedAfter = PausableUpgradeable(liquidityMining).paused();
@@ -246,13 +238,13 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         address owner = _powerTokensSystem.owner();
 
         vm.prank(owner);
-        LiquidityMiningInternalV2(liquidityMining).pause();
+        LiquidityMiningInternal(liquidityMining).pause();
 
         bool isPausedBefore = PausableUpgradeable(liquidityMining).paused();
 
         // when
         vm.prank(owner);
-        LiquidityMiningInternalV2(liquidityMining).unpause();
+        LiquidityMiningInternal(liquidityMining).unpause();
 
         // then
         bool isPausedAfter = PausableUpgradeable(liquidityMining).paused();
@@ -267,16 +259,16 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         address owner = _powerTokensSystem.owner();
         address newPauseManager = _getUserAddress(10);
         vm.prank(owner);
-        LiquidityMiningInternalV2(liquidityMining).pause();
+        LiquidityMiningInternal(liquidityMining).pause();
 
         vm.prank(owner);
-        ILiquidityMiningInternalV2(liquidityMining).setPauseManager(newPauseManager);
+        ILiquidityMiningInternal(liquidityMining).setPauseManager(newPauseManager);
 
         bool isPausedBefore = PausableUpgradeable(liquidityMining).paused();
 
         // when
         vm.prank(newPauseManager);
-        LiquidityMiningInternalV2(liquidityMining).unpause();
+        LiquidityMiningInternal(liquidityMining).unpause();
 
         // then
         bool isPausedAfter = PausableUpgradeable(liquidityMining).paused();
@@ -292,14 +284,14 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         address user = _getUserAddress(10);
 
         vm.prank(owner);
-        LiquidityMiningInternalV2(liquidityMining).pause();
+        LiquidityMiningInternal(liquidityMining).pause();
 
         bool isPausedBefore = PausableUpgradeable(liquidityMining).paused();
 
         // when
         vm.prank(user);
         vm.expectRevert(bytes(Errors.CALLER_NOT_PAUSE_MANAGER));
-        LiquidityMiningInternalV2(liquidityMining).unpause();
+        LiquidityMiningInternal(liquidityMining).unpause();
 
         // then
         bool isPausedAfter = PausableUpgradeable(liquidityMining).paused();
@@ -315,17 +307,17 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         address newPauseManager = _getUserAddress(10);
 
         vm.prank(owner);
-        LiquidityMiningInternalV2(liquidityMining).pause();
+        LiquidityMiningInternal(liquidityMining).pause();
 
         bool isPausedBefore = PausableUpgradeable(liquidityMining).paused();
 
         // when
         vm.prank(owner);
-        ILiquidityMiningInternalV2(liquidityMining).setPauseManager(newPauseManager);
+        ILiquidityMiningInternal(liquidityMining).setPauseManager(newPauseManager);
 
         vm.prank(owner);
         vm.expectRevert(bytes(Errors.CALLER_NOT_PAUSE_MANAGER));
-        LiquidityMiningInternalV2(liquidityMining).unpause();
+        LiquidityMiningInternal(liquidityMining).unpause();
 
         // then
         bool isPausedAfter = PausableUpgradeable(liquidityMining).paused();
@@ -371,7 +363,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
 
         // when
         vm.expectRevert(bytes(Errors.CALLER_NOT_ROUTER));
-        ILiquidityMiningV2(liquidityMining).addLpTokens(updateLpToken);
+        ILiquidityMining(liquidityMining).addLpTokens(updateLpToken);
     }
 
     function testShouldNotBeAbleToRemoveLpTokensWhenNotRouter() external {
@@ -386,7 +378,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
 
         // when
         vm.expectRevert(bytes(Errors.CALLER_NOT_ROUTER));
-        ILiquidityMiningV2(liquidityMining).removeLpTokens(updateLpToken);
+        ILiquidityMining(liquidityMining).removeLpTokens(updateLpToken);
     }
 
     function testShouldNotBeAbleToAddPwTokensWhenNotRouter() external {
@@ -401,7 +393,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
 
         // when
         vm.expectRevert(bytes(Errors.CALLER_NOT_ROUTER));
-        ILiquidityMiningV2(liquidityMining).addPwTokens(updateLpToken);
+        ILiquidityMining(liquidityMining).addPwTokens(updateLpToken);
     }
 
     function testShouldNotBeAbleToRemovePwTokensWhenNotRouter() external {
@@ -416,7 +408,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
 
         // when
         vm.expectRevert(bytes(Errors.CALLER_NOT_ROUTER));
-        ILiquidityMiningV2(liquidityMining).removePwTokens(updateLpToken);
+        ILiquidityMining(liquidityMining).removePwTokens(updateLpToken);
     }
 
     function testShouldNotBeAbleToDelegatePwTokenWhenContractIsPause() external {
@@ -433,7 +425,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         _powerTokensSystem.approveRouter(userOne);
 
         vm.prank(owner);
-        LiquidityMiningInternalV2(liquidityMining).pause();
+        LiquidityMiningInternal(liquidityMining).pause();
 
         vm.prank(userOne);
         IStakeService(router).stakeProtocolToken(userOne, 1_000e18);

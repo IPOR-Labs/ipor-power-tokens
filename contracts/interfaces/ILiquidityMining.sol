@@ -7,7 +7,7 @@ import "./types/LiquidityMiningTypes.sol";
 /// LiquidityMining is responsible for the distribution of the Power Token rewards to accounts
 /// staking lpTokens and / or delegating Power Tokens to LiquidityMining. LpTokens can be staked directly to the LiquidityMining,
 /// Power Tokens are a staked version of the [Staked] Tokens minted by the PowerToken smart contract.
-interface ILiquidityMiningV2 {
+interface ILiquidityMining {
     /// @notice Contract ID. The keccak-256 hash of "io.ipor.LiquidityMining" decreased by 1
     /// @return Returns an ID of the contract
     function getContractId() external pure returns (bytes32);

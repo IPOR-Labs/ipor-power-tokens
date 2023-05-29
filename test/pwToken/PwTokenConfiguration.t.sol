@@ -4,7 +4,7 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../TestCommons.sol";
 import "../PowerTokensTestsSystem.sol";
-import "../../contracts/interfaces/IPowerTokenInternalV2.sol";
+import "../../contracts/interfaces/IPowerTokenInternal.sol";
 
 contract PwTokenConfigurationTest is TestCommons {
     PowerTokensTestsSystem internal _powerTokensSystem;
@@ -22,7 +22,7 @@ contract PwTokenConfigurationTest is TestCommons {
         assertTrue(powerToken != address(0), "PowerToken address should not be zero");
         assertEq(
             "Power IPOR",
-            PowerTokenV2(powerToken).name(),
+            PowerToken(powerToken).name(),
             "PowerToken name should be Power IPOR"
         );
         assertEq(
@@ -30,13 +30,13 @@ contract PwTokenConfigurationTest is TestCommons {
             PowerTokenLens(router).powerTokenName(),
             "PowerToken name should be Power IPOR"
         );
-        assertEq("pwIPOR", PowerTokenV2(powerToken).symbol(), "PowerToken symbol should be pwIPOR");
+        assertEq("pwIPOR", PowerToken(powerToken).symbol(), "PowerToken symbol should be pwIPOR");
         assertEq(
             "pwIPOR",
             PowerTokenLens(router).powerTokenSymbol(),
             "PowerToken symbol should be pwIPOR"
         );
-        assertEq(18, PowerTokenV2(powerToken).decimals(), "PowerToken decimals should be 18");
+        assertEq(18, PowerToken(powerToken).decimals(), "PowerToken decimals should be 18");
         assertEq(
             18,
             PowerTokenLens(router).powerTokenDecimals(),
@@ -44,7 +44,7 @@ contract PwTokenConfigurationTest is TestCommons {
         );
         assertEq(
             1e18,
-            IPowerTokenInternalV2(powerToken).calculateExchangeRate(),
+            IPowerTokenInternal(powerToken).calculateExchangeRate(),
             "Exchange rate should be 1"
         );
     }
@@ -110,7 +110,7 @@ contract PwTokenConfigurationTest is TestCommons {
 
         // when
         vm.prank(owner);
-        PowerTokenInternalV2(powerToken).pause();
+        PowerTokenInternal(powerToken).pause();
 
         // then
         assertTrue(
@@ -127,11 +127,11 @@ contract PwTokenConfigurationTest is TestCommons {
         bool pausedBefore = PausableUpgradeable(powerToken).paused();
 
         vm.prank(owner);
-        IPowerTokenInternalV2(powerToken).setPauseManager(user2);
+        IPowerTokenInternal(powerToken).setPauseManager(user2);
 
         // when
         vm.prank(user2);
-        PowerTokenInternalV2(powerToken).pause();
+        PowerTokenInternal(powerToken).pause();
 
         // then
         assertTrue(
@@ -140,7 +140,7 @@ contract PwTokenConfigurationTest is TestCommons {
         );
         assertEq(
             user2,
-            IPowerTokenInternalV2(powerToken).getPauseManager(),
+            IPowerTokenInternal(powerToken).getPauseManager(),
             "Pause manager should be user2"
         );
     }
@@ -154,7 +154,7 @@ contract PwTokenConfigurationTest is TestCommons {
         // when
         vm.prank(user2);
         vm.expectRevert(bytes(Errors.CALLER_NOT_PAUSE_MANAGER));
-        PowerTokenInternalV2(powerToken).pause();
+        PowerTokenInternal(powerToken).pause();
 
         // then
         assertTrue(
@@ -169,12 +169,12 @@ contract PwTokenConfigurationTest is TestCommons {
         address powerToken = _powerTokensSystem.powerToken();
 
         vm.prank(owner);
-        PowerTokenInternalV2(powerToken).pause();
+        PowerTokenInternal(powerToken).pause();
         bool pausedBefore = PausableUpgradeable(powerToken).paused();
 
         // when
         vm.prank(owner);
-        PowerTokenInternalV2(powerToken).unpause();
+        PowerTokenInternal(powerToken).unpause();
 
         // then
         assertTrue(
@@ -190,13 +190,13 @@ contract PwTokenConfigurationTest is TestCommons {
         address powerToken = _powerTokensSystem.powerToken();
 
         vm.prank(owner);
-        PowerTokenInternalV2(powerToken).pause();
+        PowerTokenInternal(powerToken).pause();
         bool pausedBefore = PausableUpgradeable(powerToken).paused();
 
         // when
         vm.prank(user2);
         vm.expectRevert(bytes(Errors.CALLER_NOT_PAUSE_MANAGER));
-        PowerTokenInternalV2(powerToken).unpause();
+        PowerTokenInternal(powerToken).unpause();
 
         // then
         assertTrue(
@@ -212,16 +212,16 @@ contract PwTokenConfigurationTest is TestCommons {
         address powerToken = _powerTokensSystem.powerToken();
 
         vm.prank(owner);
-        PowerTokenInternalV2(powerToken).pause();
+        PowerTokenInternal(powerToken).pause();
         bool pausedBefore = PausableUpgradeable(powerToken).paused();
 
         vm.prank(owner);
-        IPowerTokenInternalV2(powerToken).setPauseManager(user2);
+        IPowerTokenInternal(powerToken).setPauseManager(user2);
 
         // when
         vm.prank(owner);
         vm.expectRevert(bytes(Errors.CALLER_NOT_PAUSE_MANAGER));
-        PowerTokenInternalV2(powerToken).unpause();
+        PowerTokenInternal(powerToken).unpause();
 
         // then
         assertTrue(
@@ -230,7 +230,7 @@ contract PwTokenConfigurationTest is TestCommons {
         );
         assertEq(
             user2,
-            IPowerTokenInternalV2(powerToken).getPauseManager(),
+            IPowerTokenInternal(powerToken).getPauseManager(),
             "Pause manager should be user2"
         );
     }
@@ -245,7 +245,7 @@ contract PwTokenConfigurationTest is TestCommons {
 
         // when
         vm.prank(owner);
-        IPowerTokenInternalV2(powerToken).revokeAllowanceForRouter(iporToken);
+        IPowerTokenInternal(powerToken).revokeAllowanceForRouter(iporToken);
 
         // then
         assertEq(0, IERC20(iporToken).allowance(powerToken, router), "Allowance should be 0");

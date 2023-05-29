@@ -3,7 +3,7 @@ pragma solidity 0.8.17;
 
 import "../TestCommons.sol";
 import "../PowerTokensTestsSystem.sol";
-import "../../contracts/interfaces/ILiquidityMiningV2.sol";
+import "../../contracts/interfaces/ILiquidityMining.sol";
 
 contract StakeLpTokensTest is TestCommons {
     event LpTokenAdded(address onBehalfOf, address lpToken, uint256 lpTokenAmount);
@@ -126,7 +126,7 @@ contract StakeLpTokensTest is TestCommons {
         address liquidityMining = _powerTokensSystem.liquidityMining();
 
         vm.prank(_powerTokensSystem.owner());
-        ILiquidityMiningInternalV2(liquidityMining).phasingOutLpToken(_activeLpToken);
+        ILiquidityMiningInternal(liquidityMining).phasingOutLpToken(_activeLpToken);
 
         // WHEN
         vm.expectRevert(bytes(Errors.LP_TOKEN_NOT_SUPPORTED));
@@ -159,7 +159,7 @@ contract StakeLpTokensTest is TestCommons {
         address liquidityMining = _powerTokensSystem.liquidityMining();
 
         vm.prank(_powerTokensSystem.owner());
-        ILiquidityMiningInternalV2(liquidityMining).pause();
+        ILiquidityMiningInternal(liquidityMining).pause();
 
         // WHEN
         vm.expectRevert(bytes("Pausable: paused"));
