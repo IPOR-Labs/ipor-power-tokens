@@ -3,10 +3,10 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "../interfaces/IStakeService.sol";
-import "../libraries/errors/Errors.sol";
 import "../interfaces/ILiquidityMiningV2.sol";
 import "../interfaces/IPowerTokenV2.sol";
+import "../interfaces/IStakeService.sol";
+import "../libraries/errors/Errors.sol";
 
 contract StakeService is IStakeService {
     using SafeERC20 for IERC20;
@@ -25,9 +25,6 @@ contract StakeService is IStakeService {
         STAKED_TOKEN_ADDRESS = stakedTokenAddress;
     }
 
-    /// @notice Stakes the lpToken amount into the LiquidityMining.
-    /// @param lpTokens addresses of the lpToken
-    /// @param lpTokenAmounts for lpTokens staked, represented with 18 decimals
     function stakeLpTokens(
         address onBehalfOf,
         address[] calldata lpTokens,
@@ -39,13 +36,14 @@ contract StakeService is IStakeService {
         require(onBehalfOf != address(0), Errors.WRONG_ADDRESS);
         LiquidityMiningTypes.UpdateLpToken[]
             memory updateLpTokens = new LiquidityMiningTypes.UpdateLpToken[](lpTokensLength);
+
+        uint256 senderBalance;
+        uint256 transferAmount;
         for (uint256 i; i != lpTokensLength; ) {
             require(lpTokens[i] != address(0), Errors.WRONG_ADDRESS);
             require(lpTokenAmounts[i] > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
-            uint256 senderBalance = IERC20(lpTokens[i]).balanceOf(msg.sender);
-            uint256 transferAmount = senderBalance < lpTokenAmounts[i]
-                ? senderBalance
-                : lpTokenAmounts[i];
+            senderBalance = IERC20(lpTokens[i]).balanceOf(msg.sender);
+            transferAmount = senderBalance < lpTokenAmounts[i] ? senderBalance : lpTokenAmounts[i];
 
             IERC20(lpTokens[i]).safeTransferFrom(
                 msg.sender,

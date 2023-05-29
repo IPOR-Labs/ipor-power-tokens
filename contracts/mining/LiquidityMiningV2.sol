@@ -51,9 +51,11 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
         uint256 lpTokensLength = lpTokens.length;
         LiquidityMiningTypes.AccruedRewardsResult[]
             memory rewards = new LiquidityMiningTypes.AccruedRewardsResult[](lpTokensLength);
+        LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators;
+        uint256 reward;
+
         for (uint256 i; i != lpTokensLength; ++i) {
-            LiquidityMiningTypes.GlobalRewardsIndicators
-                memory globalIndicators = _globalIndicators[lpTokens[i]];
+            globalIndicators = _globalIndicators[lpTokens[i]];
             if (globalIndicators.aggregatedPowerUp == 0) {
                 rewards[i] = LiquidityMiningTypes.AccruedRewardsResult(
                     lpTokens[i],
@@ -61,7 +63,7 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
                 );
             }
 
-            uint256 reward = MiningCalculation.calculateAccruedRewards(
+            reward = MiningCalculation.calculateAccruedRewards(
                 block.number,
                 globalIndicators.blockNumber,
                 globalIndicators.rewardsPerBlock,
@@ -81,15 +83,14 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
         uint256 lpTokensLength = lpTokens.length;
         LiquidityMiningTypes.AccountRewardResult[]
             memory rewards = new LiquidityMiningTypes.AccountRewardResult[](lpTokensLength);
+        LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators;
+        LiquidityMiningTypes.AccountRewardsIndicators memory accountIndicators;
+        uint256 rewardsAmount;
+
         for (uint256 i; i != lpTokensLength; ) {
-            LiquidityMiningTypes.GlobalRewardsIndicators
-                memory globalIndicators = _globalIndicators[lpTokens[i]];
-            LiquidityMiningTypes.AccountRewardsIndicators
-                memory accountIndicators = _accountIndicators[account][lpTokens[i]];
-            (uint256 rewardsAmount, ) = _calculateAccountRewards(
-                globalIndicators,
-                accountIndicators
-            );
+            globalIndicators = _globalIndicators[lpTokens[i]];
+            accountIndicators = _accountIndicators[account][lpTokens[i]];
+            (rewardsAmount, ) = _calculateAccountRewards(globalIndicators, accountIndicators);
             rewards[i] = LiquidityMiningTypes.AccountRewardResult(
                 lpTokens[i],
                 rewardsAmount,
@@ -109,23 +110,27 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
         whenNotPaused
     {
         require(account != address(0), Errors.WRONG_ADDRESS);
+        LiquidityMiningTypes.AccountRewardsIndicators memory accountIndicators;
+        LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators;
         uint256 lpTokensLength = lpTokens.length;
         uint256 rewardsAmountToTransfer;
+        address lpToken;
+        uint256 rewardsAmount;
+        uint256 accruedCompMultiplierCumulativePrevBlock;
+
         for (uint256 i; i != lpTokensLength; ++i) {
-            address lpToken = lpTokens[i];
-            LiquidityMiningTypes.AccountRewardsIndicators
-                memory accountIndicators = _accountIndicators[account][lpToken];
-            LiquidityMiningTypes.GlobalRewardsIndicators
-                memory globalIndicators = _globalIndicators[lpToken];
+            lpToken = lpTokens[i];
+            accountIndicators = _accountIndicators[account][lpToken];
+            globalIndicators = _globalIndicators[lpToken];
 
             if (accountIndicators.lpTokenBalance == 0) {
                 continue;
             }
 
-            (
-                uint256 rewardsAmount,
-                uint256 accruedCompMultiplierCumulativePrevBlock
-            ) = _calculateAccountRewards(globalIndicators, accountIndicators);
+            (rewardsAmount, accruedCompMultiplierCumulativePrevBlock) = _calculateAccountRewards(
+                globalIndicators,
+                accountIndicators
+            );
             rewardsAmountToTransfer += rewardsAmount;
             _rebalanceIndicators(
                 account,
@@ -151,17 +156,21 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
         returns (uint256 rewardsAmountToTransfer)
     {
         uint256 lpTokensLength = lpTokens.length;
-        for (uint256 i; i != lpTokensLength; ) {
-            address lpToken = lpTokens[i];
-            LiquidityMiningTypes.AccountRewardsIndicators
-                memory accountIndicators = _accountIndicators[account][lpToken];
-            LiquidityMiningTypes.GlobalRewardsIndicators
-                memory globalIndicators = _globalIndicators[lpToken];
+        address lpToken;
+        uint256 rewardsAmount;
+        uint256 accruedCompMultiplierCumulativePrevBlock;
+        LiquidityMiningTypes.AccountRewardsIndicators memory accountIndicators;
+        LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators;
 
-            (
-                uint256 rewardsAmount,
-                uint256 accruedCompMultiplierCumulativePrevBlock
-            ) = _calculateAccountRewards(globalIndicators, accountIndicators);
+        for (uint256 i; i != lpTokensLength; ) {
+            lpToken = lpTokens[i];
+            accountIndicators = _accountIndicators[account][lpToken];
+            globalIndicators = _globalIndicators[lpToken];
+
+            (rewardsAmount, accruedCompMultiplierCumulativePrevBlock) = _calculateAccountRewards(
+                globalIndicators,
+                accountIndicators
+            );
 
             if (rewardsAmount > 0) {
                 _accountIndicators[account][lpToken] = LiquidityMiningTypes
@@ -178,6 +187,7 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
                 ++i;
             }
         }
+
         uint256 allocatedRewards = _allocatedPwTokens[account];
         if (allocatedRewards > 0) {
             _allocatedPwTokens[account] = 0;
@@ -194,20 +204,24 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
         whenNotPaused
     {
         uint256 length = updateLpToken.length;
+        uint256 rewardsAmount;
+        uint256 accruedCompMultiplierCumulativePrevBlock;
         LiquidityMiningTypes.AccountRewardsIndicators memory accountIndicators;
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators;
+        LiquidityMiningTypes.UpdateLpToken memory update;
+
         for (uint256 i; i != length; ) {
-            LiquidityMiningTypes.UpdateLpToken memory update = updateLpToken[i];
+            update = updateLpToken[i];
             require(update.lpTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
             require(_lpTokens[update.lpToken], Errors.LP_TOKEN_NOT_SUPPORTED);
 
             accountIndicators = _accountIndicators[update.onBehalfOf][update.lpToken];
             globalIndicators = _globalIndicators[update.lpToken];
 
-            (
-                uint256 rewardsAmount,
-                uint256 accruedCompMultiplierCumulativePrevBlock
-            ) = _calculateAccountRewards(globalIndicators, accountIndicators);
+            (rewardsAmount, accruedCompMultiplierCumulativePrevBlock) = _calculateAccountRewards(
+                globalIndicators,
+                accountIndicators
+            );
 
             _rebalanceIndicators(
                 update.onBehalfOf,
@@ -239,9 +253,9 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
         uint256 accruedCompMultiplierCumulativePrevBlock;
         LiquidityMiningTypes.AccountRewardsIndicators memory accountIndicators;
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators;
-
+        LiquidityMiningTypes.UpdatePwToken memory update;
         for (uint256 i; i != lpTokensLength; ) {
-            LiquidityMiningTypes.UpdatePwToken memory update = updatePwTokens[i];
+            update = updatePwTokens[i];
             require(_lpTokens[update.lpToken], Errors.LP_TOKEN_NOT_SUPPORTED);
 
             accountIndicators = _accountIndicators[update.onBehalfOf][update.lpToken];
@@ -298,9 +312,10 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
         uint256 accruedCompMultiplierCumulativePrevBlock;
         LiquidityMiningTypes.AccountRewardsIndicators memory accountIndicators;
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators;
+        LiquidityMiningTypes.UpdatePwToken memory update;
 
         for (uint256 i; i != length; ) {
-            LiquidityMiningTypes.UpdatePwToken memory update = updatePwTokens[i];
+            update = updatePwTokens[i];
             require(_lpTokens[update.lpToken], Errors.LP_TOKEN_NOT_SUPPORTED);
 
             accountIndicators = _accountIndicators[update.onBehalfOf][update.lpToken];
@@ -347,24 +362,28 @@ contract LiquidityMiningV2 is ILiquidityMiningV2, LiquidityMiningInternalV2 {
         whenNotPaused
     {
         uint256 length = updateLpToken.length;
+        uint256 rewardsAmount;
+        uint256 accruedCompMultiplierCumulativePrevBlock;
+        LiquidityMiningTypes.UpdateLpToken memory update;
+        LiquidityMiningTypes.AccountRewardsIndicators memory accountIndicators;
+        LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators;
+
         for (uint256 i; i != length; ) {
-            LiquidityMiningTypes.UpdateLpToken memory update = updateLpToken[i];
+            update = updateLpToken[i];
             require(update.lpTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
-            LiquidityMiningTypes.AccountRewardsIndicators
-                memory accountIndicators = _accountIndicators[update.onBehalfOf][update.lpToken];
-            LiquidityMiningTypes.GlobalRewardsIndicators
-                memory globalIndicators = _globalIndicators[update.lpToken];
+            accountIndicators = _accountIndicators[update.onBehalfOf][update.lpToken];
+            globalIndicators = _globalIndicators[update.lpToken];
 
             require(
                 accountIndicators.lpTokenBalance >= update.lpTokenAmount,
                 Errors.ACCOUNT_LP_TOKEN_BALANCE_IS_TOO_LOW
             );
 
-            (
-                uint256 rewardsAmount,
-                uint256 accruedCompMultiplierCumulativePrevBlock
-            ) = _calculateAccountRewards(globalIndicators, accountIndicators);
+            (rewardsAmount, accruedCompMultiplierCumulativePrevBlock) = _calculateAccountRewards(
+                globalIndicators,
+                accountIndicators
+            );
 
             _rebalanceIndicators(
                 update.onBehalfOf,
