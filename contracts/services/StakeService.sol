@@ -11,18 +11,30 @@ import "../libraries/errors/Errors.sol";
 contract StakeService is IStakeService {
     using SafeERC20 for IERC20;
 
-    address public immutable LIQUIDITY_MINING_ADDRESS;
-    address public immutable POWER_TOKEN_ADDRESS;
-    address public immutable STAKED_TOKEN_ADDRESS;
+    address public immutable LIQUIDITY_MINING;
+    address public immutable POWER_TOKEN;
+    address public immutable STAKED_TOKEN;
 
     constructor(
         address liquidityMiningAddress,
         address powerTokenAddress,
         address stakedTokenAddress
     ) {
-        LIQUIDITY_MINING_ADDRESS = liquidityMiningAddress;
-        POWER_TOKEN_ADDRESS = powerTokenAddress;
-        STAKED_TOKEN_ADDRESS = stakedTokenAddress;
+        require(
+            liquidityMiningAddress != address(0),
+            string.concat(Errors.WRONG_ADDRESS, " liquidityMiningAddress")
+        );
+        require(
+            stakedTokenAddress != address(0),
+            string.concat(Errors.WRONG_ADDRESS, " stakedTokenAddress")
+        );
+        require(
+            powerTokenAddress != address(0),
+            string.concat(Errors.WRONG_ADDRESS, " powerTokenAddress")
+        );
+        LIQUIDITY_MINING = liquidityMiningAddress;
+        POWER_TOKEN = powerTokenAddress;
+        STAKED_TOKEN = stakedTokenAddress;
     }
 
     function stakeLpTokens(
@@ -45,11 +57,7 @@ contract StakeService is IStakeService {
             senderBalance = IERC20(lpTokens[i]).balanceOf(msg.sender);
             transferAmount = senderBalance < lpTokenAmounts[i] ? senderBalance : lpTokenAmounts[i];
 
-            IERC20(lpTokens[i]).safeTransferFrom(
-                msg.sender,
-                LIQUIDITY_MINING_ADDRESS,
-                transferAmount
-            );
+            IERC20(lpTokens[i]).safeTransferFrom(msg.sender, LIQUIDITY_MINING, transferAmount);
             updateLpTokens[i] = LiquidityMiningTypes.UpdateLpToken(
                 onBehalfOf,
                 lpTokens[i],
@@ -61,7 +69,7 @@ contract StakeService is IStakeService {
             }
         }
 
-        ILiquidityMining(LIQUIDITY_MINING_ADDRESS).addLpTokens(updateLpTokens);
+        ILiquidityMining(LIQUIDITY_MINING).addLpTokens(updateLpTokens);
     }
 
     function unstakeLpTokens(
@@ -90,14 +98,10 @@ contract StakeService is IStakeService {
             }
         }
 
-        ILiquidityMining(LIQUIDITY_MINING_ADDRESS).removeLpTokens(updateLpTokens);
+        ILiquidityMining(LIQUIDITY_MINING).removeLpTokens(updateLpTokens);
 
         for (uint256 i; i != lpTokensLength; ) {
-            IERC20(lpTokens[i]).safeTransferFrom(
-                LIQUIDITY_MINING_ADDRESS,
-                transferTo,
-                lpTokenAmounts[i]
-            );
+            IERC20(lpTokens[i]).safeTransferFrom(LIQUIDITY_MINING, transferTo, lpTokenAmounts[i]);
             unchecked {
                 ++i;
             }
@@ -108,48 +112,47 @@ contract StakeService is IStakeService {
         require(onBehalfOf != address(0), Errors.WRONG_ADDRESS);
         require(iporTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
-        IPowerToken(POWER_TOKEN_ADDRESS).addStakedToken(
+        IPowerToken(POWER_TOKEN).addStakedToken(
             PowerTokenTypes.UpdateStakedToken(onBehalfOf, iporTokenAmount)
         );
 
-        IERC20(STAKED_TOKEN_ADDRESS).safeTransferFrom(
-            msg.sender,
-            POWER_TOKEN_ADDRESS,
-            iporTokenAmount
-        );
+        IERC20(STAKED_TOKEN).safeTransferFrom(msg.sender, POWER_TOKEN, iporTokenAmount);
     }
 
     function unstakeProtocolToken(address transferTo, uint256 iporTokenAmount) external {
         require(iporTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
-        uint256 stakedTokenAmountToTransfer = IPowerToken(POWER_TOKEN_ADDRESS)
-            .removeStakedTokenWithFee(
-                PowerTokenTypes.UpdateStakedToken(msg.sender, iporTokenAmount)
-            );
-
-        IERC20(STAKED_TOKEN_ADDRESS).safeTransferFrom(
-            POWER_TOKEN_ADDRESS,
-            transferTo,
-            stakedTokenAmountToTransfer
+        uint256 stakedTokenAmountToTransfer = IPowerToken(POWER_TOKEN).removeStakedTokenWithFee(
+            PowerTokenTypes.UpdateStakedToken(msg.sender, iporTokenAmount)
         );
+
+        IERC20(STAKED_TOKEN).safeTransferFrom(POWER_TOKEN, transferTo, stakedTokenAmountToTransfer);
     }
 
     function cooldown(uint256 pwTokenAmount) external {
         require(pwTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
-        IPowerToken(POWER_TOKEN_ADDRESS).cooldown(msg.sender, pwTokenAmount);
+        IPowerToken(POWER_TOKEN).cooldown(msg.sender, pwTokenAmount);
     }
 
     function cancelCooldown() external {
-        IPowerToken(POWER_TOKEN_ADDRESS).cancelCooldown(msg.sender);
+        IPowerToken(POWER_TOKEN).cancelCooldown(msg.sender);
     }
 
     function redeem(address transferTo) external {
-        uint256 transferAmount = IPowerToken(POWER_TOKEN_ADDRESS).redeem(msg.sender);
+        uint256 transferAmount = IPowerToken(POWER_TOKEN).redeem(msg.sender);
         ///@dev We can transfer pwTokenAmount because it is in relation 1:1 to Staked Token
-        IERC20(STAKED_TOKEN_ADDRESS).safeTransferFrom(
-            POWER_TOKEN_ADDRESS,
-            transferTo,
-            transferAmount
-        );
+        IERC20(STAKED_TOKEN).safeTransferFrom(POWER_TOKEN, transferTo, transferAmount);
+    }
+
+    function getConfiguration()
+        external
+        view
+        returns (
+            address liquidityMiningAddress,
+            address powerTokenAddress,
+            address stakedTokenAddress
+        )
+    {
+        return (LIQUIDITY_MINING, POWER_TOKEN, STAKED_TOKEN);
     }
 }

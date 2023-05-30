@@ -3,7 +3,7 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "../TestCommons.sol";
-import "../../contracts/libraries/math/MiningCalculation.sol";
+import "contracts/libraries/math/MiningCalculation.sol";
 
 contract MiningCalculationTest is TestCommons {
     struct TestData {

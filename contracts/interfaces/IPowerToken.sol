@@ -98,7 +98,7 @@ interface IPowerToken {
     /// @param pwTokenAmount The amount of Power Tokens to delegate.
     function delegate(address account, uint256 pwTokenAmount) external;
 
-    /// @notice Undelegates a specified amount of Power Tokens from the Liquidity Mining contract back to the caller's balance.
+    /// @notice Undelegated a specified amount of Power Tokens from the Liquidity Mining contract back to the caller's balance.
     /// @dev This function allows the caller to undelegate a specified amount of Power Tokens from the Liquidity Mining contract,
     ///      effectively removing them from participation in liquidity mining and stopping the earning of rewards.
     /// @param account The address of the account to undelegate the Power Tokens from.

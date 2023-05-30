@@ -9,6 +9,7 @@ import "../interfaces/ILiquidityMiningLens.sol";
 import "../interfaces/IPowerTokenLens.sol";
 import "../interfaces/IStakeService.sol";
 import "../interfaces/IFlowsService.sol";
+import "../security/StorageLib.sol";
 
 contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
     address public immutable LIQUIDITY_MINING_ADDRESS;
@@ -65,8 +66,9 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
 
     function initialize(uint256 paused) external initializer {
         __UUPSUpgradeable_init();
-        _owner = msg.sender;
-        _paused = paused;
+        StorageLib.getOwner().value = msg.sender;
+        PauseManager.addPauseGuardian(msg.sender);
+        StorageLib.getPaused().value = paused;
     }
 
     /// @notice Determines the implementation address based on the provided function signature.
@@ -83,9 +85,9 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
             sig == IStakeService.cancelCooldown.selector ||
             sig == IStakeService.redeem.selector
         ) {
-            whenNotPaused();
-            nonReentrant();
-            _reentrancyStatus = _ENTERED;
+            _whenNotPaused();
+            _nonReentrant();
+            _enterReentrancy();
             return STAKE_SERVICE;
         }
         if (
@@ -94,9 +96,9 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
             sig == IFlowsService.undelegate.selector ||
             sig == IFlowsService.claim.selector
         ) {
-            whenNotPaused();
-            nonReentrant();
-            _reentrancyStatus = _ENTERED;
+            _whenNotPaused();
+            _nonReentrant();
+            _enterReentrancy();
             return FLOWS_SERVICE;
         }
 
@@ -157,8 +159,8 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
             returndatacopy(0, 0, returndatasize())
         }
         //todo: convert into assembly
-        if (_reentrancyStatus == _ENTERED) {
-            _reentrancyStatus = _NOT_ENTERED;
+        if (uint256(StorageLib.getReentrancyStatus().value) == _ENTERED) {
+            _leaveReentrancy();
         }
         assembly {
             switch result
@@ -181,8 +183,8 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
             bytes4 sig = bytes4(calls[i][:4]);
             address implementation = getRouterImplementation(sig);
             implementation.functionDelegateCall(calls[i]);
-            if (_reentrancyStatus == _ENTERED) {
-                _reentrancyStatus = _NOT_ENTERED;
+            if (uint256(StorageLib.getReentrancyStatus().value) == _ENTERED) {
+                _leaveReentrancy();
             }
             unchecked {
                 ++i;
@@ -193,7 +195,7 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
     /// @notice Retrieves the addresses of the deployed contracts.
     /// @dev Returns a `DeployedContracts` struct containing the addresses of the deployed contracts.
     /// @return A `DeployedContracts` struct containing the addresses of the deployed contracts.
-    function getImplementations() external view returns (DeployedContracts memory) {
+    function getConfiguration() external view returns (DeployedContracts memory) {
         return
             DeployedContracts(
                 LIQUIDITY_MINING_ADDRESS,

@@ -10,9 +10,9 @@ import "../libraries/errors/Errors.sol";
 
 contract FlowsService is IFlowsService {
     using SafeERC20 for IERC20;
-    address public immutable liquidityMining;
-    address public immutable powerToken;
-    address public immutable stakedToken;
+    address public immutable LIQUIDITY_MINING;
+    address public immutable POWER_TOKEN;
+    address public immutable STAKED_TOKEN;
 
     constructor(
         address liquidityMiningAddress,
@@ -31,27 +31,31 @@ contract FlowsService is IFlowsService {
             powerTokenAddress != address(0),
             string.concat(Errors.WRONG_ADDRESS, " powerTokenAddress")
         );
-        liquidityMining = liquidityMiningAddress;
-        stakedToken = stakedTokenAddress;
-        powerToken = powerTokenAddress;
+        LIQUIDITY_MINING = liquidityMiningAddress;
+        STAKED_TOKEN = stakedTokenAddress;
+        POWER_TOKEN = powerTokenAddress;
     }
 
     function claim(address[] calldata lpTokens) external {
         require(lpTokens.length > 0, Errors.INPUT_ARRAYS_EMPTY);
-        uint256 rewardsAmountToTransfer = ILiquidityMining(liquidityMining).claim(
+        uint256 rewardsAmountToTransfer = ILiquidityMining(LIQUIDITY_MINING).claim(
             msg.sender,
             lpTokens
         );
         require(rewardsAmountToTransfer > 0, Errors.NO_REWARDS_TO_CLAIM);
-        IPowerToken(powerToken).addStakedToken(
+        IPowerToken(POWER_TOKEN).addStakedToken(
             PowerTokenTypes.UpdateStakedToken(msg.sender, rewardsAmountToTransfer)
         );
-        IERC20(stakedToken).safeTransferFrom(liquidityMining, powerToken, rewardsAmountToTransfer);
+        IERC20(STAKED_TOKEN).safeTransferFrom(
+            LIQUIDITY_MINING,
+            POWER_TOKEN,
+            rewardsAmountToTransfer
+        );
     }
 
     function updateIndicators(address account, address[] calldata lpTokens) external {
         require(lpTokens.length > 0, Errors.INPUT_ARRAYS_EMPTY);
-        ILiquidityMining(liquidityMining).updateIndicators(account, lpTokens);
+        ILiquidityMining(LIQUIDITY_MINING).updateIndicators(account, lpTokens);
     }
 
     function delegate(address[] calldata lpTokens, uint256[] calldata pwTokenAmounts) external {
@@ -73,8 +77,8 @@ contract FlowsService is IFlowsService {
                 ++i;
             }
         }
-        IPowerToken(powerToken).delegate(account, totalStakedTokenAmount);
-        ILiquidityMining(liquidityMining).addPwTokens(updatePwTokens);
+        IPowerToken(POWER_TOKEN).delegate(account, totalStakedTokenAmount);
+        ILiquidityMining(LIQUIDITY_MINING).addPwTokens(updatePwTokens);
     }
 
     function undelegate(address[] calldata lpTokens, uint256[] calldata pwTokenAmounts) external {
@@ -97,7 +101,19 @@ contract FlowsService is IFlowsService {
             }
         }
         require(totalStakedTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
-        ILiquidityMining(liquidityMining).removePwTokens(updatePwTokens);
-        IPowerToken(powerToken).undelegate(account, totalStakedTokenAmount);
+        ILiquidityMining(LIQUIDITY_MINING).removePwTokens(updatePwTokens);
+        IPowerToken(POWER_TOKEN).undelegate(account, totalStakedTokenAmount);
+    }
+
+    function getConfiguration()
+        external
+        view
+        returns (
+            address liquidityMiningAddress,
+            address powerTokenAddress,
+            address stakedTokenAddress
+        )
+    {
+        return (LIQUIDITY_MINING, POWER_TOKEN, STAKED_TOKEN);
     }
 }
