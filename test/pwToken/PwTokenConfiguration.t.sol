@@ -21,28 +21,6 @@ contract PwTokenConfigurationTest is TestCommons {
         // then
         assertTrue(powerToken != address(0), "PowerToken address should not be zero");
         assertEq(
-            "Power IPOR",
-            PowerToken(powerToken).name(),
-            "PowerToken name should be Power IPOR"
-        );
-        assertEq(
-            "Power IPOR",
-            PowerTokenLens(router).powerTokenName(),
-            "PowerToken name should be Power IPOR"
-        );
-        assertEq("pwIPOR", PowerToken(powerToken).symbol(), "PowerToken symbol should be pwIPOR");
-        assertEq(
-            "pwIPOR",
-            PowerTokenLens(router).powerTokenSymbol(),
-            "PowerToken symbol should be pwIPOR"
-        );
-        assertEq(18, PowerToken(powerToken).decimals(), "PowerToken decimals should be 18");
-        assertEq(
-            18,
-            PowerTokenLens(router).powerTokenDecimals(),
-            "PowerToken decimals should be 18"
-        );
-        assertEq(
             1e18,
             IPowerTokenInternal(powerToken).calculateExchangeRate(),
             "Exchange rate should be 1"

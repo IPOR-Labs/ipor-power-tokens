@@ -115,16 +115,12 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
         }
 
         if (
-            sig == IPowerTokenLens.powerTokenName.selector ||
-            sig == IPowerTokenLens.getPowerTokenContractId.selector ||
-            sig == IPowerTokenLens.powerTokenSymbol.selector ||
-            sig == IPowerTokenLens.powerTokenDecimals.selector ||
-            sig == IPowerTokenLens.powerTokenTotalSupply.selector ||
-            sig == IPowerTokenLens.powerTokenBalanceOf.selector ||
-            sig == IPowerTokenLens.delegatedToLiquidityMiningBalanceOf.selector ||
-            sig == IPowerTokenLens.getActiveCooldown.selector ||
-            sig == IPowerTokenLens.getUnstakeWithoutCooldownFee.selector ||
-            sig == IPowerTokenLens.COOL_DOWN_IN_SECONDS.selector
+            sig == IPowerTokenLens.totalSupplyOfPwToken.selector ||
+            sig == IPowerTokenLens.balanceOfPwToken.selector ||
+            sig == IPowerTokenLens.balanceOfPwTokenDelegatedToLiquidityMining.selector ||
+            sig == IPowerTokenLens.getPwTokensInCooldown.selector ||
+            sig == IPowerTokenLens.getPwTokenUnstakeFee.selector ||
+            sig == IPowerTokenLens.getPwTokenCooldownTime.selector
         ) {
             return POWER_TOKEN_LENS;
         }

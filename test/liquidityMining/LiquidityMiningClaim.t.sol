@@ -3,10 +3,10 @@ pragma solidity 0.8.17;
 
 import "../TestCommons.sol";
 import "../PowerTokensTestsSystem.sol";
-import "../../contracts/interfaces/types/PowerTokenTypes.sol";
-import "../../contracts/interfaces/ILiquidityMiningLens.sol";
-import "../../contracts/interfaces/IPowerTokenLens.sol";
-import "../../contracts/tokens/PowerTokenInternal.sol";
+import "contracts/interfaces/types/PowerTokenTypes.sol";
+import "contracts/interfaces/ILiquidityMiningLens.sol";
+import "contracts/interfaces/IPowerTokenLens.sol";
+import "contracts/tokens/PowerTokenInternal.sol";
 
 contract PwTokenUndelegateTest is TestCommons {
     event Claimed(address account, address[] lpTokens, uint256 rewardsAmount);
@@ -71,7 +71,7 @@ contract PwTokenUndelegateTest is TestCommons {
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsBefore = ILiquidityMiningLens(
             _router
         ).calculateAccountRewards(_userOne, tokens);
-        uint256 pwTokensBefore = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
+        uint256 pwTokensBefore = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
 
         vm.roll(blockNumber + 100);
 
@@ -82,7 +82,7 @@ contract PwTokenUndelegateTest is TestCommons {
         IFlowsService(_router).claim(tokens);
 
         // then
-        uint256 pwTokensAfter = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
+        uint256 pwTokensAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsAfterClaim = ILiquidityMiningLens(
             _router
         ).calculateAccountRewards(_userOne, tokens);
@@ -142,7 +142,7 @@ contract PwTokenUndelegateTest is TestCommons {
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsBefore = ILiquidityMiningLens(
             _router
         ).calculateAccountRewards(_userOne, tokens);
-        uint256 pwTokensBefore = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
+        uint256 pwTokensBefore = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
 
         vm.roll(block.number + 100);
 
@@ -156,7 +156,7 @@ contract PwTokenUndelegateTest is TestCommons {
         IFlowsService(_router).claim(tokens);
 
         // then
-        uint256 pwTokensAfter = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
+        uint256 pwTokensAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsAfterClaim = ILiquidityMiningLens(
             _router
         ).calculateAccountRewards(_userOne, tokens);

@@ -44,13 +44,9 @@ contract BatchExecutorTest is TestCommons {
         requestData[0] = calldataUserTwo;
         requestData[1] = calldataUserThree;
 
-        uint256 userOneIporTokenBalanceBefore = IPowerTokenLens(_router).powerTokenBalanceOf(
-            _userOne
-        );
-        uint256 userTwoIporTokenBalanceBefore = IPowerTokenLens(_router).powerTokenBalanceOf(
-            _userTwo
-        );
-        uint256 userThreeIporTokenBalanceBefore = IPowerTokenLens(_router).powerTokenBalanceOf(
+        uint256 userOneIporTokenBalanceBefore = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
+        uint256 userTwoIporTokenBalanceBefore = IPowerTokenLens(_router).balanceOfPwToken(_userTwo);
+        uint256 userThreeIporTokenBalanceBefore = IPowerTokenLens(_router).balanceOfPwToken(
             _userThree
         );
 
@@ -58,13 +54,9 @@ contract BatchExecutorTest is TestCommons {
         vm.prank(_userOne);
         PowerTokenRouter(_router).batchExecutor(requestData);
         // then
-        uint256 userOneIporTokenBalanceAfter = IPowerTokenLens(_router).powerTokenBalanceOf(
-            _userOne
-        );
-        uint256 userTwoIporTokenBalanceAfter = IPowerTokenLens(_router).powerTokenBalanceOf(
-            _userTwo
-        );
-        uint256 userThreeIporTokenBalanceAfter = IPowerTokenLens(_router).powerTokenBalanceOf(
+        uint256 userOneIporTokenBalanceAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
+        uint256 userTwoIporTokenBalanceAfter = IPowerTokenLens(_router).balanceOfPwToken(_userTwo);
+        uint256 userThreeIporTokenBalanceAfter = IPowerTokenLens(_router).balanceOfPwToken(
             _userThree
         );
 

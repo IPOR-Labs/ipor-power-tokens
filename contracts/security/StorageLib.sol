@@ -60,7 +60,7 @@ library StorageLib {
         internal
         pure
         returns (
-            // todo chcnge to uint
+            // todo change to uint
             mapping(address => bool) storage store
         )
     {

@@ -28,7 +28,7 @@ contract PwTokenCoolDown is TestCommons {
         vm.prank(_userOne);
         IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
         PowerTokenTypes.PwTokenCooldown memory cooldownBefore = IPowerTokenLens(_router)
-            .getActiveCooldown(_userOne);
+            .getPwTokensInCooldown(_userOne);
 
         // when
         vm.prank(_userOne);
@@ -37,7 +37,7 @@ contract PwTokenCoolDown is TestCommons {
 
         // then
         PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)
-            .getActiveCooldown(_userOne);
+            .getPwTokensInCooldown(_userOne);
 
         assertEq(
             cooldownBefore.pwTokenAmount,
@@ -51,7 +51,7 @@ contract PwTokenCoolDown is TestCommons {
         vm.prank(_userOne);
         IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
         PowerTokenTypes.PwTokenCooldown memory cooldownBefore = IPowerTokenLens(_router)
-            .getActiveCooldown(_userOne);
+            .getPwTokensInCooldown(_userOne);
 
         // when
         vm.prank(_userOne);
@@ -60,7 +60,7 @@ contract PwTokenCoolDown is TestCommons {
 
         // then
         PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)
-            .getActiveCooldown(_userOne);
+            .getPwTokensInCooldown(_userOne);
 
         assertEq(
             cooldownBefore.pwTokenAmount,
@@ -74,7 +74,7 @@ contract PwTokenCoolDown is TestCommons {
         vm.prank(_userOne);
         IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
         PowerTokenTypes.PwTokenCooldown memory cooldownBefore = IPowerTokenLens(_router)
-            .getActiveCooldown(_userOne);
+            .getPwTokensInCooldown(_userOne);
 
         // when
         vm.prank(_userOne);
@@ -83,7 +83,7 @@ contract PwTokenCoolDown is TestCommons {
 
         // then
         PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)
-            .getActiveCooldown(_userOne);
+            .getPwTokensInCooldown(_userOne);
 
         assertEq(0, cooldownBefore.pwTokenAmount, "Cooldown amount should decrease");
         assertEq(500e18, cooldownAfter.pwTokenAmount, "Cooldown amount should decrease");
@@ -104,7 +104,7 @@ contract PwTokenCoolDown is TestCommons {
         vm.prank(_userOne);
         IStakeService(_router).cooldown(500e18);
         PowerTokenTypes.PwTokenCooldown memory cooldownBefore = IPowerTokenLens(_router)
-            .getActiveCooldown(_userOne);
+            .getPwTokensInCooldown(_userOne);
 
         vm.roll(100);
         vm.warp(1200);
@@ -115,7 +115,7 @@ contract PwTokenCoolDown is TestCommons {
 
         // then
         PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)
-            .getActiveCooldown(_userOne);
+            .getPwTokensInCooldown(_userOne);
 
         assertEq(500e18, cooldownBefore.pwTokenAmount, "Cooldown amount should decrease");
         assertEq(600e18, cooldownAfter.pwTokenAmount, "Cooldown amount should decrease");
@@ -142,7 +142,7 @@ contract PwTokenCoolDown is TestCommons {
         vm.prank(_userOne);
         IStakeService(_router).cooldown(500e18);
         PowerTokenTypes.PwTokenCooldown memory cooldownBefore = IPowerTokenLens(_router)
-            .getActiveCooldown(_userOne);
+            .getPwTokensInCooldown(_userOne);
 
         vm.roll(100);
         vm.warp(block.timestamp + 1200);
@@ -153,7 +153,7 @@ contract PwTokenCoolDown is TestCommons {
 
         // then
         PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)
-            .getActiveCooldown(_userOne);
+            .getPwTokensInCooldown(_userOne);
 
         assertEq(500e18, cooldownBefore.pwTokenAmount, "Cooldown amount");
         assertEq(0, cooldownAfter.pwTokenAmount, "Cooldown amount should be zero");
@@ -178,7 +178,7 @@ contract PwTokenCoolDown is TestCommons {
 
         // then
         PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)
-            .getActiveCooldown(_userOne);
+            .getPwTokensInCooldown(_userOne);
 
         assertEq(800e18, cooldownAfter.pwTokenAmount, "Cooldown amount should be 500");
     }
@@ -196,9 +196,8 @@ contract PwTokenCoolDown is TestCommons {
 
         vm.prank(_userOne);
         IStakeService(_router).cooldown(800e18);
-        uint256 delegateAmountBefore = IPowerTokenLens(_router).delegatedToLiquidityMiningBalanceOf(
-            _userOne
-        );
+        uint256 delegateAmountBefore = IPowerTokenLens(_router)
+            .balanceOfPwTokenDelegatedToLiquidityMining(_userOne);
 
         vm.roll(100);
         vm.warp(block.timestamp + 1200);
@@ -210,10 +209,9 @@ contract PwTokenCoolDown is TestCommons {
 
         // then
         PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)
-            .getActiveCooldown(_userOne);
-        uint256 delegateAmountAfter = IPowerTokenLens(_router).delegatedToLiquidityMiningBalanceOf(
-            _userOne
-        );
+            .getPwTokensInCooldown(_userOne);
+        uint256 delegateAmountAfter = IPowerTokenLens(_router)
+            .balanceOfPwTokenDelegatedToLiquidityMining(_userOne);
 
         assertEq(800e18, cooldownAfter.pwTokenAmount, "Cooldown amount should be 500");
         assertEq(delegateAmountBefore, delegateAmountAfter, "Delegate amount should not change");
@@ -240,7 +238,7 @@ contract PwTokenCoolDown is TestCommons {
 
         // then
         PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)
-            .getActiveCooldown(_userOne);
+            .getPwTokensInCooldown(_userOne);
 
         uint256 userBalanceAfter = IERC20(_powerTokensSystem.iporToken()).balanceOf(_userOne);
 
@@ -272,7 +270,7 @@ contract PwTokenCoolDown is TestCommons {
 
         // then
         PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)
-            .getActiveCooldown(_userOne);
+            .getPwTokensInCooldown(_userOne);
 
         uint256 userBalanceAfter = IERC20(_powerTokensSystem.iporToken()).balanceOf(_userOne);
 
@@ -291,7 +289,7 @@ contract PwTokenCoolDown is TestCommons {
         vm.prank(_userOne);
         IStakeService(_router).cooldown(500e18);
 
-        uint256 userBalanceBeforeExchangeRateChanged = IPowerTokenLens(_router).powerTokenBalanceOf(
+        uint256 userBalanceBeforeExchangeRateChanged = IPowerTokenLens(_router).balanceOfPwToken(
             _userOne
         );
 
@@ -300,7 +298,7 @@ contract PwTokenCoolDown is TestCommons {
         vm.prank(_powerTokensSystem.dao());
         ERC20(iporToken).transfer(powerToken, 1_000e18);
 
-        uint256 userBalanceAfterExchangeRateChanged = IPowerTokenLens(_router).powerTokenBalanceOf(
+        uint256 userBalanceAfterExchangeRateChanged = IPowerTokenLens(_router).balanceOfPwToken(
             _userOne
         );
         uint256 userBalanceERC20BeforeRedeem = IERC20(iporToken).balanceOf(_userOne);
@@ -314,7 +312,7 @@ contract PwTokenCoolDown is TestCommons {
 
         // then
         uint256 userBalanceERC20AfterRedeem = IERC20(iporToken).balanceOf(_userOne);
-        uint256 userBalanceAfterRedeem = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
+        uint256 userBalanceAfterRedeem = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
 
         assertEq(
             userBalanceERC20BeforeRedeem + 500e18,
@@ -339,11 +337,11 @@ contract PwTokenCoolDown is TestCommons {
         IPowerTokenLens powerTokenLens = IPowerTokenLens(_router);
 
         // when
-        uint256 cool_down_in_secounds = powerTokenLens.COOL_DOWN_IN_SECONDS();
+        uint256 cool_down_in_secounds = powerTokenLens.getPwTokenCooldownTime();
 
         // then
         PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)
-            .getActiveCooldown(_userOne);
+            .getPwTokensInCooldown(_userOne);
 
         uint256 userBalanceAfter = IERC20(_powerTokensSystem.iporToken()).balanceOf(_userOne);
 

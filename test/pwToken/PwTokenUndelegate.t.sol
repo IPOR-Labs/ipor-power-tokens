@@ -66,7 +66,7 @@ contract PwTokenUndelegateTest is TestCommons {
         vm.stopPrank();
 
         uint256 balanseOfDelegateBefore = IPowerTokenLens(_router)
-            .delegatedToLiquidityMiningBalanceOf(_userOne);
+            .balanceOfPwTokenDelegatedToLiquidityMining(_userOne);
 
         //  when
         vm.prank(_userOne);
@@ -76,7 +76,7 @@ contract PwTokenUndelegateTest is TestCommons {
 
         //  then
         uint256 balanseOfDelegateAfter = IPowerTokenLens(_router)
-            .delegatedToLiquidityMiningBalanceOf(_userOne);
+            .balanceOfPwTokenDelegatedToLiquidityMining(_userOne);
 
         assertEq(
             balanseOfDelegateBefore,
@@ -102,7 +102,7 @@ contract PwTokenUndelegateTest is TestCommons {
         vm.stopPrank();
 
         uint256 balanseOfDelegateBefore = IPowerTokenLens(_router)
-            .delegatedToLiquidityMiningBalanceOf(_userOne);
+            .balanceOfPwTokenDelegatedToLiquidityMining(_userOne);
 
         // when
         vm.prank(_userOne);
@@ -112,7 +112,7 @@ contract PwTokenUndelegateTest is TestCommons {
 
         // then
         uint256 balanseOfDelegateAfter = IPowerTokenLens(_router)
-            .delegatedToLiquidityMiningBalanceOf(_userOne);
+            .balanceOfPwTokenDelegatedToLiquidityMining(_userOne);
 
         assertEq(
             balanseOfDelegateBefore,
@@ -170,7 +170,7 @@ contract PwTokenUndelegateTest is TestCommons {
         vm.stopPrank();
 
         uint256 balanseOfDelegateBefore = IPowerTokenLens(_router)
-            .delegatedToLiquidityMiningBalanceOf(_userOne);
+            .balanceOfPwTokenDelegatedToLiquidityMining(_userOne);
         uint256 exchangeRateBefore = IPowerTokenInternal(_powerTokensSystem.powerToken())
             .calculateExchangeRate();
 
@@ -182,7 +182,7 @@ contract PwTokenUndelegateTest is TestCommons {
 
         //  then
         uint256 balanseOfDelegateAfter = IPowerTokenLens(_router)
-            .delegatedToLiquidityMiningBalanceOf(_userOne);
+            .balanceOfPwTokenDelegatedToLiquidityMining(_userOne);
 
         uint256 exchangeRateAfter = IPowerTokenInternal(_powerTokensSystem.powerToken())
             .calculateExchangeRate();

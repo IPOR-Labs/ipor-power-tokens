@@ -46,7 +46,7 @@ contract PwTokenDelegateTest is TestCommons {
         vm.prank(_userOne);
         IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
 
-        uint256 balancePwTokenBefore = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
+        uint256 balancePwTokenBefore = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
 
         //when
         vm.prank(_userOne);
@@ -54,7 +54,7 @@ contract PwTokenDelegateTest is TestCommons {
         IFlowsService(_router).delegate(tokens, amounts);
 
         //then
-        uint256 balancePwTokenAfter = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
+        uint256 balancePwTokenAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
 
         assertEq(balancePwTokenBefore, balancePwTokenAfter, "pw token balance should not change");
     }
@@ -73,9 +73,9 @@ contract PwTokenDelegateTest is TestCommons {
         vm.prank(_userOne);
         IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
 
-        uint256 balancePwTokenBefore = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
+        uint256 balancePwTokenBefore = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
         uint256 balanceOfDelegateBefore = IPowerTokenLens(_router)
-            .delegatedToLiquidityMiningBalanceOf(_userOne);
+            .balanceOfPwTokenDelegatedToLiquidityMining(_userOne);
 
         //when
         vm.prank(_userOne);
@@ -83,9 +83,9 @@ contract PwTokenDelegateTest is TestCommons {
         IFlowsService(_router).delegate(tokens, amounts);
 
         //then
-        uint256 balancePwTokenAfter = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
+        uint256 balancePwTokenAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
         uint256 balanceOfDelegateAfter = IPowerTokenLens(_router)
-            .delegatedToLiquidityMiningBalanceOf(_userOne);
+            .balanceOfPwTokenDelegatedToLiquidityMining(_userOne);
 
         assertEq(balancePwTokenBefore, balancePwTokenAfter, "pw token balance should not change");
         assertEq(
@@ -105,9 +105,9 @@ contract PwTokenDelegateTest is TestCommons {
         vm.prank(_userOne);
         IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
 
-        uint256 balancePwTokenBefore = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
+        uint256 balancePwTokenBefore = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
         uint256 balanceOfDelegateBefore = IPowerTokenLens(_router)
-            .delegatedToLiquidityMiningBalanceOf(_userOne);
+            .balanceOfPwTokenDelegatedToLiquidityMining(_userOne);
 
         //  when
         vm.prank(_userOne);
@@ -116,9 +116,9 @@ contract PwTokenDelegateTest is TestCommons {
         IFlowsService(_router).delegate(tokens, amounts);
 
         //  then
-        uint256 balancePwTokenAfter = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
+        uint256 balancePwTokenAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
         uint256 balanceOfDelegateAfter = IPowerTokenLens(_router)
-            .delegatedToLiquidityMiningBalanceOf(_userOne);
+            .balanceOfPwTokenDelegatedToLiquidityMining(_userOne);
 
         assertEq(balancePwTokenBefore, balancePwTokenAfter, "pw token balance should be the same");
         assertEq(
@@ -140,18 +140,18 @@ contract PwTokenDelegateTest is TestCommons {
         vm.prank(_userOne);
         IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
 
-        uint256 balancePwTokenBefore = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
+        uint256 balancePwTokenBefore = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
         uint256 balanceOfDelegateBefore = IPowerTokenLens(_router)
-            .delegatedToLiquidityMiningBalanceOf(_userOne);
+            .balanceOfPwTokenDelegatedToLiquidityMining(_userOne);
 
         // when
         vm.prank(_userOne);
         IFlowsService(_router).delegate(tokens, amounts);
 
         // then
-        uint256 balancePwTokenAfter = IPowerTokenLens(_router).powerTokenBalanceOf(_userOne);
+        uint256 balancePwTokenAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
         uint256 balanceOfDelegateAfter = IPowerTokenLens(_router)
-            .delegatedToLiquidityMiningBalanceOf(_userOne);
+            .balanceOfPwTokenDelegatedToLiquidityMining(_userOne);
 
         assertEq(balancePwTokenBefore, balancePwTokenAfter, "pw token balance should be the same");
         assertEq(

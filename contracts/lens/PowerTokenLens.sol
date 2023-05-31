@@ -14,31 +14,15 @@ contract PowerTokenLens is IPowerTokenLens {
         POWER_TOKEN = powerToken;
     }
 
-    function powerTokenName() external view override returns (string memory) {
-        return IPowerToken(POWER_TOKEN).name();
-    }
-
-    function getPowerTokenContractId() external view returns (bytes32) {
-        return IPowerToken(POWER_TOKEN).getContractId();
-    }
-
-    function powerTokenSymbol() external view override returns (string memory) {
-        return IPowerToken(POWER_TOKEN).symbol();
-    }
-
-    function powerTokenDecimals() external view returns (uint8) {
-        return IPowerToken(POWER_TOKEN).decimals();
-    }
-
-    function powerTokenTotalSupply() external view override returns (uint256) {
+    function totalSupplyOfPwToken() external view override returns (uint256) {
         return IPowerToken(POWER_TOKEN).totalSupply();
     }
 
-    function powerTokenBalanceOf(address account) external view override returns (uint256) {
+    function balanceOfPwToken(address account) external view override returns (uint256) {
         return IPowerToken(POWER_TOKEN).balanceOf(account);
     }
 
-    function delegatedToLiquidityMiningBalanceOf(address account)
+    function balanceOfPwTokenDelegatedToLiquidityMining(address account)
         external
         view
         override
@@ -47,11 +31,11 @@ contract PowerTokenLens is IPowerTokenLens {
         return IPowerToken(POWER_TOKEN).delegatedToLiquidityMiningBalanceOf(account);
     }
 
-    function getUnstakeWithoutCooldownFee() external view returns (uint256) {
+    function getPwTokenUnstakeFee() external view returns (uint256) {
         return IPowerToken(POWER_TOKEN).getUnstakeWithoutCooldownFee();
     }
 
-    function getActiveCooldown(address account)
+    function getPwTokensInCooldown(address account)
         external
         view
         returns (PowerTokenTypes.PwTokenCooldown memory)
@@ -59,15 +43,15 @@ contract PowerTokenLens is IPowerTokenLens {
         return IPowerToken(POWER_TOKEN).getActiveCooldown(account);
     }
 
-    function COOL_DOWN_IN_SECONDS() external view returns (uint256) {
+    function getPwTokenCooldownTime() external view returns (uint256) {
         return IPowerTokenInternal(POWER_TOKEN).COOL_DOWN_IN_SECONDS();
     }
 
-    function calculateExchangeRate() external view returns (uint256) {
+    function getPwTokenExchangeRate() external view returns (uint256) {
         return IPowerTokenInternal(POWER_TOKEN).calculateExchangeRate();
     }
 
-    function totalSupplyBase() external view returns (uint256) {
+    function getPwTokenTotalSupplyBase() external view returns (uint256) {
         return IPowerTokenInternal(POWER_TOKEN).totalSupplyBase();
     }
 }
