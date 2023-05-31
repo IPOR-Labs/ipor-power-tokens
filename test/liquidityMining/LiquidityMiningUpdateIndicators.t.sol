@@ -46,8 +46,12 @@ contract LiquidityMiningUpdateIndicatorsTest is TestCommons {
         uint256[] memory lpTokenAmounts = new uint256[](1);
         lpTokenAmounts[0] = 1_000e18;
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
-        IStakeService(_router).stakeLpTokens(_userOne, lpTokens, lpTokenAmounts);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            lpTokens,
+            lpTokenAmounts
+        );
         vm.stopPrank();
 
         LiquidityMiningTypes.GlobalIndicatorsResult[]
@@ -119,8 +123,12 @@ contract LiquidityMiningUpdateIndicatorsTest is TestCommons {
         lpTokenAmounts[1] = 1_000e18;
         lpTokenAmounts[2] = 1_000e18;
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 3_000e18);
-        IStakeService(_router).stakeLpTokens(_userOne, lpTokens, lpTokenAmounts);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 3_000e18);
+        IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            lpTokens,
+            lpTokenAmounts
+        );
         vm.stopPrank();
 
         LiquidityMiningTypes.GlobalIndicatorsResult[]

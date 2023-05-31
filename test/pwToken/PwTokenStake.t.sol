@@ -43,7 +43,7 @@ contract PwTokenStakeTest is TestCommons {
         // when
         vm.prank(_userOne);
         vm.expectRevert(bytes(Errors.VALUE_NOT_GREATER_THAN_ZERO));
-        IStakeService(_router).stakeProtocolToken(_userOne, 0);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 0);
 
         // then
         uint256 iporTokenBalanceAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
@@ -64,7 +64,7 @@ contract PwTokenStakeTest is TestCommons {
         vm.prank(_userOne);
         vm.expectEmit(true, true, true, true);
         emit StakedTokenAdded(_userOne, 10_000e18, 1e18, 10_000e18);
-        IStakeService(_router).stakeProtocolToken(_userOne, 10_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 10_000e18);
 
         // then
         uint256 iporTokenBalanceAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
@@ -92,7 +92,7 @@ contract PwTokenStakeTest is TestCommons {
         uint256 userErc20BalanceBefore = ERC20(_powerTokensSystem.iporToken()).balanceOf(_userOne);
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
 
         uint256 exchangeRateBefore = IPowerTokenInternal(_powerTokensSystem.powerToken())
             .calculateExchangeRate();
@@ -128,12 +128,12 @@ contract PwTokenStakeTest is TestCommons {
         address powerTokenAddress = _powerTokensSystem.powerToken();
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
 
         uint256 iporTokenUserOneBalanceBefore = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
 
         vm.prank(_userTwo);
-        IStakeService(_router).stakeProtocolToken(_userTwo, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userTwo, 1_000e18);
 
         uint256 iporTokenUserTwoBalanceBefore = IPowerTokenLens(_router).balanceOfPwToken(_userTwo);
 
@@ -198,7 +198,7 @@ contract PwTokenStakeTest is TestCommons {
         address powerTokenAddress = _powerTokensSystem.powerToken();
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
 
         uint256 iporTokenUserOneBalanceBefore = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
 
@@ -206,7 +206,7 @@ contract PwTokenStakeTest is TestCommons {
         vm.prank(_userThree);
         ERC20(iporTokenAddress).transfer(powerTokenAddress, 1_000e18);
         vm.prank(_userTwo);
-        IStakeService(_router).stakeProtocolToken(_userTwo, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userTwo, 1_000e18);
 
         // then
         uint256 iporTokenUserOneBalanceAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);

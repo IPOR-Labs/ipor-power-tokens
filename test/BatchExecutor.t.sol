@@ -30,12 +30,12 @@ contract BatchExecutorTest is TestCommons {
     function testShouldStakeIporTokensWhenStakeForTwoUsers() external {
         // given
         bytes memory calldataUserTwo = abi.encodeWithSignature(
-            "stakeProtocolToken(address,uint256)",
+            "stakeGovernanceTokenToPowerToken(address,uint256)",
             _userTwo,
             2_000e18
         );
         bytes memory calldataUserThree = abi.encodeWithSignature(
-            "stakeProtocolToken(address,uint256)",
+            "stakeGovernanceTokenToPowerToken(address,uint256)",
             _userThree,
             3_000e18
         );
@@ -82,7 +82,7 @@ contract BatchExecutorTest is TestCommons {
 
     function testShouldStakeIporTokenLpTokensDelegate() external {
         bytes memory stakeIpor = abi.encodeWithSignature(
-            "stakeProtocolToken(address,uint256)",
+            "stakeGovernanceTokenToPowerToken(address,uint256)",
             _userOne,
             3_000e18
         );
@@ -94,7 +94,7 @@ contract BatchExecutorTest is TestCommons {
         _powerTokensSystem.mintLpTokens(_powerTokensSystem.lpDai(), _userOne, 10_000e18);
 
         bytes memory stakeLpTokens = abi.encodeWithSignature(
-            "stakeLpTokens(address,address[],uint256[])",
+            "stakeLpTokensToLiquidityMining(address,address[],uint256[])",
             _userOne,
             lpTokens,
             stakedAmounts

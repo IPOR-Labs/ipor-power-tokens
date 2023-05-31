@@ -29,7 +29,7 @@ contract PwTokenUndelegateTest is TestCommons {
         tokens[0] = _powerTokensSystem.lpDai();
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
 
         //  when
         vm.prank(_userOne);
@@ -45,7 +45,7 @@ contract PwTokenUndelegateTest is TestCommons {
         tokens[0] = _powerTokensSystem.lpDai();
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
 
         //  when
         vm.prank(_userOne);
@@ -61,7 +61,7 @@ contract PwTokenUndelegateTest is TestCommons {
         tokens[0] = _powerTokensSystem.lpDai();
 
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
         IFlowsService(_router).delegate(tokens, amounts);
         vm.stopPrank();
 
@@ -97,7 +97,7 @@ contract PwTokenUndelegateTest is TestCommons {
         tokens[1] = _powerTokensSystem.lpUsdc();
 
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
         IFlowsService(_router).delegate(tokens, amounts);
         vm.stopPrank();
 
@@ -130,7 +130,7 @@ contract PwTokenUndelegateTest is TestCommons {
         tokens[0] = _powerTokensSystem.lpDai();
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
 
         //  when
         vm.prank(_userOne);
@@ -147,7 +147,7 @@ contract PwTokenUndelegateTest is TestCommons {
         tokens[1] = _powerTokensSystem.lpUsdc();
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
 
         //  when
         vm.prank(_userOne);
@@ -165,7 +165,7 @@ contract PwTokenUndelegateTest is TestCommons {
         tokens[1] = _powerTokensSystem.lpUsdc();
 
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
         IFlowsService(_router).delegate(tokens, amounts);
         vm.stopPrank();
 

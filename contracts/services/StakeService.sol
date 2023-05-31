@@ -5,10 +5,10 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "../interfaces/ILiquidityMining.sol";
 import "../interfaces/IPowerToken.sol";
-import "../interfaces/IStakeService.sol";
+import "../interfaces/IPowerTokenStakeService.sol";
 import "../libraries/errors/Errors.sol";
 
-contract StakeService is IStakeService {
+contract StakeService is IPowerTokenStakeService {
     using SafeERC20 for IERC20;
 
     address public immutable LIQUIDITY_MINING;
@@ -37,7 +37,7 @@ contract StakeService is IStakeService {
         STAKED_TOKEN = stakedTokenAddress;
     }
 
-    function stakeLpTokens(
+    function stakeLpTokensToLiquidityMining(
         address onBehalfOf,
         address[] calldata lpTokens,
         uint256[] calldata lpTokenAmounts
@@ -72,7 +72,7 @@ contract StakeService is IStakeService {
         ILiquidityMining(LIQUIDITY_MINING).addLpTokens(updateLpTokens);
     }
 
-    function unstakeLpTokens(
+    function unstakeLpTokensFromLiquidityMining(
         address transferTo,
         address[] calldata lpTokens,
         uint256[] calldata lpTokenAmounts
@@ -108,7 +108,9 @@ contract StakeService is IStakeService {
         }
     }
 
-    function stakeProtocolToken(address onBehalfOf, uint256 iporTokenAmount) external {
+    function stakeGovernanceTokenToPowerToken(address onBehalfOf, uint256 iporTokenAmount)
+        external
+    {
         require(onBehalfOf != address(0), Errors.WRONG_ADDRESS);
         require(iporTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
@@ -119,7 +121,9 @@ contract StakeService is IStakeService {
         IERC20(STAKED_TOKEN).safeTransferFrom(msg.sender, POWER_TOKEN, iporTokenAmount);
     }
 
-    function unstakeProtocolToken(address transferTo, uint256 iporTokenAmount) external {
+    function unstakeGovernanceTokenFromPowerToken(address transferTo, uint256 iporTokenAmount)
+        external
+    {
         require(iporTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
         uint256 stakedTokenAmountToTransfer = IPowerToken(POWER_TOKEN).removeStakedTokenWithFee(
@@ -129,16 +133,16 @@ contract StakeService is IStakeService {
         IERC20(STAKED_TOKEN).safeTransferFrom(POWER_TOKEN, transferTo, stakedTokenAmountToTransfer);
     }
 
-    function cooldown(uint256 pwTokenAmount) external {
+    function pwTokenCooldown(uint256 pwTokenAmount) external {
         require(pwTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
         IPowerToken(POWER_TOKEN).cooldown(msg.sender, pwTokenAmount);
     }
 
-    function cancelCooldown() external {
+    function pwTokenCancelCooldown() external {
         IPowerToken(POWER_TOKEN).cancelCooldown(msg.sender);
     }
 
-    function redeem(address transferTo) external {
+    function redeemPwToken(address transferTo) external {
         uint256 transferAmount = IPowerToken(POWER_TOKEN).redeem(msg.sender);
         ///@dev We can transfer pwTokenAmount because it is in relation 1:1 to Staked Token
         IERC20(STAKED_TOKEN).safeTransferFrom(POWER_TOKEN, transferTo, transferAmount);

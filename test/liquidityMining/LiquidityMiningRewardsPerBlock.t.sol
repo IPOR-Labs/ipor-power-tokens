@@ -3,11 +3,11 @@ pragma solidity 0.8.17;
 
 import "../TestCommons.sol";
 import "../PowerTokensTestsSystem.sol";
-import "../../contracts/interfaces/types/PowerTokenTypes.sol";
-import "../../contracts/interfaces/ILiquidityMiningLens.sol";
-import "../../contracts/interfaces/ILiquidityMiningInternal.sol";
-import "../../contracts/interfaces/IStakeService.sol";
-import "../../contracts/tokens/PowerTokenInternal.sol";
+import "contracts/interfaces/types/PowerTokenTypes.sol";
+import "contracts/interfaces/ILiquidityMiningLens.sol";
+import "contracts/interfaces/ILiquidityMiningInternal.sol";
+import "contracts/interfaces/IPowerTokenStakeService.sol";
+import "contracts/tokens/PowerTokenInternal.sol";
 
 contract LiquidityMiningRewardsPerBlockTest is TestCommons {
     event RewardsPerBlockChanged(
@@ -164,7 +164,11 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeLpTokens(_userOne, lpTokens, amounts);
+        IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            lpTokens,
+            amounts
+        );
 
         vm.roll(block.number + 100);
 
@@ -199,7 +203,11 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeLpTokens(_userOne, lpTokens, amounts);
+        IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            lpTokens,
+            amounts
+        );
 
         vm.roll(block.number + 100);
 
@@ -237,7 +245,11 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeLpTokens(_userOne, lpTokens, amounts);
+        IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            lpTokens,
+            amounts
+        );
 
         vm.roll(block.number + 100);
 
@@ -295,9 +307,13 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 2e8);
 
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 2_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 2_000e18);
         IFlowsService(_router).delegate(lpTokens, amounts);
-        IStakeService(_router).stakeLpTokens(_userOne, lpTokens, amounts);
+        IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            lpTokens,
+            amounts
+        );
         vm.stopPrank();
         vm.roll(block.number + 100);
 
@@ -332,9 +348,13 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
 
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 2_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 2_000e18);
         IFlowsService(_router).delegate(lpTokens, amounts);
-        IStakeService(_router).stakeLpTokens(_userOne, lpTokens, amounts);
+        IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            lpTokens,
+            amounts
+        );
         vm.stopPrank();
         vm.roll(block.number + 100);
 

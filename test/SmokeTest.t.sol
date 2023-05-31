@@ -33,7 +33,11 @@ contract SmokeTest is TestCommons {
         stakedAmounts[0] = 1_000e18;
 
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeLpTokens(_userOne, stakedTokens, stakedAmounts);
+        IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            stakedTokens,
+            stakedAmounts
+        );
 
         // WHEN
         uint256 balance = ILiquidityMiningLens(_router).liquidityMiningBalanceOf(
@@ -52,7 +56,7 @@ contract SmokeTest is TestCommons {
         stakedAmounts[0] = 500e18;
 
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
         IFlowsService(_router).delegate(stakedTokens, stakedAmounts);
 
         // WHEN
@@ -73,7 +77,11 @@ contract SmokeTest is TestCommons {
         stakedAmounts[0] = 1_000e18;
         _powerTokensSystem.setRewardsPerBlock(_powerTokensSystem.lpDai(), 1e8);
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeLpTokens(_userOne, stakedTokens, stakedAmounts);
+        IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            stakedTokens,
+            stakedAmounts
+        );
 
         vm.roll(block.number + 100);
 
@@ -95,7 +103,11 @@ contract SmokeTest is TestCommons {
         stakedAmounts[0] = 1_000e18;
         _powerTokensSystem.setRewardsPerBlock(_powerTokensSystem.lpDai(), 1e8);
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeLpTokens(_userOne, stakedTokens, stakedAmounts);
+        IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            stakedTokens,
+            stakedAmounts
+        );
 
         vm.roll(block.number + 100);
 

@@ -26,14 +26,14 @@ contract PwTokenCoolDown is TestCommons {
     function testShouldNotBeAbleCooldownWhenAmountIsZero() external {
         // given
         vm.prank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
         PowerTokenTypes.PwTokenCooldown memory cooldownBefore = IPowerTokenLens(_router)
             .getPwTokensInCooldown(_userOne);
 
         // when
         vm.prank(_userOne);
         vm.expectRevert(bytes(Errors.VALUE_NOT_GREATER_THAN_ZERO));
-        IStakeService(_router).cooldown(0);
+        IPowerTokenStakeService(_router).pwTokenCooldown(0);
 
         // then
         PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)
@@ -49,14 +49,14 @@ contract PwTokenCoolDown is TestCommons {
     function testShouldNotBeAbleCooldownWhenAmountIsToBig() external {
         // given
         vm.prank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
         PowerTokenTypes.PwTokenCooldown memory cooldownBefore = IPowerTokenLens(_router)
             .getPwTokensInCooldown(_userOne);
 
         // when
         vm.prank(_userOne);
         vm.expectRevert(bytes(Errors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW));
-        IStakeService(_router).cooldown(1_001e18);
+        IPowerTokenStakeService(_router).pwTokenCooldown(1_001e18);
 
         // then
         PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)
@@ -72,14 +72,14 @@ contract PwTokenCoolDown is TestCommons {
     function testShouldBeAbleCooldownWhenAmountIsNotZero() external {
         // given
         vm.prank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
         PowerTokenTypes.PwTokenCooldown memory cooldownBefore = IPowerTokenLens(_router)
             .getPwTokensInCooldown(_userOne);
 
         // when
         vm.prank(_userOne);
         emit CooldownChanged(_userOne, 500e18, block.timestamp + 2 * 7 * 24 * 60 * 60);
-        IStakeService(_router).cooldown(500e18);
+        IPowerTokenStakeService(_router).pwTokenCooldown(500e18);
 
         // then
         PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)
@@ -99,10 +99,10 @@ contract PwTokenCoolDown is TestCommons {
     function testShouldBeAbleToOverrideCooldownWhenSecondTimeExecuteMethod() external {
         // given
         vm.prank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
 
         vm.prank(_userOne);
-        IStakeService(_router).cooldown(500e18);
+        IPowerTokenStakeService(_router).pwTokenCooldown(500e18);
         PowerTokenTypes.PwTokenCooldown memory cooldownBefore = IPowerTokenLens(_router)
             .getPwTokensInCooldown(_userOne);
 
@@ -111,7 +111,7 @@ contract PwTokenCoolDown is TestCommons {
 
         // when
         vm.prank(_userOne);
-        IStakeService(_router).cooldown(600e18);
+        IPowerTokenStakeService(_router).pwTokenCooldown(600e18);
 
         // then
         PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)
@@ -137,10 +137,10 @@ contract PwTokenCoolDown is TestCommons {
         // given
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
 
         vm.prank(_userOne);
-        IStakeService(_router).cooldown(500e18);
+        IPowerTokenStakeService(_router).pwTokenCooldown(500e18);
         PowerTokenTypes.PwTokenCooldown memory cooldownBefore = IPowerTokenLens(_router)
             .getPwTokensInCooldown(_userOne);
 
@@ -149,7 +149,7 @@ contract PwTokenCoolDown is TestCommons {
 
         // when
         vm.prank(_userOne);
-        IStakeService(_router).cancelCooldown();
+        IPowerTokenStakeService(_router).pwTokenCancelCooldown();
 
         // then
         PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)
@@ -163,10 +163,10 @@ contract PwTokenCoolDown is TestCommons {
     function testShouldNotBeAbleToUnstakeWhenSomeAmountIsInCooldownState() external {
         // given
         vm.prank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
 
         vm.prank(_userOne);
-        IStakeService(_router).cooldown(800e18);
+        IPowerTokenStakeService(_router).pwTokenCooldown(800e18);
 
         vm.roll(100);
         vm.warp(block.timestamp + 1200);
@@ -174,7 +174,7 @@ contract PwTokenCoolDown is TestCommons {
         // when
         vm.prank(_userOne);
         vm.expectRevert(bytes(Errors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW));
-        IStakeService(_router).unstakeProtocolToken(_userOne, 300e18);
+        IPowerTokenStakeService(_router).unstakeGovernanceTokenFromPowerToken(_userOne, 300e18);
 
         // then
         PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)
@@ -192,10 +192,10 @@ contract PwTokenCoolDown is TestCommons {
         lpTokens[0] = _powerTokensSystem.lpDai();
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
 
         vm.prank(_userOne);
-        IStakeService(_router).cooldown(800e18);
+        IPowerTokenStakeService(_router).pwTokenCooldown(800e18);
         uint256 delegateAmountBefore = IPowerTokenLens(_router)
             .balanceOfPwTokenDelegatedToLiquidityMining(_userOne);
 
@@ -221,10 +221,10 @@ contract PwTokenCoolDown is TestCommons {
         // given
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
 
         vm.prank(_userOne);
-        IStakeService(_router).cooldown(500e18);
+        IPowerTokenStakeService(_router).pwTokenCooldown(500e18);
 
         vm.roll(100);
         vm.warp(block.timestamp + 1200);
@@ -234,7 +234,7 @@ contract PwTokenCoolDown is TestCommons {
         // when
         vm.prank(_userOne);
         vm.expectRevert(bytes(Errors.COOL_DOWN_NOT_FINISH));
-        IStakeService(_router).redeem(_userOne);
+        IPowerTokenStakeService(_router).redeemPwToken(_userOne);
 
         // then
         PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)
@@ -252,10 +252,10 @@ contract PwTokenCoolDown is TestCommons {
             .COOL_DOWN_IN_SECONDS();
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
 
         vm.prank(_userOne);
-        IStakeService(_router).cooldown(500e18);
+        IPowerTokenStakeService(_router).pwTokenCooldown(500e18);
 
         vm.roll(cooldownTime / 12 + 1);
         vm.warp(block.timestamp + cooldownTime + 12);
@@ -266,7 +266,7 @@ contract PwTokenCoolDown is TestCommons {
         vm.prank(_userOne);
         vm.expectEmit(true, true, true, true);
         emit Redeem(_userOne, 500e18);
-        IStakeService(_router).redeem(_userOne);
+        IPowerTokenStakeService(_router).redeemPwToken(_userOne);
 
         // then
         PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)
@@ -284,10 +284,10 @@ contract PwTokenCoolDown is TestCommons {
             .COOL_DOWN_IN_SECONDS();
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
 
         vm.prank(_userOne);
-        IStakeService(_router).cooldown(500e18);
+        IPowerTokenStakeService(_router).pwTokenCooldown(500e18);
 
         uint256 userBalanceBeforeExchangeRateChanged = IPowerTokenLens(_router).balanceOfPwToken(
             _userOne
@@ -308,7 +308,7 @@ contract PwTokenCoolDown is TestCommons {
 
         // when
         vm.prank(_userOne);
-        IStakeService(_router).redeem(_userOne);
+        IPowerTokenStakeService(_router).redeemPwToken(_userOne);
 
         // then
         uint256 userBalanceERC20AfterRedeem = IERC20(iporToken).balanceOf(_userOne);

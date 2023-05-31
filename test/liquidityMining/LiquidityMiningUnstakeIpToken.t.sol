@@ -3,11 +3,11 @@ pragma solidity 0.8.17;
 
 import "../TestCommons.sol";
 import "../PowerTokensTestsSystem.sol";
-import "../../contracts/interfaces/types/PowerTokenTypes.sol";
-import "../../contracts/interfaces/ILiquidityMiningLens.sol";
-import "../../contracts/interfaces/IPowerTokenLens.sol";
-import "../../contracts/interfaces/IStakeService.sol";
-import "../../contracts/tokens/PowerTokenInternal.sol";
+import "contracts/interfaces/types/PowerTokenTypes.sol";
+import "contracts/interfaces/ILiquidityMiningLens.sol";
+import "contracts/interfaces/IPowerTokenLens.sol";
+import "contracts/interfaces/IPowerTokenStakeService.sol";
+import "contracts/tokens/PowerTokenInternal.sol";
 
 contract PwTokenUnstakeLpTokensTest is TestCommons {
     event LpTokensRemoved(address account, address lpToken, uint256 lpTokenAmount);
@@ -56,7 +56,7 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         uint256[] memory lpTokenAmountsToUnstake = new uint256[](1);
         lpTokenAmountsToUnstake[0] = 50_000e18;
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
         IFlowsService(_router).delegate(lpTokens, lpTokenAmounts);
         vm.stopPrank();
 
@@ -74,7 +74,11 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
 
         for (uint256 i; i < 50; ++i) {
             vm.prank(_userOne);
-            IStakeService(_router).stakeLpTokens(_userOne, lpTokens, lpTokenAmounts);
+            IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+                _userOne,
+                lpTokens,
+                lpTokenAmounts
+            );
             vm.roll(block.number + 100);
         }
 
@@ -91,7 +95,11 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         vm.prank(_userOne);
         vm.expectEmit(true, true, true, true);
         emit LpTokensRemoved(_userOne, lpDai, lpTokenAmountsToUnstake[0]);
-        IStakeService(_router).unstakeLpTokens(_userOne, lpTokens, lpTokenAmountsToUnstake);
+        IPowerTokenStakeService(_router).unstakeLpTokensFromLiquidityMining(
+            _userOne,
+            lpTokens,
+            lpTokenAmountsToUnstake
+        );
 
         // then
 
@@ -155,7 +163,7 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         uint256[] memory lpTokenAmountsToUnstake = new uint256[](1);
         lpTokenAmountsToUnstake[0] = 50_000e18;
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
         IFlowsService(_router).delegate(lpTokens, lpTokenAmounts);
         vm.stopPrank();
 
@@ -173,7 +181,11 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
 
         for (uint256 i; i < 50; ++i) {
             vm.prank(_userOne);
-            IStakeService(_router).stakeLpTokens(_userOne, lpTokens, lpTokenAmounts);
+            IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+                _userOne,
+                lpTokens,
+                lpTokenAmounts
+            );
             vm.roll(block.number + 100);
         }
 
@@ -193,7 +205,11 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         ILiquidityMiningInternal(liquidityMining).phasingOutLpToken(lpDai);
 
         vm.prank(_userOne);
-        IStakeService(_router).unstakeLpTokens(_userOne, lpTokens, lpTokenAmountsToUnstake);
+        IPowerTokenStakeService(_router).unstakeLpTokensFromLiquidityMining(
+            _userOne,
+            lpTokens,
+            lpTokenAmountsToUnstake
+        );
 
         // then
 
@@ -255,36 +271,60 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         uint256[] memory lpTokenAmountsToUnstake = new uint256[](1);
         lpTokenAmountsToUnstake[0] = 50_000e18;
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
         IFlowsService(_router).delegate(lpTokens, lpTokenAmounts);
         vm.stopPrank();
         vm.startPrank(_userTwo);
-        IStakeService(_router).stakeProtocolToken(_userTwo, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userTwo, 1_000e18);
         IFlowsService(_router).delegate(lpTokens, lpTokenAmounts);
         vm.stopPrank();
         vm.startPrank(_userThree);
-        IStakeService(_router).stakeProtocolToken(_userThree, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userThree, 1_000e18);
         IFlowsService(_router).delegate(lpTokens, lpTokenAmounts);
         vm.stopPrank();
 
         // when
         for (uint256 i; i < 100; ++i) {
             vm.prank(_userOne);
-            IStakeService(_router).stakeLpTokens(_userOne, lpTokens, lpTokenAmounts);
+            IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+                _userOne,
+                lpTokens,
+                lpTokenAmounts
+            );
             vm.prank(_userTwo);
-            IStakeService(_router).stakeLpTokens(_userTwo, lpTokens, lpTokenAmounts);
+            IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+                _userTwo,
+                lpTokens,
+                lpTokenAmounts
+            );
             vm.prank(_userThree);
-            IStakeService(_router).stakeLpTokens(_userThree, lpTokens, lpTokenAmounts);
+            IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+                _userThree,
+                lpTokens,
+                lpTokenAmounts
+            );
             vm.roll(block.number + 150);
         }
 
         // then
         vm.prank(_userOne);
-        IStakeService(_router).unstakeLpTokens(_userOne, lpTokens, lpTokenAmountsToUnstake);
+        IPowerTokenStakeService(_router).unstakeLpTokensFromLiquidityMining(
+            _userOne,
+            lpTokens,
+            lpTokenAmountsToUnstake
+        );
         vm.prank(_userTwo);
-        IStakeService(_router).unstakeLpTokens(_userTwo, lpTokens, lpTokenAmountsToUnstake);
+        IPowerTokenStakeService(_router).unstakeLpTokensFromLiquidityMining(
+            _userTwo,
+            lpTokens,
+            lpTokenAmountsToUnstake
+        );
         vm.prank(_userThree);
-        IStakeService(_router).unstakeLpTokens(_userThree, lpTokens, lpTokenAmountsToUnstake);
+        IPowerTokenStakeService(_router).unstakeLpTokensFromLiquidityMining(
+            _userThree,
+            lpTokens,
+            lpTokenAmountsToUnstake
+        );
 
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsUserOne = ILiquidityMiningLens(
             _router
@@ -322,8 +362,12 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         uint256[] memory lpTokenAmounts = new uint256[](1);
         lpTokenAmounts[0] = 100e18;
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
-        IStakeService(_router).stakeLpTokens(_userOne, lpTokens, lpTokenAmounts);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            lpTokens,
+            lpTokenAmounts
+        );
         IFlowsService(_router).delegate(lpTokens, lpTokenAmounts);
         vm.stopPrank();
         vm.roll(block.number + 100);
@@ -341,7 +385,11 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
 
         // when
         vm.prank(_userOne);
-        IStakeService(_router).unstakeLpTokens(_userOne, lpTokens, lpTokenAmounts);
+        IPowerTokenStakeService(_router).unstakeLpTokensFromLiquidityMining(
+            _userOne,
+            lpTokens,
+            lpTokenAmounts
+        );
 
         // then
         LiquidityMiningTypes.AccountIndicatorsResult[]
@@ -410,8 +458,12 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         amountsPwTokens[0] = 400e18;
 
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeLpTokens(_userOne, tokens, amountsLpTokens);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            tokens,
+            amountsLpTokens
+        );
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
         vm.stopPrank();
 
         vm.roll(block.number + 100);
@@ -421,7 +473,11 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
 
         // when
         vm.prank(_userOne);
-        IStakeService(_router).unstakeLpTokens(_userOne, tokens, amountsLpTokens);
+        IPowerTokenStakeService(_router).unstakeLpTokensFromLiquidityMining(
+            _userOne,
+            tokens,
+            amountsLpTokens
+        );
 
         vm.roll(block.number + 100);
 
@@ -447,8 +503,12 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         amountsPwTokens[0] = 400e18;
 
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeLpTokens(_userOne, tokens, amountsLpTokens);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            tokens,
+            amountsLpTokens
+        );
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
         IFlowsService(_router).delegate(tokens, amountsPwTokens);
         vm.stopPrank();
 

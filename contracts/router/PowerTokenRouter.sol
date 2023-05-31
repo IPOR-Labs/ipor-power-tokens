@@ -7,7 +7,7 @@ import "./AccessControl.sol";
 import "../libraries/errors/Errors.sol";
 import "../interfaces/ILiquidityMiningLens.sol";
 import "../interfaces/IPowerTokenLens.sol";
-import "../interfaces/IStakeService.sol";
+import "../interfaces/IPowerTokenStakeService.sol";
 import "../interfaces/IFlowsService.sol";
 import "../security/StorageLib.sol";
 
@@ -77,13 +77,13 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
     /// @return The address of the implementation contract.
     function getRouterImplementation(bytes4 sig) internal returns (address) {
         if (
-            sig == IStakeService.stakeLpTokens.selector ||
-            sig == IStakeService.unstakeLpTokens.selector ||
-            sig == IStakeService.stakeProtocolToken.selector ||
-            sig == IStakeService.unstakeProtocolToken.selector ||
-            sig == IStakeService.cooldown.selector ||
-            sig == IStakeService.cancelCooldown.selector ||
-            sig == IStakeService.redeem.selector
+            sig == IPowerTokenStakeService.stakeLpTokensToLiquidityMining.selector ||
+            sig == IPowerTokenStakeService.unstakeLpTokensFromLiquidityMining.selector ||
+            sig == IPowerTokenStakeService.stakeGovernanceTokenToPowerToken.selector ||
+            sig == IPowerTokenStakeService.unstakeGovernanceTokenFromPowerToken.selector ||
+            sig == IPowerTokenStakeService.pwTokenCooldown.selector ||
+            sig == IPowerTokenStakeService.pwTokenCancelCooldown.selector ||
+            sig == IPowerTokenStakeService.redeemPwToken.selector
         ) {
             _whenNotPaused();
             _nonReentrant();

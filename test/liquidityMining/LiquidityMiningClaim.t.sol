@@ -65,7 +65,7 @@ contract PwTokenUndelegateTest is TestCommons {
         amounts[2] = 1_000e18;
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeLpTokens(_userOne, tokens, amounts);
+        IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(_userOne, tokens, amounts);
 
         uint256 blockNumber = block.number;
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsBefore = ILiquidityMiningLens(
@@ -137,7 +137,11 @@ contract PwTokenUndelegateTest is TestCommons {
         amountsSecond[2] = 1e18;
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeLpTokens(_userOne, tokens, amountsFirst);
+        IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            tokens,
+            amountsFirst
+        );
 
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsBefore = ILiquidityMiningLens(
             _router
@@ -148,7 +152,11 @@ contract PwTokenUndelegateTest is TestCommons {
 
         // when
         vm.prank(_userOne);
-        IStakeService(_router).stakeLpTokens(_userOne, tokens, amountsSecond);
+        IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            tokens,
+            amountsSecond
+        );
 
         vm.roll(block.number + 100);
 
@@ -207,7 +215,11 @@ contract PwTokenUndelegateTest is TestCommons {
         // when
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeLpTokens(_userOne, tokens, amountsFirst);
+        IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            tokens,
+            amountsFirst
+        );
 
         vm.roll(block.number + 100);
         LiquidityMiningTypes.AccountRewardResult[]
@@ -217,7 +229,11 @@ contract PwTokenUndelegateTest is TestCommons {
             );
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeLpTokens(_userOne, tokens, amountsFirst);
+        IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            tokens,
+            amountsFirst
+        );
 
         vm.roll(block.number + 100);
         LiquidityMiningTypes.AccountRewardResult[]
@@ -301,7 +317,11 @@ contract PwTokenUndelegateTest is TestCommons {
         amountsPwTokens[0] = 400e18;
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeLpTokens(_userOne, tokens, amountsLpTokens);
+        IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            tokens,
+            amountsLpTokens
+        );
 
         vm.roll(block.number + 100);
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsBefore = ILiquidityMiningLens(
@@ -309,7 +329,7 @@ contract PwTokenUndelegateTest is TestCommons {
         ).calculateAccountRewards(_userOne, tokens);
 
         vm.prank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
 
         // when
         vm.prank(_userOne);
@@ -366,8 +386,12 @@ contract PwTokenUndelegateTest is TestCommons {
         amountsPwTokens[0] = 400e18;
 
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeLpTokens(_userOne, tokens, amountsLpTokens);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            tokens,
+            amountsLpTokens
+        );
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
         vm.stopPrank();
 
         vm.roll(block.number + 100);
@@ -381,7 +405,11 @@ contract PwTokenUndelegateTest is TestCommons {
 
         // when
         vm.prank(_userOne);
-        IStakeService(_router).unstakeLpTokens(_userOne, tokens, amountsLpTokens);
+        IPowerTokenStakeService(_router).unstakeLpTokensFromLiquidityMining(
+            _userOne,
+            tokens,
+            amountsLpTokens
+        );
 
         vm.roll(block.number + 100);
 

@@ -43,7 +43,11 @@ contract StakeLpTokensTest is TestCommons {
         // WHEN
         vm.expectRevert(bytes("ERC20: insufficient allowance"));
         vm.prank(_userOne);
-        IStakeService(router).stakeLpTokens(_userOne, stakedTokens, stakedAmounts);
+        IPowerTokenStakeService(router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            stakedTokens,
+            stakedAmounts
+        );
 
         // THEN
         uint256 miningBalanceAfter = ERC20(_activeLpToken).balanceOf(
@@ -81,7 +85,11 @@ contract StakeLpTokensTest is TestCommons {
         vm.prank(_userOne);
         vm.expectEmit(true, true, true, true);
         emit LpTokenAdded(_userOne, _activeLpToken, stakeAmount);
-        IStakeService(router).stakeLpTokens(_userOne, stakedTokens, stakedAmounts);
+        IPowerTokenStakeService(router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            stakedTokens,
+            stakedAmounts
+        );
 
         // THEN
         uint256 miningBalanceAfter = ERC20(_activeLpToken).balanceOf(
@@ -131,7 +139,11 @@ contract StakeLpTokensTest is TestCommons {
         // WHEN
         vm.expectRevert(bytes(Errors.LP_TOKEN_NOT_SUPPORTED));
         vm.prank(_userOne);
-        IStakeService(router).stakeLpTokens(_userOne, stakedTokens, stakedAmounts);
+        IPowerTokenStakeService(router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            stakedTokens,
+            stakedAmounts
+        );
 
         // THEN
         uint256 miningBalanceAfter = ERC20(_activeLpToken).balanceOf(
@@ -164,7 +176,11 @@ contract StakeLpTokensTest is TestCommons {
         // WHEN
         vm.expectRevert(bytes("Pausable: paused"));
         vm.prank(_userOne);
-        IStakeService(router).stakeLpTokens(_userOne, stakedTokens, stakedAmounts);
+        IPowerTokenStakeService(router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            stakedTokens,
+            stakedAmounts
+        );
 
         // THEN
         uint256 miningBalanceAfter = ERC20(_activeLpToken).balanceOf(
@@ -193,7 +209,11 @@ contract StakeLpTokensTest is TestCommons {
         // WHEN
         vm.expectRevert(bytes(Errors.VALUE_NOT_GREATER_THAN_ZERO));
         vm.prank(_userOne);
-        IStakeService(router).stakeLpTokens(_userOne, stakedTokens, stakedAmounts);
+        IPowerTokenStakeService(router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            stakedTokens,
+            stakedAmounts
+        );
 
         // THEN
         uint256 miningBalanceAfter = ERC20(_activeLpToken).balanceOf(

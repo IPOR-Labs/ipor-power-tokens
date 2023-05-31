@@ -56,13 +56,13 @@ contract PwTokenUnstakeTest is TestCommons {
     function testShouldNotBeAbleUnstakeWhenAmountIsAero() external {
         // given
         vm.prank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
         uint256 iporTokenBalanceBefore = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
 
         // when
         vm.prank(_userOne);
         vm.expectRevert(bytes(Errors.VALUE_NOT_GREATER_THAN_ZERO));
-        IStakeService(_router).unstakeProtocolToken(_userOne, 0);
+        IPowerTokenStakeService(_router).unstakeGovernanceTokenFromPowerToken(_userOne, 0);
 
         // then
         uint256 iporTokenBalanceAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
@@ -77,7 +77,7 @@ contract PwTokenUnstakeTest is TestCommons {
     function testShouldBeAbleUnstake() external {
         // given
         vm.prank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
         uint256 iporTokenBalanceBefore = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
         uint256 userErc20BalanceBefore = IERC20(_powerTokensSystem.iporToken()).balanceOf(_userOne);
         uint256 exchangeRateBefore = IPowerTokenInternal(_powerTokensSystem.powerToken())
@@ -87,7 +87,7 @@ contract PwTokenUnstakeTest is TestCommons {
         vm.prank(_userOne);
         vm.expectEmit(true, true, true, true);
         emit StakedTokenRemovedWithFee(_userOne, 1_000e18, 1e18, 500e18);
-        IStakeService(_router).unstakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).unstakeGovernanceTokenFromPowerToken(_userOne, 1_000e18);
 
         // then
         uint256 iporTokenBalanceAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
@@ -112,7 +112,7 @@ contract PwTokenUnstakeTest is TestCommons {
     function testShouldBeAbleUnstakePartOfStakedBalance() external {
         // given
         vm.prank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
         uint256 iporTokenBalanceBefore = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
         uint256 userErc20BalanceBefore = IERC20(_powerTokensSystem.iporToken()).balanceOf(_userOne);
         uint256 exchangeRateBefore = IPowerTokenInternal(_powerTokensSystem.powerToken())
@@ -121,7 +121,7 @@ contract PwTokenUnstakeTest is TestCommons {
 
         // when
         vm.prank(_userOne);
-        IStakeService(_router).unstakeProtocolToken(_userOne, 500e18);
+        IPowerTokenStakeService(_router).unstakeGovernanceTokenFromPowerToken(_userOne, 500e18);
 
         // then
         uint256 iporTokenBalanceAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
@@ -158,7 +158,7 @@ contract PwTokenUnstakeTest is TestCommons {
         amounts[0] = 1_000e18;
 
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
         IFlowsService(_router).delegate(lpTokens, amounts);
 
         uint256 iporTokenBalanceBefore = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
@@ -168,7 +168,7 @@ contract PwTokenUnstakeTest is TestCommons {
 
         // when
         vm.expectRevert(bytes(Errors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW));
-        IStakeService(_router).unstakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).unstakeGovernanceTokenFromPowerToken(_userOne, 1_000e18);
 
         // then
         uint256 iporTokenBalanceAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
@@ -201,7 +201,7 @@ contract PwTokenUnstakeTest is TestCommons {
         amounts[0] = 300e18;
 
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
         IFlowsService(_router).delegate(lpTokens, amounts);
         vm.stopPrank();
 
@@ -212,7 +212,7 @@ contract PwTokenUnstakeTest is TestCommons {
 
         // when
         vm.prank(_userOne);
-        IStakeService(_router).unstakeProtocolToken(_userOne, 500e18);
+        IPowerTokenStakeService(_router).unstakeGovernanceTokenFromPowerToken(_userOne, 500e18);
 
         // then
         uint256 iporTokenBalanceAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
@@ -247,7 +247,7 @@ contract PwTokenUnstakeTest is TestCommons {
         address owner = _powerTokensSystem.owner();
 
         vm.startPrank(_userOne);
-        IStakeService(_router).stakeProtocolToken(_userOne, 1_000e18);
+        IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
         IFlowsService(_router).delegate(lpTokens, amounts);
         vm.stopPrank();
 
@@ -262,7 +262,7 @@ contract PwTokenUnstakeTest is TestCommons {
         emit UnstakeWithoutCooldownFeeChanged(owner, 5e17, 1e17);
         IPowerTokenInternal(powerTokenAddress).setUnstakeWithoutCooldownFee(1e17);
         vm.prank(_userOne);
-        IStakeService(_router).unstakeProtocolToken(_userOne, 500e18);
+        IPowerTokenStakeService(_router).unstakeGovernanceTokenFromPowerToken(_userOne, 500e18);
 
         // then
         uint256 iporTokenBalanceAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
