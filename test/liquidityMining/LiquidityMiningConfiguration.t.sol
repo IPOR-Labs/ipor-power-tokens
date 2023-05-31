@@ -433,7 +433,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         // when
         vm.prank(userOne);
         vm.expectRevert(bytes("Pausable: paused"));
-        IFlowsService(router).delegate(lpTokens, pwTokenAmounts);
+        IPowerTokenFlowsService(router).delegatePwTokensToLiquidityMining(lpTokens, pwTokenAmounts);
     }
 
     function testShouldNotBeAbleToDelegatePwTokenWhenLpTokenIsNotSupported() external {
@@ -453,6 +453,6 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         // when
         vm.prank(userOne);
         vm.expectRevert(bytes(Errors.LP_TOKEN_NOT_SUPPORTED));
-        IFlowsService(router).delegate(lpTokens, pwTokenAmounts);
+        IPowerTokenFlowsService(router).delegatePwTokensToLiquidityMining(lpTokens, pwTokenAmounts);
     }
 }

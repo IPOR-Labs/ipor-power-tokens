@@ -205,7 +205,10 @@ contract PwTokenCoolDown is TestCommons {
         // when
         vm.prank(_userOne);
         vm.expectRevert(bytes(Errors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW));
-        IFlowsService(_router).delegate(lpTokens, amountsToDelegate);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(
+            lpTokens,
+            amountsToDelegate
+        );
 
         // then
         PowerTokenTypes.PwTokenCooldown memory cooldownAfter = IPowerTokenLens(_router)

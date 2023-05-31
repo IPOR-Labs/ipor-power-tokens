@@ -50,7 +50,7 @@ contract PwTokenUndelegateTest is TestCommons {
         //  when
         vm.prank(_userOne);
         vm.expectRevert(bytes(Errors.NO_REWARDS_TO_CLAIM));
-        IFlowsService(_router).claim(tokens);
+        IPowerTokenFlowsService(_router).claimRewardsFromLiquidityMining(tokens);
     }
 
     function testShouldClaimRewardsWhen100BlocksWereMint() external {
@@ -79,7 +79,7 @@ contract PwTokenUndelegateTest is TestCommons {
         vm.prank(_userOne);
         vm.expectEmit(true, true, true, true);
         emit Claimed(_userOne, tokens, 300e18);
-        IFlowsService(_router).claim(tokens);
+        IPowerTokenFlowsService(_router).claimRewardsFromLiquidityMining(tokens);
 
         // then
         uint256 pwTokensAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
@@ -161,7 +161,7 @@ contract PwTokenUndelegateTest is TestCommons {
         vm.roll(block.number + 100);
 
         vm.prank(_userOne);
-        IFlowsService(_router).claim(tokens);
+        IPowerTokenFlowsService(_router).claimRewardsFromLiquidityMining(tokens);
 
         // then
         uint256 pwTokensAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
@@ -333,7 +333,7 @@ contract PwTokenUndelegateTest is TestCommons {
 
         // when
         vm.prank(_userOne);
-        IFlowsService(_router).delegate(tokens, amountsPwTokens);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(tokens, amountsPwTokens);
 
         vm.roll(block.number + 100);
         LiquidityMiningTypes.AccountRewardResult[]
@@ -341,7 +341,7 @@ contract PwTokenUndelegateTest is TestCommons {
                 .calculateAccountRewards(_userOne, tokens);
 
         vm.prank(_userOne);
-        IFlowsService(_router).delegate(tokens, amountsPwTokens);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(tokens, amountsPwTokens);
 
         // then
         LiquidityMiningTypes.AccountRewardResult[]
@@ -400,7 +400,7 @@ contract PwTokenUndelegateTest is TestCommons {
         ).calculateAccountRewards(_userOne, tokens);
 
         vm.prank(_userOne);
-        IFlowsService(_router).delegate(tokens, amountsPwTokens);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(tokens, amountsPwTokens);
         vm.roll(block.number + 100);
 
         // when
@@ -414,7 +414,7 @@ contract PwTokenUndelegateTest is TestCommons {
         vm.roll(block.number + 100);
 
         vm.prank(_userOne);
-        IFlowsService(_router).delegate(tokens, amountsPwTokens);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(tokens, amountsPwTokens);
 
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsAfter = ILiquidityMiningLens(
             _router

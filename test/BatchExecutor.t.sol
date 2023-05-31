@@ -101,7 +101,7 @@ contract BatchExecutorTest is TestCommons {
         );
 
         bytes memory delegate = abi.encodeWithSignature(
-            "delegate(address[],uint256[])",
+            "delegatePwTokensToLiquidityMining(address[],uint256[])",
             lpTokens,
             stakedAmounts
         );

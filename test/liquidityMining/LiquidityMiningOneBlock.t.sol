@@ -3,12 +3,12 @@ pragma solidity 0.8.17;
 
 import "../TestCommons.sol";
 import "../PowerTokensTestsSystem.sol";
-import "../../contracts/interfaces/types/PowerTokenTypes.sol";
-import "../../contracts/interfaces/ILiquidityMiningLens.sol";
-import "../../contracts/interfaces/ILiquidityMiningInternal.sol";
-import "../../contracts/interfaces/IPowerTokenStakeService.sol";
-import "../../contracts/interfaces/IFlowsService.sol";
-import "../../contracts/tokens/PowerTokenInternal.sol";
+import "contracts/interfaces/types/PowerTokenTypes.sol";
+import "contracts/interfaces/ILiquidityMiningLens.sol";
+import "contracts/interfaces/ILiquidityMiningInternal.sol";
+import "contracts/interfaces/IPowerTokenStakeService.sol";
+import "contracts/interfaces/IPowerTokenFlowsService.sol";
+import "contracts/tokens/PowerTokenInternal.sol";
 
 contract LiquidityMiningOneBlockTest is TestCommons {
     PowerTokensTestsSystem internal _powerTokensSystem;
@@ -376,7 +376,10 @@ contract LiquidityMiningOneBlockTest is TestCommons {
 
         vm.startPrank(_userOne);
         IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 100e18);
-        IFlowsService(_router).delegate(lpTokens, lpTokenAmounts);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(
+            lpTokens,
+            lpTokenAmounts
+        );
         IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
             _userOne,
             lpTokens,
@@ -388,7 +391,10 @@ contract LiquidityMiningOneBlockTest is TestCommons {
 
         vm.startPrank(_userTwo);
         IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userTwo, 100e18);
-        IFlowsService(_router).delegate(lpTokens, lpTokenAmounts);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(
+            lpTokens,
+            lpTokenAmounts
+        );
         IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
             _userTwo,
             lpTokens,
@@ -400,7 +406,10 @@ contract LiquidityMiningOneBlockTest is TestCommons {
 
         vm.startPrank(_userThree);
         IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userThree, 100e18);
-        IFlowsService(_router).delegate(lpTokens, lpTokenAmounts);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(
+            lpTokens,
+            lpTokenAmounts
+        );
         lpTokenAmounts[0] = 300e18;
         IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
             _userThree,

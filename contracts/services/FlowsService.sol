@@ -3,12 +3,12 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "../interfaces/IFlowsService.sol";
+import "../interfaces/IPowerTokenFlowsService.sol";
 import "../interfaces/ILiquidityMining.sol";
 import "../interfaces/IPowerToken.sol";
 import "../libraries/errors/Errors.sol";
 
-contract FlowsService is IFlowsService {
+contract FlowsService is IPowerTokenFlowsService {
     using SafeERC20 for IERC20;
     address public immutable LIQUIDITY_MINING;
     address public immutable POWER_TOKEN;
@@ -36,7 +36,7 @@ contract FlowsService is IFlowsService {
         POWER_TOKEN = powerTokenAddress;
     }
 
-    function claim(address[] calldata lpTokens) external {
+    function claimRewardsFromLiquidityMining(address[] calldata lpTokens) external {
         require(lpTokens.length > 0, Errors.INPUT_ARRAYS_EMPTY);
         uint256 rewardsAmountToTransfer = ILiquidityMining(LIQUIDITY_MINING).claim(
             msg.sender,
@@ -53,12 +53,17 @@ contract FlowsService is IFlowsService {
         );
     }
 
-    function updateIndicators(address account, address[] calldata lpTokens) external {
+    function updateIndicatorsInLiquidityMining(address account, address[] calldata lpTokens)
+        external
+    {
         require(lpTokens.length > 0, Errors.INPUT_ARRAYS_EMPTY);
         ILiquidityMining(LIQUIDITY_MINING).updateIndicators(account, lpTokens);
     }
 
-    function delegate(address[] calldata lpTokens, uint256[] calldata pwTokenAmounts) external {
+    function delegatePwTokensToLiquidityMining(
+        address[] calldata lpTokens,
+        uint256[] calldata pwTokenAmounts
+    ) external {
         uint256 lpTokensLength = lpTokens.length;
         require(lpTokensLength == pwTokenAmounts.length, Errors.INPUT_ARRAYS_LENGTH_MISMATCH);
         require(lpTokensLength > 0, Errors.INPUT_ARRAYS_EMPTY);
@@ -81,7 +86,10 @@ contract FlowsService is IFlowsService {
         ILiquidityMining(LIQUIDITY_MINING).addPwTokens(updatePwTokens);
     }
 
-    function undelegate(address[] calldata lpTokens, uint256[] calldata pwTokenAmounts) external {
+    function undelegatePwTokensFromLiquidityMining(
+        address[] calldata lpTokens,
+        uint256[] calldata pwTokenAmounts
+    ) external {
         uint256 length = lpTokens.length;
         require(length == pwTokenAmounts.length, Errors.INPUT_ARRAYS_LENGTH_MISMATCH);
         require(length > 0, Errors.INPUT_ARRAYS_EMPTY);

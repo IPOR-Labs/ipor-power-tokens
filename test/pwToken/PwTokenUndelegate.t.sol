@@ -34,7 +34,7 @@ contract PwTokenUndelegateTest is TestCommons {
         //  when
         vm.prank(_userOne);
         vm.expectRevert(bytes(Errors.VALUE_NOT_GREATER_THAN_ZERO));
-        IFlowsService(_router).undelegate(tokens, amounts);
+        IPowerTokenFlowsService(_router).undelegatePwTokensFromLiquidityMining(tokens, amounts);
     }
 
     function testShouldRevertTransactionWhenNoDelegateTokens() external {
@@ -50,7 +50,7 @@ contract PwTokenUndelegateTest is TestCommons {
         //  when
         vm.prank(_userOne);
         vm.expectRevert(bytes(Errors.ACC_DELEGATED_TO_LIQUIDITY_MINING_BALANCE_IS_TOO_LOW));
-        IFlowsService(_router).undelegate(tokens, amounts);
+        IPowerTokenFlowsService(_router).undelegatePwTokensFromLiquidityMining(tokens, amounts);
     }
 
     function testShouldRevertTransactionWhenDelegateAmountIsLessThenUndelegateAmount() external {
@@ -62,7 +62,7 @@ contract PwTokenUndelegateTest is TestCommons {
 
         vm.startPrank(_userOne);
         IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
-        IFlowsService(_router).delegate(tokens, amounts);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(tokens, amounts);
         vm.stopPrank();
 
         uint256 balanseOfDelegateBefore = IPowerTokenLens(_router)
@@ -72,7 +72,7 @@ contract PwTokenUndelegateTest is TestCommons {
         vm.prank(_userOne);
         vm.expectRevert(bytes(Errors.ACC_DELEGATED_TO_LIQUIDITY_MINING_BALANCE_IS_TOO_LOW));
         amounts[0] += 1;
-        IFlowsService(_router).undelegate(tokens, amounts);
+        IPowerTokenFlowsService(_router).undelegatePwTokensFromLiquidityMining(tokens, amounts);
 
         //  then
         uint256 balanseOfDelegateAfter = IPowerTokenLens(_router)
@@ -98,7 +98,7 @@ contract PwTokenUndelegateTest is TestCommons {
 
         vm.startPrank(_userOne);
         IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
-        IFlowsService(_router).delegate(tokens, amounts);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(tokens, amounts);
         vm.stopPrank();
 
         uint256 balanseOfDelegateBefore = IPowerTokenLens(_router)
@@ -108,7 +108,7 @@ contract PwTokenUndelegateTest is TestCommons {
         vm.prank(_userOne);
         vm.expectRevert(bytes(Errors.ACC_DELEGATED_TO_LIQUIDITY_MINING_BALANCE_IS_TOO_LOW));
         amounts[0] += 1;
-        IFlowsService(_router).undelegate(tokens, amounts);
+        IPowerTokenFlowsService(_router).undelegatePwTokensFromLiquidityMining(tokens, amounts);
 
         // then
         uint256 balanseOfDelegateAfter = IPowerTokenLens(_router)
@@ -135,7 +135,7 @@ contract PwTokenUndelegateTest is TestCommons {
         //  when
         vm.prank(_userOne);
         vm.expectRevert(bytes(Errors.INPUT_ARRAYS_LENGTH_MISMATCH));
-        IFlowsService(_router).delegate(tokens, amounts);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(tokens, amounts);
     }
 
     function testShouldRevertTransactionWhenMismatchArrayLengthCase2() external {
@@ -152,7 +152,7 @@ contract PwTokenUndelegateTest is TestCommons {
         //  when
         vm.prank(_userOne);
         vm.expectRevert(bytes(Errors.INPUT_ARRAYS_LENGTH_MISMATCH));
-        IFlowsService(_router).delegate(tokens, amounts);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(tokens, amounts);
     }
 
     function testShouldUndelegateWhen2Asset() external {
@@ -166,7 +166,7 @@ contract PwTokenUndelegateTest is TestCommons {
 
         vm.startPrank(_userOne);
         IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
-        IFlowsService(_router).delegate(tokens, amounts);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(tokens, amounts);
         vm.stopPrank();
 
         uint256 balanseOfDelegateBefore = IPowerTokenLens(_router)
@@ -178,7 +178,7 @@ contract PwTokenUndelegateTest is TestCommons {
         vm.prank(_userOne);
         vm.expectEmit(true, true, true, true);
         emit Undelegated(_userOne, 1_000e18);
-        IFlowsService(_router).undelegate(tokens, amounts);
+        IPowerTokenFlowsService(_router).undelegatePwTokensFromLiquidityMining(tokens, amounts);
 
         //  then
         uint256 balanseOfDelegateAfter = IPowerTokenLens(_router)

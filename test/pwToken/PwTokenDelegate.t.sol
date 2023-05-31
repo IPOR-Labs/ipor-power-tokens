@@ -33,7 +33,7 @@ contract PwTokenDelegateTest is TestCommons {
         //when
         vm.prank(_userOne);
         vm.expectRevert(bytes(Errors.INPUT_ARRAYS_LENGTH_MISMATCH));
-        IFlowsService(_router).delegate(tokens, amounts);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(tokens, amounts);
     }
 
     function testShouldRevertTransactionWhenInsufficientNumberOfTokensToDelegate() external {
@@ -51,7 +51,7 @@ contract PwTokenDelegateTest is TestCommons {
         //when
         vm.prank(_userOne);
         vm.expectRevert(bytes(Errors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW));
-        IFlowsService(_router).delegate(tokens, amounts);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(tokens, amounts);
 
         //then
         uint256 balancePwTokenAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
@@ -80,7 +80,7 @@ contract PwTokenDelegateTest is TestCommons {
         //when
         vm.prank(_userOne);
         vm.expectRevert(bytes(Errors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW));
-        IFlowsService(_router).delegate(tokens, amounts);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(tokens, amounts);
 
         //then
         uint256 balancePwTokenAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
@@ -113,7 +113,7 @@ contract PwTokenDelegateTest is TestCommons {
         vm.prank(_userOne);
         vm.expectEmit(true, true, true, true);
         emit Delegated(_userOne, 500e18);
-        IFlowsService(_router).delegate(tokens, amounts);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(tokens, amounts);
 
         //  then
         uint256 balancePwTokenAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
@@ -146,7 +146,7 @@ contract PwTokenDelegateTest is TestCommons {
 
         // when
         vm.prank(_userOne);
-        IFlowsService(_router).delegate(tokens, amounts);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(tokens, amounts);
 
         // then
         uint256 balancePwTokenAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);

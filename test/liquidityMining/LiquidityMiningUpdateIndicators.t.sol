@@ -73,7 +73,7 @@ contract LiquidityMiningUpdateIndicatorsTest is TestCommons {
         vm.roll(block.number + 100);
 
         // when
-        IFlowsService(_router).updateIndicators(_userOne, lpTokens);
+        IPowerTokenFlowsService(_router).updateIndicatorsInLiquidityMining(_userOne, lpTokens);
 
         // then
         LiquidityMiningTypes.GlobalIndicatorsResult[]
@@ -150,7 +150,7 @@ contract LiquidityMiningUpdateIndicatorsTest is TestCommons {
         vm.roll(block.number + 100);
 
         // when
-        IFlowsService(_router).updateIndicators(_userOne, lpTokens);
+        IPowerTokenFlowsService(_router).updateIndicatorsInLiquidityMining(_userOne, lpTokens);
 
         // then
         LiquidityMiningTypes.GlobalIndicatorsResult[]

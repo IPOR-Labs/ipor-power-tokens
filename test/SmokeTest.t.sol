@@ -57,7 +57,10 @@ contract SmokeTest is TestCommons {
 
         vm.startPrank(_userOne);
         IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
-        IFlowsService(_router).delegate(stakedTokens, stakedAmounts);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(
+            stakedTokens,
+            stakedAmounts
+        );
 
         // WHEN
         LiquidityMiningTypes.DelegatedPwTokenBalance[] memory balances = ILiquidityMiningLens(

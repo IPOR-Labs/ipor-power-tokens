@@ -159,7 +159,7 @@ contract PwTokenUnstakeTest is TestCommons {
 
         vm.startPrank(_userOne);
         IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
-        IFlowsService(_router).delegate(lpTokens, amounts);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(lpTokens, amounts);
 
         uint256 iporTokenBalanceBefore = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
         uint256 userErc20BalanceBefore = IERC20(_powerTokensSystem.iporToken()).balanceOf(_userOne);
@@ -202,7 +202,7 @@ contract PwTokenUnstakeTest is TestCommons {
 
         vm.startPrank(_userOne);
         IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
-        IFlowsService(_router).delegate(lpTokens, amounts);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(lpTokens, amounts);
         vm.stopPrank();
 
         uint256 iporTokenBalanceBefore = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
@@ -248,7 +248,7 @@ contract PwTokenUnstakeTest is TestCommons {
 
         vm.startPrank(_userOne);
         IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
-        IFlowsService(_router).delegate(lpTokens, amounts);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(lpTokens, amounts);
         vm.stopPrank();
 
         uint256 iporTokenBalanceBefore = IPowerTokenLens(_router).balanceOfPwToken(_userOne);

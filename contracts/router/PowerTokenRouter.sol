@@ -8,7 +8,7 @@ import "../libraries/errors/Errors.sol";
 import "../interfaces/ILiquidityMiningLens.sol";
 import "../interfaces/IPowerTokenLens.sol";
 import "../interfaces/IPowerTokenStakeService.sol";
-import "../interfaces/IFlowsService.sol";
+import "../interfaces/IPowerTokenFlowsService.sol";
 import "../security/StorageLib.sol";
 
 contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
@@ -91,10 +91,10 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
             return STAKE_SERVICE;
         }
         if (
-            sig == IFlowsService.delegate.selector ||
-            sig == IFlowsService.updateIndicators.selector ||
-            sig == IFlowsService.undelegate.selector ||
-            sig == IFlowsService.claim.selector
+            sig == IPowerTokenFlowsService.delegatePwTokensToLiquidityMining.selector ||
+            sig == IPowerTokenFlowsService.updateIndicatorsInLiquidityMining.selector ||
+            sig == IPowerTokenFlowsService.undelegatePwTokensFromLiquidityMining.selector ||
+            sig == IPowerTokenFlowsService.claimRewardsFromLiquidityMining.selector
         ) {
             _whenNotPaused();
             _nonReentrant();

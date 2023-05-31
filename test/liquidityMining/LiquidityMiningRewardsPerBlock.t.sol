@@ -308,7 +308,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
 
         vm.startPrank(_userOne);
         IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 2_000e18);
-        IFlowsService(_router).delegate(lpTokens, amounts);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(lpTokens, amounts);
         IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
             _userOne,
             lpTokens,
@@ -349,7 +349,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
 
         vm.startPrank(_userOne);
         IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 2_000e18);
-        IFlowsService(_router).delegate(lpTokens, amounts);
+        IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(lpTokens, amounts);
         IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
             _userOne,
             lpTokens,
