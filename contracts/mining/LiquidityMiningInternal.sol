@@ -64,7 +64,7 @@ abstract contract LiquidityMiningInternal is
 
         _pauseManager = _msgSender();
 
-        for (uint256 i; i != lpTokensLength; ++i) {
+        for (uint256 i; i != lpTokensLength; ) {
             require(lpTokens[i] != address(0), Errors.WRONG_ADDRESS);
 
             _lpTokens[lpTokens[i]] = true;
@@ -77,6 +77,9 @@ abstract contract LiquidityMiningInternal is
                 0,
                 0
             );
+            unchecked {
+                ++i;
+            }
         }
     }
 
