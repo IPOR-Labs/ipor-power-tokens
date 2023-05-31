@@ -64,14 +64,12 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         vm.stopPrank();
 
         LiquidityMiningTypes.AccountIndicatorsResult[]
-            memory accountIndicatorsBefore = ILiquidityMiningLens(_router).getAccountIndicators(
-                _userOne,
-                lpTokens
-            );
+            memory accountIndicatorsBefore = ILiquidityMiningLens(_router)
+                .getAccountIndicatorsFromLiquidityMining(_userOne, lpTokens);
 
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsBefore = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
         // when
 
@@ -86,14 +84,12 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         }
 
         LiquidityMiningTypes.AccountIndicatorsResult[]
-            memory accountIndicatorsAfterStake = ILiquidityMiningLens(_router).getAccountIndicators(
-                _userOne,
-                lpTokens
-            );
+            memory accountIndicatorsAfterStake = ILiquidityMiningLens(_router)
+                .getAccountIndicatorsFromLiquidityMining(_userOne, lpTokens);
 
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsAfterStake = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
         vm.prank(_userOne);
         vm.expectEmit(true, true, true, true);
@@ -108,13 +104,11 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
 
         LiquidityMiningTypes.AccountIndicatorsResult[]
             memory accountIndicatorsAfterUnstake = ILiquidityMiningLens(_router)
-                .getAccountIndicators(_userOne, lpTokens);
+                .getAccountIndicatorsFromLiquidityMining(_userOne, lpTokens);
 
         LiquidityMiningTypes.AccountRewardResult[]
-            memory rewardsAfterUnstake = ILiquidityMiningLens(_router).calculateAccountRewards(
-                _userOne,
-                lpTokens
-            );
+            memory rewardsAfterUnstake = ILiquidityMiningLens(_router)
+                .getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
         assertEq(
             accountIndicatorsBefore[0].indicators.delegatedPwTokenBalance,
@@ -174,14 +168,12 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         vm.stopPrank();
 
         LiquidityMiningTypes.AccountIndicatorsResult[]
-            memory accountIndicatorsBefore = ILiquidityMiningLens(_router).getAccountIndicators(
-                _userOne,
-                lpTokens
-            );
+            memory accountIndicatorsBefore = ILiquidityMiningLens(_router)
+                .getAccountIndicatorsFromLiquidityMining(_userOne, lpTokens);
 
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsBefore = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
         // when
 
@@ -196,14 +188,12 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         }
 
         LiquidityMiningTypes.AccountIndicatorsResult[]
-            memory accountIndicatorsAfterStake = ILiquidityMiningLens(_router).getAccountIndicators(
-                _userOne,
-                lpTokens
-            );
+            memory accountIndicatorsAfterStake = ILiquidityMiningLens(_router)
+                .getAccountIndicatorsFromLiquidityMining(_userOne, lpTokens);
 
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsAfterStake = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
         vm.prank(owner);
         vm.expectEmit(true, true, true, true);
@@ -221,13 +211,11 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
 
         LiquidityMiningTypes.AccountIndicatorsResult[]
             memory accountIndicatorsAfterUnstake = ILiquidityMiningLens(_router)
-                .getAccountIndicators(_userOne, lpTokens);
+                .getAccountIndicatorsFromLiquidityMining(_userOne, lpTokens);
 
         LiquidityMiningTypes.AccountRewardResult[]
-            memory rewardsAfterUnstake = ILiquidityMiningLens(_router).calculateAccountRewards(
-                _userOne,
-                lpTokens
-            );
+            memory rewardsAfterUnstake = ILiquidityMiningLens(_router)
+                .getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
         assertEq(
             accountIndicatorsBefore[0].indicators.delegatedPwTokenBalance,
@@ -343,17 +331,17 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
 
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsUserOne = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, lpTokens);
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsUserTwo = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userTwo, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userTwo, lpTokens);
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsUserThree = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userThree, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userThree, lpTokens);
 
         LiquidityMiningTypes.AccruedRewardsResult[] memory accruedRewards = ILiquidityMiningLens(
             _router
-        ).calculateAccruedRewards(lpTokens);
+        ).getAccruedRewardsInLiquidityMining(lpTokens);
 
         uint256 sumOfRewards = rewardsUserOne[0].rewardsAmount +
             rewardsUserTwo[0].rewardsAmount +
@@ -391,15 +379,12 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         vm.roll(block.number + 100);
 
         LiquidityMiningTypes.AccountIndicatorsResult[]
-            memory accountIndicatorsBefore = ILiquidityMiningLens(_router).getAccountIndicators(
-                _userOne,
-                lpTokens
-            );
+            memory accountIndicatorsBefore = ILiquidityMiningLens(_router)
+                .getAccountIndicatorsFromLiquidityMining(_userOne, lpTokens);
 
         LiquidityMiningTypes.GlobalIndicatorsResult[]
-            memory globalIndicatorsBefore = ILiquidityMiningLens(_router).getGlobalIndicators(
-                lpTokens
-            );
+            memory globalIndicatorsBefore = ILiquidityMiningLens(_router)
+                .getGlobalIndicatorsFromLiquidityMining(lpTokens);
 
         // when
         vm.prank(_userOne);
@@ -411,19 +396,16 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
 
         // then
         LiquidityMiningTypes.AccountIndicatorsResult[]
-            memory accountIndicatorsAfter = ILiquidityMiningLens(_router).getAccountIndicators(
-                _userOne,
-                lpTokens
-            );
+            memory accountIndicatorsAfter = ILiquidityMiningLens(_router)
+                .getAccountIndicatorsFromLiquidityMining(_userOne, lpTokens);
 
         LiquidityMiningTypes.GlobalIndicatorsResult[]
-            memory globalIndicatorsAfter = ILiquidityMiningLens(_router).getGlobalIndicators(
-                lpTokens
-            );
+            memory globalIndicatorsAfter = ILiquidityMiningLens(_router)
+                .getGlobalIndicatorsFromLiquidityMining(lpTokens);
 
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsUserOne = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
         assertEq(
             globalIndicatorsBefore[0].indicators.aggregatedPowerUp,
@@ -487,7 +469,7 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         vm.roll(block.number + 100);
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsBefore = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, tokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, tokens);
 
         // when
         vm.prank(_userOne);
@@ -502,7 +484,7 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         // then
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsAfter = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, tokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, tokens);
 
         assertEq(rewardsBefore[0].rewardsAmount, 100e18, "rewardsBefore - rewardsAmount");
         assertEq(rewardsBefore[0].allocatedPwTokens, 0, "rewardsBefore - allocatedPwTokens");
@@ -533,7 +515,7 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         vm.roll(block.number + 100);
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsBefore = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, tokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, tokens);
 
         // when
 
@@ -544,7 +526,7 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         // then
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsAfter = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, tokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, tokens);
 
         assertEq(rewardsBefore[0].rewardsAmount, 100e18, "rewardsBefore - rewardsAmount");
         assertEq(rewardsBefore[0].allocatedPwTokens, 0, "rewardsBefore - allocatedPwTokens");

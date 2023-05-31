@@ -107,10 +107,8 @@ contract BatchExecutorTest is TestCommons {
         );
 
         LiquidityMiningTypes.AccountIndicatorsResult[]
-            memory accountIndicatorsBefore = ILiquidityMiningLens(_router).getAccountIndicators(
-                _userOne,
-                lpTokens
-            );
+            memory accountIndicatorsBefore = ILiquidityMiningLens(_router)
+                .getAccountIndicatorsFromLiquidityMining(_userOne, lpTokens);
 
         bytes[] memory requestData = new bytes[](3);
         requestData[0] = stakeIpor;
@@ -124,10 +122,8 @@ contract BatchExecutorTest is TestCommons {
         // then
 
         LiquidityMiningTypes.AccountIndicatorsResult[]
-            memory accountIndicatorsAfter = ILiquidityMiningLens(_router).getAccountIndicators(
-                _userOne,
-                lpTokens
-            );
+            memory accountIndicatorsAfter = ILiquidityMiningLens(_router)
+                .getAccountIndicatorsFromLiquidityMining(_userOne, lpTokens);
 
         assertEq(
             accountIndicatorsBefore[0].indicators.lpTokenBalance,

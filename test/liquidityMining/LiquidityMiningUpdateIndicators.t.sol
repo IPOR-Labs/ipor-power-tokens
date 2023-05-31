@@ -55,21 +55,16 @@ contract LiquidityMiningUpdateIndicatorsTest is TestCommons {
         vm.stopPrank();
 
         LiquidityMiningTypes.GlobalIndicatorsResult[]
-            memory globalIndicatorsBefore = ILiquidityMiningLens(_router).getGlobalIndicators(
-                lpTokens
-            );
+            memory globalIndicatorsBefore = ILiquidityMiningLens(_router)
+                .getGlobalIndicatorsFromLiquidityMining(lpTokens);
 
         LiquidityMiningTypes.AccountIndicatorsResult[]
-            memory accountIndicatorsBefore = ILiquidityMiningLens(_router).getAccountIndicators(
-                _userOne,
-                lpTokens
-            );
+            memory accountIndicatorsBefore = ILiquidityMiningLens(_router)
+                .getAccountIndicatorsFromLiquidityMining(_userOne, lpTokens);
 
         LiquidityMiningTypes.AccountRewardResult[]
-            memory accountRewardsBefore = ILiquidityMiningLens(_router).calculateAccountRewards(
-                _userOne,
-                lpTokens
-            );
+            memory accountRewardsBefore = ILiquidityMiningLens(_router)
+                .getAccountRewardsInLiquidityMining(_userOne, lpTokens);
         vm.roll(block.number + 100);
 
         // when
@@ -77,21 +72,16 @@ contract LiquidityMiningUpdateIndicatorsTest is TestCommons {
 
         // then
         LiquidityMiningTypes.GlobalIndicatorsResult[]
-            memory globalIndicatorsAfter = ILiquidityMiningLens(_router).getGlobalIndicators(
-                lpTokens
-            );
+            memory globalIndicatorsAfter = ILiquidityMiningLens(_router)
+                .getGlobalIndicatorsFromLiquidityMining(lpTokens);
 
         LiquidityMiningTypes.AccountIndicatorsResult[]
-            memory accountIndicatorsAfter = ILiquidityMiningLens(_router).getAccountIndicators(
-                _userOne,
-                lpTokens
-            );
+            memory accountIndicatorsAfter = ILiquidityMiningLens(_router)
+                .getAccountIndicatorsFromLiquidityMining(_userOne, lpTokens);
 
         LiquidityMiningTypes.AccountRewardResult[]
-            memory accountRewardsAfter = ILiquidityMiningLens(_router).calculateAccountRewards(
-                _userOne,
-                lpTokens
-            );
+            memory accountRewardsAfter = ILiquidityMiningLens(_router)
+                .getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
         //    globalIndicatorsBefore[0].indicators.blockNumber
         assertTrue(
@@ -132,21 +122,16 @@ contract LiquidityMiningUpdateIndicatorsTest is TestCommons {
         vm.stopPrank();
 
         LiquidityMiningTypes.GlobalIndicatorsResult[]
-            memory globalIndicatorsBefore = ILiquidityMiningLens(_router).getGlobalIndicators(
-                lpTokens
-            );
+            memory globalIndicatorsBefore = ILiquidityMiningLens(_router)
+                .getGlobalIndicatorsFromLiquidityMining(lpTokens);
 
         LiquidityMiningTypes.AccountIndicatorsResult[]
-            memory accountIndicatorsBefore = ILiquidityMiningLens(_router).getAccountIndicators(
-                _userOne,
-                lpTokens
-            );
+            memory accountIndicatorsBefore = ILiquidityMiningLens(_router)
+                .getAccountIndicatorsFromLiquidityMining(_userOne, lpTokens);
 
         LiquidityMiningTypes.AccountRewardResult[]
-            memory accountRewardsBefore = ILiquidityMiningLens(_router).calculateAccountRewards(
-                _userOne,
-                lpTokens
-            );
+            memory accountRewardsBefore = ILiquidityMiningLens(_router)
+                .getAccountRewardsInLiquidityMining(_userOne, lpTokens);
         vm.roll(block.number + 100);
 
         // when
@@ -154,21 +139,16 @@ contract LiquidityMiningUpdateIndicatorsTest is TestCommons {
 
         // then
         LiquidityMiningTypes.GlobalIndicatorsResult[]
-            memory globalIndicatorsAfter = ILiquidityMiningLens(_router).getGlobalIndicators(
-                lpTokens
-            );
+            memory globalIndicatorsAfter = ILiquidityMiningLens(_router)
+                .getGlobalIndicatorsFromLiquidityMining(lpTokens);
 
         LiquidityMiningTypes.AccountIndicatorsResult[]
-            memory accountIndicatorsAfter = ILiquidityMiningLens(_router).getAccountIndicators(
-                _userOne,
-                lpTokens
-            );
+            memory accountIndicatorsAfter = ILiquidityMiningLens(_router)
+                .getAccountIndicatorsFromLiquidityMining(_userOne, lpTokens);
 
         LiquidityMiningTypes.AccountRewardResult[]
-            memory accountRewardsAfter = ILiquidityMiningLens(_router).calculateAccountRewards(
-                _userOne,
-                lpTokens
-            );
+            memory accountRewardsAfter = ILiquidityMiningLens(_router)
+                .getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
         assertTrue(
             globalIndicatorsBefore[0].indicators.blockNumber + 100 ==

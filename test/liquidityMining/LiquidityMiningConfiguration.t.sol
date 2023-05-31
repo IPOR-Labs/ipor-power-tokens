@@ -341,7 +341,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         // when
         LiquidityMiningTypes.DelegatedPwTokenBalance[] memory balances = ILiquidityMiningLens(
             router
-        ).balanceOfDelegatedPwToken(userOne, lpTokens);
+        ).balanceOfPowerTokensDelegatedToLiquidityMining(userOne, lpTokens);
 
         // then
 

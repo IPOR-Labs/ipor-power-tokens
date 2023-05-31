@@ -20,11 +20,6 @@ contract SmokeTest is TestCommons {
         _powerTokensSystem.transferIporToken(_userOne, 10_000e18);
     }
 
-    function testGetContractId() public {
-        bytes32 id = ILiquidityMiningLens(_router).getLiquidityMiningContractId();
-        assertEq(id, 0x9b1f3aa590476fc9aa58d44ad1419ab53d34c344bd5ed46b12e4af7d27c38e06);
-    }
-
     function testBalanceOf() public {
         // GIVEN
         address[] memory stakedTokens = new address[](1);
@@ -40,7 +35,7 @@ contract SmokeTest is TestCommons {
         );
 
         // WHEN
-        uint256 balance = ILiquidityMiningLens(_router).liquidityMiningBalanceOf(
+        uint256 balance = ILiquidityMiningLens(_router).balanceOfLpTokensStakedInLiquidityMining(
             _userOne,
             _powerTokensSystem.lpDai()
         );
@@ -65,7 +60,7 @@ contract SmokeTest is TestCommons {
         // WHEN
         LiquidityMiningTypes.DelegatedPwTokenBalance[] memory balances = ILiquidityMiningLens(
             _router
-        ).balanceOfDelegatedPwToken(_userOne, stakedTokens);
+        ).balanceOfPowerTokensDelegatedToLiquidityMining(_userOne, stakedTokens);
         vm.stopPrank();
 
         // THEN
@@ -91,7 +86,7 @@ contract SmokeTest is TestCommons {
         // WHEN
 
         LiquidityMiningTypes.AccruedRewardsResult[] memory result = ILiquidityMiningLens(_router)
-            .calculateAccruedRewards(stakedTokens);
+            .getAccruedRewardsInLiquidityMining(stakedTokens);
         vm.stopPrank();
 
         // THEN
@@ -117,7 +112,7 @@ contract SmokeTest is TestCommons {
         // WHEN
 
         LiquidityMiningTypes.AccountRewardResult[] memory result = ILiquidityMiningLens(_router)
-            .calculateAccountRewards(_userOne, stakedTokens);
+            .getAccountRewardsInLiquidityMining(_userOne, stakedTokens);
         vm.stopPrank();
 
         // THEN

@@ -77,15 +77,11 @@ contract LiquidityMiningOneBlockTest is TestCommons {
 
         // then
         LiquidityMiningTypes.AccountIndicatorsResult[]
-            memory userOneIndicators = ILiquidityMiningLens(_router).getAccountIndicators(
-                _userOne,
-                lpTokens
-            );
+            memory userOneIndicators = ILiquidityMiningLens(_router)
+                .getAccountIndicatorsFromLiquidityMining(_userOne, lpTokens);
         LiquidityMiningTypes.AccountIndicatorsResult[]
-            memory userTwoIndicators = ILiquidityMiningLens(_router).getAccountIndicators(
-                _userTwo,
-                lpTokens
-            );
+            memory userTwoIndicators = ILiquidityMiningLens(_router)
+                .getAccountIndicatorsFromLiquidityMining(_userTwo, lpTokens);
 
         assertEq(
             userOneIndicators[0].indicators.compositeMultiplierCumulativePrevBlock,
@@ -155,10 +151,10 @@ contract LiquidityMiningOneBlockTest is TestCommons {
 
         LiquidityMiningTypes.AccountRewardResult[] memory userOneRewards = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, lpTokens);
         LiquidityMiningTypes.AccountRewardResult[] memory userTwoRewards = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userTwo, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userTwo, lpTokens);
 
         assertEq(
             userOneRewards[0].lpToken,
@@ -221,7 +217,7 @@ contract LiquidityMiningOneBlockTest is TestCommons {
         // then
         LiquidityMiningTypes.AccountRewardResult[] memory userOneRewards = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
         assertEq(userOneRewards[0].rewardsAmount, 0, "rewardsAmount should be 0");
         assertEq(userOneRewards[0].allocatedPwTokens, 0, "allocatedPwTokens should be 0");
@@ -264,11 +260,11 @@ contract LiquidityMiningOneBlockTest is TestCommons {
         // then
         LiquidityMiningTypes.AccountRewardResult[] memory userOneRewards = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
         LiquidityMiningTypes.AccountRewardResult[] memory userTwoRewards = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userTwo, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userTwo, lpTokens);
 
         assertEq(userOneRewards[0].rewardsAmount, 0, "rewardsAmount should be 0");
         assertEq(userOneRewards[0].allocatedPwTokens, 0, "allocatedPwTokens should be 0");
@@ -347,11 +343,11 @@ contract LiquidityMiningOneBlockTest is TestCommons {
 
         LiquidityMiningTypes.AccountRewardResult[] memory userOneRewards = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
         LiquidityMiningTypes.AccountRewardResult[] memory userTwoRewards = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userTwo, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userTwo, lpTokens);
 
         assertEq(
             userOneRewards[0].rewardsAmount,
@@ -421,18 +417,18 @@ contract LiquidityMiningOneBlockTest is TestCommons {
 
         LiquidityMiningTypes.AccruedRewardsResult[] memory accruedRewards = ILiquidityMiningLens(
             _router
-        ).calculateAccruedRewards(lpTokens);
+        ).getAccruedRewardsInLiquidityMining(lpTokens);
         LiquidityMiningTypes.AccountRewardResult[] memory userOneRewards = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
         LiquidityMiningTypes.AccountRewardResult[] memory userTwoRewards = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userTwo, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userTwo, lpTokens);
 
         LiquidityMiningTypes.AccountRewardResult[] memory userThreeRewards = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userThree, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userThree, lpTokens);
 
         uint256 totalRewards = userOneRewards[0].rewardsAmount +
             userTwoRewards[0].rewardsAmount +

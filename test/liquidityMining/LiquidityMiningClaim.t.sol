@@ -70,7 +70,7 @@ contract PwTokenUndelegateTest is TestCommons {
         uint256 blockNumber = block.number;
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsBefore = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, tokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, tokens);
         uint256 pwTokensBefore = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
 
         vm.roll(blockNumber + 100);
@@ -85,7 +85,7 @@ contract PwTokenUndelegateTest is TestCommons {
         uint256 pwTokensAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsAfterClaim = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, tokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, tokens);
 
         assertEq(rewardsBefore[0].rewardsAmount, 0, "rewardsBefore - rewardsAmount");
         assertEq(rewardsBefore[0].allocatedPwTokens, 0, "rewardsBefore - allocatedPwTokens");
@@ -145,7 +145,7 @@ contract PwTokenUndelegateTest is TestCommons {
 
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsBefore = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, tokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, tokens);
         uint256 pwTokensBefore = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
 
         vm.roll(block.number + 100);
@@ -167,7 +167,7 @@ contract PwTokenUndelegateTest is TestCommons {
         uint256 pwTokensAfter = IPowerTokenLens(_router).balanceOfPwToken(_userOne);
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsAfterClaim = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, tokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, tokens);
 
         assertEq(rewardsBefore[0].rewardsAmount, 0, "rewardsBefore - rewardsAmount");
         assertEq(rewardsBefore[0].allocatedPwTokens, 0, "rewardsBefore - allocatedPwTokens");
@@ -223,10 +223,8 @@ contract PwTokenUndelegateTest is TestCommons {
 
         vm.roll(block.number + 100);
         LiquidityMiningTypes.AccountRewardResult[]
-            memory rewardsAfter100Blocks = ILiquidityMiningLens(_router).calculateAccountRewards(
-                _userOne,
-                tokens
-            );
+            memory rewardsAfter100Blocks = ILiquidityMiningLens(_router)
+                .getAccountRewardsInLiquidityMining(_userOne, tokens);
 
         vm.prank(_userOne);
         IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
@@ -237,10 +235,8 @@ contract PwTokenUndelegateTest is TestCommons {
 
         vm.roll(block.number + 100);
         LiquidityMiningTypes.AccountRewardResult[]
-            memory rewardsAfter200Blocks = ILiquidityMiningLens(_router).calculateAccountRewards(
-                _userOne,
-                tokens
-            );
+            memory rewardsAfter200Blocks = ILiquidityMiningLens(_router)
+                .getAccountRewardsInLiquidityMining(_userOne, tokens);
 
         // then
 
@@ -326,7 +322,7 @@ contract PwTokenUndelegateTest is TestCommons {
         vm.roll(block.number + 100);
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsBefore = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, tokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, tokens);
 
         vm.prank(_userOne);
         IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
@@ -338,7 +334,7 @@ contract PwTokenUndelegateTest is TestCommons {
         vm.roll(block.number + 100);
         LiquidityMiningTypes.AccountRewardResult[]
             memory rewardsAfterFirstDelegate = ILiquidityMiningLens(_router)
-                .calculateAccountRewards(_userOne, tokens);
+                .getAccountRewardsInLiquidityMining(_userOne, tokens);
 
         vm.prank(_userOne);
         IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(tokens, amountsPwTokens);
@@ -346,7 +342,7 @@ contract PwTokenUndelegateTest is TestCommons {
         // then
         LiquidityMiningTypes.AccountRewardResult[]
             memory rewardsAfterSecondDelegate = ILiquidityMiningLens(_router)
-                .calculateAccountRewards(_userOne, tokens);
+                .getAccountRewardsInLiquidityMining(_userOne, tokens);
 
         assertEq(rewardsBefore[0].rewardsAmount, 100e18, "rewardsBefore - rewardsAmount");
         assertEq(rewardsBefore[0].allocatedPwTokens, 0, "rewardsBefore - allocatedPwTokens");
@@ -397,7 +393,7 @@ contract PwTokenUndelegateTest is TestCommons {
         vm.roll(block.number + 100);
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsBefore = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, tokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, tokens);
 
         vm.prank(_userOne);
         IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(tokens, amountsPwTokens);
@@ -418,7 +414,7 @@ contract PwTokenUndelegateTest is TestCommons {
 
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsAfter = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, tokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, tokens);
 
         // then
         assertEq(rewardsBefore[0].rewardsAmount, 100e18, "rewardsBefore - rewardsAmount");

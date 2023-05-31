@@ -103,13 +103,12 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
         }
 
         if (
-            sig == ILiquidityMiningLens.getLiquidityMiningContractId.selector ||
-            sig == ILiquidityMiningLens.liquidityMiningBalanceOf.selector ||
-            sig == ILiquidityMiningLens.balanceOfDelegatedPwToken.selector ||
-            sig == ILiquidityMiningLens.calculateAccruedRewards.selector ||
-            sig == ILiquidityMiningLens.getAccountIndicators.selector ||
-            sig == ILiquidityMiningLens.getGlobalIndicators.selector ||
-            sig == ILiquidityMiningLens.calculateAccountRewards.selector
+            sig == ILiquidityMiningLens.balanceOfLpTokensStakedInLiquidityMining.selector ||
+            sig == ILiquidityMiningLens.balanceOfPowerTokensDelegatedToLiquidityMining.selector ||
+            sig == ILiquidityMiningLens.getAccruedRewardsInLiquidityMining.selector ||
+            sig == ILiquidityMiningLens.getAccountIndicatorsFromLiquidityMining.selector ||
+            sig == ILiquidityMiningLens.getGlobalIndicatorsFromLiquidityMining.selector ||
+            sig == ILiquidityMiningLens.getAccountRewardsInLiquidityMining.selector
         ) {
             return LIQUIDITY_MINING_LENS;
         }

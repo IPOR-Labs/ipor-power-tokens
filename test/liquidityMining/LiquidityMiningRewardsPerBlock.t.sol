@@ -53,8 +53,8 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         lpTokens[0] = _lpDai;
 
         LiquidityMiningTypes.GlobalIndicatorsResult[]
-            memory globalIndicatorsBefore = ILiquidityMiningLens(_miningAddress)
-                .getGlobalIndicators(lpTokens);
+            memory globalIndicatorsBefore = ILiquidityMiningLens(_router)
+                .getGlobalIndicatorsFromLiquidityMining(lpTokens);
 
         // when
         vm.prank(_owner);
@@ -64,9 +64,8 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
 
         // then
         LiquidityMiningTypes.GlobalIndicatorsResult[]
-            memory globalIndicatorsAfter = ILiquidityMiningLens(_miningAddress).getGlobalIndicators(
-                lpTokens
-            );
+            memory globalIndicatorsAfter = ILiquidityMiningLens(_router)
+                .getGlobalIndicatorsFromLiquidityMining(lpTokens);
 
         assertEq(globalIndicatorsBefore[0].indicators.rewardsPerBlock, 0);
         assertEq(globalIndicatorsAfter[0].indicators.rewardsPerBlock, 2e8);
@@ -78,8 +77,8 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         lpTokens[0] = _lpDai;
 
         LiquidityMiningTypes.GlobalIndicatorsResult[]
-            memory globalIndicatorsBefore = ILiquidityMiningLens(_miningAddress)
-                .getGlobalIndicators(lpTokens);
+            memory globalIndicatorsBefore = ILiquidityMiningLens(_router)
+                .getGlobalIndicatorsFromLiquidityMining(lpTokens);
 
         // when
         vm.prank(_owner);
@@ -87,9 +86,8 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
 
         // then
         LiquidityMiningTypes.GlobalIndicatorsResult[]
-            memory globalIndicatorsAfter = ILiquidityMiningLens(_miningAddress).getGlobalIndicators(
-                lpTokens
-            );
+            memory globalIndicatorsAfter = ILiquidityMiningLens(_router)
+                .getGlobalIndicatorsFromLiquidityMining(lpTokens);
 
         assertEq(globalIndicatorsBefore[0].indicators.accruedRewards, 0);
         assertEq(globalIndicatorsAfter[0].indicators.accruedRewards, 0);
@@ -103,8 +101,8 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         lpTokens[2] = _lpUsdt;
 
         LiquidityMiningTypes.GlobalIndicatorsResult[]
-            memory globalIndicatorsBefore = ILiquidityMiningLens(_miningAddress)
-                .getGlobalIndicators(lpTokens);
+            memory globalIndicatorsBefore = ILiquidityMiningLens(_router)
+                .getGlobalIndicatorsFromLiquidityMining(lpTokens);
 
         // when
         vm.startPrank(_owner);
@@ -116,9 +114,8 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         // then
 
         LiquidityMiningTypes.GlobalIndicatorsResult[]
-            memory globalIndicatorsAfter = ILiquidityMiningLens(_miningAddress).getGlobalIndicators(
-                lpTokens
-            );
+            memory globalIndicatorsAfter = ILiquidityMiningLens(_router)
+                .getGlobalIndicatorsFromLiquidityMining(lpTokens);
 
         assertEq(globalIndicatorsBefore[0].indicators.rewardsPerBlock, 0);
         assertEq(globalIndicatorsAfter[0].indicators.rewardsPerBlock, 1e8);
@@ -134,8 +131,8 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         lpTokens[0] = _lpDai;
 
         LiquidityMiningTypes.GlobalIndicatorsResult[]
-            memory globalIndicatorsBefore = ILiquidityMiningLens(_miningAddress)
-                .getGlobalIndicators(lpTokens);
+            memory globalIndicatorsBefore = ILiquidityMiningLens(_router)
+                .getGlobalIndicatorsFromLiquidityMining(lpTokens);
 
         // when
         vm.expectRevert(bytes("Ownable: caller is not the owner"));
@@ -144,9 +141,8 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         // then
 
         LiquidityMiningTypes.GlobalIndicatorsResult[]
-            memory globalIndicatorsAfter = ILiquidityMiningLens(_miningAddress).getGlobalIndicators(
-                lpTokens
-            );
+            memory globalIndicatorsAfter = ILiquidityMiningLens(_router)
+                .getGlobalIndicatorsFromLiquidityMining(lpTokens);
 
         assertEq(globalIndicatorsBefore[0].indicators.rewardsPerBlock, 0);
         assertEq(globalIndicatorsAfter[0].indicators.rewardsPerBlock, 0);
@@ -173,8 +169,8 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         vm.roll(block.number + 100);
 
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsBefore = ILiquidityMiningLens(
-            _miningAddress
-        ).calculateAccountRewards(_userOne, lpTokens);
+            _router
+        ).getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
         // when
         vm.prank(_owner);
@@ -185,7 +181,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         // then
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsAfter = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
         assertEq(rewardsBefore[0].rewardsAmount, 100e18);
         assertEq(rewardsAfter[0].rewardsAmount, 100e18);
@@ -215,8 +211,8 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
 
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsBefore = ILiquidityMiningLens(
-            _miningAddress
-        ).calculateAccountRewards(_userOne, lpTokens);
+            _router
+        ).getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
         // when
         vm.prank(_owner);
@@ -227,7 +223,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         // then
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsAfter = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
         assertEq(rewardsBefore[0].rewardsAmount, 100e18);
         assertEq(rewardsAfter[0].rewardsAmount, 200e18);
@@ -254,8 +250,8 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         vm.roll(block.number + 100);
 
         LiquidityMiningTypes.GlobalIndicatorsResult[]
-            memory globalIndicatorsBefore = ILiquidityMiningLens(_miningAddress)
-                .getGlobalIndicators(lpTokens);
+            memory globalIndicatorsBefore = ILiquidityMiningLens(_router)
+                .getGlobalIndicatorsFromLiquidityMining(lpTokens);
 
         // when
         vm.prank(_owner);
@@ -263,9 +259,8 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
 
         // then
         LiquidityMiningTypes.GlobalIndicatorsResult[]
-            memory globalIndicatorsAfter = ILiquidityMiningLens(_miningAddress).getGlobalIndicators(
-                lpTokens
-            );
+            memory globalIndicatorsAfter = ILiquidityMiningLens(_router)
+                .getGlobalIndicatorsFromLiquidityMining(lpTokens);
 
         // then
         assertEq(globalIndicatorsAfter[0].indicators.aggregatedPowerUp, 200e18);
@@ -319,7 +314,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
 
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsBefore = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
         // when
         vm.prank(_owner);
@@ -330,7 +325,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         // then
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsAfter = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
         assertEq(rewardsBefore[0].rewardsAmount, 200e18);
         assertEq(rewardsAfter[0].rewardsAmount, 300e18);
@@ -360,7 +355,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
 
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsBefore = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
         // when
         vm.prank(_owner);
@@ -371,7 +366,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         // then
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsAfter = ILiquidityMiningLens(
             _router
-        ).calculateAccountRewards(_userOne, lpTokens);
+        ).getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
         assertEq(rewardsBefore[0].rewardsAmount, 100e18);
         assertEq(rewardsAfter[0].rewardsAmount, 300e18);
