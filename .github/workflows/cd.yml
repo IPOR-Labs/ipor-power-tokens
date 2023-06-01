@@ -24,11 +24,10 @@ jobs:
     if: ${{ always() }}
     needs:
       - notify
-      - build-sc
       - foundry-tests
     uses: ./.github/workflows/report-slack.yml
     secrets:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
     with:
-      success: ${{ needs.build-sc.result == 'success' && needs.foundry-tests.result == 'success' }}
+      success: ${{ needs.foundry-tests.result == 'success' }}
       slack-status-msg-id: ${{ needs.notify.outputs.slack-status-msg-id }}
