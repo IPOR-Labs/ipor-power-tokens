@@ -5,7 +5,6 @@ import "abdk-libraries-solidity/ABDKMathQuad.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 
 import "../errors/Errors.sol";
-import "../Constants.sol";
 import "./MathOperation.sol";
 
 /// @title Library containing the core logic used in the Liquidity Mining module.
@@ -47,12 +46,12 @@ library MiningCalculation {
         bytes16 verticalShift,
         bytes16 horizontalShift
     ) internal pure returns (uint256) {
-        if (accountLpTokenAmount < Constants.D18) {
+        if (accountLpTokenAmount < 1e18) {
             return 0;
         }
 
-        bytes16 accountPwTokenAmountQP = _toQuadruplePrecision(accountPwTokenAmount, Constants.D18);
-        bytes16 lpTokenAmountQP = _toQuadruplePrecision(accountLpTokenAmount, Constants.D18);
+        bytes16 accountPwTokenAmountQP = _toQuadruplePrecision(accountPwTokenAmount, 1e18);
+        bytes16 lpTokenAmountQP = _toQuadruplePrecision(accountLpTokenAmount, 1e18);
         bytes16 ratio = ABDKMathQuad.div(accountPwTokenAmountQP, lpTokenAmountQP);
 
         bytes16 result;
@@ -71,7 +70,7 @@ library MiningCalculation {
 
             result = ABDKMathQuad.add(verticalShift, ABDKMathQuad.log_2(underLog));
         }
-        bytes16 resultD18 = ABDKMathQuad.mul(result, ABDKMathQuad.fromUInt(Constants.D18));
+        bytes16 resultD18 = ABDKMathQuad.mul(result, ABDKMathQuad.fromUInt(1e18));
 
         return ABDKMathQuad.toUInt(resultD18);
     }
@@ -98,7 +97,7 @@ library MiningCalculation {
         uint256 newApu;
 
         if (apu < 0) {
-            uint256 absApu = MathOperation.division((-apu).toUint256(), Constants.D18);
+            uint256 absApu = MathOperation.division((-apu).toUint256(), 1e18);
 
             /// @dev the last unstaking of lpTokens can experience a rounding error
             if (previousAggregatedPowerUp < absApu && previousAggregatedPowerUp + 10000 >= absApu) {
@@ -112,7 +111,7 @@ library MiningCalculation {
 
             newApu = previousAggregatedPowerUp - absApu;
         } else {
-            newApu = previousAggregatedPowerUp + MathOperation.division(apu.toUint256(), Constants.D18);
+            newApu = previousAggregatedPowerUp + MathOperation.division(apu.toUint256(), 1e18);
         }
 
         if (newApu < 10000) {
@@ -139,7 +138,7 @@ library MiningCalculation {
         );
         uint256 newRewards = (blockNumber - lastRebalanceBlockNumber) *
             rewardsPerBlock *
-            Constants.D10;
+            1e10;
         return previousAccruedRewards + newRewards;
     }
 
@@ -156,7 +155,7 @@ library MiningCalculation {
             return 0;
         }
         /// @dev decimals: 8 + 18 + 19 - 18 = 27
-        return MathOperation.division(rewardsPerBlock * Constants.D18 * Constants.D19, aggregatedPowerUp);
+        return MathOperation.division(rewardsPerBlock * 1e18 * 1e19, aggregatedPowerUp);
     }
 
     /// @notice calculates the account's rewards issued in pwTokens
@@ -181,7 +180,7 @@ library MiningCalculation {
             (accruedCompMultiplierCumulativePrevBlock - accountCompMultiplierCumulativePrevBlock);
 
         /// @dev decimals: 18 + 18 + 27 - 45 =  18
-        return MathOperation.division(accountStakedTokenRewards, Constants.D45);
+        return MathOperation.division(accountStakedTokenRewards, 1e45);
     }
 
     /// @notice Calculates the accrued Composite Multiplier Cumulative for the previous block

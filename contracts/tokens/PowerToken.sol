@@ -35,7 +35,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         return
             MathOperation.division(
                 _baseTotalSupply * _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS),
-                Constants.D18
+                1e18
             );
     }
 
@@ -105,7 +105,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         require(transferAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
         uint256 exchangeRate = _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS);
-        uint256 baseAmountToUnstake = MathOperation.division(transferAmount * Constants.D18, exchangeRate);
+        uint256 baseAmountToUnstake = MathOperation.division(transferAmount * 1e18, exchangeRate);
 
         require(
             _baseBalance[account] >= baseAmountToUnstake,
@@ -129,7 +129,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         uint256 exchangeRate = _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS);
 
         uint256 baseAmount = MathOperation.division(
-            updateStakedToken.stakedTokenAmount * Constants.D18,
+            updateStakedToken.stakedTokenAmount * 1e18,
             exchangeRate
         );
 
@@ -162,7 +162,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         );
 
         uint256 baseAmountToUnstake = MathOperation.division(
-            updateStakedToken.stakedTokenAmount * Constants.D18,
+            updateStakedToken.stakedTokenAmount * 1e18,
             exchangeRate
         );
 

@@ -24,7 +24,7 @@ contract MiningCalculationStepFunctionTest is TestCommons {
 
     function testShouldCalculateProperAccountPowerUp() public parameterizedTest(getDataForTest()) {
         // given
-        bytes16 ratio = _toQuadruplePrecision(_testData.inputRatio, Constants.D18);
+        bytes16 ratio = _toQuadruplePrecision(_testData.inputRatio, 1e18);
 
         // when
         bytes16 result = MiningCalculation.accountPowerUpStepFunction(ratio);
@@ -93,7 +93,7 @@ contract MiningCalculationStepFunctionTest is TestCommons {
     }
 
     function _bytes16ToUint(bytes16 number) private pure returns (uint256) {
-        bytes16 resultD18 = ABDKMathQuad.mul(number, ABDKMathQuad.fromUInt(Constants.D18));
+        bytes16 resultD18 = ABDKMathQuad.mul(number, ABDKMathQuad.fromUInt(1e18));
         return ABDKMathQuad.toUInt(resultD18);
     }
 }

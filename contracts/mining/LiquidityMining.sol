@@ -32,13 +32,16 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
         balances = new LiquidityMiningTypes.DelegatedPwTokenBalance[](lpTokensLength);
         address lpToken;
 
-        for (uint256 i; i != lpTokensLength; ++i) {
+        for (uint256 i; i != lpTokensLength; ) {
             lpToken = lpTokens[i];
             require(_lpTokens[lpToken], Errors.LP_TOKEN_NOT_SUPPORTED);
             balances[i] = LiquidityMiningTypes.DelegatedPwTokenBalance(
                 lpToken,
                 _accountIndicators[account][lpToken].delegatedPwTokenBalance
             );
+            unchecked {
+                ++i;
+            }
         }
     }
 
@@ -54,7 +57,7 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators;
         uint256 reward;
 
-        for (uint256 i; i != lpTokensLength; ++i) {
+        for (uint256 i; i != lpTokensLength; ) {
             globalIndicators = _globalIndicators[lpTokens[i]];
             if (globalIndicators.aggregatedPowerUp == 0) {
                 rewards[i] = LiquidityMiningTypes.AccruedRewardsResult(
@@ -70,6 +73,10 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
                 globalIndicators.accruedRewards
             );
             rewards[i] = LiquidityMiningTypes.AccruedRewardsResult(lpTokens[i], reward);
+
+            unchecked {
+                ++i;
+            }
         }
         return rewards;
     }
@@ -118,7 +125,7 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
         uint256 rewardsAmount;
         uint256 accruedCompMultiplierCumulativePrevBlock;
 
-        for (uint256 i; i != lpTokensLength; ++i) {
+        for (uint256 i; i != lpTokensLength; ) {
             lpToken = lpTokens[i];
             accountIndicators = _accountIndicators[account][lpToken];
             globalIndicators = _globalIndicators[lpToken];
@@ -142,6 +149,9 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
                 accountIndicators.delegatedPwTokenBalance
             );
             emit IndicatorsUpdated(account, lpToken);
+            unchecked {
+                ++i;
+            }
         }
         if (rewardsAmountToTransfer > 0) {
             _allocatedPwTokens[account] += rewardsAmountToTransfer;

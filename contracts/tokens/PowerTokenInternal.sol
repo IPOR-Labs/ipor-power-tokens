@@ -8,7 +8,6 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "../libraries/errors/Errors.sol";
 import "../libraries/math/MathOperation.sol";
-import "../libraries/Constants.sol";
 import "../interfaces/types/PowerTokenTypes.sol";
 import "../interfaces/IStakedToken.sol";
 import "../security/MiningOwnableUpgradeable.sol";
@@ -74,7 +73,7 @@ abstract contract PowerTokenInternal is
         __UUPSUpgradeable_init_unchained();
 
         _pauseManager = _msgSender();
-        _unstakeWithoutCooldownFee = Constants.D17 * 5;
+        _unstakeWithoutCooldownFee = 1e17 * 5;
     }
 
     function getVersion() external pure override returns (uint256) {
@@ -103,7 +102,7 @@ abstract contract PowerTokenInternal is
         onlyOwner
     {
         require(
-            unstakeWithoutCooldownFee <= Constants.D18,
+            unstakeWithoutCooldownFee <= 1e18,
             Errors.UNSTAKE_WITHOUT_COOLDOWN_FEE_IS_TO_HIGH
         );
         uint256 oldValue = _unstakeWithoutCooldownFee;
@@ -148,7 +147,7 @@ abstract contract PowerTokenInternal is
         uint256 baseTotalSupply = _baseTotalSupply;
 
         if (baseTotalSupply == 0) {
-            return Constants.D18;
+            return 1e18;
         }
 
         uint256 balanceOfStakedToken = IERC20Upgradeable(stakedTokenAddress).balanceOf(
@@ -156,10 +155,10 @@ abstract contract PowerTokenInternal is
         );
 
         if (balanceOfStakedToken == 0) {
-            return Constants.D18;
+            return 1e18;
         }
 
-        return MathOperation.division(balanceOfStakedToken * Constants.D18, baseTotalSupply);
+        return MathOperation.division(balanceOfStakedToken * 1e18, baseTotalSupply);
     }
 
     function _calculateAmountWithCooldownFeeSubtracted(uint256 baseAmount)
@@ -168,7 +167,7 @@ abstract contract PowerTokenInternal is
         returns (uint256)
     {
         return
-            MathOperation.division((Constants.D18 - _unstakeWithoutCooldownFee) * baseAmount, Constants.D18);
+            MathOperation.division((1e18 - _unstakeWithoutCooldownFee) * baseAmount, 1e18);
     }
 
     function _calculateBaseAmountToPwToken(uint256 baseAmount, uint256 exchangeRate)
@@ -176,7 +175,7 @@ abstract contract PowerTokenInternal is
         pure
         returns (uint256)
     {
-        return MathOperation.division(baseAmount * exchangeRate, Constants.D18);
+        return MathOperation.division(baseAmount * exchangeRate, 1e18);
     }
 
     function _getAvailablePwTokenAmount(address account, uint256 exchangeRate)
