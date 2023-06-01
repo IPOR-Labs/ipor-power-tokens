@@ -5,7 +5,7 @@ import "abdk-libraries-solidity/ABDKMathQuad.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 
 import "../errors/Errors.sol";
-import "./Math.sol";
+import "./MathOperation.sol";
 
 /// @title Library containing the core logic used in the Liquidity Mining module.
 library MiningCalculation {
@@ -97,7 +97,7 @@ library MiningCalculation {
         uint256 newApu;
 
         if (apu < 0) {
-            uint256 absApu = Math.division((-apu).toUint256(), 1e18);
+            uint256 absApu = MathOperation.division((-apu).toUint256(), 1e18);
 
             /// @dev the last unstaking of lpTokens can experience a rounding error
             if (previousAggregatedPowerUp < absApu && previousAggregatedPowerUp + 10000 >= absApu) {
@@ -111,7 +111,7 @@ library MiningCalculation {
 
             newApu = previousAggregatedPowerUp - absApu;
         } else {
-            newApu = previousAggregatedPowerUp + Math.division(apu.toUint256(), 1e18);
+            newApu = previousAggregatedPowerUp + MathOperation.division(apu.toUint256(), 1e18);
         }
 
         if (newApu < 10000) {
@@ -155,7 +155,7 @@ library MiningCalculation {
             return 0;
         }
         /// @dev decimals: 8 + 18 + 19 - 18 = 27
-        return Math.division(rewardsPerBlock * 1e18 * 1e19, aggregatedPowerUp);
+        return MathOperation.division(rewardsPerBlock * 1e18 * 1e19, aggregatedPowerUp);
     }
 
     /// @notice calculates the account's rewards issued in pwTokens
@@ -180,7 +180,7 @@ library MiningCalculation {
             (accruedCompMultiplierCumulativePrevBlock - accountCompMultiplierCumulativePrevBlock);
 
         /// @dev decimals: 18 + 18 + 27 - 45 =  18
-        return Math.division(accountStakedTokenRewards, 1e45);
+        return MathOperation.division(accountStakedTokenRewards, 1e45);
     }
 
     /// @notice Calculates the accrued Composite Multiplier Cumulative for the previous block

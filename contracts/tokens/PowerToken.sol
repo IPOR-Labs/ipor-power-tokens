@@ -33,7 +33,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
 
     function totalSupply() external view override returns (uint256) {
         return
-            Math.division(
+            MathOperation.division(
                 _baseTotalSupply * _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS),
                 1e18
             );
@@ -105,7 +105,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         require(transferAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
         uint256 exchangeRate = _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS);
-        uint256 baseAmountToUnstake = Math.division(transferAmount * 1e18, exchangeRate);
+        uint256 baseAmountToUnstake = MathOperation.division(transferAmount * 1e18, exchangeRate);
 
         require(
             _baseBalance[account] >= baseAmountToUnstake,
@@ -128,7 +128,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
 
         uint256 exchangeRate = _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS);
 
-        uint256 baseAmount = Math.division(
+        uint256 baseAmount = MathOperation.division(
             updateStakedToken.stakedTokenAmount * 1e18,
             exchangeRate
         );
@@ -161,7 +161,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
             Errors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW
         );
 
-        uint256 baseAmountToUnstake = Math.division(
+        uint256 baseAmountToUnstake = MathOperation.division(
             updateStakedToken.stakedTokenAmount * 1e18,
             exchangeRate
         );

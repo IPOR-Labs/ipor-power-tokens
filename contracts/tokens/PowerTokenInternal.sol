@@ -7,7 +7,7 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "../libraries/errors/Errors.sol";
-import "../libraries/math/Math.sol";
+import "../libraries/math/MathOperation.sol";
 import "../interfaces/types/PowerTokenTypes.sol";
 import "../interfaces/IStakedToken.sol";
 import "../security/MiningOwnableUpgradeable.sol";
@@ -158,7 +158,7 @@ abstract contract PowerTokenInternal is
             return 1e18;
         }
 
-        return Math.division(balanceOfStakedToken * 1e18, baseTotalSupply);
+        return MathOperation.division(balanceOfStakedToken * 1e18, baseTotalSupply);
     }
 
     function _calculateAmountWithCooldownFeeSubtracted(uint256 baseAmount)
@@ -167,7 +167,7 @@ abstract contract PowerTokenInternal is
         returns (uint256)
     {
         return
-            Math.division((1e18 - _unstakeWithoutCooldownFee) * baseAmount, 1e18);
+            MathOperation.division((1e18 - _unstakeWithoutCooldownFee) * baseAmount, 1e18);
     }
 
     function _calculateBaseAmountToPwToken(uint256 baseAmount, uint256 exchangeRate)
@@ -175,7 +175,7 @@ abstract contract PowerTokenInternal is
         pure
         returns (uint256)
     {
-        return Math.division(baseAmount * exchangeRate, 1e18);
+        return MathOperation.division(baseAmount * exchangeRate, 1e18);
     }
 
     function _getAvailablePwTokenAmount(address account, uint256 exchangeRate)
