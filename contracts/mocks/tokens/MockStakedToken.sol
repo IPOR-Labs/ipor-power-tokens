@@ -19,6 +19,7 @@ contract MockStakedToken is ERC20 {
         string memory symbol,
         address daoWalletAddress
     ) ERC20(name, symbol) {
+        require(address(0) != daoWalletAddress, "PT_000");
         _decimals = 18;
         _mint(daoWalletAddress, 100_000_000 * 1e18);
     }
