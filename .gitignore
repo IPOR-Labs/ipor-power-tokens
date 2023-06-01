@@ -29,3 +29,4 @@ slither-report.json
 package-lock.json
 out/
 
+/.deps/

@@ -8,7 +8,6 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "../libraries/errors/Errors.sol";
 import "../libraries/math/MiningCalculation.sol";
-import "../libraries/Constants.sol";
 import "../interfaces/types/LiquidityMiningTypes.sol";
 import "../interfaces/ILiquidityMiningInternal.sol";
 import "../interfaces/IStakedToken.sol";
@@ -64,7 +63,7 @@ abstract contract LiquidityMiningInternal is
 
         _pauseManager = _msgSender();
 
-        for (uint256 i; i != lpTokensLength; ++i) {
+        for (uint256 i; i != lpTokensLength; ) {
             require(lpTokens[i] != address(0), Errors.WRONG_ADDRESS);
 
             _lpTokens[lpTokens[i]] = true;
@@ -77,6 +76,9 @@ abstract contract LiquidityMiningInternal is
                 0,
                 0
             );
+            unchecked {
+                ++i;
+            }
         }
     }
 
