@@ -13,12 +13,13 @@ contract StakeService is IPowerTokenStakeService {
 
     address public immutable LIQUIDITY_MINING;
     address public immutable POWER_TOKEN;
+    //TODO: governance token
     address public immutable STAKED_TOKEN;
 
     constructor(
-        address liquidityMiningAddress,
+        address liquidityMiningAddress, //TODO: address redundant
         address powerTokenAddress,
-        address stakedTokenAddress
+        address stakedTokenAddress //TODO: governance token
     ) {
         require(
             liquidityMiningAddress != address(0),
@@ -108,12 +109,14 @@ contract StakeService is IPowerTokenStakeService {
         }
     }
 
+    //TODO: onBehalfOf - beneficiary
     function stakeGovernanceTokenToPowerToken(address onBehalfOf, uint256 iporTokenAmount)
         external
     {
         require(onBehalfOf != address(0), Errors.WRONG_ADDRESS);
         require(iporTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
+        //TODO: addGovernanceToken
         IPowerToken(POWER_TOKEN).addStakedToken(
             PowerTokenTypes.UpdateStakedToken(onBehalfOf, iporTokenAmount)
         );

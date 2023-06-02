@@ -70,6 +70,7 @@ interface ILiquidityMiningInternal {
     /// @param oldPwTokenAmount old value of `rewards per block`, denominated in Power Token, represented in 8 decimals
     /// @param newPwTokenAmount new value of `rewards per block`, denominated in Power Token, represented in 8 decimals
     event RewardsPerBlockChanged(
+        //TODO: remove changedBy and old value in every event.
         address indexed changedBy,
         address lpToken,
         uint256 oldPwTokenAmount,

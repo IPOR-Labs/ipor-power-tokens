@@ -26,7 +26,7 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
         address powerTokenAddress;
         address liquidityMiningLens;
         address stakeService;
-        address miningService;
+        address miningService; //TODO: zmiana nazwy na flowsService
         address powerTokenLens;
     }
 
@@ -86,6 +86,7 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
             sig == IPowerTokenStakeService.redeemPwToken.selector
         ) {
             _whenNotPaused();
+            //TODO: merge _nonReentrant() and _enterReentrancy() into one function
             _nonReentrant();
             _enterReentrancy();
             return STAKE_SERVICE;

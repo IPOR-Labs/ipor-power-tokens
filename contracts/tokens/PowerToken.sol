@@ -126,6 +126,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
     {
         require(updateStakedToken.stakedTokenAmount != 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
+        //TODO: don't have to use in param governance token, because is available in this method
         uint256 exchangeRate = _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS);
 
         uint256 baseAmount = MathOperation.division(
@@ -186,7 +187,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
             updateStakedToken.stakedTokenAmount - stakedTokenAmountToTransfer
         );
     }
-
+//TODO: change to delegateInternal in places where modifier allow requests from our smart contracts
     function delegate(address account, uint256 pwTokenAmount)
         external
         override

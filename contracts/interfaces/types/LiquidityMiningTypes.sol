@@ -50,6 +50,7 @@ library LiquidityMiningTypes {
     }
 
     struct UpdateLpToken {
+        //TODO: change to beneficiary
         address onBehalfOf;
         address lpToken;
         uint256 lpTokenAmount;

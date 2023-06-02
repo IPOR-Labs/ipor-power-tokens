@@ -117,8 +117,10 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
         whenNotPaused
     {
         require(account != address(0), Errors.WRONG_ADDRESS);
+
         LiquidityMiningTypes.AccountRewardsIndicators memory accountIndicators;
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators;
+
         uint256 lpTokensLength = lpTokens.length;
         uint256 rewardsAmountToTransfer;
         address lpToken;
@@ -127,6 +129,7 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
 
         for (uint256 i; i != lpTokensLength; ) {
             lpToken = lpTokens[i];
+
             accountIndicators = _accountIndicators[account][lpToken];
             globalIndicators = _globalIndicators[lpToken];
 
@@ -138,7 +141,9 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
                 globalIndicators,
                 accountIndicators
             );
+
             rewardsAmountToTransfer += rewardsAmount;
+
             _rebalanceIndicators(
                 account,
                 lpToken,
@@ -148,7 +153,9 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
                 accountIndicators.lpTokenBalance,
                 accountIndicators.delegatedPwTokenBalance
             );
+
             emit IndicatorsUpdated(account, lpToken);
+
             unchecked {
                 ++i;
             }
@@ -216,13 +223,14 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
         uint256 length = updateLpToken.length;
         uint256 rewardsAmount;
         uint256 accruedCompMultiplierCumulativePrevBlock;
+
         LiquidityMiningTypes.AccountRewardsIndicators memory accountIndicators;
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators;
         LiquidityMiningTypes.UpdateLpToken memory update;
 
         for (uint256 i; i != length; ) {
             update = updateLpToken[i];
-            require(update.lpTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
+            require(update.lpTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO); //TODO: checked in other places
             require(_lpTokens[update.lpToken], Errors.LP_TOKEN_NOT_SUPPORTED);
 
             accountIndicators = _accountIndicators[update.onBehalfOf][update.lpToken];
@@ -242,9 +250,11 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
                 accountIndicators.lpTokenBalance + update.lpTokenAmount,
                 accountIndicators.delegatedPwTokenBalance
             );
+
             if (rewardsAmount > 0) {
                 _allocatedPwTokens[update.onBehalfOf] += rewardsAmount;
             }
+
             unchecked {
                 ++i;
             }
@@ -320,6 +330,7 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
         uint256 length = updatePwTokens.length;
         uint256 rewardsIteration;
         uint256 accruedCompMultiplierCumulativePrevBlock;
+
         LiquidityMiningTypes.AccountRewardsIndicators memory accountIndicators;
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators;
         LiquidityMiningTypes.UpdatePwToken memory update;
@@ -374,6 +385,7 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
         uint256 length = updateLpToken.length;
         uint256 rewardsAmount;
         uint256 accruedCompMultiplierCumulativePrevBlock;
+
         LiquidityMiningTypes.UpdateLpToken memory update;
         LiquidityMiningTypes.AccountRewardsIndicators memory accountIndicators;
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators;

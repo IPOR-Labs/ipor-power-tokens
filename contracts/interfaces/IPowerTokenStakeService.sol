@@ -13,10 +13,12 @@ interface IPowerTokenStakeService {
     /// @dev The function transfers the LP tokens from the caller's address to the LiquidityMining contract.
     /// @dev Finally, the function calls the `addLpTokens` function of the LiquidityMining contract to update the staked LP tokens.
     /// @dev Reverts if any of the requirements is not met or if the transfer of LP tokens fails.
+    //TODO: add information in docs that when sender doesn't have enough tokens, the function will transfer all tokens that sender has
+
     function stakeLpTokensToLiquidityMining(
         address onBehalfOf,
         address[] calldata lpTokens,
-        uint256[] calldata lpTokenAmounts
+        uint256[] calldata lpTokenAmounts //TODO: lpTokenMaxAmounts
     ) external;
 
     /// @notice Unstakes the specified amounts of LP tokens from the LiquidityMining contract and transfers them to the specified address.

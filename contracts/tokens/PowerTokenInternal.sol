@@ -33,7 +33,8 @@ abstract contract PowerTokenInternal is
     address internal _liquidityMining;
     // @dev @deprecated use _STAKED_TOKEN_ADDRESS instead
     address internal _stakedToken;
-    address internal immutable _STAKED_TOKEN_ADDRESS;
+    address internal immutable _STAKED_TOKEN_ADDRESS;//TODO: przenies na gore
+
     address internal _pauseManager;
 
     /// @dev account address -> base amount, represented with 18 decimals
