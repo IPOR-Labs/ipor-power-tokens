@@ -173,8 +173,7 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
     function batchExecutor(bytes[] calldata calls) external {
         uint256 length = calls.length;
         for (uint256 i; i != length; ) {
-            bytes4 sig = bytes4(calls[i][:4]);
-            address implementation = getRouterImplementation(sig);
+            address implementation = getRouterImplementation(bytes4(calls[i][:4]));
             implementation.functionDelegateCall(calls[i]);
             if (uint256(StorageLib.getReentrancyStatus().value) == _ENTERED) {
                 _leaveReentrancy();
