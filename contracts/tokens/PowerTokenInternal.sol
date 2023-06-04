@@ -33,7 +33,7 @@ abstract contract PowerTokenInternal is
     address internal _liquidityMining;
     // @dev @deprecated use _STAKED_TOKEN_ADDRESS instead
     address internal _stakedToken;
-    address internal immutable _STAKED_TOKEN_ADDRESS;//TODO: przenies na gore
+    address internal immutable _STAKED_TOKEN_ADDRESS; //TODO: przenies na gore
 
     address internal _pauseManager;
 
@@ -97,25 +97,18 @@ abstract contract PowerTokenInternal is
         return _pauseManager;
     }
 
-    function setUnstakeWithoutCooldownFee(uint256 unstakeWithoutCooldownFee)
-        external
-        override
-        onlyOwner
-    {
-        require(
-            unstakeWithoutCooldownFee <= 1e18,
-            Errors.UNSTAKE_WITHOUT_COOLDOWN_FEE_IS_TO_HIGH
-        );
-        uint256 oldValue = _unstakeWithoutCooldownFee;
+    function setUnstakeWithoutCooldownFee(
+        uint256 unstakeWithoutCooldownFee
+    ) external override onlyOwner {
+        require(unstakeWithoutCooldownFee <= 1e18, Errors.UNSTAKE_WITHOUT_COOLDOWN_FEE_IS_TO_HIGH);
         _unstakeWithoutCooldownFee = unstakeWithoutCooldownFee;
-        emit UnstakeWithoutCooldownFeeChanged(_msgSender(), oldValue, unstakeWithoutCooldownFee);
+        emit UnstakeWithoutCooldownFeeChanged(unstakeWithoutCooldownFee);
     }
 
     function setPauseManager(address newPauseManagerAddr) external override onlyOwner {
         require(newPauseManagerAddr != address(0), Errors.WRONG_ADDRESS);
-        address oldPauseManagerAddr = _pauseManager;
         _pauseManager = newPauseManagerAddr;
-        emit PauseManagerChanged(_msgSender(), oldPauseManagerAddr, newPauseManagerAddr);
+        emit PauseManagerChanged(newPauseManagerAddr);
     }
 
     function pause() external override onlyPauseManager {
@@ -140,11 +133,9 @@ abstract contract PowerTokenInternal is
         emit AllowanceRevoked(erc20Token, ROUTER_ADDRESS);
     }
 
-    function _calculateInternalExchangeRate(address stakedTokenAddress)
-        internal
-        view
-        returns (uint256)
-    {
+    function _calculateInternalExchangeRate(
+        address stakedTokenAddress
+    ) internal view returns (uint256) {
         uint256 baseTotalSupply = _baseTotalSupply;
 
         if (baseTotalSupply == 0) {
@@ -162,28 +153,23 @@ abstract contract PowerTokenInternal is
         return MathOperation.division(balanceOfStakedToken * 1e18, baseTotalSupply);
     }
 
-    function _calculateAmountWithCooldownFeeSubtracted(uint256 baseAmount)
-        internal
-        view
-        returns (uint256)
-    {
-        return
-            MathOperation.division((1e18 - _unstakeWithoutCooldownFee) * baseAmount, 1e18);
+    function _calculateAmountWithCooldownFeeSubtracted(
+        uint256 baseAmount
+    ) internal view returns (uint256) {
+        return MathOperation.division((1e18 - _unstakeWithoutCooldownFee) * baseAmount, 1e18);
     }
 
-    function _calculateBaseAmountToPwToken(uint256 baseAmount, uint256 exchangeRate)
-        internal
-        pure
-        returns (uint256)
-    {
+    function _calculateBaseAmountToPwToken(
+        uint256 baseAmount,
+        uint256 exchangeRate
+    ) internal pure returns (uint256) {
         return MathOperation.division(baseAmount * exchangeRate, 1e18);
     }
 
-    function _getAvailablePwTokenAmount(address account, uint256 exchangeRate)
-        internal
-        view
-        returns (uint256)
-    {
+    function _getAvailablePwTokenAmount(
+        address account,
+        uint256 exchangeRate
+    ) internal view returns (uint256) {
         return
             _calculateBaseAmountToPwToken(_baseBalance[account], exchangeRate) -
             _delegatedToLiquidityMiningBalance[account] -

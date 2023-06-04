@@ -12,11 +12,7 @@ import "../../contracts/tokens/PowerTokenInternal.sol";
 contract LiquidityMiningConfigurationTest is TestCommons {
     event LpTokenSupportRemoved(address account, address lpToken);
     event NewLpTokenSupported(address account, address lpToken);
-    event PauseManagerChanged(
-        address indexed changedBy,
-        address indexed oldPauseManager,
-        address indexed newPauseManager
-    );
+    event PauseManagerChanged(address indexed newPauseManager);
 
     PowerTokensTestsSystem internal _powerTokensSystem;
 
@@ -193,7 +189,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
 
         vm.prank(owner);
         vm.expectEmit(true, true, true, true);
-        emit PauseManagerChanged(owner, owner, newPauseManager);
+        emit PauseManagerChanged(newPauseManager);
         ILiquidityMiningInternal(liquidityMining).setPauseManager(newPauseManager);
 
         bool isPausedBefore = PausableUpgradeable(liquidityMining).paused();

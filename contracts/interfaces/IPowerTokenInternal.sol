@@ -59,34 +59,16 @@ interface IPowerTokenInternal {
     event RewardsReceived(address account, uint256 rewardsAmount);
 
     /// @notice Emitted when the fee for immediate unstaking is modified.
-    /// @param changedBy account address that changed the configuration
-    /// @param oldFee old value of the fee, represented with 18 decimals
     /// @param newFee new value of the fee, represented with 18 decimals
-    event UnstakeWithoutCooldownFeeChanged(
-        address indexed changedBy,
-        uint256 oldFee,
-        uint256 newFee
-    );
+    event UnstakeWithoutCooldownFeeChanged(uint256 newFee);
 
     /// @notice Emmited when PauseManager's address had been changed by its owner.
-    /// @param changedBy account address that has changed the LiquidityMining's address
-    /// @param oldLiquidityMining PauseManager's old address
     /// @param newLiquidityMining PauseManager's new address
-    event LiquidityMiningChanged(
-        address indexed changedBy,
-        address indexed oldLiquidityMining,
-        address indexed newLiquidityMining
-    );
+    event LiquidityMiningChanged(address indexed newLiquidityMining);
 
     /// @notice Emmited when the PauseManager's address is changed by its owner.
-    /// @param changedBy account address that has changed the LiquidityMining's address
-    /// @param oldPauseManager PauseManager's old address
     /// @param newPauseManager PauseManager's new address
-    event PauseManagerChanged(
-        address indexed changedBy,
-        address indexed oldPauseManager,
-        address indexed newPauseManager
-    );
+    event PauseManagerChanged(address indexed newPauseManager);
 
     /// @notice Emitted when owner grants allowance for router
     /// @param erc20Token address of ERC20 token

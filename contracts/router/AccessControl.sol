@@ -7,7 +7,7 @@ import "../security/PauseManager.sol";
 
 contract AccessControl {
     event AppointedToTransferOwnership(address indexed appointedOwner);
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event OwnershipTransferred(address indexed newOwner);
 
     uint256 internal constant _NOT_ENTERED = 1;
     uint256 internal constant _ENTERED = 2;
@@ -115,7 +115,7 @@ contract AccessControl {
     function _nonReentrant() internal view {
         require(
             uint256(StorageLib.getReentrancyStatus().value) != _ENTERED,
-        //TODO: use ipor standard error message
+            //TODO: use ipor standard error message
             "ReentrancyGuard: reentrant call"
         );
     }
@@ -134,9 +134,8 @@ contract AccessControl {
      */
     function _transferOwnership(address newOwner) internal virtual {
         StorageLib.OwnerStorage storage ownerStorage = StorageLib.getOwner();
-        address oldOwner = address(ownerStorage.value);
         ownerStorage.value = newOwner;
-        emit OwnershipTransferred(oldOwner, newOwner);
+        emit OwnershipTransferred(newOwner);
     }
 
     function _pause() internal {
@@ -147,7 +146,7 @@ contract AccessControl {
     function _onlyOwner() internal view {
         require(
             address(StorageLib.getOwner().value) == msg.sender,
-        //TODO: use one standard error message
+            //TODO: use one standard error message
             "Ownable: caller is not the owner"
         );
     }

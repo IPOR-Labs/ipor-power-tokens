@@ -10,12 +10,7 @@ import "contracts/interfaces/IPowerTokenStakeService.sol";
 import "contracts/tokens/PowerTokenInternal.sol";
 
 contract LiquidityMiningRewardsPerBlockTest is TestCommons {
-    event RewardsPerBlockChanged(
-        address indexed changedBy,
-        address lpToken,
-        uint256 oldPwTokenAmount,
-        uint256 newPwTokenAmount
-    );
+    event RewardsPerBlockChanged(address lpToken, uint256 newPwTokenAmount);
 
     PowerTokensTestsSystem internal _powerTokensSystem;
     address internal _router;
@@ -59,7 +54,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         // when
         vm.prank(_owner);
         vm.expectEmit(true, true, true, true);
-        emit RewardsPerBlockChanged(_owner, _lpDai, 0, 2e8);
+        emit RewardsPerBlockChanged(_lpDai, 2e8);
         ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 2e8);
 
         // then

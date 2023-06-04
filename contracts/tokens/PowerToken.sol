@@ -9,9 +9,10 @@ import "./PowerTokenInternal.sol";
 /// @notice Power Token is retrieved when the account stakes [Staked] Token.
 /// PowerToken smart contract allows staking, unstaking of [Staked] Token, delegating, undelegating of Power Token balance to LiquidityMining.
 contract PowerToken is PowerTokenInternal, IPowerToken {
-    constructor(address routerAddress, address stakedTokenAddress)
-        PowerTokenInternal(routerAddress, stakedTokenAddress)
-    {
+    constructor(
+        address routerAddress,
+        address stakedTokenAddress
+    ) PowerTokenInternal(routerAddress, stakedTokenAddress) {
         _disableInitializers();
     }
 
@@ -43,12 +44,9 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         return _balanceOf(account);
     }
 
-    function delegatedToLiquidityMiningBalanceOf(address account)
-        external
-        view
-        override
-        returns (uint256)
-    {
+    function delegatedToLiquidityMiningBalanceOf(
+        address account
+    ) external view override returns (uint256) {
         return _delegatedToLiquidityMiningBalance[account];
     }
 
@@ -56,20 +54,16 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         return _unstakeWithoutCooldownFee;
     }
 
-    function getActiveCooldown(address account)
-        external
-        view
-        returns (PowerTokenTypes.PwTokenCooldown memory)
-    {
+    function getActiveCooldown(
+        address account
+    ) external view returns (PowerTokenTypes.PwTokenCooldown memory) {
         return _cooldowns[account];
     }
 
-    function cooldown(address account, uint256 pwTokenAmount)
-        external
-        override
-        whenNotPaused
-        onlyRouter
-    {
+    function cooldown(
+        address account,
+        uint256 pwTokenAmount
+    ) external override whenNotPaused onlyRouter {
         uint256 availablePwTokenAmount = _calculateBaseAmountToPwToken(
             _baseBalance[account],
             _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS)
@@ -84,21 +78,17 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
             block.timestamp + COOL_DOWN_IN_SECONDS,
             pwTokenAmount
         );
-        emit CooldownChanged(account, pwTokenAmount, block.timestamp + COOL_DOWN_IN_SECONDS);
+        emit CooldownChanged(pwTokenAmount, block.timestamp + COOL_DOWN_IN_SECONDS);
     }
 
     function cancelCooldown(address account) external override whenNotPaused onlyRouter {
         delete _cooldowns[account];
-        emit CooldownChanged(account, 0, 0);
+        emit CooldownChanged(0, 0);
     }
 
-    function redeem(address account)
-        external
-        override
-        whenNotPaused
-        onlyRouter
-        returns (uint256 transferAmount)
-    {
+    function redeem(
+        address account
+    ) external override whenNotPaused onlyRouter returns (uint256 transferAmount) {
         PowerTokenTypes.PwTokenCooldown memory accountCooldown = _cooldowns[account];
         transferAmount = accountCooldown.pwTokenAmount;
         require(block.timestamp >= accountCooldown.endTimestamp, Errors.COOL_DOWN_NOT_FINISH);
@@ -120,10 +110,9 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         emit Redeem(account, transferAmount);
     }
 
-    function addStakedToken(PowerTokenTypes.UpdateStakedToken memory updateStakedToken)
-        external
-        onlyRouter
-    {
+    function addStakedToken(
+        PowerTokenTypes.UpdateStakedToken memory updateStakedToken
+    ) external onlyRouter {
         require(updateStakedToken.stakedTokenAmount != 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
         //TODO: don't have to use in param governance token, because is available in this method
@@ -145,11 +134,9 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         );
     }
 
-    function removeStakedTokenWithFee(PowerTokenTypes.UpdateStakedToken memory updateStakedToken)
-        external
-        onlyRouter
-        returns (uint256 stakedTokenAmountToTransfer)
-    {
+    function removeStakedTokenWithFee(
+        PowerTokenTypes.UpdateStakedToken memory updateStakedToken
+    ) external onlyRouter returns (uint256 stakedTokenAmountToTransfer) {
         require(updateStakedToken.stakedTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
         address account = updateStakedToken.onBehalfOf;
@@ -187,13 +174,12 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
             updateStakedToken.stakedTokenAmount - stakedTokenAmountToTransfer
         );
     }
-//TODO: change to delegateInternal in places where modifier allow requests from our smart contracts
-    function delegate(address account, uint256 pwTokenAmount)
-        external
-        override
-        whenNotPaused
-        onlyRouter
-    {
+
+    //TODO: change to delegateInternal in places where modifier allow requests from our smart contracts
+    function delegate(
+        address account,
+        uint256 pwTokenAmount
+    ) external override whenNotPaused onlyRouter {
         require(
             _getAvailablePwTokenAmount(
                 account,
@@ -206,12 +192,10 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         emit Delegated(account, pwTokenAmount);
     }
 
-    function undelegate(address account, uint256 pwTokenAmount)
-        external
-        override
-        whenNotPaused
-        onlyRouter
-    {
+    function undelegate(
+        address account,
+        uint256 pwTokenAmount
+    ) external override whenNotPaused onlyRouter {
         require(
             _delegatedToLiquidityMiningBalance[account] >= pwTokenAmount,
             Errors.ACC_DELEGATED_TO_LIQUIDITY_MINING_BALANCE_IS_TOO_LOW

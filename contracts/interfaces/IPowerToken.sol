@@ -49,10 +49,9 @@ interface IPowerToken {
     /// Struct containing information on when the cooldown end and what is the quantity of the Power Tokens locked.
     /// @param account account address that owns Power Tokens in the cooldown
     /// @return Object PowerTokenTypes.PowerTokenCoolDown represents active cool down
-    function getActiveCooldown(address account)
-        external
-        view
-        returns (PowerTokenTypes.PwTokenCooldown memory);
+    function getActiveCooldown(
+        address account
+    ) external view returns (PowerTokenTypes.PwTokenCooldown memory);
 
     /// @notice Initiates a cooldown for the specified account.
     /// @dev This function allows an account to initiate a cooldown period for a specified amount of Power Tokens.
@@ -87,9 +86,9 @@ interface IPowerToken {
     ///      while deducting a fee from the staked token amount. The fee is determined based on the cooldown period.
     /// @param updateStakedToken An object of type PowerTokenTypes.UpdateStakedToken containing the details of the staked token update.
     /// @return stakedTokenAmountToTransfer The amount of staked tokens to be transferred after applying the fee.
-    function removeStakedTokenWithFee(PowerTokenTypes.UpdateStakedToken memory updateStakedToken)
-        external
-        returns (uint256 stakedTokenAmountToTransfer);
+    function removeStakedTokenWithFee(
+        PowerTokenTypes.UpdateStakedToken memory updateStakedToken
+    ) external returns (uint256 stakedTokenAmountToTransfer);
 
     /// @notice Delegates a specified amount of Power Tokens from the caller's balance to the Liquidity Mining contract.
     /// @dev This function allows the caller to delegate a specified amount of Power Tokens to the Liquidity Mining contract,
@@ -140,10 +139,9 @@ interface IPowerToken {
     event Undelegated(address indexed account, uint256 pwTokenAmounts);
 
     /// @notice Emitted when the sender sets the cooldown on Power Tokens
-    /// @param changedBy account address that has changed the cooldown rules
     /// @param pwTokenAmount amount of pwToken in cooldown
     /// @param endTimestamp end time of the cooldown
-    event CooldownChanged(address indexed changedBy, uint256 pwTokenAmount, uint256 endTimestamp);
+    event CooldownChanged(uint256 pwTokenAmount, uint256 endTimestamp);
 
     /// @notice Emitted when the sender redeems the pwTokens after the cooldown
     /// @param account address that executed the redeem function
