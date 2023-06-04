@@ -28,8 +28,6 @@ abstract contract PowerTokenInternal is
 
     bytes32 internal constant _STAKED_TOKEN_ID =
         0xdba05ed67d0251facfcab8345f27ccd3e72b5a1da8cebfabbcccf4316e6d053c;
-    bytes32 internal constant _LIQUIDITY_MINING_ID =
-        0x9b1f3aa590476fc9aa58d44ad1419ab53d34c344bd5ed46b12e4af7d27c38e06;
     // @dev @deprecated
     address internal _liquidityMining;
     // @dev @deprecated use _STAKED_TOKEN_ADDRESS instead

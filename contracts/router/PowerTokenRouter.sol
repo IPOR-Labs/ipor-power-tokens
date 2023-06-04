@@ -64,11 +64,11 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
         _disableInitializers();
     }
 
-    function initialize(uint256 paused) external initializer {
+    function initialize(uint256 pausedTemp) external initializer {
         __UUPSUpgradeable_init();
         StorageLib.getOwner().value = msg.sender;
         PauseManager.addPauseGuardian(msg.sender);
-        StorageLib.getPaused().value = paused;
+        StorageLib.getPaused().value = pausedTemp;
     }
 
     /// @notice Determines the implementation address based on the provided function signature.
