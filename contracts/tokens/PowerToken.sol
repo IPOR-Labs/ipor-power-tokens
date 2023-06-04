@@ -33,11 +33,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
     }
 
     function totalSupply() external view override returns (uint256) {
-        return
-            MathOperation.division(
-                _baseTotalSupply * _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS),
-                1e18
-            );
+        return MathOperation.division(_baseTotalSupply * _calculateInternalExchangeRate(), 1e18);
     }
 
     function balanceOf(address account) external view override returns (uint256) {
@@ -66,7 +62,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
     ) external override whenNotPaused onlyRouter {
         uint256 availablePwTokenAmount = _calculateBaseAmountToPwToken(
             _baseBalance[account],
-            _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS)
+            _calculateInternalExchangeRate()
         ) - _delegatedToLiquidityMiningBalance[account];
 
         require(
@@ -94,7 +90,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         require(block.timestamp >= accountCooldown.endTimestamp, Errors.COOL_DOWN_NOT_FINISH);
         require(transferAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
-        uint256 exchangeRate = _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS);
+        uint256 exchangeRate = _calculateInternalExchangeRate();
         uint256 baseAmountToUnstake = MathOperation.division(transferAmount * 1e18, exchangeRate);
 
         require(
@@ -118,8 +114,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
             Errors.VALUE_NOT_GREATER_THAN_ZERO
         );
 
-        //TODO: don't have to use in param governance token, because is available in this method
-        uint256 exchangeRate = _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS);
+        uint256 exchangeRate = _calculateInternalExchangeRate();
 
         uint256 baseAmount = MathOperation.division(
             updateGovernanceToken.governanceTokenAmount * 1e18,
@@ -147,7 +142,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
 
         address account = updateGovernanceToken.beneficiary;
 
-        uint256 exchangeRate = _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS);
+        uint256 exchangeRate = _calculateInternalExchangeRate();
         uint256 availablePwTokenAmount = _getAvailablePwTokenAmount(account, exchangeRate);
 
         require(
@@ -187,10 +182,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         uint256 pwTokenAmount
     ) external override whenNotPaused onlyRouter {
         require(
-            _getAvailablePwTokenAmount(
-                account,
-                _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS)
-            ) >= pwTokenAmount,
+            _getAvailablePwTokenAmount(account, _calculateInternalExchangeRate()) >= pwTokenAmount,
             Errors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW
         );
 

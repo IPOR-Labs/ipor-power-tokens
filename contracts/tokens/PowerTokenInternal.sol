@@ -24,7 +24,7 @@ abstract contract PowerTokenInternal is
     /// @dev 14 days
     uint256 public constant COOL_DOWN_IN_SECONDS = 2 * 7 * 24 * 60 * 60;
     address public immutable ROUTER_ADDRESS;
-    address internal immutable _STAKED_TOKEN_ADDRESS;
+    address internal immutable _GOVERNANCE_TOKEN;
 
     bytes32 internal constant _STAKED_TOKEN_ID =
         0xdba05ed67d0251facfcab8345f27ccd3e72b5a1da8cebfabbcccf4316e6d053c;
@@ -54,7 +54,7 @@ abstract contract PowerTokenInternal is
             IGovernanceToken(governanceToken).getContractId() == _STAKED_TOKEN_ID,
             Errors.WRONG_CONTRACT_ID
         );
-        _STAKED_TOKEN_ADDRESS = governanceToken;
+        _GOVERNANCE_TOKEN = governanceToken;
         ROUTER_ADDRESS = routerAddress;
     }
 
@@ -86,11 +86,11 @@ abstract contract PowerTokenInternal is
     }
 
     function calculateExchangeRate() external view override returns (uint256) {
-        return _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS);
+        return _calculateInternalExchangeRate();
     }
 
     function getGovernanceToken() external view override returns (address) {
-        return _STAKED_TOKEN_ADDRESS;
+        return _GOVERNANCE_TOKEN;
     }
 
     function getPauseManager() external view override returns (address) {
@@ -133,16 +133,14 @@ abstract contract PowerTokenInternal is
         emit AllowanceRevoked(erc20Token, ROUTER_ADDRESS);
     }
 
-    function _calculateInternalExchangeRate(
-        address GovernanceTokenAddress
-    ) internal view returns (uint256) {
+    function _calculateInternalExchangeRate() internal view returns (uint256) {
         uint256 baseTotalSupply = _baseTotalSupply;
 
         if (baseTotalSupply == 0) {
             return 1e18;
         }
 
-        uint256 balanceOfGovernanceToken = IERC20Upgradeable(GovernanceTokenAddress).balanceOf(
+        uint256 balanceOfGovernanceToken = IERC20Upgradeable(_GOVERNANCE_TOKEN).balanceOf(
             address(this)
         );
 
@@ -178,10 +176,7 @@ abstract contract PowerTokenInternal is
 
     function _balanceOf(address account) internal view returns (uint256) {
         return
-            _calculateBaseAmountToPwToken(
-                _baseBalance[account],
-                _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS)
-            );
+            _calculateBaseAmountToPwToken(_baseBalance[account], _calculateInternalExchangeRate());
     }
 
     //solhint-disable no-empty-blocks
