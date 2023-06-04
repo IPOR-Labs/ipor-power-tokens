@@ -43,4 +43,7 @@ library Errors {
     string public constant INPUT_ARRAYS_EMPTY = "PT_721";
     string public constant CALLER_NOT_ROUTER = "PT_722";
     string public constant CALLER_NOT_GUARDIAN = "PT_723";
+    string public constant CONTRACT_PAUSED = "PT_724";
+    string public constant REENTRANCY = "PT_725";
+    string public constant CALLER_NOT_OWNER = "PT_723";
 }

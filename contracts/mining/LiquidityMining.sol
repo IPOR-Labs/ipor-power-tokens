@@ -220,7 +220,6 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
 
         for (uint256 i; i != length; ) {
             update = updateLpToken[i];
-            require(update.lpTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO); //TODO: checked in other places
             require(_lpTokens[update.lpToken], Errors.LP_TOKEN_NOT_SUPPORTED);
 
             accountIndicators = _accountIndicators[update.beneficiary][update.lpToken];

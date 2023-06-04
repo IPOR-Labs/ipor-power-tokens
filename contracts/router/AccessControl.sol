@@ -108,16 +108,11 @@ contract AccessControl {
     }
 
     function _whenNotPaused() internal view {
-        //TODO: use ipor standard error message
-        require(uint256(StorageLib.getPaused().value) == 0, "Pausable: paused");
+        require(uint256(StorageLib.getPaused().value) == 0, Errors.CONTRACT_PAUSED);
     }
 
     function _nonReentrant() internal view {
-        require(
-            uint256(StorageLib.getReentrancyStatus().value) != _ENTERED,
-            //TODO: use ipor standard error message
-            "ReentrancyGuard: reentrant call"
-        );
+        require(uint256(StorageLib.getReentrancyStatus().value) != _ENTERED, Errors.REENTRANCY);
     }
 
     function _enterReentrancy() internal {
@@ -144,10 +139,6 @@ contract AccessControl {
 
     /// @dev Internal function to check if the sender is the contract owner.
     function _onlyOwner() internal view {
-        require(
-            address(StorageLib.getOwner().value) == msg.sender,
-            //TODO: use one standard error message
-            "Ownable: caller is not the owner"
-        );
+        require(address(StorageLib.getOwner().value) == msg.sender, Errors.CALLER_NOT_OWNER);
     }
 }

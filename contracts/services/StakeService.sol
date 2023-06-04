@@ -13,8 +13,7 @@ contract StakeService is IPowerTokenStakeService {
 
     address public immutable LIQUIDITY_MINING;
     address public immutable POWER_TOKEN;
-    //TODO: governance token
-    address public immutable STAKED_TOKEN;
+    address public immutable GOVERNANCE_TOKEN;
 
     constructor(address liquidityMining, address powerToken, address governanceToken) {
         require(
@@ -28,7 +27,7 @@ contract StakeService is IPowerTokenStakeService {
         require(powerToken != address(0), string.concat(Errors.WRONG_ADDRESS, " powerToken"));
         LIQUIDITY_MINING = liquidityMining;
         POWER_TOKEN = powerToken;
-        STAKED_TOKEN = governanceToken;
+        GOVERNANCE_TOKEN = governanceToken;
     }
 
     function stakeLpTokensToLiquidityMining(
@@ -116,7 +115,7 @@ contract StakeService is IPowerTokenStakeService {
             PowerTokenTypes.UpdateGovernanceToken(beneficiary, governanceTokenAmount)
         );
 
-        IERC20(STAKED_TOKEN).safeTransferFrom(msg.sender, POWER_TOKEN, governanceTokenAmount);
+        IERC20(GOVERNANCE_TOKEN).safeTransferFrom(msg.sender, POWER_TOKEN, governanceTokenAmount);
     }
 
     function unstakeGovernanceTokenFromPowerToken(
@@ -130,7 +129,7 @@ contract StakeService is IPowerTokenStakeService {
                 PowerTokenTypes.UpdateGovernanceToken(msg.sender, governanceTokenAmount)
             );
 
-        IERC20(STAKED_TOKEN).safeTransferFrom(
+        IERC20(GOVERNANCE_TOKEN).safeTransferFrom(
             POWER_TOKEN,
             transferTo,
             governanceTokenAmountToTransfer
@@ -149,7 +148,7 @@ contract StakeService is IPowerTokenStakeService {
     function redeemPwToken(address transferTo) external {
         uint256 transferAmount = IPowerToken(POWER_TOKEN).redeem(msg.sender);
         ///@dev We can transfer pwTokenAmount because it is in relation 1:1 to Staked Token
-        IERC20(STAKED_TOKEN).safeTransferFrom(POWER_TOKEN, transferTo, transferAmount);
+        IERC20(GOVERNANCE_TOKEN).safeTransferFrom(POWER_TOKEN, transferTo, transferAmount);
     }
 
     function getConfiguration()
@@ -161,6 +160,6 @@ contract StakeService is IPowerTokenStakeService {
             address governanceTokenAddress
         )
     {
-        return (LIQUIDITY_MINING, POWER_TOKEN, STAKED_TOKEN);
+        return (LIQUIDITY_MINING, POWER_TOKEN, GOVERNANCE_TOKEN);
     }
 }
