@@ -78,17 +78,19 @@ interface IPowerToken {
     /// @notice Adds staked tokens to the specified account.
     /// @dev This function allows the specified account to add staked tokens to their Power Token balance.
     ///      The staked tokens are converted to Power Tokens based on the internal exchange rate.
-    /// @param updateStakedToken An object of type PowerTokenTypes.UpdateStakedToken containing the details of the staked token update.
-    function addStakedToken(PowerTokenTypes.UpdateStakedToken memory updateStakedToken) external;
+    /// @param updateGovernanceToken An object of type PowerTokenTypes.UpdateGovernanceToken containing the details of the staked token update.
+    function addGovernanceToken(
+        PowerTokenTypes.UpdateGovernanceToken memory updateGovernanceToken
+    ) external;
 
     /// @notice Removes staked tokens from the specified account, applying a fee.
     /// @dev This function allows the specified account to remove staked tokens from their Power Token balance,
     ///      while deducting a fee from the staked token amount. The fee is determined based on the cooldown period.
-    /// @param updateStakedToken An object of type PowerTokenTypes.UpdateStakedToken containing the details of the staked token update.
-    /// @return stakedTokenAmountToTransfer The amount of staked tokens to be transferred after applying the fee.
-    function removeStakedTokenWithFee(
-        PowerTokenTypes.UpdateStakedToken memory updateStakedToken
-    ) external returns (uint256 stakedTokenAmountToTransfer);
+    /// @param updateGovernanceToken An object of type PowerTokenTypes.UpdateGovernanceToken containing the details of the staked token update.
+    /// @return governanceTokenAmountToTransfer The amount of staked tokens to be transferred after applying the fee.
+    function removeGovernanceTokenWithFee(
+        PowerTokenTypes.UpdateGovernanceToken memory updateGovernanceToken
+    ) external returns (uint256 governanceTokenAmountToTransfer);
 
     /// @notice Delegates a specified amount of Power Tokens from the caller's balance to the Liquidity Mining contract.
     /// @dev This function allows the caller to delegate a specified amount of Power Tokens to the Liquidity Mining contract,
@@ -106,12 +108,12 @@ interface IPowerToken {
 
     /// @notice Emitted when the account stake/add [Staked] Tokens
     /// @param account account address that executed the staking
-    /// @param stakedTokenAmount of Staked Token amount being staked into PowerToken contract
+    /// @param governanceTokenAmount of Staked Token amount being staked into PowerToken contract
     /// @param internalExchangeRate internal exchange rate used to calculate the base amount
-    /// @param baseAmount value calculated based on the stakedTokenAmount and the internalExchangeRate
-    event StakedTokenAdded(
+    /// @param baseAmount value calculated based on the governanceTokenAmount and the internalExchangeRate
+    event GovernanceTokenAdded(
         address indexed account,
-        uint256 stakedTokenAmount,
+        uint256 governanceTokenAmount,
         uint256 internalExchangeRate,
         uint256 baseAmount
     );
@@ -121,7 +123,7 @@ interface IPowerToken {
     /// @param pwTokenAmount amount of Power Tokens that were unstaked
     /// @param internalExchangeRate which was used to calculate the base amount
     /// @param fee amount subtracted from the pwTokenAmount
-    event StakedTokenRemovedWithFee(
+    event GovernanceTokenRemovedWithFee(
         address indexed account,
         uint256 pwTokenAmount,
         uint256 internalExchangeRate,

@@ -39,7 +39,7 @@ interface IPowerTokenStakeService {
     /// @param beneficiary The address on whose behalf the IPOR tokens will be staked.
     /// @param iporTokenAmount The amount of IPOR tokens to be staked, represented with 18 decimals.
     /// @dev The function ensures that the provided `beneficiary` address is valid and the `iporTokenAmount` is greater than zero.
-    /// @dev The function calls the `addStakedToken` function of the PowerToken contract to update the staked IPOR tokens.
+    /// @dev The function calls the `addGovernanceToken` function of the PowerToken contract to update the staked IPOR tokens.
     /// @dev Finally, the function transfers the IPOR tokens from the sender to the PowerToken contract for staking.
     /// @dev Reverts if any of the requirements is not met or if the transfer of IPOR tokens fails.
     function stakeGovernanceTokenToPowerToken(
@@ -51,7 +51,7 @@ interface IPowerTokenStakeService {
     /// @param transferTo The address to which the unstaked IPOR tokens will be transferred.
     /// @param iporTokenAmount The amount of IPOR tokens to be unstaked, represented with 18 decimals.
     /// @dev The function ensures that the `iporTokenAmount` is greater than zero.
-    /// @dev The function calls the `removeStakedTokenWithFee` function of the PowerToken contract to remove the staked IPOR tokens.
+    /// @dev The function calls the `removeGovernanceTokenWithFee` function of the PowerToken contract to remove the staked IPOR tokens.
     /// @dev Finally, the function transfers the corresponding staked token amount to the `transferTo` address.
     /// @dev Reverts if the `iporTokenAmount` is not greater than zero, or if the transfer of staked tokens fails.
     function unstakeGovernanceTokenFromPowerToken(

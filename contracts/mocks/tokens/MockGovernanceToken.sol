@@ -3,7 +3,7 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 /// @title Staked Token in standard ERC20 mocked.
-contract MockStakedToken is ERC20 {
+contract MockGovernanceToken is ERC20 {
     /**
      * @dev Contract id.
      * This is the keccak-256 hash of "io.ipor.IporToken" subtracted by 1

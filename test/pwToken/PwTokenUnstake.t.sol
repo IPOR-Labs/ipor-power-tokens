@@ -10,7 +10,7 @@ import "../../contracts/tokens/PowerTokenInternal.sol";
 
 contract PwTokenUnstakeTest is TestCommons {
     event UnstakeWithoutCooldownFeeChanged(uint256 newFee);
-    event StakedTokenRemovedWithFee(
+    event GovernanceTokenRemovedWithFee(
         address indexed account,
         uint256 pwTokenAmount,
         uint256 internalExchangeRate,
@@ -82,7 +82,7 @@ contract PwTokenUnstakeTest is TestCommons {
         // when
         vm.prank(_userOne);
         vm.expectEmit(true, true, true, true);
-        emit StakedTokenRemovedWithFee(_userOne, 1_000e18, 1e18, 500e18);
+        emit GovernanceTokenRemovedWithFee(_userOne, 1_000e18, 1e18, 500e18);
         IPowerTokenStakeService(_router).unstakeGovernanceTokenFromPowerToken(_userOne, 1_000e18);
 
         // then

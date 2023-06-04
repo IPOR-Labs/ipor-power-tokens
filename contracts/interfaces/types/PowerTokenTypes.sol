@@ -10,9 +10,8 @@ library PowerTokenTypes {
         uint256 pwTokenAmount;
     }
 
-    //TODO: UpdateGovernanceToken
-    struct UpdateStakedToken {
+    struct UpdateGovernanceToken {
         address beneficiary;
-        uint256 stakedTokenAmount;
+        uint256 governanceTokenAmount;
     }
 }

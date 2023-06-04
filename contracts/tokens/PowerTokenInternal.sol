@@ -9,7 +9,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "../libraries/errors/Errors.sol";
 import "../libraries/math/MathOperation.sol";
 import "../interfaces/types/PowerTokenTypes.sol";
-import "../interfaces/IStakedToken.sol";
+import "../interfaces/IGovernanceToken.sol";
 import "../security/MiningOwnableUpgradeable.sol";
 import "../interfaces/IPowerTokenInternal.sol";
 import "../interfaces/ILiquidityMining.sol";
@@ -32,7 +32,7 @@ abstract contract PowerTokenInternal is
     // @dev @deprecated
     address internal _liquidityMining;
     // @dev @deprecated use _STAKED_TOKEN_ADDRESS instead
-    address internal _stakedToken;
+    address internal _governanceToken;
     address internal immutable _STAKED_TOKEN_ADDRESS; //TODO: przenies na gore
 
     address internal _pauseManager;
@@ -47,14 +47,14 @@ abstract contract PowerTokenInternal is
     uint256 internal _baseTotalSupply;
     uint256 internal _unstakeWithoutCooldownFee;
 
-    constructor(address routerAddress, address stakedTokenAddress) {
+    constructor(address routerAddress, address governanceToken) {
         require(routerAddress != address(0), Errors.WRONG_ADDRESS);
-        require(stakedTokenAddress != address(0), Errors.WRONG_ADDRESS);
+        require(governanceToken != address(0), Errors.WRONG_ADDRESS);
         require(
-            IStakedToken(stakedTokenAddress).getContractId() == _STAKED_TOKEN_ID,
+            IGovernanceToken(governanceToken).getContractId() == _STAKED_TOKEN_ID,
             Errors.WRONG_CONTRACT_ID
         );
-        _STAKED_TOKEN_ADDRESS = stakedTokenAddress;
+        _STAKED_TOKEN_ADDRESS = governanceToken;
         ROUTER_ADDRESS = routerAddress;
     }
 
@@ -89,7 +89,7 @@ abstract contract PowerTokenInternal is
         return _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS);
     }
 
-    function getStakedToken() external view override returns (address) {
+    function getGovernanceToken() external view override returns (address) {
         return _STAKED_TOKEN_ADDRESS;
     }
 
@@ -134,7 +134,7 @@ abstract contract PowerTokenInternal is
     }
 
     function _calculateInternalExchangeRate(
-        address stakedTokenAddress
+        address GovernanceTokenAddress
     ) internal view returns (uint256) {
         uint256 baseTotalSupply = _baseTotalSupply;
 
@@ -142,15 +142,15 @@ abstract contract PowerTokenInternal is
             return 1e18;
         }
 
-        uint256 balanceOfStakedToken = IERC20Upgradeable(stakedTokenAddress).balanceOf(
+        uint256 balanceOfGovernanceToken = IERC20Upgradeable(GovernanceTokenAddress).balanceOf(
             address(this)
         );
 
-        if (balanceOfStakedToken == 0) {
+        if (balanceOfGovernanceToken == 0) {
             return 1e18;
         }
 
-        return MathOperation.division(balanceOfStakedToken * 1e18, baseTotalSupply);
+        return MathOperation.division(balanceOfGovernanceToken * 1e18, baseTotalSupply);
     }
 
     function _calculateAmountWithCooldownFeeSubtracted(

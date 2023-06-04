@@ -22,7 +22,7 @@ interface IPowerTokenInternal {
     function setUnstakeWithoutCooldownFee(uint256 unstakeWithoutCooldownFee) external;
 
     /// @notice method returning address of the Staked Token
-    function getStakedToken() external view returns (address);
+    function getGovernanceToken() external view returns (address);
 
     /// @notice Gets the Pause Manager's address
     /// @return Pause Manager's address

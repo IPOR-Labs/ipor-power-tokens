@@ -136,9 +136,7 @@ library MiningCalculation {
             blockNumber >= lastRebalanceBlockNumber,
             Errors.BLOCK_NUMBER_LOWER_THAN_PREVIOUS_BLOCK_NUMBER
         );
-        uint256 newRewards = (blockNumber - lastRebalanceBlockNumber) *
-            rewardsPerBlock *
-            1e10;
+        uint256 newRewards = (blockNumber - lastRebalanceBlockNumber) * rewardsPerBlock * 1e10;
         return previousAccruedRewards + newRewards;
     }
 
@@ -146,11 +144,10 @@ library MiningCalculation {
     /// @param rewardsPerBlock config param, number of Power Token rewardes across all participants in one block, represented with 8 decimals
     /// @param aggregatedPowerUp Aggregated Power-up indicator, represented with 18 decimals
     /// @return composite multiplier, value represented with 27 decimals
-    function calculateCompositeMultiplier(uint256 rewardsPerBlock, uint256 aggregatedPowerUp)
-        internal
-        pure
-        returns (uint256)
-    {
+    function calculateCompositeMultiplier(
+        uint256 rewardsPerBlock,
+        uint256 aggregatedPowerUp
+    ) internal pure returns (uint256) {
         if (aggregatedPowerUp == 0) {
             return 0;
         }
@@ -175,12 +172,12 @@ library MiningCalculation {
             Errors.ACCOUNT_COMPOSITE_MULTIPLIER_GT_COMPOSITE_MULTIPLIER
         );
 
-        uint256 accountStakedTokenRewards = accountLpTokenAmount *
+        uint256 accountGovernanceTokenRewards = accountLpTokenAmount *
             accountPowerUp *
             (accruedCompMultiplierCumulativePrevBlock - accountCompMultiplierCumulativePrevBlock);
 
         /// @dev decimals: 18 + 18 + 27 - 45 =  18
-        return MathOperation.division(accountStakedTokenRewards, 1e45);
+        return MathOperation.division(accountGovernanceTokenRewards, 1e45);
     }
 
     /// @notice Calculates the accrued Composite Multiplier Cumulative for the previous block
@@ -215,11 +212,10 @@ library MiningCalculation {
     }
 
     /// @dev Quadruple precision, 128 bits
-    function _toQuadruplePrecision(uint256 number, uint256 decimals)
-        private
-        pure
-        returns (bytes16)
-    {
+    function _toQuadruplePrecision(
+        uint256 number,
+        uint256 decimals
+    ) private pure returns (bytes16) {
         if (number % decimals > 0) {
             /// @dev during calculation this value is lost in the conversion
             number += 1;

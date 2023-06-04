@@ -10,7 +10,7 @@ import "../libraries/errors/Errors.sol";
 import "../libraries/math/MiningCalculation.sol";
 import "../interfaces/types/LiquidityMiningTypes.sol";
 import "../interfaces/ILiquidityMiningInternal.sol";
-import "../interfaces/IStakedToken.sol";
+import "../interfaces/IGovernanceToken.sol";
 import "../interfaces/IPowerToken.sol";
 import "../security/MiningOwnableUpgradeable.sol";
 

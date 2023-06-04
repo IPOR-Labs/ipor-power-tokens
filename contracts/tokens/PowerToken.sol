@@ -11,8 +11,8 @@ import "./PowerTokenInternal.sol";
 contract PowerToken is PowerTokenInternal, IPowerToken {
     constructor(
         address routerAddress,
-        address stakedTokenAddress
-    ) PowerTokenInternal(routerAddress, stakedTokenAddress) {
+        address governanceTokenAddress
+    ) PowerTokenInternal(routerAddress, governanceTokenAddress) {
         _disableInitializers();
     }
 
@@ -110,47 +110,53 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         emit Redeem(account, transferAmount);
     }
 
-    function addStakedToken(
-        PowerTokenTypes.UpdateStakedToken memory updateStakedToken
+    function addGovernanceToken(
+        PowerTokenTypes.UpdateGovernanceToken memory updateGovernanceToken
     ) external onlyRouter {
-        require(updateStakedToken.stakedTokenAmount != 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(
+            updateGovernanceToken.governanceTokenAmount != 0,
+            Errors.VALUE_NOT_GREATER_THAN_ZERO
+        );
 
         //TODO: don't have to use in param governance token, because is available in this method
         uint256 exchangeRate = _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS);
 
         uint256 baseAmount = MathOperation.division(
-            updateStakedToken.stakedTokenAmount * 1e18,
+            updateGovernanceToken.governanceTokenAmount * 1e18,
             exchangeRate
         );
 
-        _baseBalance[updateStakedToken.beneficiary] += baseAmount;
+        _baseBalance[updateGovernanceToken.beneficiary] += baseAmount;
         _baseTotalSupply += baseAmount;
 
-        emit StakedTokenAdded(
-            updateStakedToken.beneficiary,
-            updateStakedToken.stakedTokenAmount,
+        emit GovernanceTokenAdded(
+            updateGovernanceToken.beneficiary,
+            updateGovernanceToken.governanceTokenAmount,
             exchangeRate,
             baseAmount
         );
     }
 
-    function removeStakedTokenWithFee(
-        PowerTokenTypes.UpdateStakedToken memory updateStakedToken
-    ) external onlyRouter returns (uint256 stakedTokenAmountToTransfer) {
-        require(updateStakedToken.stakedTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
+    function removeGovernanceTokenWithFee(
+        PowerTokenTypes.UpdateGovernanceToken memory updateGovernanceToken
+    ) external onlyRouter returns (uint256 governanceTokenAmountToTransfer) {
+        require(
+            updateGovernanceToken.governanceTokenAmount > 0,
+            Errors.VALUE_NOT_GREATER_THAN_ZERO
+        );
 
-        address account = updateStakedToken.beneficiary;
+        address account = updateGovernanceToken.beneficiary;
 
         uint256 exchangeRate = _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS);
         uint256 availablePwTokenAmount = _getAvailablePwTokenAmount(account, exchangeRate);
 
         require(
-            availablePwTokenAmount >= updateStakedToken.stakedTokenAmount,
+            availablePwTokenAmount >= updateGovernanceToken.governanceTokenAmount,
             Errors.ACC_AVAILABLE_POWER_TOKEN_BALANCE_IS_TOO_LOW
         );
 
         uint256 baseAmountToUnstake = MathOperation.division(
-            updateStakedToken.stakedTokenAmount * 1e18,
+            updateGovernanceToken.governanceTokenAmount * 1e18,
             exchangeRate
         );
 
@@ -162,16 +168,16 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         _baseBalance[account] -= baseAmountToUnstake;
         _baseTotalSupply -= baseAmountToUnstake;
 
-        stakedTokenAmountToTransfer = _calculateBaseAmountToPwToken(
+        governanceTokenAmountToTransfer = _calculateBaseAmountToPwToken(
             _calculateAmountWithCooldownFeeSubtracted(baseAmountToUnstake),
             exchangeRate
         );
 
-        emit StakedTokenRemovedWithFee(
+        emit GovernanceTokenRemovedWithFee(
             account,
-            updateStakedToken.stakedTokenAmount,
+            updateGovernanceToken.governanceTokenAmount,
             exchangeRate,
-            updateStakedToken.stakedTokenAmount - stakedTokenAmountToTransfer
+            updateGovernanceToken.governanceTokenAmount - governanceTokenAmountToTransfer
         );
     }
 

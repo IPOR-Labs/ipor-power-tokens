@@ -29,8 +29,8 @@ contract StakeLpTokensTest is TestCommons {
     {
         // GIVEN
         address router = _powerTokensSystem.router();
-        address[] memory stakedTokens = new address[](1);
-        stakedTokens[0] = _activeLpToken;
+        address[] memory governanceTokens = new address[](1);
+        governanceTokens[0] = _activeLpToken;
         uint256[] memory stakedAmounts = new uint256[](1);
         stakedAmounts[0] = 1_000e18;
         _powerTokensSystem.mintLpTokens(_activeLpToken, _userOne, 10_000e18);
@@ -45,7 +45,7 @@ contract StakeLpTokensTest is TestCommons {
         vm.prank(_userOne);
         IPowerTokenStakeService(router).stakeLpTokensToLiquidityMining(
             _userOne,
-            stakedTokens,
+            governanceTokens,
             stakedAmounts
         );
 
@@ -64,8 +64,8 @@ contract StakeLpTokensTest is TestCommons {
         uint256 mintAmount = 10_000e18;
         uint256 stakeAmount = 1_000e18;
         address router = _powerTokensSystem.router();
-        address[] memory stakedTokens = new address[](1);
-        stakedTokens[0] = _activeLpToken;
+        address[] memory governanceTokens = new address[](1);
+        governanceTokens[0] = _activeLpToken;
         uint256[] memory stakedAmounts = new uint256[](1);
         stakedAmounts[0] = stakeAmount;
 
@@ -78,7 +78,7 @@ contract StakeLpTokensTest is TestCommons {
         uint256 userBalanceBefore = ERC20(_activeLpToken).balanceOf(_userOne);
         LiquidityMiningTypes.AccountIndicatorsResult[]
             memory accountIndicatorsBefore = ILiquidityMiningLens(_powerTokensSystem.router())
-                .getAccountIndicatorsFromLiquidityMining(_userOne, stakedTokens);
+                .getAccountIndicatorsFromLiquidityMining(_userOne, governanceTokens);
 
         // WHEN
 
@@ -87,7 +87,7 @@ contract StakeLpTokensTest is TestCommons {
         emit LpTokenAdded(_userOne, _activeLpToken, stakeAmount);
         IPowerTokenStakeService(router).stakeLpTokensToLiquidityMining(
             _userOne,
-            stakedTokens,
+            governanceTokens,
             stakedAmounts
         );
 
@@ -98,7 +98,7 @@ contract StakeLpTokensTest is TestCommons {
         uint256 userBalanceAfter = ERC20(_activeLpToken).balanceOf(_userOne);
         LiquidityMiningTypes.AccountIndicatorsResult[]
             memory accountIndicatorsAfter = ILiquidityMiningLens(_powerTokensSystem.router())
-                .getAccountIndicatorsFromLiquidityMining(_userOne, stakedTokens);
+                .getAccountIndicatorsFromLiquidityMining(_userOne, governanceTokens);
 
         assertEq(miningBalanceBefore + stakeAmount, miningBalanceAfter);
         assertEq(userBalanceBefore, userBalanceAfter + stakeAmount);
@@ -125,8 +125,8 @@ contract StakeLpTokensTest is TestCommons {
         uint256 mintAmount = 10_000e18;
         uint256 stakeAmount = 1_000e18;
         address router = _powerTokensSystem.router();
-        address[] memory stakedTokens = new address[](1);
-        stakedTokens[0] = _activeLpToken;
+        address[] memory governanceTokens = new address[](1);
+        governanceTokens[0] = _activeLpToken;
         uint256[] memory stakedAmounts = new uint256[](1);
         stakedAmounts[0] = stakeAmount;
         _powerTokensSystem.mintLpTokens(_activeLpToken, _userOne, mintAmount);
@@ -141,7 +141,7 @@ contract StakeLpTokensTest is TestCommons {
         vm.prank(_userOne);
         IPowerTokenStakeService(router).stakeLpTokensToLiquidityMining(
             _userOne,
-            stakedTokens,
+            governanceTokens,
             stakedAmounts
         );
 
@@ -162,8 +162,8 @@ contract StakeLpTokensTest is TestCommons {
         uint256 mintAmount = 10_000e18;
         uint256 stakeAmount = 1_000e18;
         address router = _powerTokensSystem.router();
-        address[] memory stakedTokens = new address[](1);
-        stakedTokens[0] = _activeLpToken;
+        address[] memory governanceTokens = new address[](1);
+        governanceTokens[0] = _activeLpToken;
         uint256[] memory stakedAmounts = new uint256[](1);
         stakedAmounts[0] = stakeAmount;
         _powerTokensSystem.mintLpTokens(_activeLpToken, _userOne, mintAmount);
@@ -178,7 +178,7 @@ contract StakeLpTokensTest is TestCommons {
         vm.prank(_userOne);
         IPowerTokenStakeService(router).stakeLpTokensToLiquidityMining(
             _userOne,
-            stakedTokens,
+            governanceTokens,
             stakedAmounts
         );
 
@@ -199,8 +199,8 @@ contract StakeLpTokensTest is TestCommons {
         uint256 mintAmount = 10_000e18;
         uint256 stakeAmount = 0;
         address router = _powerTokensSystem.router();
-        address[] memory stakedTokens = new address[](1);
-        stakedTokens[0] = _activeLpToken;
+        address[] memory governanceTokens = new address[](1);
+        governanceTokens[0] = _activeLpToken;
         uint256[] memory stakedAmounts = new uint256[](1);
         stakedAmounts[0] = stakeAmount;
         _powerTokensSystem.mintLpTokens(_activeLpToken, _userOne, mintAmount);
@@ -211,7 +211,7 @@ contract StakeLpTokensTest is TestCommons {
         vm.prank(_userOne);
         IPowerTokenStakeService(router).stakeLpTokensToLiquidityMining(
             _userOne,
-            stakedTokens,
+            governanceTokens,
             stakedAmounts
         );
 

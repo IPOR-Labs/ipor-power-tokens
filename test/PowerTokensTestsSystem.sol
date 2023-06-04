@@ -3,7 +3,7 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
-import "../contracts/mocks/tokens/MockStakedToken.sol";
+import "../contracts/mocks/tokens/MockGovernanceToken.sol";
 import "../contracts/mocks/tokens/MockToken.sol";
 import "../contracts/mocks/tokens/MockLpToken.sol";
 import "./TestCommons.sol";
@@ -82,7 +82,7 @@ contract PowerTokensTestsSystem is TestCommons {
         MockLpToken(lpDai).approve(router, type(uint256).max);
         MockLpToken(lpUsdc).approve(router, type(uint256).max);
         MockLpToken(lpUsdt).approve(router, type(uint256).max);
-        MockStakedToken(iporToken).approve(router, type(uint256).max);
+        MockGovernanceToken(iporToken).approve(router, type(uint256).max);
         vm.stopPrank();
     }
 
@@ -99,7 +99,7 @@ contract PowerTokensTestsSystem is TestCommons {
         MockLpToken(lpUsdc).setJoseph(owner);
         MockLpToken(lpUsdt).setJoseph(owner);
 
-        iporToken = address(new MockStakedToken("IPOR", "IPOR", dao));
+        iporToken = address(new MockGovernanceToken("IPOR", "IPOR", dao));
         vm.stopPrank();
     }
 
@@ -199,7 +199,7 @@ contract PowerTokensTestsSystem is TestCommons {
         MockLpToken(lpDai).approve(router, type(uint256).max);
         MockLpToken(lpUsdc).approve(router, type(uint256).max);
         MockLpToken(lpUsdt).approve(router, type(uint256).max);
-        MockStakedToken(iporToken).approve(router, type(uint256).max);
+        MockGovernanceToken(iporToken).approve(router, type(uint256).max);
         vm.stopPrank();
     }
 }

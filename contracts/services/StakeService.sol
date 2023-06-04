@@ -16,26 +16,19 @@ contract StakeService is IPowerTokenStakeService {
     //TODO: governance token
     address public immutable STAKED_TOKEN;
 
-    constructor(
-        address liquidityMiningAddress, //TODO: address redundant
-        address powerTokenAddress,
-        address stakedTokenAddress //TODO: governance token
-    ) {
+    constructor(address liquidityMining, address powerToken, address governanceToken) {
         require(
-            liquidityMiningAddress != address(0),
-            string.concat(Errors.WRONG_ADDRESS, " liquidityMiningAddress")
+            liquidityMining != address(0),
+            string.concat(Errors.WRONG_ADDRESS, " liquidityMining")
         );
         require(
-            stakedTokenAddress != address(0),
-            string.concat(Errors.WRONG_ADDRESS, " stakedTokenAddress")
+            governanceToken != address(0),
+            string.concat(Errors.WRONG_ADDRESS, " governanceToken")
         );
-        require(
-            powerTokenAddress != address(0),
-            string.concat(Errors.WRONG_ADDRESS, " powerTokenAddress")
-        );
-        LIQUIDITY_MINING = liquidityMiningAddress;
-        POWER_TOKEN = powerTokenAddress;
-        STAKED_TOKEN = stakedTokenAddress;
+        require(powerToken != address(0), string.concat(Errors.WRONG_ADDRESS, " powerToken"));
+        LIQUIDITY_MINING = liquidityMining;
+        POWER_TOKEN = powerToken;
+        STAKED_TOKEN = governanceToken;
     }
 
     function stakeLpTokensToLiquidityMining(
@@ -111,33 +104,37 @@ contract StakeService is IPowerTokenStakeService {
         }
     }
 
-    //TODO: onBehalfOf - beneficiary
     function stakeGovernanceTokenToPowerToken(
         address beneficiary,
-        uint256 iporTokenAmount
+        uint256 governanceTokenAmount
     ) external {
         require(beneficiary != address(0), Errors.WRONG_ADDRESS);
-        require(iporTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(governanceTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
         //TODO: addGovernanceToken
-        IPowerToken(POWER_TOKEN).addStakedToken(
-            PowerTokenTypes.UpdateStakedToken(beneficiary, iporTokenAmount)
+        IPowerToken(POWER_TOKEN).addGovernanceToken(
+            PowerTokenTypes.UpdateGovernanceToken(beneficiary, governanceTokenAmount)
         );
 
-        IERC20(STAKED_TOKEN).safeTransferFrom(msg.sender, POWER_TOKEN, iporTokenAmount);
+        IERC20(STAKED_TOKEN).safeTransferFrom(msg.sender, POWER_TOKEN, governanceTokenAmount);
     }
 
     function unstakeGovernanceTokenFromPowerToken(
         address transferTo,
-        uint256 iporTokenAmount
+        uint256 governanceTokenAmount
     ) external {
-        require(iporTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(governanceTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
-        uint256 stakedTokenAmountToTransfer = IPowerToken(POWER_TOKEN).removeStakedTokenWithFee(
-            PowerTokenTypes.UpdateStakedToken(msg.sender, iporTokenAmount)
+        uint256 governanceTokenAmountToTransfer = IPowerToken(POWER_TOKEN)
+            .removeGovernanceTokenWithFee(
+                PowerTokenTypes.UpdateGovernanceToken(msg.sender, governanceTokenAmount)
+            );
+
+        IERC20(STAKED_TOKEN).safeTransferFrom(
+            POWER_TOKEN,
+            transferTo,
+            governanceTokenAmountToTransfer
         );
-
-        IERC20(STAKED_TOKEN).safeTransferFrom(POWER_TOKEN, transferTo, stakedTokenAmountToTransfer);
     }
 
     function pwTokenCooldown(uint256 pwTokenAmount) external {
@@ -161,7 +158,7 @@ contract StakeService is IPowerTokenStakeService {
         returns (
             address liquidityMiningAddress,
             address powerTokenAddress,
-            address stakedTokenAddress
+            address governanceTokenAddress
         )
     {
         return (LIQUIDITY_MINING, POWER_TOKEN, STAKED_TOKEN);
