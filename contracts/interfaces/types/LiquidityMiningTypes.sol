@@ -51,13 +51,13 @@ library LiquidityMiningTypes {
 
     struct UpdateLpToken {
         //TODO: change to beneficiary
-        address onBehalfOf;
+        address beneficiary;
         address lpToken;
         uint256 lpTokenAmount;
     }
 
     struct UpdatePwToken {
-        address onBehalfOf;
+        address beneficiary;
         address lpToken;
         uint256 pwTokenAmount;
     }

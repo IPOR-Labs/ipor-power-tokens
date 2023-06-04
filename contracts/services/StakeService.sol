@@ -39,14 +39,14 @@ contract StakeService is IPowerTokenStakeService {
     }
 
     function stakeLpTokensToLiquidityMining(
-        address onBehalfOf,
+        address beneficiary,
         address[] calldata lpTokens,
-        uint256[] calldata lpTokenAmounts
+        uint256[] calldata lpTokenMaxAmounts
     ) external {
         uint256 lpTokensLength = lpTokens.length;
-        require(lpTokensLength == lpTokenAmounts.length, Errors.INPUT_ARRAYS_LENGTH_MISMATCH);
+        require(lpTokensLength == lpTokenMaxAmounts.length, Errors.INPUT_ARRAYS_LENGTH_MISMATCH);
         require(lpTokensLength > 0, Errors.INPUT_ARRAYS_EMPTY);
-        require(onBehalfOf != address(0), Errors.WRONG_ADDRESS);
+        require(beneficiary != address(0), Errors.WRONG_ADDRESS);
         LiquidityMiningTypes.UpdateLpToken[]
             memory updateLpTokens = new LiquidityMiningTypes.UpdateLpToken[](lpTokensLength);
 
@@ -54,13 +54,15 @@ contract StakeService is IPowerTokenStakeService {
         uint256 transferAmount;
         for (uint256 i; i != lpTokensLength; ) {
             require(lpTokens[i] != address(0), Errors.WRONG_ADDRESS);
-            require(lpTokenAmounts[i] > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
+            require(lpTokenMaxAmounts[i] > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
             senderBalance = IERC20(lpTokens[i]).balanceOf(msg.sender);
-            transferAmount = senderBalance < lpTokenAmounts[i] ? senderBalance : lpTokenAmounts[i];
+            transferAmount = senderBalance < lpTokenMaxAmounts[i]
+                ? senderBalance
+                : lpTokenMaxAmounts[i];
 
             IERC20(lpTokens[i]).safeTransferFrom(msg.sender, LIQUIDITY_MINING, transferAmount);
             updateLpTokens[i] = LiquidityMiningTypes.UpdateLpToken(
-                onBehalfOf,
+                beneficiary,
                 lpTokens[i],
                 transferAmount
             );
@@ -110,23 +112,25 @@ contract StakeService is IPowerTokenStakeService {
     }
 
     //TODO: onBehalfOf - beneficiary
-    function stakeGovernanceTokenToPowerToken(address onBehalfOf, uint256 iporTokenAmount)
-        external
-    {
-        require(onBehalfOf != address(0), Errors.WRONG_ADDRESS);
+    function stakeGovernanceTokenToPowerToken(
+        address beneficiary,
+        uint256 iporTokenAmount
+    ) external {
+        require(beneficiary != address(0), Errors.WRONG_ADDRESS);
         require(iporTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
         //TODO: addGovernanceToken
         IPowerToken(POWER_TOKEN).addStakedToken(
-            PowerTokenTypes.UpdateStakedToken(onBehalfOf, iporTokenAmount)
+            PowerTokenTypes.UpdateStakedToken(beneficiary, iporTokenAmount)
         );
 
         IERC20(STAKED_TOKEN).safeTransferFrom(msg.sender, POWER_TOKEN, iporTokenAmount);
     }
 
-    function unstakeGovernanceTokenFromPowerToken(address transferTo, uint256 iporTokenAmount)
-        external
-    {
+    function unstakeGovernanceTokenFromPowerToken(
+        address transferTo,
+        uint256 iporTokenAmount
+    ) external {
         require(iporTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
         uint256 stakedTokenAmountToTransfer = IPowerToken(POWER_TOKEN).removeStakedTokenWithFee(

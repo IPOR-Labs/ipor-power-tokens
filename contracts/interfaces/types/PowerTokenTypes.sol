@@ -12,7 +12,7 @@ library PowerTokenTypes {
 
     //TODO: UpdateGovernanceToken
     struct UpdateStakedToken {
-        address onBehalfOf;
+        address beneficiary;
         uint256 stakedTokenAmount;
     }
 }

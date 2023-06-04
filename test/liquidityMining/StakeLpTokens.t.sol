@@ -6,7 +6,7 @@ import "../PowerTokensTestsSystem.sol";
 import "../../contracts/interfaces/ILiquidityMining.sol";
 
 contract StakeLpTokensTest is TestCommons {
-    event LpTokenAdded(address onBehalfOf, address lpToken, uint256 lpTokenAmount);
+    event LpTokenAdded(address beneficiary, address lpToken, uint256 lpTokenAmount);
 
     PowerTokensTestsSystem internal _powerTokensSystem;
     address[] internal _lpTokens;

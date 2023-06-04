@@ -123,11 +123,11 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
             exchangeRate
         );
 
-        _baseBalance[updateStakedToken.onBehalfOf] += baseAmount;
+        _baseBalance[updateStakedToken.beneficiary] += baseAmount;
         _baseTotalSupply += baseAmount;
 
         emit StakedTokenAdded(
-            updateStakedToken.onBehalfOf,
+            updateStakedToken.beneficiary,
             updateStakedToken.stakedTokenAmount,
             exchangeRate,
             baseAmount
@@ -139,7 +139,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
     ) external onlyRouter returns (uint256 stakedTokenAmountToTransfer) {
         require(updateStakedToken.stakedTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
-        address account = updateStakedToken.onBehalfOf;
+        address account = updateStakedToken.beneficiary;
 
         uint256 exchangeRate = _calculateInternalExchangeRate(_STAKED_TOKEN_ADDRESS);
         uint256 availablePwTokenAmount = _getAvailablePwTokenAmount(account, exchangeRate);

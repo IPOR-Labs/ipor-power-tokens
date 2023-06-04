@@ -22,27 +22,26 @@ interface ILiquidityMining {
     /// @param account address for which to fetch the information about balance of delegated Power Tokens
     /// @param lpTokens list of lpTokens addresses(lpTokens)
     /// @return balances list of {LiquidityMiningTypes.DelegatedPwTokenBalance} structure, with information how much Power Token is delegated per lpToken address.
-    function balanceOfDelegatedPwToken(address account, address[] memory lpTokens)
-        external
-        view
-        returns (LiquidityMiningTypes.DelegatedPwTokenBalance[] memory balances);
+    function balanceOfDelegatedPwToken(
+        address account,
+        address[] memory lpTokens
+    ) external view returns (LiquidityMiningTypes.DelegatedPwTokenBalance[] memory balances);
 
     /// @notice Calculates the accrued rewards for multiple LP tokens.
     /// @param lpTokens An array of LP token addresses.
     /// @return An array of `AccruedRewardsResult` structures, containing the LP token address and the accrued rewards amount.
-    function calculateAccruedRewards(address[] calldata lpTokens)
-        external
-        view
-        returns (LiquidityMiningTypes.AccruedRewardsResult[] memory);
+    function calculateAccruedRewards(
+        address[] calldata lpTokens
+    ) external view returns (LiquidityMiningTypes.AccruedRewardsResult[] memory);
 
     /// @notice Calculates the rewards earned by an account for multiple LP tokens.
     /// @param account The address of the account for which to calculate rewards.
     /// @param lpTokens An array of LP token addresses.
     /// @return An array of `AccountRewardResult` structures, containing the LP token address, rewards amount, and allocated Power Token balance for the account.
-    function calculateAccountRewards(address account, address[] calldata lpTokens)
-        external
-        view
-        returns (LiquidityMiningTypes.AccountRewardResult[] memory);
+    function calculateAccountRewards(
+        address account,
+        address[] calldata lpTokens
+    ) external view returns (LiquidityMiningTypes.AccountRewardResult[] memory);
 
     /// @notice method allowing to update the indicators per asset (lpToken).
     /// @param account of which we should update the indicators
@@ -73,26 +72,26 @@ interface ILiquidityMining {
     /// @param account The account address to claim rewards for.
     /// @param lpTokens An array of LP token addresses for which rewards will be claimed.
     /// @return rewardsAmountToTransfer The total amount of rewards transferred to the account.
-    function claim(address account, address[] calldata lpTokens)
-        external
-        returns (uint256 rewardsAmountToTransfer);
+    function claim(
+        address account,
+        address[] calldata lpTokens
+    ) external returns (uint256 rewardsAmountToTransfer);
 
     /// @notice Retrieves the global indicators for multiple LP tokens.
     /// @param lpTokens An array of LP token addresses for which to retrieve the global indicators.
     /// @return An array of LiquidityMiningTypes.GlobalIndicatorsResult containing the global indicators for each LP token.
-    function getGlobalIndicators(address[] calldata lpTokens)
-        external
-        view
-        returns (LiquidityMiningTypes.GlobalIndicatorsResult[] memory);
+    function getGlobalIndicators(
+        address[] calldata lpTokens
+    ) external view returns (LiquidityMiningTypes.GlobalIndicatorsResult[] memory);
 
     /// @notice Retrieves the account indicators for a specific account and multiple LP tokens.
     /// @param account The address of the account for which to retrieve the account indicators.
     /// @param lpTokens An array of LP token addresses for which to retrieve the account indicators.
     /// @return An array of LiquidityMiningTypes.AccountIndicatorsResult containing the account indicators for each LP token.
-    function getAccountIndicators(address account, address[] calldata lpTokens)
-        external
-        view
-        returns (LiquidityMiningTypes.AccountIndicatorsResult[] memory);
+    function getAccountIndicators(
+        address account,
+        address[] calldata lpTokens
+    ) external view returns (LiquidityMiningTypes.AccountIndicatorsResult[] memory);
 
     /// @notice Emitted when the account stakes the lpTokens
     /// @param account Account's address in the context of which the activities of staking of lpTokens are performed
@@ -117,10 +116,10 @@ interface ILiquidityMining {
     event IndicatorsUpdated(address account, address lpToken);
 
     /// @notice Emitted when the lpToken is added to the LiquidityMining
-    /// @param onBehalfOf Account address on behalf of which the lpToken is added
+    /// @param beneficiary Account address on behalf of which the lpToken is added
     /// @param lpToken lpToken address which is added
     /// @param lpTokenAmount Amount of lpTokens added, represented with 18 decimals
-    event LpTokenAdded(address onBehalfOf, address lpToken, uint256 lpTokenAmount);
+    event LpTokenAdded(address beneficiary, address lpToken, uint256 lpTokenAmount);
 
     /// @notice Emitted when the lpToken is removed from the LiquidityMining
     /// @param account address on behalf of which the lpToken is removed
@@ -129,10 +128,10 @@ interface ILiquidityMining {
     event LpTokensRemoved(address account, address lpToken, uint256 lpTokenAmount);
 
     /// @notice Emitted when the PwTokens is added to lpToken pool
-    /// @param onBehalfOf Account address on behalf of which the PwToken is added
+    /// @param beneficiary Account address on behalf of which the PwToken is added
     /// @param lpToken lpToken address to which the PwToken is added
     /// @param pwTokenAmount Amount of PwTokens added, represented with 18 decimals
-    event PwTokensAdded(address onBehalfOf, address lpToken, uint256 pwTokenAmount);
+    event PwTokensAdded(address beneficiary, address lpToken, uint256 pwTokenAmount);
 
     /// @notice Emitted when the PwTokens is removed from lpToken pool
     /// @param account Account address on behalf of which the PwToken is removed

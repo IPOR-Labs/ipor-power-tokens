@@ -51,22 +51,14 @@ contract PowerTokensTestsSystem is TestCommons {
         _updatePowerTokenImplementation();
     }
 
-    function mintStable(
-        address stable,
-        address onBehalfOf,
-        uint256 amount
-    ) external {
+    function mintStable(address stable, address beneficiary, uint256 amount) external {
         vm.prank(owner);
-        MockToken(stable).mint(onBehalfOf, amount);
+        MockToken(stable).mint(beneficiary, amount);
     }
 
-    function mintLpTokens(
-        address lpToken,
-        address onBehalfOf,
-        uint256 amount
-    ) external {
+    function mintLpTokens(address lpToken, address beneficiary, uint256 amount) external {
         vm.startPrank(owner);
-        MockLpToken(lpToken).mint(onBehalfOf, amount);
+        MockLpToken(lpToken).mint(beneficiary, amount);
         vm.stopPrank();
     }
 

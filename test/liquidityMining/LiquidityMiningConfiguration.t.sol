@@ -353,7 +353,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
             memory updateLpToken = new LiquidityMiningTypes.UpdateLpToken[](1);
         updateLpToken[0].lpToken = _powerTokensSystem.lpDai();
         updateLpToken[0].lpTokenAmount = 100;
-        updateLpToken[0].onBehalfOf = address(this);
+        updateLpToken[0].beneficiary = address(this);
 
         address liquidityMining = _powerTokensSystem.liquidityMining();
 
@@ -368,7 +368,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
             memory updateLpToken = new LiquidityMiningTypes.UpdateLpToken[](1);
         updateLpToken[0].lpToken = _powerTokensSystem.lpDai();
         updateLpToken[0].lpTokenAmount = 100;
-        updateLpToken[0].onBehalfOf = address(this);
+        updateLpToken[0].beneficiary = address(this);
 
         address liquidityMining = _powerTokensSystem.liquidityMining();
 
@@ -383,7 +383,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
             memory updateLpToken = new LiquidityMiningTypes.UpdatePwToken[](1);
         updateLpToken[0].lpToken = _powerTokensSystem.lpDai();
         updateLpToken[0].pwTokenAmount = 100;
-        updateLpToken[0].onBehalfOf = address(this);
+        updateLpToken[0].beneficiary = address(this);
 
         address liquidityMining = _powerTokensSystem.liquidityMining();
 
@@ -398,7 +398,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
             memory updateLpToken = new LiquidityMiningTypes.UpdatePwToken[](1);
         updateLpToken[0].lpToken = _powerTokensSystem.lpDai();
         updateLpToken[0].pwTokenAmount = 100;
-        updateLpToken[0].onBehalfOf = address(this);
+        updateLpToken[0].beneficiary = address(this);
 
         address liquidityMining = _powerTokensSystem.liquidityMining();
 
