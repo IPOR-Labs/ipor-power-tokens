@@ -110,7 +110,6 @@ contract StakeService is IPowerTokenStakeService {
         require(beneficiary != address(0), Errors.WRONG_ADDRESS);
         require(governanceTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
-        //TODO: addGovernanceToken
         IPowerToken(POWER_TOKEN).addGovernanceToken(
             PowerTokenTypes.UpdateGovernanceToken(beneficiary, governanceTokenAmount)
         );

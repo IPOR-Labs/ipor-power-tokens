@@ -26,7 +26,7 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
         address powerTokenAddress;
         address liquidityMiningLens;
         address stakeService;
-        address flowService;
+        address flowsService;
         address powerTokenLens;
     }
 
@@ -48,8 +48,8 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
             string.concat(Errors.WRONG_ADDRESS, " stakeService")
         );
         require(
-            deployedContracts.flowService != address(0),
-            string.concat(Errors.WRONG_ADDRESS, " flowService")
+            deployedContracts.flowsService != address(0),
+            string.concat(Errors.WRONG_ADDRESS, " flowsService")
         );
         require(
             deployedContracts.powerTokenLens != address(0),
@@ -57,7 +57,7 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
         );
         LIQUIDITY_MINING_LENS = deployedContracts.liquidityMiningLens;
         STAKE_SERVICE = deployedContracts.stakeService;
-        FLOWS_SERVICE = deployedContracts.flowService;
+        FLOWS_SERVICE = deployedContracts.flowsService;
         LIQUIDITY_MINING_ADDRESS = deployedContracts.liquidityMiningAddress;
         POWER_TOKEN_ADDRESS = deployedContracts.powerTokenAddress;
         POWER_TOKEN_LENS = deployedContracts.powerTokenLens;

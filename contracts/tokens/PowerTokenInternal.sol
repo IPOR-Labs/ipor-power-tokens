@@ -24,6 +24,7 @@ abstract contract PowerTokenInternal is
     /// @dev 14 days
     uint256 public constant COOL_DOWN_IN_SECONDS = 2 * 7 * 24 * 60 * 60;
     address public immutable ROUTER_ADDRESS;
+    address internal immutable _STAKED_TOKEN_ADDRESS;
 
     bytes32 internal constant _STAKED_TOKEN_ID =
         0xdba05ed67d0251facfcab8345f27ccd3e72b5a1da8cebfabbcccf4316e6d053c;
@@ -33,7 +34,6 @@ abstract contract PowerTokenInternal is
     address internal _liquidityMining;
     // @dev @deprecated use _STAKED_TOKEN_ADDRESS instead
     address internal _governanceToken;
-    address internal immutable _STAKED_TOKEN_ADDRESS; //TODO: przenies na gore
 
     address internal _pauseManager;
 

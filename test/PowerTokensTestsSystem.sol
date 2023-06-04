@@ -178,7 +178,7 @@ contract PowerTokensTestsSystem is TestCommons {
                 powerTokenAddress: powerToken,
                 liquidityMiningLens: liquidityMiningLens,
                 stakeService: stakeService,
-                miningService: flowsService,
+                flowsService: flowsService,
                 powerTokenLens: powerTokenLens
             })
         );
