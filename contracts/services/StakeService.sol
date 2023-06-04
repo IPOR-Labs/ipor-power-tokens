@@ -64,7 +64,7 @@ contract StakeService is IPowerTokenStakeService {
             }
         }
 
-        ILiquidityMining(LIQUIDITY_MINING).addLpTokens(updateLpTokens);
+        ILiquidityMining(LIQUIDITY_MINING).addLpTokensInternal(updateLpTokens);
     }
 
     function unstakeLpTokensFromLiquidityMining(
@@ -93,7 +93,7 @@ contract StakeService is IPowerTokenStakeService {
             }
         }
 
-        ILiquidityMining(LIQUIDITY_MINING).removeLpTokens(updateLpTokens);
+        ILiquidityMining(LIQUIDITY_MINING).removeLpTokensInternal(updateLpTokens);
 
         for (uint256 i; i != lpTokensLength; ) {
             IERC20(lpTokens[i]).safeTransferFrom(LIQUIDITY_MINING, transferTo, lpTokenAmounts[i]);
@@ -110,7 +110,7 @@ contract StakeService is IPowerTokenStakeService {
         require(beneficiary != address(0), Errors.WRONG_ADDRESS);
         require(governanceTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
-        IPowerToken(POWER_TOKEN).addGovernanceToken(
+        IPowerToken(POWER_TOKEN).addGovernanceTokenInternal(
             PowerTokenTypes.UpdateGovernanceToken(beneficiary, governanceTokenAmount)
         );
 
@@ -124,7 +124,7 @@ contract StakeService is IPowerTokenStakeService {
         require(governanceTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
         uint256 governanceTokenAmountToTransfer = IPowerToken(POWER_TOKEN)
-            .removeGovernanceTokenWithFee(
+            .removeGovernanceTokenWithFeeInternal(
                 PowerTokenTypes.UpdateGovernanceToken(msg.sender, governanceTokenAmount)
             );
 
@@ -137,15 +137,15 @@ contract StakeService is IPowerTokenStakeService {
 
     function pwTokenCooldown(uint256 pwTokenAmount) external {
         require(pwTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
-        IPowerToken(POWER_TOKEN).cooldown(msg.sender, pwTokenAmount);
+        IPowerToken(POWER_TOKEN).cooldownInternal(msg.sender, pwTokenAmount);
     }
 
     function pwTokenCancelCooldown() external {
-        IPowerToken(POWER_TOKEN).cancelCooldown(msg.sender);
+        IPowerToken(POWER_TOKEN).cancelCooldownInternal(msg.sender);
     }
 
     function redeemPwToken(address transferTo) external {
-        uint256 transferAmount = IPowerToken(POWER_TOKEN).redeem(msg.sender);
+        uint256 transferAmount = IPowerToken(POWER_TOKEN).redeemInternal(msg.sender);
         ///@dev We can transfer pwTokenAmount because it is in relation 1:1 to Staked Token
         IERC20(GOVERNANCE_TOKEN).safeTransferFrom(POWER_TOKEN, transferTo, transferAmount);
     }

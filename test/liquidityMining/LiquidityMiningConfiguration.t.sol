@@ -359,7 +359,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
 
         // when
         vm.expectRevert(bytes(Errors.CALLER_NOT_ROUTER));
-        ILiquidityMining(liquidityMining).addLpTokens(updateLpToken);
+        ILiquidityMining(liquidityMining).addLpTokensInternal(updateLpToken);
     }
 
     function testShouldNotBeAbleToRemoveLpTokensWhenNotRouter() external {
@@ -374,7 +374,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
 
         // when
         vm.expectRevert(bytes(Errors.CALLER_NOT_ROUTER));
-        ILiquidityMining(liquidityMining).removeLpTokens(updateLpToken);
+        ILiquidityMining(liquidityMining).removeLpTokensInternal(updateLpToken);
     }
 
     function testShouldNotBeAbleToAddPwTokensWhenNotRouter() external {
@@ -389,7 +389,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
 
         // when
         vm.expectRevert(bytes(Errors.CALLER_NOT_ROUTER));
-        ILiquidityMining(liquidityMining).addPwTokens(updateLpToken);
+        ILiquidityMining(liquidityMining).addPwTokensInternal(updateLpToken);
     }
 
     function testShouldNotBeAbleToRemovePwTokensWhenNotRouter() external {
@@ -404,7 +404,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
 
         // when
         vm.expectRevert(bytes(Errors.CALLER_NOT_ROUTER));
-        ILiquidityMining(liquidityMining).removePwTokens(updateLpToken);
+        ILiquidityMining(liquidityMining).removePwTokensInternal(updateLpToken);
     }
 
     function testShouldNotBeAbleToDelegatePwTokenWhenContractIsPause() external {

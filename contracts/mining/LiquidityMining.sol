@@ -161,7 +161,7 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
         }
     }
 
-    function claim(
+    function claimInternal(
         address account,
         address[] calldata lpTokens
     ) external override whenNotPaused onlyRouter returns (uint256 rewardsAmountToTransfer) {
@@ -207,7 +207,7 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
         return rewardsAmountToTransfer;
     }
 
-    function addLpTokens(
+    function addLpTokensInternal(
         LiquidityMiningTypes.UpdateLpToken[] memory updateLpToken
     ) external override onlyRouter whenNotPaused {
         uint256 length = updateLpToken.length;
@@ -251,7 +251,7 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
         }
     }
 
-    function addPwTokens(
+    function addPwTokensInternal(
         LiquidityMiningTypes.UpdatePwToken[] memory updatePwTokens
     ) external onlyRouter whenNotPaused {
         uint256 rewards;
@@ -308,7 +308,7 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
         }
     }
 
-    function removePwTokens(
+    function removePwTokensInternal(
         LiquidityMiningTypes.UpdatePwToken[] memory updatePwTokens
     ) external onlyRouter whenNotPaused {
         uint256 rewards;
@@ -361,7 +361,7 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
         }
     }
 
-    function removeLpTokens(
+    function removeLpTokensInternal(
         LiquidityMiningTypes.UpdateLpToken[] memory updateLpToken
     ) external override onlyRouter whenNotPaused {
         uint256 length = updateLpToken.length;

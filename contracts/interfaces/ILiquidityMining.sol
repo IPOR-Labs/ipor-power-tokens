@@ -51,28 +51,36 @@ interface ILiquidityMining {
     /// @notice Adds LP tokens to the liquidity mining for multiple accounts.
     /// @param updateLpToken An array of `UpdateLpToken` structures, each containing the account address,
     /// LP token address, and LP token amount to be added.
-    function addLpTokens(LiquidityMiningTypes.UpdateLpToken[] memory updateLpToken) external;
+    function addLpTokensInternal(
+        LiquidityMiningTypes.UpdateLpToken[] memory updateLpToken
+    ) external;
 
     /// @notice Adds Power tokens to the liquidity mining for multiple accounts.
     /// @param updatePwToken An array of `UpdatePwToken` structures, each containing the account address,
     /// LP token address, and Power token amount to be added.
-    function addPwTokens(LiquidityMiningTypes.UpdatePwToken[] memory updatePwToken) external;
+    function addPwTokensInternal(
+        LiquidityMiningTypes.UpdatePwToken[] memory updatePwToken
+    ) external;
 
     /// @notice Removes LP tokens from the liquidity mining for multiple accounts.
     /// @param updateLpToken An array of `UpdateLpToken` structures, each containing the account address,
     /// LP token address, and LP token amount to be removed.
-    function removeLpTokens(LiquidityMiningTypes.UpdateLpToken[] memory updateLpToken) external;
+    function removeLpTokensInternal(
+        LiquidityMiningTypes.UpdateLpToken[] memory updateLpToken
+    ) external;
 
     /// @notice Removes Power Tokens from the liquidity mining for multiple accounts.
     /// @param updatePwToken An array of `UpdatePwToken` structures, each containing the account address,
     /// LP token address, and Power Token amount to be removed.
-    function removePwTokens(LiquidityMiningTypes.UpdatePwToken[] memory updatePwToken) external;
+    function removePwTokensInternal(
+        LiquidityMiningTypes.UpdatePwToken[] memory updatePwToken
+    ) external;
 
     /// @notice Claims accumulated rewards for multiple LP tokens and transfers them to the specified account.
     /// @param account The account address to claim rewards for.
     /// @param lpTokens An array of LP token addresses for which rewards will be claimed.
     /// @return rewardsAmountToTransfer The total amount of rewards transferred to the account.
-    function claim(
+    function claimInternal(
         address account,
         address[] calldata lpTokens
     ) external returns (uint256 rewardsAmountToTransfer);

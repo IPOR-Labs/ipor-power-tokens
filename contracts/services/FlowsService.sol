@@ -31,12 +31,12 @@ contract FlowsService is IPowerTokenFlowsService {
 
     function claimRewardsFromLiquidityMining(address[] calldata lpTokens) external {
         require(lpTokens.length > 0, Errors.INPUT_ARRAYS_EMPTY);
-        uint256 rewardsAmountToTransfer = ILiquidityMining(LIQUIDITY_MINING).claim(
+        uint256 rewardsAmountToTransfer = ILiquidityMining(LIQUIDITY_MINING).claimInternal(
             msg.sender,
             lpTokens
         );
         require(rewardsAmountToTransfer > 0, Errors.NO_REWARDS_TO_CLAIM);
-        IPowerToken(POWER_TOKEN).addGovernanceToken(
+        IPowerToken(POWER_TOKEN).addGovernanceTokenInternal(
             PowerTokenTypes.UpdateGovernanceToken(msg.sender, rewardsAmountToTransfer)
         );
         IERC20(STAKED_TOKEN).safeTransferFrom(
@@ -76,8 +76,8 @@ contract FlowsService is IPowerTokenFlowsService {
                 ++i;
             }
         }
-        IPowerToken(POWER_TOKEN).delegate(account, totalGovernanceTokenAmount);
-        ILiquidityMining(LIQUIDITY_MINING).addPwTokens(updatePwTokens);
+        IPowerToken(POWER_TOKEN).delegateInternal(account, totalGovernanceTokenAmount);
+        ILiquidityMining(LIQUIDITY_MINING).addPwTokensInternal(updatePwTokens);
     }
 
     function undelegatePwTokensFromLiquidityMining(
@@ -103,8 +103,8 @@ contract FlowsService is IPowerTokenFlowsService {
             }
         }
         require(totalGovernanceTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
-        ILiquidityMining(LIQUIDITY_MINING).removePwTokens(updatePwTokens);
-        IPowerToken(POWER_TOKEN).undelegate(account, totalGovernanceTokenAmount);
+        ILiquidityMining(LIQUIDITY_MINING).removePwTokensInternal(updatePwTokens);
+        IPowerToken(POWER_TOKEN).undelegateInternal(account, totalGovernanceTokenAmount);
     }
 
     function getConfiguration()

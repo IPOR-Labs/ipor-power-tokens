@@ -56,7 +56,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         return _cooldowns[account];
     }
 
-    function cooldown(
+    function cooldownInternal(
         address account,
         uint256 pwTokenAmount
     ) external override whenNotPaused onlyRouter {
@@ -77,12 +77,12 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         emit CooldownChanged(pwTokenAmount, block.timestamp + COOL_DOWN_IN_SECONDS);
     }
 
-    function cancelCooldown(address account) external override whenNotPaused onlyRouter {
+    function cancelCooldownInternal(address account) external override whenNotPaused onlyRouter {
         delete _cooldowns[account];
         emit CooldownChanged(0, 0);
     }
 
-    function redeem(
+    function redeemInternal(
         address account
     ) external override whenNotPaused onlyRouter returns (uint256 transferAmount) {
         PowerTokenTypes.PwTokenCooldown memory accountCooldown = _cooldowns[account];
@@ -106,7 +106,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         emit Redeem(account, transferAmount);
     }
 
-    function addGovernanceToken(
+    function addGovernanceTokenInternal(
         PowerTokenTypes.UpdateGovernanceToken memory updateGovernanceToken
     ) external onlyRouter {
         require(
@@ -132,7 +132,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         );
     }
 
-    function removeGovernanceTokenWithFee(
+    function removeGovernanceTokenWithFeeInternal(
         PowerTokenTypes.UpdateGovernanceToken memory updateGovernanceToken
     ) external onlyRouter returns (uint256 governanceTokenAmountToTransfer) {
         require(
@@ -177,7 +177,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
     }
 
     //TODO: change to delegateInternal in places where modifier allow requests from our smart contracts
-    function delegate(
+    function delegateInternal(
         address account,
         uint256 pwTokenAmount
     ) external override whenNotPaused onlyRouter {
@@ -190,7 +190,7 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         emit Delegated(account, pwTokenAmount);
     }
 
-    function undelegate(
+    function undelegateInternal(
         address account,
         uint256 pwTokenAmount
     ) external override whenNotPaused onlyRouter {
