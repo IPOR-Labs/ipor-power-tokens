@@ -111,11 +111,8 @@ contract AccessControl {
         require(uint256(StorageLib.getPaused().value) == 0, Errors.CONTRACT_PAUSED);
     }
 
-    function _nonReentrant() internal view {
-        require(uint256(StorageLib.getReentrancyStatus().value) != _ENTERED, Errors.REENTRANCY);
-    }
-
     function _enterReentrancy() internal {
+        require(uint256(StorageLib.getReentrancyStatus().value) != _ENTERED, Errors.REENTRANCY);
         StorageLib.getReentrancyStatus().value = _ENTERED;
     }
 

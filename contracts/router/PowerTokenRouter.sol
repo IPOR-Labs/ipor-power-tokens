@@ -86,8 +86,6 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
             sig == IPowerTokenStakeService.redeemPwToken.selector
         ) {
             _whenNotPaused();
-            //TODO: merge _nonReentrant() and _enterReentrancy() into one function
-            _nonReentrant();
             _enterReentrancy();
             return STAKE_SERVICE;
         }
@@ -98,7 +96,6 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
             sig == IPowerTokenFlowsService.claimRewardsFromLiquidityMining.selector
         ) {
             _whenNotPaused();
-            _nonReentrant();
             _enterReentrancy();
             return FLOWS_SERVICE;
         }

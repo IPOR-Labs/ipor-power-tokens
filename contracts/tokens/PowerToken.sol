@@ -176,7 +176,6 @@ contract PowerToken is PowerTokenInternal, IPowerToken {
         );
     }
 
-    //TODO: change to delegateInternal in places where modifier allow requests from our smart contracts
     function delegateInternal(
         address account,
         uint256 pwTokenAmount
