@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 
 import "../interfaces/types/LiquidityMiningTypes.sol";
 import "../interfaces/ILiquidityMiningLens.sol";
@@ -17,11 +17,10 @@ contract LiquidityMiningLens is ILiquidityMiningLens {
         LIQUIDITY_MINING = liquidityMining;
     }
 
-    function balanceOfLpTokensStakedInLiquidityMining(address account, address lpToken)
-        external
-        view
-        returns (uint256)
-    {
+    function balanceOfLpTokensStakedInLiquidityMining(
+        address account,
+        address lpToken
+    ) external view returns (uint256) {
         return ILiquidityMining(LIQUIDITY_MINING).balanceOf(account, lpToken);
     }
 
@@ -32,37 +31,29 @@ contract LiquidityMiningLens is ILiquidityMiningLens {
         return ILiquidityMining(LIQUIDITY_MINING).balanceOfDelegatedPwToken(account, lpTokens);
     }
 
-    function getAccruedRewardsInLiquidityMining(address[] calldata lpTokens)
-        external
-        view
-        override
-        returns (LiquidityMiningTypes.AccruedRewardsResult[] memory result)
-    {
+    function getAccruedRewardsInLiquidityMining(
+        address[] calldata lpTokens
+    ) external view override returns (LiquidityMiningTypes.AccruedRewardsResult[] memory result) {
         return ILiquidityMining(LIQUIDITY_MINING).calculateAccruedRewards(lpTokens);
     }
 
-    function getAccountRewardsInLiquidityMining(address account, address[] calldata lpTokens)
-        external
-        view
-        override
-        returns (LiquidityMiningTypes.AccountRewardResult[] memory)
-    {
+    function getAccountRewardsInLiquidityMining(
+        address account,
+        address[] calldata lpTokens
+    ) external view override returns (LiquidityMiningTypes.AccountRewardResult[] memory) {
         return ILiquidityMining(LIQUIDITY_MINING).calculateAccountRewards(account, lpTokens);
     }
 
-    function getGlobalIndicatorsFromLiquidityMining(address[] memory lpTokens)
-        external
-        view
-        returns (LiquidityMiningTypes.GlobalIndicatorsResult[] memory)
-    {
+    function getGlobalIndicatorsFromLiquidityMining(
+        address[] memory lpTokens
+    ) external view returns (LiquidityMiningTypes.GlobalIndicatorsResult[] memory) {
         return ILiquidityMining(LIQUIDITY_MINING).getGlobalIndicators(lpTokens);
     }
 
-    function getAccountIndicatorsFromLiquidityMining(address account, address[] calldata lpTokens)
-        external
-        view
-        returns (LiquidityMiningTypes.AccountIndicatorsResult[] memory)
-    {
+    function getAccountIndicatorsFromLiquidityMining(
+        address account,
+        address[] calldata lpTokens
+    ) external view returns (LiquidityMiningTypes.AccountIndicatorsResult[] memory) {
         return ILiquidityMining(LIQUIDITY_MINING).getAccountIndicators(account, lpTokens);
     }
 }

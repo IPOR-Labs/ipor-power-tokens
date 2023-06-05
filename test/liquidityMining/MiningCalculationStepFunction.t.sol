@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "../TestCommons.sol";
@@ -77,11 +77,10 @@ contract MiningCalculationStepFunctionTest is TestCommons {
     }
 
     /// @dev Quadruple precision, 128 bits
-    function _toQuadruplePrecision(uint256 number, uint256 decimals)
-        private
-        pure
-        returns (bytes16)
-    {
+    function _toQuadruplePrecision(
+        uint256 number,
+        uint256 decimals
+    ) private pure returns (bytes16) {
         if (number % decimals > 0) {
             /// @dev during calculation this value is lost in the conversion
             number += 1;

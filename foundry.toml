@@ -1,6 +1,7 @@
 [profile.default]
 src = 'contracts'
 out = 'out'
+solc = "0.8.20"
 libs = ["node_modules", "lib"]
 fs_permissions = [{ access = "read-write", path = "./"}]
 remappings = [
