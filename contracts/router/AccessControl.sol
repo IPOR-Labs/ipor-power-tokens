@@ -7,7 +7,7 @@ import "../security/PauseManager.sol";
 
 contract AccessControl {
     event AppointedToTransferOwnership(address indexed appointedOwner);
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event OwnershipTransferred(address indexed newOwner);
 
     uint256 internal constant _NOT_ENTERED = 1;
     uint256 internal constant _ENTERED = 2;
@@ -108,17 +108,11 @@ contract AccessControl {
     }
 
     function _whenNotPaused() internal view {
-        require(uint256(StorageLib.getPaused().value) == 0, "Pausable: paused");
-    }
-
-    function _nonReentrant() internal view {
-        require(
-            uint256(StorageLib.getReentrancyStatus().value) != _ENTERED,
-            "ReentrancyGuard: reentrant call"
-        );
+        require(uint256(StorageLib.getPaused().value) == 0, Errors.CONTRACT_PAUSED);
     }
 
     function _enterReentrancy() internal {
+        require(uint256(StorageLib.getReentrancyStatus().value) != _ENTERED, Errors.REENTRANCY);
         StorageLib.getReentrancyStatus().value = _ENTERED;
     }
 
@@ -132,9 +126,8 @@ contract AccessControl {
      */
     function _transferOwnership(address newOwner) internal virtual {
         StorageLib.OwnerStorage storage ownerStorage = StorageLib.getOwner();
-        address oldOwner = address(ownerStorage.value);
         ownerStorage.value = newOwner;
-        emit OwnershipTransferred(oldOwner, newOwner);
+        emit OwnershipTransferred(newOwner);
     }
 
     function _pause() internal {
@@ -143,9 +136,6 @@ contract AccessControl {
 
     /// @dev Internal function to check if the sender is the contract owner.
     function _onlyOwner() internal view {
-        require(
-            address(StorageLib.getOwner().value) == msg.sender,
-            "Ownable: caller is not the owner"
-        );
+        require(address(StorageLib.getOwner().value) == msg.sender, Errors.CALLER_NOT_OWNER);
     }
 }

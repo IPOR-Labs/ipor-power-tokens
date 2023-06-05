@@ -10,7 +10,7 @@ import "../libraries/errors/Errors.sol";
 import "../libraries/math/MiningCalculation.sol";
 import "../interfaces/types/LiquidityMiningTypes.sol";
 import "../interfaces/ILiquidityMiningInternal.sol";
-import "../interfaces/IStakedToken.sol";
+import "../interfaces/IGovernanceToken.sol";
 import "../interfaces/IPowerToken.sol";
 import "../security/MiningOwnableUpgradeable.sol";
 
@@ -114,9 +114,8 @@ abstract contract LiquidityMiningInternal is
 
     function setPauseManager(address newPauseManagerAddr) external override onlyOwner {
         require(newPauseManagerAddr != address(0), Errors.WRONG_ADDRESS);
-        address oldPauseManagerAddr = _pauseManager;
         _pauseManager = newPauseManagerAddr;
-        emit PauseManagerChanged(_msgSender(), oldPauseManagerAddr, newPauseManagerAddr);
+        emit PauseManagerChanged(newPauseManagerAddr);
     }
 
     function pause() external override onlyPauseManager {
@@ -268,12 +267,7 @@ abstract contract LiquidityMiningInternal is
             accruedRewards.toUint88()
         );
 
-        emit RewardsPerBlockChanged(
-            _msgSender(),
-            lpToken,
-            globalIndicators.rewardsPerBlock,
-            pwTokenAmount
-        );
+        emit RewardsPerBlockChanged(lpToken, pwTokenAmount);
     }
 
     /// @notice Gets Horizontal shift param used in Liquidity Mining equations.

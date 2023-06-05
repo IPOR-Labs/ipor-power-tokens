@@ -50,7 +50,7 @@ contract RouterAccessControlTest is TestCommons {
 
         // when
         vm.prank(_userOne);
-        vm.expectRevert("Ownable: caller is not the owner");
+        vm.expectRevert(bytes(Errors.CALLER_NOT_OWNER));
         AccessControl(_router).transferOwnership(_userOne);
 
         // then
@@ -112,7 +112,7 @@ contract RouterAccessControlTest is TestCommons {
 
         // when
         vm.prank(_userOne);
-        vm.expectRevert("Ownable: caller is not the owner");
+        vm.expectRevert(bytes(Errors.CALLER_NOT_OWNER));
         AccessControl(_router).renounceOwnership();
 
         // then
@@ -150,7 +150,7 @@ contract RouterAccessControlTest is TestCommons {
 
         // when
         vm.prank(_userOne);
-        vm.expectRevert("Ownable: caller is not the owner");
+        vm.expectRevert(bytes(Errors.CALLER_NOT_OWNER));
         AccessControl(_router).addPauseGuardian(_userOne);
 
         // then
@@ -185,7 +185,7 @@ contract RouterAccessControlTest is TestCommons {
 
         // when
         vm.prank(_userOne);
-        vm.expectRevert("Ownable: caller is not the owner");
+        vm.expectRevert(bytes(Errors.CALLER_NOT_OWNER));
         AccessControl(_router).removePauseGuardian(_userOne);
 
         // then
@@ -251,7 +251,7 @@ contract RouterAccessControlTest is TestCommons {
 
         // when
         vm.prank(_userOne);
-        vm.expectRevert("Ownable: caller is not the owner");
+        vm.expectRevert(bytes(Errors.CALLER_NOT_OWNER));
         AccessControl(_router).unpause();
 
         // then

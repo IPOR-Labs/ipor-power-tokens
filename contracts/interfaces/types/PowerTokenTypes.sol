@@ -10,8 +10,8 @@ library PowerTokenTypes {
         uint256 pwTokenAmount;
     }
 
-    struct UpdateStakedToken {
-        address onBehalfOf;
-        uint256 stakedTokenAmount;
+    struct UpdateGovernanceToken {
+        address beneficiary;
+        uint256 governanceTokenAmount;
     }
 }

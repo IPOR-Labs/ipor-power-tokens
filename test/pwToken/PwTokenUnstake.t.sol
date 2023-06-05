@@ -9,12 +9,8 @@ import "../../contracts/interfaces/IPowerTokenInternal.sol";
 import "../../contracts/tokens/PowerTokenInternal.sol";
 
 contract PwTokenUnstakeTest is TestCommons {
-    event UnstakeWithoutCooldownFeeChanged(
-        address indexed changedBy,
-        uint256 oldFee,
-        uint256 newFee
-    );
-    event StakedTokenRemovedWithFee(
+    event UnstakeWithoutCooldownFeeChanged(uint256 newFee);
+    event GovernanceTokenRemovedWithFee(
         address indexed account,
         uint256 pwTokenAmount,
         uint256 internalExchangeRate,
@@ -86,7 +82,7 @@ contract PwTokenUnstakeTest is TestCommons {
         // when
         vm.prank(_userOne);
         vm.expectEmit(true, true, true, true);
-        emit StakedTokenRemovedWithFee(_userOne, 1_000e18, 1e18, 500e18);
+        emit GovernanceTokenRemovedWithFee(_userOne, 1_000e18, 1e18, 500e18);
         IPowerTokenStakeService(_router).unstakeGovernanceTokenFromPowerToken(_userOne, 1_000e18);
 
         // then
@@ -259,7 +255,7 @@ contract PwTokenUnstakeTest is TestCommons {
         // when
         vm.prank(owner);
         vm.expectEmit(true, true, true, true);
-        emit UnstakeWithoutCooldownFeeChanged(owner, 5e17, 1e17);
+        emit UnstakeWithoutCooldownFeeChanged(1e17);
         IPowerTokenInternal(powerTokenAddress).setUnstakeWithoutCooldownFee(1e17);
         vm.prank(_userOne);
         IPowerTokenStakeService(_router).unstakeGovernanceTokenFromPowerToken(_userOne, 500e18);

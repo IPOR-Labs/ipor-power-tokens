@@ -59,10 +59,7 @@ library StorageLib {
     function getPauseGuardianStorage()
         internal
         pure
-        returns (
-            // todo change to uint
-            mapping(address => bool) storage store
-        )
+        returns (mapping(address => uint256) storage store)
     {
         uint256 slot = _getStorageSlot(StorageId.PauseGuardians);
         assembly {

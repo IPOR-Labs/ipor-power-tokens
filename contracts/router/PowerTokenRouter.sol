@@ -26,7 +26,7 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
         address powerTokenAddress;
         address liquidityMiningLens;
         address stakeService;
-        address miningService;
+        address flowsService;
         address powerTokenLens;
     }
 
@@ -48,8 +48,8 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
             string.concat(Errors.WRONG_ADDRESS, " stakeService")
         );
         require(
-            deployedContracts.miningService != address(0),
-            string.concat(Errors.WRONG_ADDRESS, " miningService")
+            deployedContracts.flowsService != address(0),
+            string.concat(Errors.WRONG_ADDRESS, " flowsService")
         );
         require(
             deployedContracts.powerTokenLens != address(0),
@@ -57,18 +57,18 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
         );
         LIQUIDITY_MINING_LENS = deployedContracts.liquidityMiningLens;
         STAKE_SERVICE = deployedContracts.stakeService;
-        FLOWS_SERVICE = deployedContracts.miningService;
+        FLOWS_SERVICE = deployedContracts.flowsService;
         LIQUIDITY_MINING_ADDRESS = deployedContracts.liquidityMiningAddress;
         POWER_TOKEN_ADDRESS = deployedContracts.powerTokenAddress;
         POWER_TOKEN_LENS = deployedContracts.powerTokenLens;
         _disableInitializers();
     }
 
-    function initialize(uint256 paused) external initializer {
+    function initialize(uint256 pausedTemp) external initializer {
         __UUPSUpgradeable_init();
         StorageLib.getOwner().value = msg.sender;
         PauseManager.addPauseGuardian(msg.sender);
-        StorageLib.getPaused().value = paused;
+        StorageLib.getPaused().value = pausedTemp;
     }
 
     /// @notice Determines the implementation address based on the provided function signature.
@@ -86,7 +86,6 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
             sig == IPowerTokenStakeService.redeemPwToken.selector
         ) {
             _whenNotPaused();
-            _nonReentrant();
             _enterReentrancy();
             return STAKE_SERVICE;
         }
@@ -97,7 +96,6 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
             sig == IPowerTokenFlowsService.claimRewardsFromLiquidityMining.selector
         ) {
             _whenNotPaused();
-            _nonReentrant();
             _enterReentrancy();
             return FLOWS_SERVICE;
         }
@@ -175,8 +173,7 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
     function batchExecutor(bytes[] calldata calls) external {
         uint256 length = calls.length;
         for (uint256 i; i != length; ) {
-            bytes4 sig = bytes4(calls[i][:4]);
-            address implementation = getRouterImplementation(sig);
+            address implementation = getRouterImplementation(bytes4(calls[i][:4]));
             implementation.functionDelegateCall(calls[i]);
             if (uint256(StorageLib.getReentrancyStatus().value) == _ENTERED) {
                 _leaveReentrancy();

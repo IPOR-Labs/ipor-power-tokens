@@ -27,7 +27,7 @@ contract PwTokenConfigurationTest is TestCommons {
         );
     }
 
-    function testShouldNotBeAbleToDeployContractWhenNoStakedTokenAddress() external {
+    function testShouldNotBeAbleToDeployContractWhenNoGovernanceTokenAddress() external {
         // given
         address router = _powerTokensSystem.dao();
         // when
