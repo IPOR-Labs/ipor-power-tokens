@@ -12,13 +12,13 @@ contract AccessControl {
     uint256 internal constant _NOT_ENTERED = 1;
     uint256 internal constant _ENTERED = 2;
 
-    /// @dev Throws error if called by any account other than the owner.
+    /// @dev Throws an error if called by any account other than the owner.
     modifier onlyOwner() {
         _onlyOwner();
         _;
     }
 
-    /// @dev Throws error if called by any account other than the appointed owner.
+    /// @dev Throws an error if called by any account other than the appointed owner.
     modifier onlyAppointedOwner() {
         require(
             address(StorageLib.getAppointedOwner().appointedOwner) == msg.sender,
@@ -27,7 +27,7 @@ contract AccessControl {
         _;
     }
 
-    /// @dev Throws if called by any account other than the pause guardian.
+    /// @dev Throws an error if called by any account other than the pause guardian.
     modifier onlyPauseGuardian() {
         require(PauseManager.isPauseGuardian(msg.sender), Errors.CALLER_NOT_GUARDIAN);
         _;
@@ -39,7 +39,7 @@ contract AccessControl {
         return StorageLib.getOwner().value;
     }
 
-    /// @notice Transfers the ownership of the contract to a new appointed owner.
+    /// @notice Transfers the ownership of the contract to the new appointed owner.
     /// @param newAppointedOwner The address of the new appointed owner.
     /// @dev Only the current contract owner can call this function.
     function transferOwnership(address newAppointedOwner) public onlyOwner {
@@ -50,7 +50,7 @@ contract AccessControl {
         emit AppointedToTransferOwnership(newAppointedOwner);
     }
 
-    /// @notice Confirms the transfer of ownership by the appointed owner.
+    /// @notice Confirms the transfer of the ownership by the appointed owner.
     /// @dev Only the appointed owner can call this function.
     function confirmTransferOwnership() public onlyAppointedOwner {
         StorageLib.AppointedOwnerStorage storage appointedOwnerStorage = StorageLib

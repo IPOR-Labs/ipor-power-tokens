@@ -7,7 +7,7 @@ import "./PowerTokenInternal.sol";
 
 ///@title Smart contract responsible for managing Power Token.
 /// @notice Power Token is retrieved when the account stakes [Staked] Token.
-/// PowerToken smart contract allows staking, unstaking of [Staked] Token, delegating, undelegating of Power Token balance to LiquidityMining.
+/// PowerToken smart contract allows for staking, unstaking of [Staked] Token, delegating, undelegating of Power Token balance to LiquidityMining.
 contract PowerToken is PowerTokenInternal, IPowerToken {
     constructor(
         address routerAddress,

@@ -72,7 +72,7 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
     }
 
     /// @notice Determines the implementation address based on the provided function signature.
-    /// @dev This function is internal and used by the fallback function to delegate the current call to the appropriate implementation.
+    /// @dev This internal function is used by the fallback function to delegate the current call to the appropriate implementation.
     /// @param sig The function signature for which the implementation address needs to be determined.
     /// @return The address of the implementation contract.
     function getRouterImplementation(bytes4 sig) internal returns (address) {
@@ -168,7 +168,7 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
     }
 
     /// @notice Executes a batch of calls to different contracts.
-    /// @dev Allows executing multiple function calls in a single transaction to different contracts.
+    /// @dev Allows executing multiple function calls in a single transaction to other contracts.
     /// @param calls An array of encoded function calls, where each element represents the encoded data of a single function call.
     function batchExecutor(bytes[] calldata calls) external {
         uint256 length = calls.length;
