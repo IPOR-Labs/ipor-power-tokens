@@ -3,12 +3,12 @@ pragma solidity 0.8.20;
 
 import "../TestCommons.sol";
 import "../PowerTokensTestsSystem.sol";
-import "contracts/interfaces/types/PowerTokenTypes.sol";
-import "contracts/interfaces/ILiquidityMiningLens.sol";
-import "contracts/interfaces/ILiquidityMiningInternal.sol";
-import "contracts/interfaces/IPowerTokenStakeService.sol";
-import "contracts/interfaces/IPowerTokenFlowsService.sol";
-import "contracts/tokens/PowerTokenInternal.sol";
+import "@power-tokens/contracts/interfaces/types/PowerTokenTypes.sol";
+import "@power-tokens/contracts/interfaces/ILiquidityMiningLens.sol";
+import "@power-tokens/contracts/interfaces/ILiquidityMiningInternal.sol";
+import "@power-tokens/contracts/interfaces/IPowerTokenStakeService.sol";
+import "@power-tokens/contracts/interfaces/IPowerTokenFlowsService.sol";
+import "@power-tokens/contracts/tokens/PowerTokenInternal.sol";
 
 contract LiquidityMiningOneBlockTest is TestCommons {
     PowerTokensTestsSystem internal _powerTokensSystem;
