@@ -146,7 +146,7 @@ contract StakeService is IPowerTokenStakeService {
 
     function redeemPwToken(address transferTo) external {
         uint256 transferAmount = IPowerToken(POWER_TOKEN).redeemInternal(msg.sender);
-        ///@dev We can transfer pwTokenAmount because it is in relation 1:1 to Staked Token
+        ///@dev pwTokenAmount can be transfered because it is in relation 1:1 to Governace Token
         IERC20(GOVERNANCE_TOKEN).safeTransferFrom(POWER_TOKEN, transferTo, transferAmount);
     }
 

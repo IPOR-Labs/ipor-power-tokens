@@ -27,7 +27,7 @@ abstract contract LiquidityMiningInternal is
 
     address public immutable ROUTER_ADDRESS; // Router address
 
-    // @deprecated do not use this
+    // @deprecated "_powerToken" do not use
     address internal _powerToken;
     address internal _pauseManager;
 
@@ -140,7 +140,7 @@ abstract contract LiquidityMiningInternal is
         emit AllowanceRevoked(erc20Token, ROUTER_ADDRESS);
     }
 
-    /// @dev Rebalance makes that rewards for account are reset in current block.
+    /// @dev Rebalance causes account's rewards to reset in current block.
     function _rebalanceIndicators(
         address account,
         address lpToken,
@@ -174,7 +174,7 @@ abstract contract LiquidityMiningInternal is
 
         uint256 accruedRewards;
 
-        /// @dev check if we should update rewards, it should happened when at least one account stakes lpTokens
+        /// @dev checks if rewards should be updated, It's truggered if at least one account stakes lpTokens
         if (globalIndicators.aggregatedPowerUp == 0) {
             accruedRewards = globalIndicators.accruedRewards;
         } else {
