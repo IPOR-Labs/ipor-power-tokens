@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
@@ -8,10 +8,9 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "../libraries/errors/Errors.sol";
 import "../libraries/math/MiningCalculation.sol";
-import "../libraries/Constants.sol";
 import "../interfaces/types/LiquidityMiningTypes.sol";
 import "../interfaces/ILiquidityMiningInternal.sol";
-import "../interfaces/IStakedToken.sol";
+import "../interfaces/IGovernanceToken.sol";
 import "../interfaces/IPowerToken.sol";
 import "../security/MiningOwnableUpgradeable.sol";
 
@@ -28,7 +27,7 @@ abstract contract LiquidityMiningInternal is
 
     address public immutable ROUTER_ADDRESS; // Router address
 
-    // @deprecated do not use this
+    // @deprecated "_powerToken" do not use
     address internal _powerToken;
     address internal _pauseManager;
 
@@ -64,7 +63,7 @@ abstract contract LiquidityMiningInternal is
 
         _pauseManager = _msgSender();
 
-        for (uint256 i; i != lpTokensLength; ++i) {
+        for (uint256 i; i != lpTokensLength; ) {
             require(lpTokens[i] != address(0), Errors.WRONG_ADDRESS);
 
             _lpTokens[lpTokens[i]] = true;
@@ -77,6 +76,9 @@ abstract contract LiquidityMiningInternal is
                 0,
                 0
             );
+            unchecked {
+                ++i;
+            }
         }
     }
 
@@ -112,9 +114,8 @@ abstract contract LiquidityMiningInternal is
 
     function setPauseManager(address newPauseManagerAddr) external override onlyOwner {
         require(newPauseManagerAddr != address(0), Errors.WRONG_ADDRESS);
-        address oldPauseManagerAddr = _pauseManager;
         _pauseManager = newPauseManagerAddr;
-        emit PauseManagerChanged(_msgSender(), oldPauseManagerAddr, newPauseManagerAddr);
+        emit PauseManagerChanged(newPauseManagerAddr);
     }
 
     function pause() external override onlyPauseManager {
@@ -139,7 +140,7 @@ abstract contract LiquidityMiningInternal is
         emit AllowanceRevoked(erc20Token, ROUTER_ADDRESS);
     }
 
-    /// @dev Rebalance makes that rewards for account are reset in current block.
+    /// @dev Rebalance causes account's rewards to reset in current block.
     function _rebalanceIndicators(
         address account,
         address lpToken,
@@ -173,7 +174,7 @@ abstract contract LiquidityMiningInternal is
 
         uint256 accruedRewards;
 
-        /// @dev check if we should update rewards, it should happened when at least one account stakes lpTokens
+        /// @dev checks if rewards should be updated, It's truggered if at least one account stakes lpTokens
         if (globalIndicators.aggregatedPowerUp == 0) {
             accruedRewards = globalIndicators.accruedRewards;
         } else {
@@ -266,12 +267,7 @@ abstract contract LiquidityMiningInternal is
             accruedRewards.toUint88()
         );
 
-        emit RewardsPerBlockChanged(
-            _msgSender(),
-            lpToken,
-            globalIndicators.rewardsPerBlock,
-            pwTokenAmount
-        );
+        emit RewardsPerBlockChanged(lpToken, pwTokenAmount);
     }
 
     /// @notice Gets Horizontal shift param used in Liquidity Mining equations.

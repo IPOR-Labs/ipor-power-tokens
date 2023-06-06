@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "../TestCommons.sol";
-import "contracts/libraries/math/MiningCalculation.sol";
+import "@power-tokens/contracts/libraries/math/MiningCalculation.sol";
 
 contract MiningCalculationTest is TestCommons {
     struct TestData {

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 
 interface IPowerTokenFlowsService {
     /// @notice Claims rewards for the caller by transferring them from the LiquidityMining contract to the PowerToken contract.
@@ -15,8 +15,10 @@ interface IPowerTokenFlowsService {
     /// @param lpTokens An array of LP tokens for which the indicators are to be updated.
     /// @dev This function calls the `updateIndicators` function of the `ILiquidityMining` contract to update the indicators.
     /// @dev Reverts if the `lpTokens` array is empty.
-    function updateIndicatorsInLiquidityMining(address account, address[] calldata lpTokens)
-        external;
+    function updateIndicatorsInLiquidityMining(
+        address account,
+        address[] calldata lpTokens
+    ) external;
 
     /// @notice Delegates staked tokens by providing LP tokens and corresponding amounts.
     /// @param lpTokens An array of LP tokens to delegate.

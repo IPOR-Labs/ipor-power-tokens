@@ -1,22 +1,18 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "../TestCommons.sol";
 import "../PowerTokensTestsSystem.sol";
-import "../../contracts/interfaces/types/PowerTokenTypes.sol";
-import "../../contracts/interfaces/ILiquidityMiningLens.sol";
-import "../../contracts/interfaces/IPowerTokenLens.sol";
-import "../../contracts/tokens/PowerTokenInternal.sol";
+import "@power-tokens/contracts/interfaces/types/PowerTokenTypes.sol";
+import "@power-tokens/contracts/interfaces/ILiquidityMiningLens.sol";
+import "@power-tokens/contracts/interfaces/IPowerTokenLens.sol";
+import "@power-tokens/contracts/tokens/PowerTokenInternal.sol";
 
 contract LiquidityMiningConfigurationTest is TestCommons {
     event LpTokenSupportRemoved(address account, address lpToken);
     event NewLpTokenSupported(address account, address lpToken);
-    event PauseManagerChanged(
-        address indexed changedBy,
-        address indexed oldPauseManager,
-        address indexed newPauseManager
-    );
+    event PauseManagerChanged(address indexed newPauseManager);
 
     PowerTokensTestsSystem internal _powerTokensSystem;
 
@@ -193,7 +189,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
 
         vm.prank(owner);
         vm.expectEmit(true, true, true, true);
-        emit PauseManagerChanged(owner, owner, newPauseManager);
+        emit PauseManagerChanged(newPauseManager);
         ILiquidityMiningInternal(liquidityMining).setPauseManager(newPauseManager);
 
         bool isPausedBefore = PausableUpgradeable(liquidityMining).paused();
@@ -357,13 +353,13 @@ contract LiquidityMiningConfigurationTest is TestCommons {
             memory updateLpToken = new LiquidityMiningTypes.UpdateLpToken[](1);
         updateLpToken[0].lpToken = _powerTokensSystem.lpDai();
         updateLpToken[0].lpTokenAmount = 100;
-        updateLpToken[0].onBehalfOf = address(this);
+        updateLpToken[0].beneficiary = address(this);
 
         address liquidityMining = _powerTokensSystem.liquidityMining();
 
         // when
         vm.expectRevert(bytes(Errors.CALLER_NOT_ROUTER));
-        ILiquidityMining(liquidityMining).addLpTokens(updateLpToken);
+        ILiquidityMining(liquidityMining).addLpTokensInternal(updateLpToken);
     }
 
     function testShouldNotBeAbleToRemoveLpTokensWhenNotRouter() external {
@@ -372,13 +368,13 @@ contract LiquidityMiningConfigurationTest is TestCommons {
             memory updateLpToken = new LiquidityMiningTypes.UpdateLpToken[](1);
         updateLpToken[0].lpToken = _powerTokensSystem.lpDai();
         updateLpToken[0].lpTokenAmount = 100;
-        updateLpToken[0].onBehalfOf = address(this);
+        updateLpToken[0].beneficiary = address(this);
 
         address liquidityMining = _powerTokensSystem.liquidityMining();
 
         // when
         vm.expectRevert(bytes(Errors.CALLER_NOT_ROUTER));
-        ILiquidityMining(liquidityMining).removeLpTokens(updateLpToken);
+        ILiquidityMining(liquidityMining).removeLpTokensInternal(updateLpToken);
     }
 
     function testShouldNotBeAbleToAddPwTokensWhenNotRouter() external {
@@ -387,13 +383,13 @@ contract LiquidityMiningConfigurationTest is TestCommons {
             memory updateLpToken = new LiquidityMiningTypes.UpdatePwToken[](1);
         updateLpToken[0].lpToken = _powerTokensSystem.lpDai();
         updateLpToken[0].pwTokenAmount = 100;
-        updateLpToken[0].onBehalfOf = address(this);
+        updateLpToken[0].beneficiary = address(this);
 
         address liquidityMining = _powerTokensSystem.liquidityMining();
 
         // when
         vm.expectRevert(bytes(Errors.CALLER_NOT_ROUTER));
-        ILiquidityMining(liquidityMining).addPwTokens(updateLpToken);
+        ILiquidityMining(liquidityMining).addPwTokensInternal(updateLpToken);
     }
 
     function testShouldNotBeAbleToRemovePwTokensWhenNotRouter() external {
@@ -402,13 +398,13 @@ contract LiquidityMiningConfigurationTest is TestCommons {
             memory updateLpToken = new LiquidityMiningTypes.UpdatePwToken[](1);
         updateLpToken[0].lpToken = _powerTokensSystem.lpDai();
         updateLpToken[0].pwTokenAmount = 100;
-        updateLpToken[0].onBehalfOf = address(this);
+        updateLpToken[0].beneficiary = address(this);
 
         address liquidityMining = _powerTokensSystem.liquidityMining();
 
         // when
         vm.expectRevert(bytes(Errors.CALLER_NOT_ROUTER));
-        ILiquidityMining(liquidityMining).removePwTokens(updateLpToken);
+        ILiquidityMining(liquidityMining).removePwTokensInternal(updateLpToken);
     }
 
     function testShouldNotBeAbleToDelegatePwTokenWhenContractIsPause() external {

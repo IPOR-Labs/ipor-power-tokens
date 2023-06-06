@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 
 library Errors {
     /// @notice Error thrown when the lpToken address is not supported
-    /// @dev List of supported LpTokens are defined in {LiquidityMining._lpTokens}
+    /// @dev List of supported LpTokens is defined in {LiquidityMining._lpTokens}
     string public constant LP_TOKEN_NOT_SUPPORTED = "PT_701";
     /// @notice Error thrown when the caller / msgSender is not a Pause Manager address.
-    /// @dev Pause Manager can be defined by smart contract's Onwer
+    /// @dev Pause Manager can be defined by the smart contract's Onwer
     string public constant CALLER_NOT_PAUSE_MANAGER = "PT_704";
     /// @notice Error thrown when the account's base balance is too low
     string public constant ACCOUNT_BASE_BALANCE_IS_TOO_LOW = "PT_705";
@@ -43,4 +43,7 @@ library Errors {
     string public constant INPUT_ARRAYS_EMPTY = "PT_721";
     string public constant CALLER_NOT_ROUTER = "PT_722";
     string public constant CALLER_NOT_GUARDIAN = "PT_723";
+    string public constant CONTRACT_PAUSED = "PT_724";
+    string public constant REENTRANCY = "PT_725";
+    string public constant CALLER_NOT_OWNER = "PT_723";
 }

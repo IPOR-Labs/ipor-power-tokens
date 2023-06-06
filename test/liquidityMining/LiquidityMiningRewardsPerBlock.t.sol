@@ -1,21 +1,16 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 
 import "../TestCommons.sol";
 import "../PowerTokensTestsSystem.sol";
-import "contracts/interfaces/types/PowerTokenTypes.sol";
-import "contracts/interfaces/ILiquidityMiningLens.sol";
-import "contracts/interfaces/ILiquidityMiningInternal.sol";
-import "contracts/interfaces/IPowerTokenStakeService.sol";
-import "contracts/tokens/PowerTokenInternal.sol";
+import "@power-tokens/contracts/interfaces/types/PowerTokenTypes.sol";
+import "@power-tokens/contracts/interfaces/ILiquidityMiningLens.sol";
+import "@power-tokens/contracts/interfaces/ILiquidityMiningInternal.sol";
+import "@power-tokens/contracts/interfaces/IPowerTokenStakeService.sol";
+import "@power-tokens/contracts/tokens/PowerTokenInternal.sol";
 
 contract LiquidityMiningRewardsPerBlockTest is TestCommons {
-    event RewardsPerBlockChanged(
-        address indexed changedBy,
-        address lpToken,
-        uint256 oldPwTokenAmount,
-        uint256 newPwTokenAmount
-    );
+    event RewardsPerBlockChanged(address lpToken, uint256 newPwTokenAmount);
 
     PowerTokensTestsSystem internal _powerTokensSystem;
     address internal _router;
@@ -59,7 +54,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         // when
         vm.prank(_owner);
         vm.expectEmit(true, true, true, true);
-        emit RewardsPerBlockChanged(_owner, _lpDai, 0, 2e8);
+        emit RewardsPerBlockChanged(_lpDai, 2e8);
         ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 2e8);
 
         // then

@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 
 import "../TestCommons.sol";
 import "../PowerTokensTestsSystem.sol";
-import "contracts/interfaces/types/PowerTokenTypes.sol";
-import "contracts/interfaces/ILiquidityMiningLens.sol";
-import "contracts/interfaces/ILiquidityMiningInternal.sol";
-import "contracts/interfaces/IPowerTokenStakeService.sol";
-import "contracts/interfaces/IPowerTokenFlowsService.sol";
-import "contracts/tokens/PowerTokenInternal.sol";
+import "@power-tokens/contracts/interfaces/types/PowerTokenTypes.sol";
+import "@power-tokens/contracts/interfaces/ILiquidityMiningLens.sol";
+import "@power-tokens/contracts/interfaces/ILiquidityMiningInternal.sol";
+import "@power-tokens/contracts/interfaces/IPowerTokenStakeService.sol";
+import "@power-tokens/contracts/interfaces/IPowerTokenFlowsService.sol";
+import "@power-tokens/contracts/tokens/PowerTokenInternal.sol";
 
 contract LiquidityMiningOneBlockTest is TestCommons {
     PowerTokensTestsSystem internal _powerTokensSystem;
@@ -53,8 +53,8 @@ contract LiquidityMiningOneBlockTest is TestCommons {
 
     function testShouldHasTheSameAccountParamsWhen2UserStakeLpTokensInOneBlock() external {
         // given
-        uint256[] memory lpTokenAmounts = new uint256[](1);
-        lpTokenAmounts[0] = 1_000e18;
+        uint256[] memory lpTokenMaxAmounts = new uint256[](1);
+        lpTokenMaxAmounts[0] = 1_000e18;
         address[] memory lpTokens = new address[](1);
         lpTokens[0] = _lpDai;
 
@@ -66,13 +66,13 @@ contract LiquidityMiningOneBlockTest is TestCommons {
         IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
             _userOne,
             lpTokens,
-            lpTokenAmounts
+            lpTokenMaxAmounts
         );
         vm.prank(_userTwo);
         IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
             _userTwo,
             lpTokens,
-            lpTokenAmounts
+            lpTokenMaxAmounts
         );
 
         // then

@@ -17,6 +17,8 @@ jobs:
     uses: ./.github/workflows/foundry-tests.yml
     secrets:
       FORK_URL: ${{ secrets.PROVIDER_URL }}
+    with:
+      fork-test-enabled: false
 
   report:
     if: ${{ always() }}

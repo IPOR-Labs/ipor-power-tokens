@@ -29,3 +29,6 @@ slither-report.json
 package-lock.json
 out/
 
+/.deps/
+/broadcast/
+ipor-power-token-addresses.json

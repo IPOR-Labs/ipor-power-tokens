@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 
 import "../TestCommons.sol";
 import "../PowerTokensTestsSystem.sol";
-import "../../contracts/interfaces/types/PowerTokenTypes.sol";
-import "../../contracts/interfaces/IPowerTokenLens.sol";
-import "../../contracts/tokens/PowerTokenInternal.sol";
+import "@power-tokens/contracts/interfaces/types/PowerTokenTypes.sol";
+import "@power-tokens/contracts/interfaces/IPowerTokenLens.sol";
+import "@power-tokens/contracts/tokens/PowerTokenInternal.sol";
 
 contract PwTokenStakeTest is TestCommons {
-    event StakedTokenAdded(
+    event GovernanceTokenAdded(
         address indexed account,
-        uint256 stakedTokenAmount,
+        uint256 governanceTokenAmount,
         uint256 internalExchangeRate,
         uint256 baseAmount
     );
@@ -63,7 +63,7 @@ contract PwTokenStakeTest is TestCommons {
         // when
         vm.prank(_userOne);
         vm.expectEmit(true, true, true, true);
-        emit StakedTokenAdded(_userOne, 10_000e18, 1e18, 10_000e18);
+        emit GovernanceTokenAdded(_userOne, 10_000e18, 1e18, 10_000e18);
         IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 10_000e18);
 
         // then
@@ -83,7 +83,9 @@ contract PwTokenStakeTest is TestCommons {
         );
     }
 
-    function testShouldExchangeRateIncreaseWhenTransferStakedTokenToPowerTokenAddress() external {
+    function testShouldExchangeRateIncreaseWhenTransferGovernanceTokenToPowerTokenAddress()
+        external
+    {
         // given
 
         address iporTokenAddress = _powerTokensSystem.iporToken();

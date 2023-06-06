@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 
 /// @title Struct used across Liquidity Mining.
 library PowerTokenTypes {
@@ -10,8 +10,8 @@ library PowerTokenTypes {
         uint256 pwTokenAmount;
     }
 
-    struct UpdateStakedToken {
-        address onBehalfOf;
-        uint256 stakedTokenAmount;
+    struct UpdateGovernanceToken {
+        address beneficiary;
+        uint256 governanceTokenAmount;
     }
 }

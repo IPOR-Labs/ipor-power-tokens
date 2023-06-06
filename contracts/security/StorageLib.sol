@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 
-/// @title Storage ID's associated with the IPOR Protocol Router.
+/// @title Storage IDs associated with the IPOR Protocol Router.
 library StorageLib {
     uint256 constant STORAGE_SLOT_BASE = 1_000_000;
 
@@ -59,10 +59,7 @@ library StorageLib {
     function getPauseGuardianStorage()
         internal
         pure
-        returns (
-            // todo change to uint
-            mapping(address => bool) storage store
-        )
+        returns (mapping(address => uint256) storage store)
     {
         uint256 slot = _getStorageSlot(StorageId.PauseGuardians);
         assembly {

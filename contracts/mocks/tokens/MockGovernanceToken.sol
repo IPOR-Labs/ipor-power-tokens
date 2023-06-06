@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 /// @title Staked Token in standard ERC20 mocked.
-contract MockStakedToken is ERC20 {
+contract MockGovernanceToken is ERC20 {
     /**
      * @dev Contract id.
      * This is the keccak-256 hash of "io.ipor.IporToken" subtracted by 1
@@ -19,6 +19,7 @@ contract MockStakedToken is ERC20 {
         string memory symbol,
         address daoWalletAddress
     ) ERC20(name, symbol) {
+        require(address(0) != daoWalletAddress, "PT_000");
         _decimals = 18;
         _mint(daoWalletAddress, 100_000_000 * 1e18);
     }

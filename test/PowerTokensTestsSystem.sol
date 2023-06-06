@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
-import "../contracts/mocks/tokens/MockStakedToken.sol";
-import "../contracts/mocks/tokens/MockToken.sol";
-import "../contracts/mocks/tokens/MockLpToken.sol";
+import "@power-tokens/contracts/mocks/tokens/MockGovernanceToken.sol";
+import "@power-tokens/contracts/mocks/tokens/MockToken.sol";
+import "@power-tokens/contracts/mocks/tokens/MockLpToken.sol";
 import "./TestCommons.sol";
-import "../contracts/mining/LiquidityMining.sol";
-import "../contracts/tokens/PowerToken.sol";
-import "../contracts/lens/LiquidityMiningLens.sol";
-import "../contracts/services/StakeService.sol";
-import "../contracts/services/FlowsService.sol";
-import "../contracts/router/PowerTokenRouter.sol";
-import "../contracts/lens/PowerTokenLens.sol";
+import "@power-tokens/contracts/mining/LiquidityMining.sol";
+import "@power-tokens/contracts/tokens/PowerToken.sol";
+import "@power-tokens/contracts/lens/LiquidityMiningLens.sol";
+import "@power-tokens/contracts/services/StakeService.sol";
+import "@power-tokens/contracts/services/FlowsService.sol";
+import "@power-tokens/contracts/router/PowerTokenRouter.sol";
+import "@power-tokens/contracts/lens/PowerTokenLens.sol";
 
 contract PowerTokensTestsSystem is TestCommons {
     using SafeCast for uint256;
@@ -51,22 +51,14 @@ contract PowerTokensTestsSystem is TestCommons {
         _updatePowerTokenImplementation();
     }
 
-    function mintStable(
-        address stable,
-        address onBehalfOf,
-        uint256 amount
-    ) external {
+    function mintStable(address stable, address beneficiary, uint256 amount) external {
         vm.prank(owner);
-        MockToken(stable).mint(onBehalfOf, amount);
+        MockToken(stable).mint(beneficiary, amount);
     }
 
-    function mintLpTokens(
-        address lpToken,
-        address onBehalfOf,
-        uint256 amount
-    ) external {
+    function mintLpTokens(address lpToken, address beneficiary, uint256 amount) external {
         vm.startPrank(owner);
-        MockLpToken(lpToken).mint(onBehalfOf, amount);
+        MockLpToken(lpToken).mint(beneficiary, amount);
         vm.stopPrank();
     }
 
@@ -90,7 +82,7 @@ contract PowerTokensTestsSystem is TestCommons {
         MockLpToken(lpDai).approve(router, type(uint256).max);
         MockLpToken(lpUsdc).approve(router, type(uint256).max);
         MockLpToken(lpUsdt).approve(router, type(uint256).max);
-        MockStakedToken(iporToken).approve(router, type(uint256).max);
+        MockGovernanceToken(iporToken).approve(router, type(uint256).max);
         vm.stopPrank();
     }
 
@@ -107,7 +99,7 @@ contract PowerTokensTestsSystem is TestCommons {
         MockLpToken(lpUsdc).setJoseph(owner);
         MockLpToken(lpUsdt).setJoseph(owner);
 
-        iporToken = address(new MockStakedToken("IPOR", "IPOR", dao));
+        iporToken = address(new MockGovernanceToken("IPOR", "IPOR", dao));
         vm.stopPrank();
     }
 
@@ -186,7 +178,7 @@ contract PowerTokensTestsSystem is TestCommons {
                 powerTokenAddress: powerToken,
                 liquidityMiningLens: liquidityMiningLens,
                 stakeService: stakeService,
-                miningService: flowsService,
+                flowsService: flowsService,
                 powerTokenLens: powerTokenLens
             })
         );
@@ -207,7 +199,7 @@ contract PowerTokensTestsSystem is TestCommons {
         MockLpToken(lpDai).approve(router, type(uint256).max);
         MockLpToken(lpUsdc).approve(router, type(uint256).max);
         MockLpToken(lpUsdt).approve(router, type(uint256).max);
-        MockStakedToken(iporToken).approve(router, type(uint256).max);
+        MockGovernanceToken(iporToken).approve(router, type(uint256).max);
         vm.stopPrank();
     }
 }

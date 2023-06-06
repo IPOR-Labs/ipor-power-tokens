@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 
 import "./types/LiquidityMiningTypes.sol";
 
@@ -65,16 +65,9 @@ interface ILiquidityMiningInternal {
     event LpTokensUnstaked(address account, address lpToken, uint256 lpTokenAmount);
 
     /// @notice Emitted when the LiquidityMining's Owner changes the `rewards per block`
-    /// @param changedBy address of account executing changes
     /// @param lpToken address of lpToken for which the `rewards per block` is changed
-    /// @param oldPwTokenAmount old value of `rewards per block`, denominated in Power Token, represented in 8 decimals
     /// @param newPwTokenAmount new value of `rewards per block`, denominated in Power Token, represented in 8 decimals
-    event RewardsPerBlockChanged(
-        address indexed changedBy,
-        address lpToken,
-        uint256 oldPwTokenAmount,
-        uint256 newPwTokenAmount
-    );
+    event RewardsPerBlockChanged(address lpToken, uint256 newPwTokenAmount);
 
     /// @notice Emitted when the LiquidityMining's Owner adds support for lpToken
     /// @param account address of LiquidityMining's Owner
@@ -99,14 +92,8 @@ interface ILiquidityMiningInternal {
     event PwTokenUndelegated(address account, address lpToken, uint256 pwTokenAmount);
 
     /// @notice Emitted when the PauseManager's address is changed by its owner.
-    /// @param changedBy account address that has changed LiquidityMining's address
-    /// @param oldPauseManager PauseManager's old address
     /// @param newPauseManager PauseManager's new address
-    event PauseManagerChanged(
-        address indexed changedBy,
-        address indexed oldPauseManager,
-        address indexed newPauseManager
-    );
+    event PauseManagerChanged(address indexed newPauseManager);
 
     /// @notice Emitted when owner grants allowance for router
     /// @param erc20Token address of ERC20 token

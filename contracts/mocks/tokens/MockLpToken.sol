@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -15,22 +15,14 @@ contract MockLpToken is ERC20, Ownable {
 
     event Mint(address indexed account, uint256 amount);
     event Burn(address indexed account, uint256 amount);
-    event JosephChanged(
-        address indexed changedBy,
-        address indexed oldJoseph,
-        address indexed newJoseph
-    );
+    event JosephChanged(address indexed newJoseph);
 
     modifier onlyJoseph() {
         require(_msgSender() == _joseph, "PT_327");
         _;
     }
 
-    constructor(
-        string memory name,
-        string memory symbol,
-        address asset
-    ) ERC20(name, symbol) {
+    constructor(string memory name, string memory symbol, address asset) ERC20(name, symbol) {
         require(address(0) != asset, "PT_000");
         _asset = asset;
         _decimals = 18;
@@ -48,7 +40,7 @@ contract MockLpToken is ERC20, Ownable {
         require(newJoseph != address(0), "PT_000");
         address oldJoseph = _joseph;
         _joseph = newJoseph;
-        emit JosephChanged(_msgSender(), oldJoseph, newJoseph);
+        emit JosephChanged(newJoseph);
     }
 
     function mint(address account, uint256 amount) external onlyJoseph {

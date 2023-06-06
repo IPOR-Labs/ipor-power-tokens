@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 
 import "../interfaces/IPowerTokenLens.sol";
 import "../interfaces/IPowerToken.sol";
@@ -22,12 +22,9 @@ contract PowerTokenLens is IPowerTokenLens {
         return IPowerToken(POWER_TOKEN).balanceOf(account);
     }
 
-    function balanceOfPwTokenDelegatedToLiquidityMining(address account)
-        external
-        view
-        override
-        returns (uint256)
-    {
+    function balanceOfPwTokenDelegatedToLiquidityMining(
+        address account
+    ) external view override returns (uint256) {
         return IPowerToken(POWER_TOKEN).delegatedToLiquidityMiningBalanceOf(account);
     }
 
@@ -35,11 +32,9 @@ contract PowerTokenLens is IPowerTokenLens {
         return IPowerToken(POWER_TOKEN).getUnstakeWithoutCooldownFee();
     }
 
-    function getPwTokensInCooldown(address account)
-        external
-        view
-        returns (PowerTokenTypes.PwTokenCooldown memory)
-    {
+    function getPwTokensInCooldown(
+        address account
+    ) external view returns (PowerTokenTypes.PwTokenCooldown memory) {
         return IPowerToken(POWER_TOKEN).getActiveCooldown(account);
     }
 

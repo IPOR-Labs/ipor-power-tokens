@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 
 import "forge-std/Test.sol";
 import "./TestCommons.sol";
@@ -22,15 +22,15 @@ contract SmokeTest is TestCommons {
 
     function testBalanceOf() public {
         // GIVEN
-        address[] memory stakedTokens = new address[](1);
-        stakedTokens[0] = _powerTokensSystem.lpDai();
+        address[] memory governanceTokens = new address[](1);
+        governanceTokens[0] = _powerTokensSystem.lpDai();
         uint256[] memory stakedAmounts = new uint256[](1);
         stakedAmounts[0] = 1_000e18;
 
         vm.startPrank(_userOne);
         IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
             _userOne,
-            stakedTokens,
+            governanceTokens,
             stakedAmounts
         );
 
@@ -45,22 +45,22 @@ contract SmokeTest is TestCommons {
 
     function testBalanceOfDelegatedPwToken() public {
         // GIVEN
-        address[] memory stakedTokens = new address[](1);
-        stakedTokens[0] = _powerTokensSystem.lpDai();
+        address[] memory governanceTokens = new address[](1);
+        governanceTokens[0] = _powerTokensSystem.lpDai();
         uint256[] memory stakedAmounts = new uint256[](1);
         stakedAmounts[0] = 500e18;
 
         vm.startPrank(_userOne);
         IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 1_000e18);
         IPowerTokenFlowsService(_router).delegatePwTokensToLiquidityMining(
-            stakedTokens,
+            governanceTokens,
             stakedAmounts
         );
 
         // WHEN
         LiquidityMiningTypes.DelegatedPwTokenBalance[] memory balances = ILiquidityMiningLens(
             _router
-        ).balanceOfPowerTokensDelegatedToLiquidityMining(_userOne, stakedTokens);
+        ).balanceOfPowerTokensDelegatedToLiquidityMining(_userOne, governanceTokens);
         vm.stopPrank();
 
         // THEN
@@ -69,15 +69,15 @@ contract SmokeTest is TestCommons {
 
     function testCalculateAccruedRewards() public {
         // GIVEN
-        address[] memory stakedTokens = new address[](1);
-        stakedTokens[0] = _powerTokensSystem.lpDai();
+        address[] memory governanceTokens = new address[](1);
+        governanceTokens[0] = _powerTokensSystem.lpDai();
         uint256[] memory stakedAmounts = new uint256[](1);
         stakedAmounts[0] = 1_000e18;
         _powerTokensSystem.setRewardsPerBlock(_powerTokensSystem.lpDai(), 1e8);
         vm.startPrank(_userOne);
         IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
             _userOne,
-            stakedTokens,
+            governanceTokens,
             stakedAmounts
         );
 
@@ -86,7 +86,7 @@ contract SmokeTest is TestCommons {
         // WHEN
 
         LiquidityMiningTypes.AccruedRewardsResult[] memory result = ILiquidityMiningLens(_router)
-            .getAccruedRewardsInLiquidityMining(stakedTokens);
+            .getAccruedRewardsInLiquidityMining(governanceTokens);
         vm.stopPrank();
 
         // THEN
@@ -95,15 +95,15 @@ contract SmokeTest is TestCommons {
 
     function testCalculateAccountRewards() public {
         // GIVEN
-        address[] memory stakedTokens = new address[](1);
-        stakedTokens[0] = _powerTokensSystem.lpDai();
+        address[] memory governanceTokens = new address[](1);
+        governanceTokens[0] = _powerTokensSystem.lpDai();
         uint256[] memory stakedAmounts = new uint256[](1);
         stakedAmounts[0] = 1_000e18;
         _powerTokensSystem.setRewardsPerBlock(_powerTokensSystem.lpDai(), 1e8);
         vm.startPrank(_userOne);
         IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
             _userOne,
-            stakedTokens,
+            governanceTokens,
             stakedAmounts
         );
 
@@ -112,7 +112,7 @@ contract SmokeTest is TestCommons {
         // WHEN
 
         LiquidityMiningTypes.AccountRewardResult[] memory result = ILiquidityMiningLens(_router)
-            .getAccountRewardsInLiquidityMining(_userOne, stakedTokens);
+            .getAccountRewardsInLiquidityMining(_userOne, governanceTokens);
         vm.stopPrank();
 
         // THEN

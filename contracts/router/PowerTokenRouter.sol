@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
@@ -26,7 +26,7 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
         address powerTokenAddress;
         address liquidityMiningLens;
         address stakeService;
-        address miningService;
+        address flowsService;
         address powerTokenLens;
     }
 
@@ -48,8 +48,8 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
             string.concat(Errors.WRONG_ADDRESS, " stakeService")
         );
         require(
-            deployedContracts.miningService != address(0),
-            string.concat(Errors.WRONG_ADDRESS, " miningService")
+            deployedContracts.flowsService != address(0),
+            string.concat(Errors.WRONG_ADDRESS, " flowsService")
         );
         require(
             deployedContracts.powerTokenLens != address(0),
@@ -57,22 +57,22 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
         );
         LIQUIDITY_MINING_LENS = deployedContracts.liquidityMiningLens;
         STAKE_SERVICE = deployedContracts.stakeService;
-        FLOWS_SERVICE = deployedContracts.miningService;
+        FLOWS_SERVICE = deployedContracts.flowsService;
         LIQUIDITY_MINING_ADDRESS = deployedContracts.liquidityMiningAddress;
         POWER_TOKEN_ADDRESS = deployedContracts.powerTokenAddress;
         POWER_TOKEN_LENS = deployedContracts.powerTokenLens;
         _disableInitializers();
     }
 
-    function initialize(uint256 paused) external initializer {
+    function initialize(uint256 pausedTemp) external initializer {
         __UUPSUpgradeable_init();
         StorageLib.getOwner().value = msg.sender;
         PauseManager.addPauseGuardian(msg.sender);
-        StorageLib.getPaused().value = paused;
+        StorageLib.getPaused().value = pausedTemp;
     }
 
     /// @notice Determines the implementation address based on the provided function signature.
-    /// @dev This function is internal and used by the fallback function to delegate the current call to the appropriate implementation.
+    /// @dev This internal function is used by the fallback function to delegate the current call to the appropriate implementation.
     /// @param sig The function signature for which the implementation address needs to be determined.
     /// @return The address of the implementation contract.
     function getRouterImplementation(bytes4 sig) internal returns (address) {
@@ -86,7 +86,6 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
             sig == IPowerTokenStakeService.redeemPwToken.selector
         ) {
             _whenNotPaused();
-            _nonReentrant();
             _enterReentrancy();
             return STAKE_SERVICE;
         }
@@ -97,7 +96,6 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
             sig == IPowerTokenFlowsService.claimRewardsFromLiquidityMining.selector
         ) {
             _whenNotPaused();
-            _nonReentrant();
             _enterReentrancy();
             return FLOWS_SERVICE;
         }
@@ -170,13 +168,12 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
     }
 
     /// @notice Executes a batch of calls to different contracts.
-    /// @dev Allows executing multiple function calls in a single transaction to different contracts.
+    /// @dev Allows executing multiple function calls in a single transaction to other contracts.
     /// @param calls An array of encoded function calls, where each element represents the encoded data of a single function call.
     function batchExecutor(bytes[] calldata calls) external {
         uint256 length = calls.length;
         for (uint256 i; i != length; ) {
-            bytes4 sig = bytes4(calls[i][:4]);
-            address implementation = getRouterImplementation(sig);
+            address implementation = getRouterImplementation(bytes4(calls[i][:4]));
             implementation.functionDelegateCall(calls[i]);
             if (uint256(StorageLib.getReentrancyStatus().value) == _ENTERED) {
                 _leaveReentrancy();
