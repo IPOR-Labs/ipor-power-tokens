@@ -4,7 +4,7 @@ pragma solidity 0.8.20;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../TestCommons.sol";
 import "../PowerTokensTestsSystem.sol";
-import "../../contracts/interfaces/IPowerTokenInternal.sol";
+import "@power-tokens/contracts/interfaces/IPowerTokenInternal.sol";
 
 contract PwTokenConfigurationTest is TestCommons {
     PowerTokensTestsSystem internal _powerTokensSystem;

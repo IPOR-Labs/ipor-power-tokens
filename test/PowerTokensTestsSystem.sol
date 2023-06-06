@@ -3,17 +3,17 @@ pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
-import "../contracts/mocks/tokens/MockGovernanceToken.sol";
-import "../contracts/mocks/tokens/MockToken.sol";
-import "../contracts/mocks/tokens/MockLpToken.sol";
+import "@power-tokens/contracts/mocks/tokens/MockGovernanceToken.sol";
+import "@power-tokens/contracts/mocks/tokens/MockToken.sol";
+import "@power-tokens/contracts/mocks/tokens/MockLpToken.sol";
 import "./TestCommons.sol";
-import "../contracts/mining/LiquidityMining.sol";
-import "../contracts/tokens/PowerToken.sol";
-import "../contracts/lens/LiquidityMiningLens.sol";
-import "../contracts/services/StakeService.sol";
-import "../contracts/services/FlowsService.sol";
-import "../contracts/router/PowerTokenRouter.sol";
-import "../contracts/lens/PowerTokenLens.sol";
+import "@power-tokens/contracts/mining/LiquidityMining.sol";
+import "@power-tokens/contracts/tokens/PowerToken.sol";
+import "@power-tokens/contracts/lens/LiquidityMiningLens.sol";
+import "@power-tokens/contracts/services/StakeService.sol";
+import "@power-tokens/contracts/services/FlowsService.sol";
+import "@power-tokens/contracts/router/PowerTokenRouter.sol";
+import "@power-tokens/contracts/lens/PowerTokenLens.sol";
 
 contract PowerTokensTestsSystem is TestCommons {
     using SafeCast for uint256;

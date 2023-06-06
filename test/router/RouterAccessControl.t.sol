@@ -2,7 +2,7 @@
 pragma solidity 0.8.20;
 
 import "forge-std/Test.sol";
-import "contracts/router/AccessControl.sol";
+import "@power-tokens/contracts/router/AccessControl.sol";
 import "../TestCommons.sol";
 import "../PowerTokensTestsSystem.sol";
 
