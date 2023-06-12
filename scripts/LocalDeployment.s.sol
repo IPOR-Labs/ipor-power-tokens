@@ -21,10 +21,13 @@ import "@power-tokens/contracts/mocks/tokens/MockToken.sol";
 contract LocalDeployment is Script {
     address defaultAnvilAddress = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
 
-    struct PowerTokenSystem {
-        address powerTokenRouter;
-        address liquidityMining;
-        address powerToken;
+    struct System {
+        address powerTokenRouterProxy;
+        address powerTokenRouterImpl;
+        address liquidityMiningProxy;
+        address liquidityMiningImpl;
+        address powerTokenProxy;
+        address powerTokenImpl;
         address governanceToken;
         address liquidityMiningLens;
         address stakeService;
@@ -45,15 +48,15 @@ contract LocalDeployment is Script {
     }
 
     function run() public {
-        PowerTokenSystem memory system;
+        System memory system;
         vm.startBroadcast(_private_key);
         _getFullInstance(system);
         vm.stopBroadcast();
         toAddressesJson(system);
     }
 
-    function _getFullInstance(PowerTokenSystem memory system) internal {
-        deployEmptyPowerTokenRouter(system);
+    function _getFullInstance(System memory system) internal {
+        deployDummyPowerTokenRouter(system);
         deployTokens(system);
         deployGovernanceToken(system);
         deployLpTokens(system);
@@ -67,49 +70,57 @@ contract LocalDeployment is Script {
         grantAllowances(system);
     }
 
-    function grantAllowances(PowerTokenSystem memory system) internal {
-        ILiquidityMiningInternal(system.liquidityMining).grantAllowanceForRouter(system.lpDai);
-        ILiquidityMiningInternal(system.liquidityMining).grantAllowanceForRouter(system.lpUsdc);
-        ILiquidityMiningInternal(system.liquidityMining).grantAllowanceForRouter(system.lpUsdt);
-        ILiquidityMiningInternal(system.liquidityMining).grantAllowanceForRouter(system.governanceToken);
-        IPowerTokenInternal(system.powerToken).grantAllowanceForRouter(system.governanceToken);
+    function grantAllowances(System memory system) internal {
+        ILiquidityMiningInternal(system.liquidityMiningProxy).grantAllowanceForRouter(system.lpDai);
+        ILiquidityMiningInternal(system.liquidityMiningProxy).grantAllowanceForRouter(
+            system.lpUsdc
+        );
+        ILiquidityMiningInternal(system.liquidityMiningProxy).grantAllowanceForRouter(
+            system.lpUsdt
+        );
+        ILiquidityMiningInternal(system.liquidityMiningProxy).grantAllowanceForRouter(
+            system.governanceToken
+        );
+        IPowerTokenInternal(system.powerTokenProxy).grantAllowanceForRouter(system.governanceToken);
     }
 
-    function deployGovernanceToken(PowerTokenSystem memory system) internal {
+    function deployGovernanceToken(System memory system) internal {
         system.governanceToken = address(
             new MockGovernanceToken("IPOR", "IPOR", defaultAnvilAddress)
         );
     }
 
-    function upgradePowerTokenRouter(PowerTokenSystem memory system) internal {
+    function upgradePowerTokenRouter(System memory system) internal {
         PowerTokenRouter.DeployedContracts memory deployedContracts = PowerTokenRouter
             .DeployedContracts({
-                liquidityMiningAddress: system.liquidityMining,
-                powerTokenAddress: system.powerToken,
+                liquidityMiningAddress: system.liquidityMiningProxy,
+                powerTokenAddress: system.powerTokenProxy,
                 liquidityMiningLens: system.liquidityMiningLens,
                 stakeService: system.stakeService,
                 flowsService: system.flowService,
                 powerTokenLens: system.powerTokenLens
             });
 
-        system.powerTokenRouter = address(new PowerTokenRouter(deployedContracts));
+        system.powerTokenRouterImpl = address(new PowerTokenRouter(deployedContracts));
+        PowerTokenRouter(system.powerTokenRouterProxy).upgradeTo(system.powerTokenRouterImpl);
     }
 
-    function deployLiquidityMining(PowerTokenSystem memory system) internal {
+    function deployLiquidityMining(System memory system) internal {
         address[] memory lpTokens = new address[](3);
         lpTokens[0] = system.lpDai;
         lpTokens[1] = system.lpUsdc;
         lpTokens[2] = system.lpUsdt;
 
-        system.liquidityMining = address(
+        system.liquidityMiningImpl = address(new LiquidityMining(system.powerTokenRouterProxy));
+        system.liquidityMiningProxy = address(
             new ERC1967Proxy(
-                address(new LiquidityMining(system.powerTokenRouter)),
+                system.liquidityMiningImpl,
                 abi.encodeWithSignature("initialize(address[])", lpTokens)
             )
         );
     }
 
-    function deployTokens(PowerTokenSystem memory system) internal {
+    function deployTokens(System memory system) internal {
         system.dai = address(new MockToken("DAI", "DAI", 100_000_000 * 1e18, 18));
         system.usdc = address(new MockToken("USDC", "USDC", 100_000_000 * 1e6, 6));
         system.usdt = address(new MockToken("USDT", "USDT", 100_000_000 * 1e6, 6));
@@ -122,7 +133,7 @@ contract LocalDeployment is Script {
         MockLpToken(system.lpUsdt).setJoseph(defaultAnvilAddress);
     }
 
-    function deployLpTokens(PowerTokenSystem memory system) internal {
+    function deployLpTokens(System memory system) internal {
         system.lpDai = address(new MockLpToken("lpDai", "lpDai", system.dai));
         system.lpUsdc = address(new MockLpToken("lpUsdc", "lpUsdc", system.usdc));
         system.lpUsdt = address(new MockLpToken("lpUsdt", "lpUsdt", system.usdt));
@@ -132,36 +143,44 @@ contract LocalDeployment is Script {
         MockLpToken(system.lpUsdt).setJoseph(defaultAnvilAddress);
     }
 
-    function deployPowerToken(PowerTokenSystem memory system) internal {
-        system.powerToken = address(
-            new ERC1967Proxy(
-                address(new PowerToken(system.powerTokenRouter, system.governanceToken)),
-                abi.encodeWithSignature("initialize()")
+    function deployPowerToken(System memory system) internal {
+        system.powerTokenImpl = address(
+            new PowerToken(system.powerTokenRouterProxy, system.governanceToken)
+        );
+        system.powerTokenProxy = address(
+            new ERC1967Proxy(system.powerTokenImpl, abi.encodeWithSignature("initialize()"))
+        );
+    }
+
+    function deployLiquidityMiningLens(System memory system) internal {
+        system.liquidityMiningLens = address(new LiquidityMiningLens(system.liquidityMiningProxy));
+    }
+
+    function deployPowerTokenStakeService(System memory system) internal {
+        system.stakeService = address(
+            new StakeService(
+                system.liquidityMiningProxy,
+                system.powerTokenProxy,
+                system.governanceToken
             )
         );
     }
 
-    function deployLiquidityMiningLens(PowerTokenSystem memory system) internal {
-        system.liquidityMiningLens = address(new LiquidityMiningLens(system.liquidityMining));
-    }
-
-    function deployPowerTokenStakeService(PowerTokenSystem memory system) internal {
-        system.stakeService = address(
-            new StakeService(system.liquidityMining, system.powerToken, system.governanceToken)
-        );
-    }
-
-    function deployPowerTokenFlowService(PowerTokenSystem memory system) internal {
+    function deployPowerTokenFlowService(System memory system) internal {
         system.flowService = address(
-            new FlowsService(system.liquidityMining, system.governanceToken, system.powerToken)
+            new FlowsService(
+                system.liquidityMiningProxy,
+                system.governanceToken,
+                system.powerTokenProxy
+            )
         );
     }
 
-    function deployPowerTokenLens(PowerTokenSystem memory system) internal {
-        system.powerTokenLens = address(new PowerTokenLens(system.powerToken));
+    function deployPowerTokenLens(System memory system) internal {
+        system.powerTokenLens = address(new PowerTokenLens(system.powerTokenProxy));
     }
 
-    function deployEmptyPowerTokenRouter(PowerTokenSystem memory system) internal {
+    function deployDummyPowerTokenRouter(System memory system) internal {
         PowerTokenRouter.DeployedContracts memory deployedContracts = PowerTokenRouter
             .DeployedContracts({
                 liquidityMiningAddress: defaultAnvilAddress,
@@ -172,29 +191,34 @@ contract LocalDeployment is Script {
                 powerTokenLens: defaultAnvilAddress
             });
 
-        system.powerTokenRouter = address(
+        system.powerTokenRouterImpl = address(new PowerTokenRouter(deployedContracts));
+        system.powerTokenRouterProxy = address(
             new ERC1967Proxy(
-                address(new PowerTokenRouter(deployedContracts)),
+                system.powerTokenRouterImpl,
                 abi.encodeWithSignature("initialize(uint256)", 0)
             )
         );
     }
 
-    function toAddressesJson(PowerTokenSystem memory system) internal {
+    function toAddressesJson(System memory system) internal {
         string memory path = vm.projectRoot();
         string memory addressesJson = "";
 
-        vm.serializeAddress(addressesJson, "PowerToken", system.powerToken);
+        vm.serializeAddress(addressesJson, "PowerTokenProxy", system.powerTokenProxy);
+        vm.serializeAddress(addressesJson, "PowerTokenImpl", system.powerTokenImpl);
+        vm.serializeAddress(addressesJson, "LiquidityMiningProxy", system.liquidityMiningProxy);
+        vm.serializeAddress(addressesJson, "LiquidityMiningImpl", system.liquidityMiningImpl);
         vm.serializeAddress(addressesJson, "StakedToken", system.governanceToken);
         vm.serializeAddress(addressesJson, "LiquidityMiningLens", system.liquidityMiningLens);
         vm.serializeAddress(addressesJson, "StakeService", system.stakeService);
         vm.serializeAddress(addressesJson, "FlowService", system.flowService);
-        vm.serializeAddress(addressesJson, "PowerTokenLens", system.powerTokenLens);
+        vm.serializeAddress(addressesJson, "FlowService", system.flowService);
+        vm.serializeAddress(addressesJson, "PowerTokenRouterProxy", system.powerTokenRouterImpl);
 
         string memory finalJson = vm.serializeAddress(
             addressesJson,
-            "PowerTokenRouter",
-            system.powerTokenRouter
+            "PowerTokenRouterProxy",
+            system.powerTokenRouterProxy
         );
 
         vm.writeJson(finalJson, string.concat(path, "/ipor-power-token-addresses.json"));
