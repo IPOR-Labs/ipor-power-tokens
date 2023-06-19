@@ -13,6 +13,7 @@ import "../interfaces/ILiquidityMiningInternal.sol";
 import "../interfaces/IGovernanceToken.sol";
 import "../interfaces/IPowerToken.sol";
 import "../security/MiningOwnableUpgradeable.sol";
+import "../interfaces/IProxyImplementation.sol";
 
 abstract contract LiquidityMiningInternal is
     Initializable,
@@ -20,7 +21,8 @@ abstract contract LiquidityMiningInternal is
     UUPSUpgradeable,
     MiningOwnableUpgradeable,
     ReentrancyGuardUpgradeable,
-    ILiquidityMiningInternal
+    ILiquidityMiningInternal,
+    IProxyImplementation
 {
     using SafeCast for uint256;
     using SafeCast for int256;
@@ -138,6 +140,10 @@ abstract contract LiquidityMiningInternal is
 
         IERC20(erc20Token).approve(ROUTER_ADDRESS, 0);
         emit AllowanceRevoked(erc20Token, ROUTER_ADDRESS);
+    }
+
+    function getImplementation() external view override returns (address) {
+        return StorageSlotUpgradeable.getAddressSlot(_IMPLEMENTATION_SLOT).value;
     }
 
     /// @dev Rebalance causes account's rewards to reset in current block.
