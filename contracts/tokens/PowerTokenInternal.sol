@@ -13,13 +13,15 @@ import "../interfaces/IGovernanceToken.sol";
 import "../security/MiningOwnableUpgradeable.sol";
 import "../interfaces/IPowerTokenInternal.sol";
 import "../interfaces/ILiquidityMining.sol";
+import "../interfaces/IProxyImplementation.sol";
 
 abstract contract PowerTokenInternal is
     PausableUpgradeable,
     UUPSUpgradeable,
     ReentrancyGuardUpgradeable,
     MiningOwnableUpgradeable,
-    IPowerTokenInternal
+    IPowerTokenInternal,
+    IProxyImplementation
 {
     /// @dev 14 days
     uint256 public constant COOL_DOWN_IN_SECONDS = 2 * 7 * 24 * 60 * 60;
@@ -129,6 +131,10 @@ abstract contract PowerTokenInternal is
 
         IERC20(erc20Token).approve(ROUTER_ADDRESS, 0);
         emit AllowanceRevoked(erc20Token, ROUTER_ADDRESS);
+    }
+
+    function getImplementation() external view override returns (address) {
+        return StorageSlotUpgradeable.getAddressSlot(_IMPLEMENTATION_SLOT).value;
     }
 
     function _calculateInternalExchangeRate() internal view returns (uint256) {

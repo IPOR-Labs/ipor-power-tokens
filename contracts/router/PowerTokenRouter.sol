@@ -10,8 +10,9 @@ import "../interfaces/IPowerTokenLens.sol";
 import "../interfaces/IPowerTokenStakeService.sol";
 import "../interfaces/IPowerTokenFlowsService.sol";
 import "../security/StorageLib.sol";
+import "../interfaces/IProxyImplementation.sol";
 
-contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
+contract PowerTokenRouter is UUPSUpgradeable, AccessControl, IProxyImplementation {
     address public immutable LIQUIDITY_MINING_ADDRESS;
     address public immutable POWER_TOKEN_ADDRESS;
     address public immutable LIQUIDITY_MINING_LENS;
@@ -197,6 +198,10 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl {
                 FLOWS_SERVICE,
                 POWER_TOKEN_LENS
             );
+    }
+
+    function getImplementation() external view override returns (address) {
+        return StorageSlotUpgradeable.getAddressSlot(_IMPLEMENTATION_SLOT).value;
     }
 
     //solhint-disable no-empty-blocks
