@@ -2,7 +2,7 @@
 pragma solidity 0.8.20;
 
 import "./TestCommons.sol";
-import "contracts/router/PowerTokenRouter.sol";
+import "../contracts/router/PowerTokenRouter.sol";
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract RouterTest is TestCommons {

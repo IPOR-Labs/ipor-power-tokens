@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.20;
 
-import "./types/LiquidityMiningTypes.sol";
 
 /// @title The interface for interaction with the LiquidityMining contract. Contains mainly technical methods or methods used by PowerToken smart contract.
 interface ILiquidityMiningInternal {

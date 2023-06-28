@@ -2,7 +2,6 @@
 pragma solidity 0.8.20;
 
 import "./types/LiquidityMiningTypes.sol";
-import "./ILiquidityMining.sol";
 
 interface ILiquidityMiningLens {
     /// @notice Returns the balance of LP tokens staked by the specified account in the Liquidity Mining contract.

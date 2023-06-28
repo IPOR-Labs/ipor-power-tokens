@@ -1,17 +1,15 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.20;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "../libraries/errors/Errors.sol";
 import "../libraries/math/MiningCalculation.sol";
 import "../interfaces/types/LiquidityMiningTypes.sol";
 import "../interfaces/ILiquidityMiningInternal.sol";
-import "../interfaces/IGovernanceToken.sol";
-import "../interfaces/IPowerToken.sol";
 import "../security/MiningOwnableUpgradeable.sol";
 import "../interfaces/IProxyImplementation.sol";
 

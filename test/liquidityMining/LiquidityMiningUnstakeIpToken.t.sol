@@ -3,11 +3,8 @@ pragma solidity 0.8.20;
 
 import "../TestCommons.sol";
 import "../PowerTokensTestsSystem.sol";
-import "@power-tokens/contracts/interfaces/types/PowerTokenTypes.sol";
 import "@power-tokens/contracts/interfaces/ILiquidityMiningLens.sol";
-import "@power-tokens/contracts/interfaces/IPowerTokenLens.sol";
 import "@power-tokens/contracts/interfaces/IPowerTokenStakeService.sol";
-import "@power-tokens/contracts/tokens/PowerTokenInternal.sol";
 
 contract PwTokenUnstakeLpTokensTest is TestCommons {
     event LpTokensRemoved(address account, address lpToken, uint256 lpTokenAmount);

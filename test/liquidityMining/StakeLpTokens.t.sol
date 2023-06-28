@@ -3,7 +3,6 @@ pragma solidity 0.8.20;
 
 import "../TestCommons.sol";
 import "../PowerTokensTestsSystem.sol";
-import "@power-tokens/contracts/interfaces/ILiquidityMining.sol";
 
 contract StakeLpTokensTest is TestCommons {
     event LpTokenAdded(address beneficiary, address lpToken, uint256 lpTokenAmount);
