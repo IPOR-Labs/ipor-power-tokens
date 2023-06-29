@@ -3,24 +3,26 @@ pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "./AccessControl.sol";
-import "../libraries/errors/Errors.sol";
 import "../interfaces/ILiquidityMiningLens.sol";
 import "../interfaces/IPowerTokenLens.sol";
 import "../interfaces/IPowerTokenStakeService.sol";
 import "../interfaces/IPowerTokenFlowsService.sol";
-import "../security/StorageLib.sol";
 import "../interfaces/IProxyImplementation.sol";
+import "../security/StorageLib.sol";
+import "../libraries/errors/Errors.sol";
+import "../libraries/ContractValidator.sol";
+import "./AccessControl.sol";
 
 contract PowerTokenRouter is UUPSUpgradeable, AccessControl, IProxyImplementation {
-    address public immutable LIQUIDITY_MINING_ADDRESS;
-    address public immutable POWER_TOKEN_ADDRESS;
-    address public immutable LIQUIDITY_MINING_LENS;
-    address public immutable POWER_TOKEN_LENS;
-    address public immutable STAKE_SERVICE;
-    address public immutable FLOWS_SERVICE;
-
     using Address for address;
+    using ContractValidator for address;
+
+    address public immutable liquidityMining;
+    address public immutable powerToken;
+    address public immutable liquidityMiningLens;
+    address public immutable powerTokenLens;
+    address public immutable stakeService;
+    address public immutable flowsService;
 
     struct DeployedContracts {
         address liquidityMiningAddress;
@@ -32,36 +34,12 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl, IProxyImplementatio
     }
 
     constructor(DeployedContracts memory deployedContracts) {
-        require(
-            deployedContracts.liquidityMiningAddress != address(0),
-            string.concat(Errors.WRONG_ADDRESS, " liquidityMiningAddress")
-        );
-        require(
-            deployedContracts.powerTokenAddress != address(0),
-            string.concat(Errors.WRONG_ADDRESS, " powerTokenAddress")
-        );
-        require(
-            deployedContracts.liquidityMiningLens != address(0),
-            string.concat(Errors.WRONG_ADDRESS, " liquidityMiningLens")
-        );
-        require(
-            deployedContracts.stakeService != address(0),
-            string.concat(Errors.WRONG_ADDRESS, " stakeService")
-        );
-        require(
-            deployedContracts.flowsService != address(0),
-            string.concat(Errors.WRONG_ADDRESS, " flowsService")
-        );
-        require(
-            deployedContracts.powerTokenLens != address(0),
-            string.concat(Errors.WRONG_ADDRESS, " powerTokenLens")
-        );
-        LIQUIDITY_MINING_LENS = deployedContracts.liquidityMiningLens;
-        STAKE_SERVICE = deployedContracts.stakeService;
-        FLOWS_SERVICE = deployedContracts.flowsService;
-        LIQUIDITY_MINING_ADDRESS = deployedContracts.liquidityMiningAddress;
-        POWER_TOKEN_ADDRESS = deployedContracts.powerTokenAddress;
-        POWER_TOKEN_LENS = deployedContracts.powerTokenLens;
+        liquidityMiningLens = deployedContracts.liquidityMiningLens.checkAddress();
+        stakeService = deployedContracts.stakeService.checkAddress();
+        flowsService = deployedContracts.flowsService.checkAddress();
+        liquidityMining = deployedContracts.liquidityMiningAddress.checkAddress();
+        powerToken = deployedContracts.powerTokenAddress.checkAddress();
+        powerTokenLens = deployedContracts.powerTokenLens.checkAddress();
         _disableInitializers();
     }
 
@@ -70,6 +48,50 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl, IProxyImplementatio
         StorageLib.getOwner().value = msg.sender;
         PauseManager.addPauseGuardian(msg.sender);
         StorageLib.getPaused().value = pausedTemp;
+    }
+
+    /// @notice Fallback function that delegates the current call to the appropriate implementation.
+    /// @dev This function is triggered when a function is called on the contract that doesn't match any specific function signature.
+    ///      It delegates the call to the implementation contract based on the function signature using the getRouterImplementation() internal function.
+    ///      The implementation contract is responsible for executing the actual logic of the function call.
+    fallback() external {
+        _delegate(getRouterImplementation(msg.sig));
+    }
+
+    /// @notice Retrieves the addresses of the deployed contracts.
+    /// @dev Returns a `DeployedContracts` struct containing the addresses of the deployed contracts.
+    /// @return A `DeployedContracts` struct containing the addresses of the deployed contracts.
+    function getConfiguration() external view returns (DeployedContracts memory) {
+        return
+            DeployedContracts(
+                liquidityMining,
+                powerToken,
+                liquidityMiningLens,
+                stakeService,
+                flowsService,
+                powerTokenLens
+            );
+    }
+
+    function getImplementation() external view override returns (address) {
+        return StorageSlotUpgradeable.getAddressSlot(_IMPLEMENTATION_SLOT).value;
+    }
+
+    /// @notice Executes a batch of calls to different contracts.
+    /// @dev Allows executing multiple function calls in a single transaction to other contracts.
+    /// @param calls An array of encoded function calls, where each element represents the encoded data of a single function call.
+    function batchExecutor(bytes[] calldata calls) external {
+        uint256 length = calls.length;
+        for (uint256 i; i != length; ) {
+            address implementation = getRouterImplementation(bytes4(calls[i][:4]));
+            implementation.functionDelegateCall(calls[i]);
+            if (uint256(StorageLib.getReentrancyStatus().value) == _ENTERED) {
+                _leaveReentrancy();
+            }
+            unchecked {
+                ++i;
+            }
+        }
     }
 
     /// @notice Determines the implementation address based on the provided function signature.
@@ -88,7 +110,7 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl, IProxyImplementatio
         ) {
             _whenNotPaused();
             _enterReentrancy();
-            return STAKE_SERVICE;
+            return stakeService;
         }
         if (
             sig == IPowerTokenFlowsService.delegatePwTokensToLiquidityMining.selector ||
@@ -98,7 +120,7 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl, IProxyImplementatio
         ) {
             _whenNotPaused();
             _enterReentrancy();
-            return FLOWS_SERVICE;
+            return flowsService;
         }
 
         if (
@@ -109,7 +131,7 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl, IProxyImplementatio
             sig == ILiquidityMiningLens.getGlobalIndicatorsFromLiquidityMining.selector ||
             sig == ILiquidityMiningLens.getAccountRewardsInLiquidityMining.selector
         ) {
-            return LIQUIDITY_MINING_LENS;
+            return liquidityMiningLens;
         }
 
         if (
@@ -120,18 +142,10 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl, IProxyImplementatio
             sig == IPowerTokenLens.getPwTokenUnstakeFee.selector ||
             sig == IPowerTokenLens.getPwTokenCooldownTime.selector
         ) {
-            return POWER_TOKEN_LENS;
+            return powerTokenLens;
         }
 
         revert(Errors.ROUTER_INVALID_SIGNATURE);
-    }
-
-    /// @notice Fallback function that delegates the current call to the appropriate implementation.
-    /// @dev This function is triggered when a function is called on the contract that doesn't match any specific function signature.
-    ///      It delegates the call to the implementation contract based on the function signature using the getRouterImplementation() internal function.
-    ///      The implementation contract is responsible for executing the actual logic of the function call.
-    fallback() external {
-        _delegate(getRouterImplementation(msg.sig));
     }
 
     /// @dev Delegates the current call to `implementation`.
@@ -166,42 +180,6 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl, IProxyImplementatio
                 return(0, returndatasize())
             }
         }
-    }
-
-    /// @notice Executes a batch of calls to different contracts.
-    /// @dev Allows executing multiple function calls in a single transaction to other contracts.
-    /// @param calls An array of encoded function calls, where each element represents the encoded data of a single function call.
-    function batchExecutor(bytes[] calldata calls) external {
-        uint256 length = calls.length;
-        for (uint256 i; i != length; ) {
-            address implementation = getRouterImplementation(bytes4(calls[i][:4]));
-            implementation.functionDelegateCall(calls[i]);
-            if (uint256(StorageLib.getReentrancyStatus().value) == _ENTERED) {
-                _leaveReentrancy();
-            }
-            unchecked {
-                ++i;
-            }
-        }
-    }
-
-    /// @notice Retrieves the addresses of the deployed contracts.
-    /// @dev Returns a `DeployedContracts` struct containing the addresses of the deployed contracts.
-    /// @return A `DeployedContracts` struct containing the addresses of the deployed contracts.
-    function getConfiguration() external view returns (DeployedContracts memory) {
-        return
-            DeployedContracts(
-                LIQUIDITY_MINING_ADDRESS,
-                POWER_TOKEN_ADDRESS,
-                LIQUIDITY_MINING_LENS,
-                STAKE_SERVICE,
-                FLOWS_SERVICE,
-                POWER_TOKEN_LENS
-            );
-    }
-
-    function getImplementation() external view override returns (address) {
-        return StorageSlotUpgradeable.getAddressSlot(_IMPLEMENTATION_SLOT).value;
     }
 
     //solhint-disable no-empty-blocks

@@ -5,55 +5,53 @@ import "../interfaces/types/LiquidityMiningTypes.sol";
 import "../interfaces/ILiquidityMiningLens.sol";
 import "../interfaces/ILiquidityMining.sol";
 import "../libraries/errors/Errors.sol";
+import "../libraries/ContractValidator.sol";
 
 contract LiquidityMiningLens is ILiquidityMiningLens {
-    address public immutable LIQUIDITY_MINING;
+    using ContractValidator for address;
+    address public immutable liquidityMining;
 
-    constructor(address liquidityMining) {
-        require(
-            liquidityMining != address(0),
-            string.concat(Errors.WRONG_ADDRESS, " liquidityMining")
-        );
-        LIQUIDITY_MINING = liquidityMining;
+    constructor(address liquidityMiningInput) {
+        liquidityMining = liquidityMiningInput.checkAddress();
     }
 
     function balanceOfLpTokensStakedInLiquidityMining(
         address account,
         address lpToken
     ) external view returns (uint256) {
-        return ILiquidityMining(LIQUIDITY_MINING).balanceOf(account, lpToken);
+        return ILiquidityMining(liquidityMining).balanceOf(account, lpToken);
     }
 
     function balanceOfPowerTokensDelegatedToLiquidityMining(
         address account,
         address[] memory lpTokens
     ) external view returns (LiquidityMiningTypes.DelegatedPwTokenBalance[] memory balances) {
-        return ILiquidityMining(LIQUIDITY_MINING).balanceOfDelegatedPwToken(account, lpTokens);
+        return ILiquidityMining(liquidityMining).balanceOfDelegatedPwToken(account, lpTokens);
     }
 
     function getAccruedRewardsInLiquidityMining(
         address[] calldata lpTokens
     ) external view override returns (LiquidityMiningTypes.AccruedRewardsResult[] memory result) {
-        return ILiquidityMining(LIQUIDITY_MINING).calculateAccruedRewards(lpTokens);
+        return ILiquidityMining(liquidityMining).calculateAccruedRewards(lpTokens);
     }
 
     function getAccountRewardsInLiquidityMining(
         address account,
         address[] calldata lpTokens
     ) external view override returns (LiquidityMiningTypes.AccountRewardResult[] memory) {
-        return ILiquidityMining(LIQUIDITY_MINING).calculateAccountRewards(account, lpTokens);
+        return ILiquidityMining(liquidityMining).calculateAccountRewards(account, lpTokens);
     }
 
     function getGlobalIndicatorsFromLiquidityMining(
         address[] memory lpTokens
     ) external view returns (LiquidityMiningTypes.GlobalIndicatorsResult[] memory) {
-        return ILiquidityMining(LIQUIDITY_MINING).getGlobalIndicators(lpTokens);
+        return ILiquidityMining(liquidityMining).getGlobalIndicators(lpTokens);
     }
 
     function getAccountIndicatorsFromLiquidityMining(
         address account,
         address[] calldata lpTokens
     ) external view returns (LiquidityMiningTypes.AccountIndicatorsResult[] memory) {
-        return ILiquidityMining(LIQUIDITY_MINING).getAccountIndicators(account, lpTokens);
+        return ILiquidityMining(liquidityMining).getAccountIndicators(account, lpTokens);
     }
 }

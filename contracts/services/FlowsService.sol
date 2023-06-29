@@ -7,41 +7,42 @@ import "../interfaces/IPowerTokenFlowsService.sol";
 import "../interfaces/ILiquidityMining.sol";
 import "../interfaces/IPowerToken.sol";
 import "../libraries/errors/Errors.sol";
+import "../libraries/ContractValidator.sol";
 
 contract FlowsService is IPowerTokenFlowsService {
+    using ContractValidator for address;
     using SafeERC20 for IERC20;
-    address public immutable LIQUIDITY_MINING;
-    address public immutable POWER_TOKEN;
-    address public immutable STAKED_TOKEN;
+    address public immutable liquidityMining;
+    address public immutable powerToken;
+    address public immutable governanceToken;
 
-    constructor(address liquidityMining, address governanceToken, address powerToken) {
-        require(
-            liquidityMining != address(0),
-            string.concat(Errors.WRONG_ADDRESS, " liquidityMining")
-        );
-        require(
-            governanceToken != address(0),
-            string.concat(Errors.WRONG_ADDRESS, " governanceToken")
-        );
-        require(powerToken != address(0), string.concat(Errors.WRONG_ADDRESS, " powerToken"));
-        LIQUIDITY_MINING = liquidityMining;
-        STAKED_TOKEN = governanceToken;
-        POWER_TOKEN = powerToken;
+    constructor(
+        address liquidityMiningInput,
+        address governanceTokenInput,
+        address powerTokenInput
+    ) {
+        liquidityMining = liquidityMiningInput.checkAddress();
+        governanceToken = governanceTokenInput.checkAddress();
+        powerToken = powerTokenInput.checkAddress();
+    }
+
+    function getConfiguration() external view returns (address, address, address) {
+        return (liquidityMining, powerToken, governanceToken);
     }
 
     function claimRewardsFromLiquidityMining(address[] calldata lpTokens) external {
         require(lpTokens.length > 0, Errors.INPUT_ARRAYS_EMPTY);
-        uint256 rewardsAmountToTransfer = ILiquidityMining(LIQUIDITY_MINING).claimInternal(
+        uint256 rewardsAmountToTransfer = ILiquidityMining(liquidityMining).claimInternal(
             msg.sender,
             lpTokens
         );
         require(rewardsAmountToTransfer > 0, Errors.NO_REWARDS_TO_CLAIM);
-        IPowerToken(POWER_TOKEN).addGovernanceTokenInternal(
+        IPowerToken(powerToken).addGovernanceTokenInternal(
             PowerTokenTypes.UpdateGovernanceToken(msg.sender, rewardsAmountToTransfer)
         );
-        IERC20(STAKED_TOKEN).safeTransferFrom(
-            LIQUIDITY_MINING,
-            POWER_TOKEN,
+        IERC20(governanceToken).safeTransferFrom(
+            liquidityMining,
+            powerToken,
             rewardsAmountToTransfer
         );
     }
@@ -51,7 +52,7 @@ contract FlowsService is IPowerTokenFlowsService {
         address[] calldata lpTokens
     ) external {
         require(lpTokens.length > 0, Errors.INPUT_ARRAYS_EMPTY);
-        ILiquidityMining(LIQUIDITY_MINING).updateIndicators(account, lpTokens);
+        ILiquidityMining(liquidityMining).updateIndicators(account, lpTokens);
     }
 
     function delegatePwTokensToLiquidityMining(
@@ -76,8 +77,8 @@ contract FlowsService is IPowerTokenFlowsService {
                 ++i;
             }
         }
-        IPowerToken(POWER_TOKEN).delegateInternal(account, totalGovernanceTokenAmount);
-        ILiquidityMining(LIQUIDITY_MINING).addPwTokensInternal(updatePwTokens);
+        IPowerToken(powerToken).delegateInternal(account, totalGovernanceTokenAmount);
+        ILiquidityMining(liquidityMining).addPwTokensInternal(updatePwTokens);
     }
 
     function undelegatePwTokensFromLiquidityMining(
@@ -103,15 +104,7 @@ contract FlowsService is IPowerTokenFlowsService {
             }
         }
         require(totalGovernanceTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
-        ILiquidityMining(LIQUIDITY_MINING).removePwTokensInternal(updatePwTokens);
-        IPowerToken(POWER_TOKEN).undelegateInternal(account, totalGovernanceTokenAmount);
-    }
-
-    function getConfiguration()
-        external
-        view
-        returns (address liquidityMining, address powerToken, address governanceToken)
-    {
-        return (LIQUIDITY_MINING, POWER_TOKEN, STAKED_TOKEN);
+        ILiquidityMining(liquidityMining).removePwTokensInternal(updatePwTokens);
+        IPowerToken(powerToken).undelegateInternal(account, totalGovernanceTokenAmount);
     }
 }
