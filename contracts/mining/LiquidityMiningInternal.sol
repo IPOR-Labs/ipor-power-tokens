@@ -14,6 +14,7 @@ import "../interfaces/IGovernanceToken.sol";
 import "../interfaces/IPowerToken.sol";
 import "../security/MiningOwnableUpgradeable.sol";
 import "../interfaces/IProxyImplementation.sol";
+import "../libraries/ContractValidator.sol";
 
 abstract contract LiquidityMiningInternal is
     Initializable,
@@ -24,26 +25,27 @@ abstract contract LiquidityMiningInternal is
     ILiquidityMiningInternal,
     IProxyImplementation
 {
+    using ContractValidator for address;
     using SafeCast for uint256;
     using SafeCast for int256;
 
-    address public immutable ROUTER_ADDRESS; // Router address
+    address public immutable routerAddress;
 
-    // @deprecated "_powerToken" do not use
-    address internal _powerToken;
+    // @deprecated field is deprecated
+    address internal _powerTokenDeprecated;
     address internal _pauseManager;
 
     mapping(address => bool) internal _lpTokens;
     mapping(address => uint256) internal _allocatedPwTokens;
 
     mapping(address => LiquidityMiningTypes.GlobalRewardsIndicators) internal _globalIndicators;
-    //  account address => lpToken address => account params
+
+    /// @dev account address => lpToken address => account params
     mapping(address => mapping(address => LiquidityMiningTypes.AccountRewardsIndicators))
         internal _accountIndicators;
 
-    constructor(address routerAddress) {
-        require(routerAddress != address(0), string.concat(Errors.WRONG_ADDRESS, " routerAddress"));
-        ROUTER_ADDRESS = routerAddress;
+    constructor(address routerAddressInput) {
+        routerAddress = routerAddressInput.checkAddress();
     }
 
     modifier onlyPauseManager() {
@@ -52,7 +54,7 @@ abstract contract LiquidityMiningInternal is
     }
 
     modifier onlyRouter() {
-        require(_msgSender() == ROUTER_ADDRESS, Errors.CALLER_NOT_ROUTER);
+        require(_msgSender() == routerAddress, Errors.CALLER_NOT_ROUTER);
         _;
     }
 
@@ -131,15 +133,15 @@ abstract contract LiquidityMiningInternal is
     function grantAllowanceForRouter(address erc20Token) external override onlyOwner {
         require(erc20Token != address(0), Errors.WRONG_ADDRESS);
 
-        IERC20(erc20Token).approve(ROUTER_ADDRESS, type(uint256).max);
-        emit AllowanceGranted(erc20Token, ROUTER_ADDRESS);
+        IERC20(erc20Token).approve(routerAddress, type(uint256).max);
+        emit AllowanceGranted(erc20Token, routerAddress);
     }
 
     function revokeAllowanceForRouter(address erc20Token) external override onlyOwner {
         require(erc20Token != address(0), Errors.WRONG_ADDRESS);
 
-        IERC20(erc20Token).approve(ROUTER_ADDRESS, 0);
-        emit AllowanceRevoked(erc20Token, ROUTER_ADDRESS);
+        IERC20(erc20Token).approve(routerAddress, 0);
+        emit AllowanceRevoked(erc20Token, routerAddress);
     }
 
     function getImplementation() external view override returns (address) {
