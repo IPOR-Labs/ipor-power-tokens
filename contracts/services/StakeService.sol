@@ -126,6 +126,47 @@ contract StakeService is IPowerTokenStakeService {
         IERC20(governanceToken).safeTransferFrom(msg.sender, powerToken, governanceTokenAmount);
     }
 
+    function stakeGovernanceTokenToPowerTokenAndDelegate(
+        address beneficiary,
+        uint256 governanceTokenAmount,
+        address[] calldata lpTokens,
+        uint256[] calldata pwTokenAmounts
+    ) external {
+        require(beneficiary != address(0), Errors.WRONG_ADDRESS);
+        require(governanceTokenAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
+
+        uint256 lpTokensLength = lpTokens.length;
+        require(lpTokensLength == pwTokenAmounts.length, Errors.INPUT_ARRAYS_LENGTH_MISMATCH);
+        require(lpTokensLength > 0, Errors.INPUT_ARRAYS_EMPTY);
+        uint256 totalGovernanceTokenAmount;
+
+        LiquidityMiningTypes.UpdatePwToken[]
+            memory updatePwTokens = new LiquidityMiningTypes.UpdatePwToken[](lpTokensLength);
+
+        for (uint256 i; i != lpTokensLength; ) {
+            totalGovernanceTokenAmount += pwTokenAmounts[i];
+            updatePwTokens[i] = LiquidityMiningTypes.UpdatePwToken(
+                beneficiary,
+                lpTokens[i],
+                pwTokenAmounts[i]
+            );
+            unchecked {
+                ++i;
+            }
+        }
+
+        require(
+            totalGovernanceTokenAmount <= governanceTokenAmount,
+            Errors.ACC_DELEGATED_TO_LIQUIDITY_MINING_BALANCE_IS_TOO_LOW
+        );
+        IPowerToken(powerToken).addGovernanceTokenInternal(
+            PowerTokenTypes.UpdateGovernanceToken(beneficiary, governanceTokenAmount)
+        );
+        IERC20(governanceToken).safeTransferFrom(msg.sender, powerToken, governanceTokenAmount);
+        IPowerToken(powerToken).delegateInternal(beneficiary, totalGovernanceTokenAmount);
+        ILiquidityMining(liquidityMining).addPwTokensInternal(updatePwTokens);
+    }
+
     function unstakeGovernanceTokenFromPowerToken(
         address transferTo,
         uint256 governanceTokenAmount
