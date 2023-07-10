@@ -68,13 +68,6 @@ interface IPowerTokenStakeService {
         uint256[] calldata pwTokenAmounts
     ) external;
 
-    function stakeGovernanceTokenToPowerTokenAndDelegate(
-        address beneficiary,
-        uint256 iporTokenAmount,
-        address[] calldata lpTokens,
-        uint256[] calldata pwTokenAmounts
-    ) external;
-
     /// @notice Unstakes the specified amount of IPOR tokens and transfers them to the specified address.
     /// @param transferTo The address to which the unstaked IPOR tokens will be transferred.
     /// @param iporTokenAmount The amount of IPOR tokens to be unstaked, represented with 18 decimals.
