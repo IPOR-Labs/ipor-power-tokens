@@ -103,6 +103,7 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl, IProxyImplementatio
             sig == IPowerTokenStakeService.stakeLpTokensToLiquidityMining.selector ||
             sig == IPowerTokenStakeService.unstakeLpTokensFromLiquidityMining.selector ||
             sig == IPowerTokenStakeService.stakeGovernanceTokenToPowerToken.selector ||
+            sig == IPowerTokenStakeService.stakeGovernanceTokenToPowerTokenAndDelegate.selector ||
             sig == IPowerTokenStakeService.unstakeGovernanceTokenFromPowerToken.selector ||
             sig == IPowerTokenStakeService.pwTokenCooldown.selector ||
             sig == IPowerTokenStakeService.pwTokenCancelCooldown.selector ||
