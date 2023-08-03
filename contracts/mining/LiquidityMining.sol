@@ -64,6 +64,7 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
                     lpTokens[i],
                     globalIndicators.accruedRewards
                 );
+                continue;
             }
 
             reward = MiningCalculation.calculateAccruedRewards(

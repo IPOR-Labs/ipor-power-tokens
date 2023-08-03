@@ -6,32 +6,39 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "../libraries/errors/Errors.sol";
-import "../libraries/math/MathOperation.sol";
 import "../interfaces/types/PowerTokenTypes.sol";
 import "../interfaces/IGovernanceToken.sol";
-import "../security/MiningOwnableUpgradeable.sol";
 import "../interfaces/IPowerTokenInternal.sol";
 import "../interfaces/ILiquidityMining.sol";
+import "../interfaces/IProxyImplementation.sol";
+import "../libraries/errors/Errors.sol";
+import "../libraries/math/MathOperation.sol";
+import "../security/MiningOwnableUpgradeable.sol";
+import "../libraries/ContractValidator.sol";
 
 abstract contract PowerTokenInternal is
     PausableUpgradeable,
     UUPSUpgradeable,
     ReentrancyGuardUpgradeable,
     MiningOwnableUpgradeable,
-    IPowerTokenInternal
+    IPowerTokenInternal,
+    IProxyImplementation
 {
+    using ContractValidator for address;
+
+    bytes32 internal constant _GOVERNANCE_TOKEN_ID =
+        0xdba05ed67d0251facfcab8345f27ccd3e72b5a1da8cebfabbcccf4316e6d053c;
+
     /// @dev 14 days
     uint256 public constant COOL_DOWN_IN_SECONDS = 2 * 7 * 24 * 60 * 60;
-    address public immutable ROUTER_ADDRESS;
-    address internal immutable _GOVERNANCE_TOKEN;
 
-    bytes32 internal constant _STAKED_TOKEN_ID =
-        0xdba05ed67d0251facfcab8345f27ccd3e72b5a1da8cebfabbcccf4316e6d053c;
+    address public immutable routerAddress;
+    address internal immutable _governanceToken;
+
     // @dev @deprecated
-    address internal _liquidityMining;
+    address internal _liquidityMiningDeprecated;
     // @dev @deprecated use _STAKED_TOKEN_ADDRESS instead
-    address internal _governanceToken;
+    address internal _governanceTokenDeprecated;
 
     address internal _pauseManager;
 
@@ -40,20 +47,20 @@ abstract contract PowerTokenInternal is
 
     /// @dev balance of Power Token delegated to LiquidityMining, information per account, balance represented with 18 decimals
     mapping(address => uint256) internal _delegatedToLiquidityMiningBalance;
+
     // account address -> {endTimestamp, amount}
     mapping(address => PowerTokenTypes.PwTokenCooldown) internal _cooldowns;
+
     uint256 internal _baseTotalSupply;
     uint256 internal _unstakeWithoutCooldownFee;
 
-    constructor(address routerAddress, address governanceToken) {
-        require(routerAddress != address(0), Errors.WRONG_ADDRESS);
-        require(governanceToken != address(0), Errors.WRONG_ADDRESS);
+    constructor(address routerAddressInput, address governanceTokenInput) {
+        _governanceToken = governanceTokenInput.checkAddress();
+        routerAddress = routerAddressInput.checkAddress();
         require(
-            IGovernanceToken(governanceToken).getContractId() == _STAKED_TOKEN_ID,
+            IGovernanceToken(governanceTokenInput).getContractId() == _GOVERNANCE_TOKEN_ID,
             Errors.WRONG_CONTRACT_ID
         );
-        _GOVERNANCE_TOKEN = governanceToken;
-        ROUTER_ADDRESS = routerAddress;
     }
 
     modifier onlyPauseManager() {
@@ -62,7 +69,7 @@ abstract contract PowerTokenInternal is
     }
 
     modifier onlyRouter() {
-        require(_msgSender() == ROUTER_ADDRESS, Errors.CALLER_NOT_ROUTER);
+        require(_msgSender() == routerAddress, Errors.CALLER_NOT_ROUTER);
         _;
     }
 
@@ -88,7 +95,7 @@ abstract contract PowerTokenInternal is
     }
 
     function getGovernanceToken() external view override returns (address) {
-        return _GOVERNANCE_TOKEN;
+        return _governanceToken;
     }
 
     function getPauseManager() external view override returns (address) {
@@ -120,15 +127,19 @@ abstract contract PowerTokenInternal is
     function grantAllowanceForRouter(address erc20Token) external override onlyOwner {
         require(erc20Token != address(0), Errors.WRONG_ADDRESS);
 
-        IERC20(erc20Token).approve(ROUTER_ADDRESS, type(uint256).max);
+        IERC20(erc20Token).approve(routerAddress, type(uint256).max);
         emit AllowanceGranted(_msgSender(), erc20Token);
     }
 
     function revokeAllowanceForRouter(address erc20Token) external override onlyOwner {
         require(erc20Token != address(0), Errors.WRONG_ADDRESS);
 
-        IERC20(erc20Token).approve(ROUTER_ADDRESS, 0);
-        emit AllowanceRevoked(erc20Token, ROUTER_ADDRESS);
+        IERC20(erc20Token).approve(routerAddress, 0);
+        emit AllowanceRevoked(erc20Token, routerAddress);
+    }
+
+    function getImplementation() external view override returns (address) {
+        return StorageSlotUpgradeable.getAddressSlot(_IMPLEMENTATION_SLOT).value;
     }
 
     function _calculateInternalExchangeRate() internal view returns (uint256) {
@@ -138,7 +149,7 @@ abstract contract PowerTokenInternal is
             return 1e18;
         }
 
-        uint256 balanceOfGovernanceToken = IERC20Upgradeable(_GOVERNANCE_TOKEN).balanceOf(
+        uint256 balanceOfGovernanceToken = IERC20Upgradeable(_governanceToken).balanceOf(
             address(this)
         );
 
