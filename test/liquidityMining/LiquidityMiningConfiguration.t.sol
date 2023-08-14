@@ -25,7 +25,11 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         address[] memory lpTokewns = new address[](0);
 
         // when
-        LiquidityMining implementation = new LiquidityMining(_powerTokensSystem.dao());
+        LiquidityMining implementation = new LiquidityMining(
+            _powerTokensSystem.dao(),
+            _getUserAddress(123),
+            _getUserAddress(123)
+        );
         ERC1967Proxy proxy = new ERC1967Proxy(
             address(implementation),
             abi.encodeWithSignature("initialize(address[])", lpTokewns)
@@ -64,7 +68,11 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         lpTokewns[0] = _powerTokensSystem.lpDai();
 
         // when
-        LiquidityMining implementation = new LiquidityMining(_powerTokensSystem.dao());
+        LiquidityMining implementation = new LiquidityMining(
+            _powerTokensSystem.dao(),
+            _getUserAddress(123),
+            _getUserAddress(123)
+        );
         ERC1967Proxy proxy = new ERC1967Proxy(
             address(implementation),
             abi.encodeWithSignature("initialize(address[])", lpTokewns)

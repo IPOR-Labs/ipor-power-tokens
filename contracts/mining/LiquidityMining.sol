@@ -10,7 +10,11 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
     using SafeCast for uint256;
     using SafeCast for int256;
 
-    constructor(address routerAddress) LiquidityMiningInternal(routerAddress) {
+    constructor(
+        address routerAddress,
+        address lpStEthInput,
+        address ethUsdOracleInput
+    ) LiquidityMiningInternal(routerAddress, lpStEthInput, ethUsdOracleInput) {
         _disableInitializers();
     }
 
