@@ -22,13 +22,13 @@ interface IPowerTokenFlowsService {
 
     /// @notice Delegates staked tokens by providing LP tokens and corresponding amounts.
     /// @param lpTokens An array of LP tokens to delegate.
-    /// @param lpTokenAmounts An array of corresponding amounts of LP tokens to delegate.
+    /// @param pwTokenAmounts An array of corresponding amounts of LP tokens to delegate.
     /// @dev This function allows the caller to delegate their staked tokens by providing the LP tokens and their corresponding amounts.
     /// @dev It requires that the length of `lpTokens` is equal to the length of `lpTokenAmounts`.
     /// @dev It reverts if either `lpTokens` or `lpTokenAmounts` arrays are empty.
     function delegatePwTokensToLiquidityMining(
         address[] calldata lpTokens,
-        uint256[] calldata lpTokenAmounts
+        uint256[] calldata pwTokenAmounts
     ) external;
 
     /// @notice Undelegates staked tokens by providing LP tokens and corresponding amounts.
