@@ -128,7 +128,11 @@ contract PowerTokensTestsSystem is TestCommons {
 
     function _createLiquidityMining() private {
         // address in constructor will be replaced
-        LiquidityMining implementation = new LiquidityMining(dao);
+        LiquidityMining implementation = new LiquidityMining(
+            dao,
+            _getUserAddress(123),
+            _getUserAddress(123)
+        );
 
         vm.startPrank(owner);
         address[] memory lpTokewns = new address[](3);
@@ -151,7 +155,11 @@ contract PowerTokensTestsSystem is TestCommons {
     }
 
     function _updateLiquidityMiningImplementation() private {
-        LiquidityMining implementation = new LiquidityMining(router);
+        LiquidityMining implementation = new LiquidityMining(
+            router,
+            _getUserAddress(123),
+            _getUserAddress(123)
+        );
         vm.startPrank(owner);
         LiquidityMining(liquidityMining).upgradeTo(address(implementation));
         ILiquidityMiningInternal(liquidityMining).grantAllowanceForRouter(lpDai);
