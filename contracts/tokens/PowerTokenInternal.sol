@@ -64,12 +64,12 @@ abstract contract PowerTokenInternal is
     }
 
     modifier onlyPauseManager() {
-        require(_msgSender() == _pauseManager, Errors.CALLER_NOT_PAUSE_MANAGER);
+        require(msg.sender == _pauseManager, Errors.CALLER_NOT_PAUSE_MANAGER);
         _;
     }
 
     modifier onlyRouter() {
-        require(_msgSender() == routerAddress, Errors.CALLER_NOT_ROUTER);
+        require(msg.sender == routerAddress, Errors.CALLER_NOT_ROUTER);
         _;
     }
 
@@ -78,7 +78,7 @@ abstract contract PowerTokenInternal is
         __Ownable_init_unchained();
         __UUPSUpgradeable_init_unchained();
 
-        _pauseManager = _msgSender();
+        _pauseManager = msg.sender;
         _unstakeWithoutCooldownFee = 1e17 * 5;
     }
 
@@ -128,7 +128,7 @@ abstract contract PowerTokenInternal is
         require(erc20Token != address(0), Errors.WRONG_ADDRESS);
 
         IERC20(erc20Token).approve(routerAddress, type(uint256).max);
-        emit AllowanceGranted(_msgSender(), erc20Token);
+        emit AllowanceGranted(msg.sender, erc20Token);
     }
 
     function revokeAllowanceForRouter(address erc20Token) external override onlyOwner {
