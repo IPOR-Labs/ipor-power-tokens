@@ -24,14 +24,6 @@ interface IPowerTokenInternal {
     /// @notice method returning address of the Staked Token
     function getGovernanceToken() external view returns (address);
 
-    /// @notice Gets the Pause Manager's address
-    /// @return Pause Manager's address
-    function getPauseManager() external view returns (address);
-
-    /// @notice Sets the new Pause Manager address
-    /// @param newPauseManagerAddr - new Pause Manager's address
-    function setPauseManager(address newPauseManagerAddr) external;
-
     /// @notice Pauses the smart contract, it can only be executed by the Owner
     /// @dev Emits {Paused} event.
     function pause() external;
@@ -51,6 +43,21 @@ interface IPowerTokenInternal {
     /// @notice Gets the power token cool down time in seconds.
     /// @return uint256 cool down time in seconds
     function COOL_DOWN_IN_SECONDS() external view returns (uint256);
+
+    /// @notice Adds a new pause guardian to the contract.
+    /// @param guardians The addresses of the new pause guardians.
+    /// @dev Only the contract owner can call this function.
+    function addPauseGuardians(address[] calldata guardians) external;
+
+    /// @notice Removes a pause guardian from the contract.
+    /// @param guardians The addresses of the pause guardians to be removed.
+    /// @dev Only the contract owner can call this function.
+    function removePauseGuardians(address[] calldata guardians) external;
+
+    /// @notice Checks if an address is a pause guardian.
+    /// @param guardian The address to be checked.
+    /// @return A boolean indicating whether the address is a pause guardian (true) or not (false).
+    function isPauseGuardian(address guardian) external view returns (bool);
 
     /// @notice Emitted when the user receives rewards from the LiquidityMining
     /// @dev Receiving rewards does not change Internal Exchange Rate of Power Tokens in PowerToken smart contract.

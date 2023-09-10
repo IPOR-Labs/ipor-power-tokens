@@ -12,12 +12,147 @@ import "@power-tokens/contracts/tokens/PowerTokenInternal.sol";
 contract LiquidityMiningConfigurationTest is TestCommons {
     event LpTokenSupportRemoved(address account, address lpToken);
     event NewLpTokenSupported(address account, address lpToken);
-    event PauseManagerChanged(address indexed newPauseManager);
+    event PauseGuardiansAdded(address[] indexed guardians);
+    event PauseGuardiansRemoved(address[] indexed guardians);
 
     PowerTokensTestsSystem internal _powerTokensSystem;
 
     function setUp() external {
         _powerTokensSystem = new PowerTokensTestsSystem();
+        address[] memory guardians = new address[](1);
+        guardians[0] = _powerTokensSystem.owner();
+        address lm = _powerTokensSystem.liquidityMining();
+
+        vm.prank(_powerTokensSystem.owner());
+        LiquidityMining(lm).addPauseGuardians(guardians);
+    }
+
+    function testShouldBeAbleToSet4NewPauseGuardians() external {
+        // given
+        address[] memory guardians = new address[](4);
+        guardians[0] = _getUserAddress(10);
+        guardians[1] = _getUserAddress(11);
+        guardians[2] = _getUserAddress(12);
+        guardians[3] = _getUserAddress(13);
+
+        address lm = _powerTokensSystem.liquidityMining();
+        bool userOneIsPauseGuardianBefore = LiquidityMining(lm).isPauseGuardian(guardians[0]);
+        bool userTwoIsPauseGuardianBefore = LiquidityMining(lm).isPauseGuardian(guardians[1]);
+        bool userThreeIsPauseGuardianBefore = LiquidityMining(lm).isPauseGuardian(guardians[2]);
+        bool userFourIsPauseGuardianBefore = LiquidityMining(lm).isPauseGuardian(guardians[3]);
+
+        // when
+        vm.prank(_powerTokensSystem.owner());
+        vm.expectEmit(true, true, true, true);
+        emit PauseGuardiansAdded(guardians);
+        LiquidityMining(lm).addPauseGuardians(guardians);
+
+        // then
+
+        bool userOneIsPauseGuardianAfter = LiquidityMining(lm).isPauseGuardian(guardians[0]);
+        bool userTwoIsPauseGuardianAfter = LiquidityMining(lm).isPauseGuardian(guardians[1]);
+        bool userThreeIsPauseGuardianAfter = LiquidityMining(lm).isPauseGuardian(guardians[2]);
+        bool userFourIsPauseGuardianAfter = LiquidityMining(lm).isPauseGuardian(guardians[3]);
+
+        assertFalse(userOneIsPauseGuardianBefore, "should not be pause guardian before");
+        assertFalse(userTwoIsPauseGuardianBefore, "should not be pause guardian before");
+        assertFalse(userThreeIsPauseGuardianBefore, "should not be pause guardian before");
+        assertFalse(userFourIsPauseGuardianBefore, "should not be pause guardian before");
+
+        assertTrue(userOneIsPauseGuardianAfter, "should be pause guardian after");
+        assertTrue(userTwoIsPauseGuardianAfter, "should be pause guardian after");
+        assertTrue(userThreeIsPauseGuardianAfter, "should be pause guardian after");
+        assertTrue(userFourIsPauseGuardianAfter, "should be pause guardian after");
+    }
+
+    function testShoudBeAbleToRemove2UsersFromGuardians() external {
+        // given
+        address[] memory guardians = new address[](4);
+        guardians[0] = _getUserAddress(10);
+        guardians[1] = _getUserAddress(11);
+        guardians[2] = _getUserAddress(12);
+        guardians[3] = _getUserAddress(13);
+
+        address lm = _powerTokensSystem.liquidityMining();
+
+        vm.prank(_powerTokensSystem.owner());
+        LiquidityMining(lm).addPauseGuardians(guardians);
+
+        address[] memory guardiansToRemove = new address[](2);
+        guardiansToRemove[0] = guardians[0];
+        guardiansToRemove[1] = guardians[1];
+
+        bool userOneIsPauseGuardianBefore = LiquidityMining(lm).isPauseGuardian(guardians[0]);
+        bool userTwoIsPauseGuardianBefore = LiquidityMining(lm).isPauseGuardian(guardians[1]);
+        bool userThreeIsPauseGuardianBefore = LiquidityMining(lm).isPauseGuardian(guardians[2]);
+        bool userFourIsPauseGuardianBefore = LiquidityMining(lm).isPauseGuardian(guardians[3]);
+
+        // when
+        vm.prank(_powerTokensSystem.owner());
+        vm.expectEmit(true, true, true, true);
+        emit PauseGuardiansRemoved(guardiansToRemove);
+        LiquidityMining(lm).removePauseGuardians(guardiansToRemove);
+
+        // then
+
+        bool userOneIsPauseGuardianAfter = LiquidityMining(lm).isPauseGuardian(guardians[0]);
+        bool userTwoIsPauseGuardianAfter = LiquidityMining(lm).isPauseGuardian(guardians[1]);
+        bool userThreeIsPauseGuardianAfter = LiquidityMining(lm).isPauseGuardian(guardians[2]);
+        bool userFourIsPauseGuardianAfter = LiquidityMining(lm).isPauseGuardian(guardians[3]);
+
+        assertTrue(userOneIsPauseGuardianBefore, "should be pause guardian before");
+        assertTrue(userTwoIsPauseGuardianBefore, "should be pause guardian before");
+        assertTrue(userThreeIsPauseGuardianBefore, "should not be pause guardian before");
+        assertTrue(userFourIsPauseGuardianBefore, "should not be pause guardian before");
+
+        assertFalse(userOneIsPauseGuardianAfter, "should not be pause guardian after");
+        assertFalse(userTwoIsPauseGuardianAfter, "should not be pause guardian after");
+        assertTrue(userThreeIsPauseGuardianAfter, "should not be pause guardian after");
+        assertTrue(userFourIsPauseGuardianAfter, "should not be pause guardian after");
+    }
+
+    function testShouldBeAbleToPauseWhenUserIsGuardian() external {
+        // given
+        address[] memory guardians = new address[](1);
+        guardians[0] = _getUserAddress(10);
+
+        address lm = _powerTokensSystem.liquidityMining();
+
+        vm.prank(_powerTokensSystem.owner());
+        LiquidityMining(lm).addPauseGuardians(guardians);
+
+        bool isPausedBefore = PausableUpgradeable(lm).paused();
+
+        // when
+        vm.prank(guardians[0]);
+        LiquidityMining(lm).pause();
+
+        // then
+        bool isPausedAfter = PausableUpgradeable(lm).paused();
+
+        assertFalse(isPausedBefore, "should not be paused before");
+        assertTrue(isPausedAfter, "should be paused after");
+    }
+
+    function testShouldNotBeAbleToPauseWhenRemovedFromGuardians() external {
+        // given
+        address[] memory guardians = new address[](1);
+        guardians[0] = _getUserAddress(10);
+
+        address lm = _powerTokensSystem.liquidityMining();
+
+        vm.prank(_powerTokensSystem.owner());
+        LiquidityMining(lm).addPauseGuardians(guardians);
+
+        bool isPausedBefore = PausableUpgradeable(lm).paused();
+
+        // when
+        vm.prank(_powerTokensSystem.owner());
+        LiquidityMining(lm).removePauseGuardians(guardians);
+
+        vm.prank(guardians[0]);
+        vm.expectRevert(bytes(Errors.CALLER_NOT_GUARDIAN));
+        LiquidityMining(lm).pause();
     }
 
     function testShouldDeployContractWithoutAssets() external {
@@ -171,39 +306,22 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         assertTrue(ownerAfter == owner, "should be owner after");
     }
 
-    function testShouldBeAbleToPauseContractWhenOwnerInitialDeployment() external {
-        // given
-        address liquidityMining = _powerTokensSystem.liquidityMining();
-        address owner = _powerTokensSystem.owner();
-
-        bool isPausedBefore = PausableUpgradeable(liquidityMining).paused();
-
-        // when
-        vm.prank(owner);
-        LiquidityMiningInternal(liquidityMining).pause();
-
-        // then
-        bool isPausedAfter = PausableUpgradeable(liquidityMining).paused();
-
-        assertTrue(!isPausedBefore, "should not be paused before");
-        assertTrue(isPausedAfter, "should be paused after");
-    }
-
     function testShouldBeAbleToPauseContractWhenPauseManagerChanged() external {
         // given
         address liquidityMining = _powerTokensSystem.liquidityMining();
         address owner = _powerTokensSystem.owner();
-        address newPauseManager = _getUserAddress(10);
+        address[] memory guardians = new address[](1);
+        guardians[0] = _getUserAddress(10);
 
         vm.prank(owner);
         vm.expectEmit(true, true, true, true);
-        emit PauseManagerChanged(newPauseManager);
-        ILiquidityMiningInternal(liquidityMining).setPauseManager(newPauseManager);
+        emit PauseGuardiansAdded(guardians);
+        ILiquidityMiningInternal(liquidityMining).addPauseGuardians(guardians);
 
         bool isPausedBefore = PausableUpgradeable(liquidityMining).paused();
 
         // when
-        vm.prank(newPauseManager);
+        vm.prank(guardians[0]);
         LiquidityMiningInternal(liquidityMining).pause();
 
         // then
@@ -211,74 +329,6 @@ contract LiquidityMiningConfigurationTest is TestCommons {
 
         assertTrue(!isPausedBefore, "should not be paused before");
         assertTrue(isPausedAfter, "should be paused after");
-    }
-
-    function testShouldNotBeAbleToPauseContractWhenInitialPauseManagerChanged() external {
-        // given
-        address liquidityMining = _powerTokensSystem.liquidityMining();
-        address owner = _powerTokensSystem.owner();
-        address newPauseManager = _getUserAddress(10);
-
-        vm.prank(owner);
-        ILiquidityMiningInternal(liquidityMining).setPauseManager(newPauseManager);
-
-        bool isPausedBefore = PausableUpgradeable(liquidityMining).paused();
-
-        // when
-        vm.prank(owner);
-        vm.expectRevert(bytes(Errors.CALLER_NOT_PAUSE_MANAGER));
-        LiquidityMiningInternal(liquidityMining).pause();
-
-        // then
-        bool isPausedAfter = PausableUpgradeable(liquidityMining).paused();
-
-        assertTrue(!isPausedBefore, "should not be paused before");
-        assertTrue(!isPausedAfter, "should not be paused after");
-    }
-
-    function testShouldBeAbleToUnpauseContractWhenOwnerInitialDeployment() external {
-        // given
-        address liquidityMining = _powerTokensSystem.liquidityMining();
-        address owner = _powerTokensSystem.owner();
-
-        vm.prank(owner);
-        LiquidityMiningInternal(liquidityMining).pause();
-
-        bool isPausedBefore = PausableUpgradeable(liquidityMining).paused();
-
-        // when
-        vm.prank(owner);
-        LiquidityMiningInternal(liquidityMining).unpause();
-
-        // then
-        bool isPausedAfter = PausableUpgradeable(liquidityMining).paused();
-
-        assertTrue(isPausedBefore, "should be paused before");
-        assertTrue(!isPausedAfter, "should not be paused after");
-    }
-
-    function testShouldBeAbleToUnpauseContractWhenPauseManagerChanged() external {
-        // given
-        address liquidityMining = _powerTokensSystem.liquidityMining();
-        address owner = _powerTokensSystem.owner();
-        address newPauseManager = _getUserAddress(10);
-        vm.prank(owner);
-        LiquidityMiningInternal(liquidityMining).pause();
-
-        vm.prank(owner);
-        ILiquidityMiningInternal(liquidityMining).setPauseManager(newPauseManager);
-
-        bool isPausedBefore = PausableUpgradeable(liquidityMining).paused();
-
-        // when
-        vm.prank(newPauseManager);
-        LiquidityMiningInternal(liquidityMining).unpause();
-
-        // then
-        bool isPausedAfter = PausableUpgradeable(liquidityMining).paused();
-
-        assertTrue(isPausedBefore, "should be paused before");
-        assertTrue(!isPausedAfter, "should not be paused after");
     }
 
     function testShouldNotBeAbleToUnpauseContractWhenNoOwner() external {
@@ -294,33 +344,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
 
         // when
         vm.prank(user);
-        vm.expectRevert(bytes(Errors.CALLER_NOT_PAUSE_MANAGER));
-        LiquidityMiningInternal(liquidityMining).unpause();
-
-        // then
-        bool isPausedAfter = PausableUpgradeable(liquidityMining).paused();
-
-        assertTrue(isPausedBefore, "should be paused before");
-        assertTrue(isPausedAfter, "should be paused after");
-    }
-
-    function testShouldNotBeAbleToUnpauseContractWhenInitialPauseManagerChanged() external {
-        // given
-        address liquidityMining = _powerTokensSystem.liquidityMining();
-        address owner = _powerTokensSystem.owner();
-        address newPauseManager = _getUserAddress(10);
-
-        vm.prank(owner);
-        LiquidityMiningInternal(liquidityMining).pause();
-
-        bool isPausedBefore = PausableUpgradeable(liquidityMining).paused();
-
-        // when
-        vm.prank(owner);
-        ILiquidityMiningInternal(liquidityMining).setPauseManager(newPauseManager);
-
-        vm.prank(owner);
-        vm.expectRevert(bytes(Errors.CALLER_NOT_PAUSE_MANAGER));
+        vm.expectRevert(bytes("Ownable: caller is not the owner"));
         LiquidityMiningInternal(liquidityMining).unpause();
 
         // then

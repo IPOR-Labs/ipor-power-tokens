@@ -14,6 +14,7 @@ import "../interfaces/IGovernanceToken.sol";
 import "../interfaces/IPowerToken.sol";
 import "../interfaces/AggregatorV3Interface.sol";
 import "../security/MiningOwnableUpgradeable.sol";
+import "../security/PauseManager.sol";
 import "../interfaces/IProxyImplementation.sol";
 import "../libraries/ContractValidator.sol";
 
@@ -36,7 +37,8 @@ abstract contract LiquidityMiningInternal is
 
     // @deprecated field is deprecated
     address internal _powerTokenDeprecated;
-    address internal _pauseManager;
+    // @deprecated field is deprecated
+    address internal _pauseManagerDeprecated;
 
     mapping(address => bool) internal _lpTokens;
     mapping(address => uint256) internal _allocatedPwTokens;
@@ -53,8 +55,9 @@ abstract contract LiquidityMiningInternal is
         ethUsdOracle = ethUsdOracleInput.checkAddress();
     }
 
-    modifier onlyPauseManager() {
-        require(_msgSender() == _pauseManager, Errors.CALLER_NOT_PAUSE_MANAGER);
+    /// @dev Throws an error if called by any account other than the pause guardian.
+    modifier onlyPauseGuardian() {
+        require(PauseManager.isPauseGuardian(msg.sender), Errors.CALLER_NOT_GUARDIAN);
         _;
     }
 
@@ -69,8 +72,6 @@ abstract contract LiquidityMiningInternal is
         __UUPSUpgradeable_init_unchained();
 
         uint256 lpTokensLength = lpTokens.length;
-
-        _pauseManager = _msgSender();
 
         for (uint256 i; i != lpTokensLength; ) {
             require(lpTokens[i] != address(0), Errors.WRONG_ADDRESS);
@@ -95,10 +96,6 @@ abstract contract LiquidityMiningInternal is
         return 2_001;
     }
 
-    function getPauseManager() external view override returns (address) {
-        return _pauseManager;
-    }
-
     function isLpTokenSupported(address lpToken) external view override returns (bool) {
         return _lpTokens[lpToken];
     }
@@ -121,18 +118,33 @@ abstract contract LiquidityMiningInternal is
         emit LpTokenSupportRemoved(msg.sender, lpToken);
     }
 
-    function setPauseManager(address newPauseManagerAddr) external override onlyOwner {
-        require(newPauseManagerAddr != address(0), Errors.WRONG_ADDRESS);
-        _pauseManager = newPauseManagerAddr;
-        emit PauseManagerChanged(newPauseManagerAddr);
-    }
-
-    function pause() external override onlyPauseManager {
+    function pause() external override onlyPauseGuardian {
         _pause();
     }
 
-    function unpause() external override onlyPauseManager {
+    function unpause() external override onlyOwner {
         _unpause();
+    }
+
+    /// @notice Adds a new pause guardian to the contract.
+    /// @param guardians The addresses of the new pause guardians.
+    /// @dev Only the contract owner can call this function.
+    function addPauseGuardians(address[] calldata guardians) external onlyOwner {
+        PauseManager.addPauseGuardians(guardians);
+    }
+
+    /// @notice Removes a pause guardian from the contract.
+    /// @param guardians The addresses of the pause guardians to be removed.
+    /// @dev Only the contract owner can call this function.
+    function removePauseGuardians(address[] calldata guardians) external onlyOwner {
+        PauseManager.removePauseGuardians(guardians);
+    }
+
+    /// @notice Checks if an address is a pause guardian.
+    /// @param guardian The address to be checked.
+    /// @return A boolean indicating whether the address is a pause guardian (true) or not (false).
+    function isPauseGuardian(address guardian) external view returns (bool) {
+        return PauseManager.isPauseGuardian(guardian);
     }
 
     function grantAllowanceForRouter(address erc20Token) external override onlyOwner {
