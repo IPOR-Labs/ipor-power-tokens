@@ -7,6 +7,7 @@ import "../interfaces/ILiquidityMining.sol";
 import "../libraries/errors/Errors.sol";
 import "../libraries/ContractValidator.sol";
 
+/// @dev It is not recommended to use lens contract directly, should be used only through router (like IporProtocolRouter or PowerTokenRouter)
 contract LiquidityMiningLens is ILiquidityMiningLens {
     using ContractValidator for address;
     address public immutable liquidityMining;

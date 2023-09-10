@@ -9,6 +9,7 @@ import "../interfaces/IPowerTokenStakeService.sol";
 import "../libraries/errors/Errors.sol";
 import "../libraries/ContractValidator.sol";
 
+/// @dev It is not recommended to use service contract directly, should be used only through router (like IporProtocolRouter or PowerTokenRouter)
 contract StakeService is IPowerTokenStakeService {
     using ContractValidator for address;
     using SafeERC20 for IERC20;
