@@ -54,12 +54,12 @@ abstract contract LiquidityMiningInternal is
     }
 
     modifier onlyPauseManager() {
-        require(_msgSender() == _pauseManager, Errors.CALLER_NOT_PAUSE_MANAGER);
+        require(msg.sender == _pauseManager, Errors.CALLER_NOT_PAUSE_MANAGER);
         _;
     }
 
     modifier onlyRouter() {
-        require(_msgSender() == routerAddress, Errors.CALLER_NOT_ROUTER);
+        require(msg.sender == routerAddress, Errors.CALLER_NOT_ROUTER);
         _;
     }
 
@@ -70,7 +70,7 @@ abstract contract LiquidityMiningInternal is
 
         uint256 lpTokensLength = lpTokens.length;
 
-        _pauseManager = _msgSender();
+        _pauseManager = msg.sender;
 
         for (uint256 i; i != lpTokensLength; ) {
             require(lpTokens[i] != address(0), Errors.WRONG_ADDRESS);
