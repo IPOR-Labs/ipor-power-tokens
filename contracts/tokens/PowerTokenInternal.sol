@@ -53,6 +53,7 @@ abstract contract PowerTokenInternal is
     mapping(address => PowerTokenTypes.PwTokenCooldown) internal _cooldowns;
 
     uint256 internal _baseTotalSupply;
+    /// @dev value represents percentage in 18 decimals, example 1e18 = 100%, 50% = 5 * 1e17
     uint256 internal _unstakeWithoutCooldownFee;
 
     constructor(address routerAddressInput, address governanceTokenInput) {
@@ -80,6 +81,7 @@ abstract contract PowerTokenInternal is
         __Ownable_init_unchained();
         __UUPSUpgradeable_init_unchained();
 
+        /// @dev 50% fee for unstake without cooldown
         _unstakeWithoutCooldownFee = 1e17 * 5;
     }
 

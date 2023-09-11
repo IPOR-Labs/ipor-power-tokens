@@ -10,7 +10,7 @@ library PauseManager {
             return;
         }
         mapping(address => uint256) storage pauseGuardians = StorageLib.getPauseGuardianStorage();
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i; i < length; ) {
             pauseGuardians[guardians[i]] = 1;
             unchecked {
                 ++i;
@@ -26,7 +26,7 @@ library PauseManager {
         }
         mapping(address => uint256) storage pauseGuardians = StorageLib.getPauseGuardianStorage();
 
-        for (uint256 i = 0; i < length; ) {
+        for (uint256 i; i < length; ) {
             pauseGuardians[guardians[i]] = 0;
             unchecked {
                 ++i;
