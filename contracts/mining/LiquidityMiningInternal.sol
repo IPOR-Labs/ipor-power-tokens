@@ -223,7 +223,7 @@ abstract contract LiquidityMiningInternal is
     function _calculateWeightedLpTokenBalance(
         address lpToken,
         uint256 lpTokenBalance
-    ) internal returns (uint256) {
+    ) internal view returns (uint256) {
         if (lpToken != lpStEth) {
             return lpTokenBalance;
         }
