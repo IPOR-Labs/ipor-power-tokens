@@ -21,6 +21,12 @@ contract StakeLpTokensTest is TestCommons {
         _lpTokens = lpTokensTemp;
 
         _userOne = _getUserAddress(10);
+        address[] memory guardians = new address[](1);
+        guardians[0] = _powerTokensSystem.owner();
+
+        address lm = _powerTokensSystem.liquidityMining();
+        vm.prank(_powerTokensSystem.owner());
+        LiquidityMining(lm).addPauseGuardians(guardians);
     }
 
     function testShouldNotBeAbleToStakeWhenInsufficientAllowanceOnLpToken()
