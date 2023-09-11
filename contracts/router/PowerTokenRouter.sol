@@ -46,7 +46,6 @@ contract PowerTokenRouter is UUPSUpgradeable, AccessControl, IProxyImplementatio
     function initialize(uint256 pausedTemp) external initializer {
         __UUPSUpgradeable_init();
         StorageLib.getOwner().value = msg.sender;
-        PauseManager.addPauseGuardian(msg.sender);
         StorageLib.getPaused().value = pausedTemp;
     }
 

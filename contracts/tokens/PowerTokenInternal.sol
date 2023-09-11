@@ -13,8 +13,9 @@ import "../interfaces/ILiquidityMining.sol";
 import "../interfaces/IProxyImplementation.sol";
 import "../libraries/errors/Errors.sol";
 import "../libraries/math/MathOperation.sol";
-import "../security/MiningOwnableUpgradeable.sol";
 import "../libraries/ContractValidator.sol";
+import "../security/MiningOwnableUpgradeable.sol";
+import "../security/PauseManager.sol";
 
 abstract contract PowerTokenInternal is
     PausableUpgradeable,
@@ -39,8 +40,8 @@ abstract contract PowerTokenInternal is
     address internal _liquidityMiningDeprecated;
     // @dev @deprecated use _STAKED_TOKEN_ADDRESS instead
     address internal _governanceTokenDeprecated;
-
-    address internal _pauseManager;
+    // @deprecated field is deprecated
+    address internal _pauseManagerDeprecated;
 
     /// @dev account address -> base amount, represented with 18 decimals
     mapping(address => uint256) internal _baseBalance;
@@ -52,6 +53,7 @@ abstract contract PowerTokenInternal is
     mapping(address => PowerTokenTypes.PwTokenCooldown) internal _cooldowns;
 
     uint256 internal _baseTotalSupply;
+    /// @dev value represents percentage in 18 decimals, example 1e18 = 100%, 50% = 5 * 1e17
     uint256 internal _unstakeWithoutCooldownFee;
 
     constructor(address routerAddressInput, address governanceTokenInput) {
@@ -63,13 +65,14 @@ abstract contract PowerTokenInternal is
         );
     }
 
-    modifier onlyPauseManager() {
-        require(_msgSender() == _pauseManager, Errors.CALLER_NOT_PAUSE_MANAGER);
+    /// @dev Throws an error if called by any account other than the pause guardian.
+    modifier onlyPauseGuardian() {
+        require(PauseManager.isPauseGuardian(msg.sender), Errors.CALLER_NOT_GUARDIAN);
         _;
     }
 
     modifier onlyRouter() {
-        require(_msgSender() == routerAddress, Errors.CALLER_NOT_ROUTER);
+        require(msg.sender == routerAddress, Errors.CALLER_NOT_ROUTER);
         _;
     }
 
@@ -78,7 +81,7 @@ abstract contract PowerTokenInternal is
         __Ownable_init_unchained();
         __UUPSUpgradeable_init_unchained();
 
-        _pauseManager = _msgSender();
+        /// @dev 50% fee for unstake without cooldown
         _unstakeWithoutCooldownFee = 1e17 * 5;
     }
 
@@ -98,10 +101,6 @@ abstract contract PowerTokenInternal is
         return _governanceToken;
     }
 
-    function getPauseManager() external view override returns (address) {
-        return _pauseManager;
-    }
-
     function setUnstakeWithoutCooldownFee(
         uint256 unstakeWithoutCooldownFee
     ) external override onlyOwner {
@@ -110,17 +109,11 @@ abstract contract PowerTokenInternal is
         emit UnstakeWithoutCooldownFeeChanged(unstakeWithoutCooldownFee);
     }
 
-    function setPauseManager(address newPauseManagerAddr) external override onlyOwner {
-        require(newPauseManagerAddr != address(0), Errors.WRONG_ADDRESS);
-        _pauseManager = newPauseManagerAddr;
-        emit PauseManagerChanged(newPauseManagerAddr);
-    }
-
-    function pause() external override onlyPauseManager {
+    function pause() external override onlyPauseGuardian {
         _pause();
     }
 
-    function unpause() external override onlyPauseManager {
+    function unpause() external override onlyOwner {
         _unpause();
     }
 
@@ -128,7 +121,7 @@ abstract contract PowerTokenInternal is
         require(erc20Token != address(0), Errors.WRONG_ADDRESS);
 
         IERC20(erc20Token).approve(routerAddress, type(uint256).max);
-        emit AllowanceGranted(_msgSender(), erc20Token);
+        emit AllowanceGranted(msg.sender, erc20Token);
     }
 
     function revokeAllowanceForRouter(address erc20Token) external override onlyOwner {
@@ -140,6 +133,18 @@ abstract contract PowerTokenInternal is
 
     function getImplementation() external view override returns (address) {
         return StorageSlotUpgradeable.getAddressSlot(_IMPLEMENTATION_SLOT).value;
+    }
+
+    function addPauseGuardians(address[] calldata guardians) external onlyOwner {
+        PauseManager.addPauseGuardians(guardians);
+    }
+
+    function removePauseGuardians(address[] calldata guardians) external onlyOwner {
+        PauseManager.removePauseGuardians(guardians);
+    }
+
+    function isPauseGuardian(address guardian) external view returns (bool) {
+        return PauseManager.isPauseGuardian(guardian);
     }
 
     function _calculateInternalExchangeRate() internal view returns (uint256) {

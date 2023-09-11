@@ -87,17 +87,17 @@ contract AccessControl {
     }
 
     /// @notice Adds a new pause guardian to the contract.
-    /// @param _guardian The address of the new pause guardian.
+    /// @param guardians The addresses of the new pause guardians.
     /// @dev Only the contract owner can call this function.
-    function addPauseGuardian(address _guardian) external onlyOwner {
-        PauseManager.addPauseGuardian(_guardian);
+    function addPauseGuardians(address[] calldata guardians) external onlyOwner {
+        PauseManager.addPauseGuardians(guardians);
     }
 
     /// @notice Removes a pause guardian from the contract.
-    /// @param _guardian The address of the pause guardian to be removed.
+    /// @param guardians The addresses of the pause guardians to be removed.
     /// @dev Only the contract owner can call this function.
-    function removePauseGuardian(address _guardian) external onlyOwner {
-        PauseManager.removePauseGuardian(_guardian);
+    function removePauseGuardians(address[] calldata guardians) external onlyOwner {
+        PauseManager.removePauseGuardians(guardians);
     }
 
     /// @notice Checks if an address is a pause guardian.

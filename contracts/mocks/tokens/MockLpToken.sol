@@ -18,7 +18,7 @@ contract MockLpToken is ERC20, Ownable {
     event JosephChanged(address indexed newJoseph);
 
     modifier onlyJoseph() {
-        require(_msgSender() == _joseph, "PT_327");
+        require(msg.sender == _joseph, "PT_327");
         _;
     }
 

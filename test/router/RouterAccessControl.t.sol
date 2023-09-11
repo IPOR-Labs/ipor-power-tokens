@@ -11,6 +11,7 @@ contract RouterAccessControlTest is TestCommons {
     address internal _router;
     address internal _userOne;
     address internal _owner;
+    address[] internal _guardians;
 
     function setUp() public {
         _powerTokensSystem = new PowerTokensTestsSystem();
@@ -21,6 +22,9 @@ contract RouterAccessControlTest is TestCommons {
         _powerTokensSystem.mintLpTokens(_powerTokensSystem.lpDai(), _userOne, 10_000e18);
         _powerTokensSystem.approveRouter(_userOne);
         _powerTokensSystem.transferIporToken(_userOne, 10_000e18);
+
+        _guardians = new address[](1);
+        _guardians[0] = _userOne;
     }
 
     function testShouldReturnOwnerOfRouter() external {
@@ -121,21 +125,13 @@ contract RouterAccessControlTest is TestCommons {
         assertEq(ownerAfter, _owner, "owner after should be equal to _owner");
     }
 
-    function testShouldOwnerBeGuardian() external {
-        // when
-        bool isGuardian = AccessControl(_router).isPauseGuardian(_owner);
-
-        // then
-        assertTrue(isGuardian, "owner should be guardian");
-    }
-
     function testShouldBeAbleToAddNewGuardian() external {
         // given
         bool isGuardianBefore = AccessControl(_router).isPauseGuardian(_userOne);
 
         // when
         vm.prank(_owner);
-        AccessControl(_router).addPauseGuardian(_userOne);
+        AccessControl(_router).addPauseGuardians(_guardians);
 
         // then
         bool isGuardianAfter = AccessControl(_router).isPauseGuardian(_userOne);
@@ -151,7 +147,7 @@ contract RouterAccessControlTest is TestCommons {
         // when
         vm.prank(_userOne);
         vm.expectRevert(bytes(Errors.CALLER_NOT_OWNER));
-        AccessControl(_router).addPauseGuardian(_userOne);
+        AccessControl(_router).addPauseGuardians(_guardians);
 
         // then
         bool isGuardianAfter = AccessControl(_router).isPauseGuardian(_userOne);
@@ -163,12 +159,12 @@ contract RouterAccessControlTest is TestCommons {
     function testShouldBeAbleToRemoveGuardian() external {
         // given
         vm.prank(_owner);
-        AccessControl(_router).addPauseGuardian(_userOne);
+        AccessControl(_router).addPauseGuardians(_guardians);
         bool isGuardianBefore = AccessControl(_router).isPauseGuardian(_userOne);
 
         // when
         vm.prank(_owner);
-        AccessControl(_router).removePauseGuardian(_userOne);
+        AccessControl(_router).removePauseGuardians(_guardians);
 
         // then
         bool isGuardianAfter = AccessControl(_router).isPauseGuardian(_userOne);
@@ -180,13 +176,13 @@ contract RouterAccessControlTest is TestCommons {
     function testShouldNotBeAbleToRemoveGuardianWhenNotOwner() external {
         // given
         vm.prank(_owner);
-        AccessControl(_router).addPauseGuardian(_userOne);
+        AccessControl(_router).addPauseGuardians(_guardians);
         bool isGuardianBefore = AccessControl(_router).isPauseGuardian(_userOne);
 
         // when
         vm.prank(_userOne);
         vm.expectRevert(bytes(Errors.CALLER_NOT_OWNER));
-        AccessControl(_router).removePauseGuardian(_userOne);
+        AccessControl(_router).removePauseGuardians(_guardians);
 
         // then
         bool isGuardianAfter = AccessControl(_router).isPauseGuardian(_userOne);
@@ -197,6 +193,9 @@ contract RouterAccessControlTest is TestCommons {
 
     function testShouldBeAbleToPause() external {
         // given
+        _guardians[0] = _owner;
+        vm.prank(_owner);
+        AccessControl(_router).addPauseGuardians(_guardians);
         uint256 isPausedBefore = AccessControl(_router).paused();
 
         // when
@@ -228,6 +227,9 @@ contract RouterAccessControlTest is TestCommons {
 
     function testShouldBeAbleToUnpause() external {
         // given
+        _guardians[0] = _owner;
+        vm.prank(_owner);
+        AccessControl(_router).addPauseGuardians(_guardians);
         vm.prank(_owner);
         AccessControl(_router).pause();
         uint256 isPausedBefore = AccessControl(_router).paused();
@@ -245,6 +247,9 @@ contract RouterAccessControlTest is TestCommons {
 
     function testShouldNotBeAbleToUnpauseWhenNotGuardian() external {
         // given
+        _guardians[0] = _owner;
+        vm.prank(_owner);
+        AccessControl(_router).addPauseGuardians(_guardians);
         vm.prank(_owner);
         AccessControl(_router).pause();
         uint256 isPausedBefore = AccessControl(_router).paused();

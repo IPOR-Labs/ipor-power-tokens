@@ -9,10 +9,6 @@ interface ILiquidityMiningInternal {
     /// @return Current LiquidityMining (Liquidity Rewards) version
     function getVersion() external pure returns (uint256);
 
-    /// @notice Gets the Pause Manager's address
-    /// @return Pause Manager's address
-    function getPauseManager() external view returns (address);
-
     /// @notice Checks if lpToken is supported by the liquidity mining module.
     /// @param lpToken lpToken address
     /// @return returns true if lpToken is supported by the LiquidityMining, false otherwise
@@ -32,10 +28,6 @@ interface ILiquidityMiningInternal {
     /// @dev Can be executed only by the Owner. Note! That when lpToken is removed, the rewards cannot be claimed. To restore claiming, run function {addLpToken()} and {setRewardsPerBlock()}
     /// @param lpToken address of the lpToken
     function phasingOutLpToken(address lpToken) external;
-
-    /// @notice Sets the new Pause Manager address
-    /// @param newPauseManagerAddr - new address of Pause Manager
-    function setPauseManager(address newPauseManagerAddr) external;
 
     /// @notice Pauses current smart contract, it can only be executed by the Owner
     /// @dev Emits {Paused} event.
@@ -57,6 +49,21 @@ interface ILiquidityMiningInternal {
     /// @dev This function revokes the allowance for the specified ERC20 token from the Router contract by setting the allowance to zero.
     /// @dev Reverts if the `erc20Token` address is zero.
     function revokeAllowanceForRouter(address erc20Token) external;
+
+    /// @notice Adds a new pause guardian to the contract.
+    /// @param guardians The addresses of the new pause guardians.
+    /// @dev Only the contract owner can call this function.
+    function addPauseGuardians(address[] calldata guardians) external;
+
+    /// @notice Removes a pause guardian from the contract.
+    /// @param guardians The addresses of the pause guardians to be removed.
+    /// @dev Only the contract owner can call this function.
+    function removePauseGuardians(address[] calldata guardians) external;
+
+    /// @notice Checks if an address is a pause guardian.
+    /// @param guardian The address to be checked.
+    /// @return A boolean indicating whether the address is a pause guardian (true) or not (false).
+    function isPauseGuardian(address guardian) external view returns (bool);
 
     /// @notice Emitted when the account unstakes lpTokens
     /// @param account account unstaking tokens

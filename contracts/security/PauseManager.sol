@@ -4,16 +4,35 @@ pragma solidity 0.8.20;
 import "./StorageLib.sol";
 
 library PauseManager {
-    function addPauseGuardian(address _guardian) internal {
+    function addPauseGuardians(address[] calldata guardians) internal {
+        uint256 length = guardians.length;
+        if (length == 0) {
+            return;
+        }
         mapping(address => uint256) storage pauseGuardians = StorageLib.getPauseGuardianStorage();
-        pauseGuardians[_guardian] = 1;
-        emit PauseGuardianAdded(_guardian);
+        for (uint256 i; i < length; ) {
+            pauseGuardians[guardians[i]] = 1;
+            unchecked {
+                ++i;
+            }
+        }
+        emit PauseGuardiansAdded(guardians);
     }
 
-    function removePauseGuardian(address _guardian) internal {
+    function removePauseGuardians(address[] calldata guardians) internal {
+        uint256 length = guardians.length;
+        if (length == 0) {
+            return;
+        }
         mapping(address => uint256) storage pauseGuardians = StorageLib.getPauseGuardianStorage();
-        pauseGuardians[_guardian] = 0;
-        emit PauseGuardianRemoved(_guardian);
+
+        for (uint256 i; i < length; ) {
+            pauseGuardians[guardians[i]] = 0;
+            unchecked {
+                ++i;
+            }
+        }
+        emit PauseGuardiansRemoved(guardians);
     }
 
     function isPauseGuardian(address _guardian) internal view returns (bool) {
@@ -21,7 +40,7 @@ library PauseManager {
         return pauseGuardians[_guardian] == 1;
     }
 
-    event PauseGuardianAdded(address indexed guardian);
+    event PauseGuardiansAdded(address[] indexed guardians);
 
-    event PauseGuardianRemoved(address indexed guardian);
+    event PauseGuardiansRemoved(address[] indexed guardians);
 }
