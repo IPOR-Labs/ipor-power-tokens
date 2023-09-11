@@ -62,7 +62,7 @@ abstract contract LiquidityMiningInternal is
     }
 
     modifier onlyRouter() {
-        require(_msgSender() == routerAddress, Errors.CALLER_NOT_ROUTER);
+        require(msg.sender == routerAddress, Errors.CALLER_NOT_ROUTER);
         _;
     }
 
@@ -235,7 +235,7 @@ abstract contract LiquidityMiningInternal is
     function _calculateWeightedLpTokenBalance(
         address lpToken,
         uint256 lpTokenBalance
-    ) internal returns (uint256) {
+    ) internal view returns (uint256) {
         if (lpToken != lpStEth) {
             return lpTokenBalance;
         }

@@ -71,7 +71,7 @@ abstract contract PowerTokenInternal is
     }
 
     modifier onlyRouter() {
-        require(_msgSender() == routerAddress, Errors.CALLER_NOT_ROUTER);
+        require(msg.sender == routerAddress, Errors.CALLER_NOT_ROUTER);
         _;
     }
 
@@ -119,7 +119,7 @@ abstract contract PowerTokenInternal is
         require(erc20Token != address(0), Errors.WRONG_ADDRESS);
 
         IERC20(erc20Token).approve(routerAddress, type(uint256).max);
-        emit AllowanceGranted(_msgSender(), erc20Token);
+        emit AllowanceGranted(msg.sender, erc20Token);
     }
 
     function revokeAllowanceForRouter(address erc20Token) external override onlyOwner {
