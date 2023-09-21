@@ -82,3 +82,10 @@ to deploy the smart contracts to the mainnet or testnet.
 - Install [Slither](https://remix-ide.readthedocs.io/fr/latest/slither.html),  `remixd -i slither`  
 - Run `slither .` to verify contract
 
+### How to run the coverage
+- run `brew install ekhtml`
+- run `brew install lcov`
+- run `mkdir coverage`
+- run `forge coverage --report lcov && genhtml lcov.info --branch-coverage --output-dir coverage`
+
+

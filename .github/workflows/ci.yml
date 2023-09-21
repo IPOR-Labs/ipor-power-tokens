@@ -11,29 +11,22 @@ jobs:
     secrets:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
-  build-sc:
-    needs: notify
-    uses: ./.github/workflows/build-smart-contracts.yml
-    secrets:
-      PROVIDER_URL: ${{ secrets.PROVIDER_URL }}
-
   foundry-tests:
     needs: notify
     uses: ./.github/workflows/foundry-tests.yml
-    with:
-      fork-test-enabled: false
     secrets:
       FORK_URL: ${{ secrets.PROVIDER_URL }}
+    with:
+      fork-test-enabled: false
 
   report:
     if: ${{ always() }}
     needs:
       - notify
-      - build-sc
       - foundry-tests
     uses: ./.github/workflows/report-slack.yml
     secrets:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
     with:
-      success: ${{ needs.build-sc.result == 'success' && needs.foundry-tests.result == 'success' }}
+      success: ${{ needs.foundry-tests.result == 'success' }}
       slack-status-msg-id: ${{ needs.notify.outputs.slack-status-msg-id }}

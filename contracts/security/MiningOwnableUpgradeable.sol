@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "../libraries/errors/Errors.sol";
@@ -10,7 +10,7 @@ contract MiningOwnableUpgradeable is OwnableUpgradeable {
     event AppointedToTransferOwnership(address indexed appointedOwner);
 
     modifier onlyAppointedOwner() {
-        require(_appointedOwner == _msgSender(), Errors.SENDER_NOT_APPOINTED_OWNER);
+        require(_appointedOwner == msg.sender, Errors.SENDER_NOT_APPOINTED_OWNER);
         _;
     }
 
@@ -22,7 +22,7 @@ contract MiningOwnableUpgradeable is OwnableUpgradeable {
 
     function confirmTransferOwnership() public onlyAppointedOwner {
         _appointedOwner = address(0);
-        _transferOwnership(_msgSender());
+        _transferOwnership(msg.sender);
     }
 
     function renounceOwnership() public virtual override onlyOwner {
