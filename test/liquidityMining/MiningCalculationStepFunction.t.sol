@@ -1,14 +1,13 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "../TestCommons.sol";
-import "../../contracts/mocks/MockMiningCalculation.sol";
+import "@power-tokens/contracts/libraries/math/MiningCalculation.sol";
 import "abdk-libraries-solidity/ABDKMathQuad.sol";
 
 contract MiningCalculationStepFunctionTest is TestCommons {
     TestData private _testData;
-    MockMiningCalculation internal _calculation;
 
     struct TestData {
         uint256 inputRatio;
@@ -23,16 +22,12 @@ contract MiningCalculationStepFunctionTest is TestCommons {
         }
     }
 
-    function setUp() public {
-        _calculation = new MockMiningCalculation();
-    }
-
     function testShouldCalculateProperAccountPowerUp() public parameterizedTest(getDataForTest()) {
         // given
-        bytes16 ratio = _toQuadruplePrecision(_testData.inputRatio, Constants.D18);
+        bytes16 ratio = _toQuadruplePrecision(_testData.inputRatio, 1e18);
 
         // when
-        bytes16 result = _calculation.accountPowerUpStepFunction(ratio);
+        bytes16 result = MiningCalculation.accountPowerUpStepFunction(ratio);
 
         // then
 
@@ -82,11 +77,10 @@ contract MiningCalculationStepFunctionTest is TestCommons {
     }
 
     /// @dev Quadruple precision, 128 bits
-    function _toQuadruplePrecision(uint256 number, uint256 decimals)
-        private
-        pure
-        returns (bytes16)
-    {
+    function _toQuadruplePrecision(
+        uint256 number,
+        uint256 decimals
+    ) private pure returns (bytes16) {
         if (number % decimals > 0) {
             /// @dev during calculation this value is lost in the conversion
             number += 1;
@@ -98,7 +92,7 @@ contract MiningCalculationStepFunctionTest is TestCommons {
     }
 
     function _bytes16ToUint(bytes16 number) private pure returns (uint256) {
-        bytes16 resultD18 = ABDKMathQuad.mul(number, ABDKMathQuad.fromUInt(Constants.D18));
+        bytes16 resultD18 = ABDKMathQuad.mul(number, ABDKMathQuad.fromUInt(1e18));
         return ABDKMathQuad.toUInt(resultD18);
     }
 }

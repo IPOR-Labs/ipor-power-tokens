@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 
 import "./types/PowerTokenTypes.sol";
 
@@ -49,73 +49,71 @@ interface IPowerToken {
     /// Struct containing information on when the cooldown end and what is the quantity of the Power Tokens locked.
     /// @param account account address that owns Power Tokens in the cooldown
     /// @return Object PowerTokenTypes.PowerTokenCoolDown represents active cool down
-    function getActiveCooldown(address account)
-        external
-        view
-        returns (PowerTokenTypes.PwTokenCooldown memory);
+    function getActiveCooldown(
+        address account
+    ) external view returns (PowerTokenTypes.PwTokenCooldown memory);
 
-    /// @notice Stakes [Staked] Tokens and mints Power Tokens (pwToken).
-    /// @param stakedTokenAmount Tokens that sender staked to mint the Power Tokens
-    function stake(uint256 stakedTokenAmount) external;
+    /// @notice Initiates a cooldown for the specified account.
+    /// @dev This function allows an account to initiate a cooldown period for a specified amount of Power Tokens.
+    ///      During the cooldown period, the specified amount of Power Tokens cannot be redeemed or transferred.
+    /// @param account The account address for which the cooldown is initiated.
+    /// @param pwTokenAmount The amount of Power Tokens to be put on cooldown.
+    function cooldownInternal(address account, uint256 pwTokenAmount) external;
 
-    /// @notice Unstakes Staked Tokens in the amount specified.
-    /// @dev If the sender unstake tokens immediately (without the cooldown), then fee is applied by the PowerToken smart contract. See: `UnstakeWithoutCooldownFee`.
-    /// @param pwTokenAmount Power Tokens amount which will be unstake or a given sender
-    function unstake(uint256 pwTokenAmount) external;
+    /// @notice Cancels the cooldown for the specified account.
+    /// @dev This function allows an account to cancel the active cooldown period for their Power Tokens,
+    ///      enabling them to freely redeem or transfer their Power Tokens.
+    /// @param account The account address for which the cooldown is to be canceled.
+    function cancelCooldownInternal(address account) external;
 
-    /// @notice Delegates the Power Tokens to the LiquidityMining
-    /// @param lpTokens - list of lpTokens to which Power Tokens are delegated
-    /// @param pwTokenAmounts - list of the amounts of Power Tokens delegated to corresponding lpTokens
-    function delegateToLiquidityMining(
-        address[] calldata lpTokens,
-        uint256[] calldata pwTokenAmounts
+    /// @notice Redeems Power Tokens for the specified account.
+    /// @dev This function allows an account to redeem their Power Tokens, transferring the specified
+    ///      amount of Power Tokens back to the account's staked token balance.
+    ///      The redemption is subject to the cooldown period, and the account must wait for the cooldown
+    ///      period to finish before being able to redeem the Power Tokens.
+    /// @param account The account address for which Power Tokens are to be redeemed.
+    /// @return transferAmount The amount of Power Tokens that have been redeemed and transferred back to the staked token balance.
+    function redeemInternal(address account) external returns (uint256 transferAmount);
+
+    /// @notice Adds staked tokens to the specified account.
+    /// @dev This function allows the specified account to add staked tokens to their Power Token balance.
+    ///      The staked tokens are converted to Power Tokens based on the internal exchange rate.
+    /// @param updateGovernanceToken An object of type PowerTokenTypes.UpdateGovernanceToken containing the details of the staked token update.
+    function addGovernanceTokenInternal(
+        PowerTokenTypes.UpdateGovernanceToken memory updateGovernanceToken
     ) external;
 
-    /// @notice Delegates Power Tokens and stakes lpTokens
-    /// @dev Power Token amounts can equal zero. lpToken amounts can qual zero.
-    /// @param lpTokens - list of lpTokens to which the sender delegates Power Tokens
-    /// @param pwTokenAmounts - list of the amounts of Power Tokens delegated to correspondng lpTokens
-    /// @param lpTokenAmounts - list of staked lpToken amounts
-    function delegateAndStakeToLiquidityMining(
-        address[] calldata lpTokens,
-        uint256[] calldata pwTokenAmounts,
-        uint256[] calldata lpTokenAmounts
-    ) external;
+    /// @notice Removes staked tokens from the specified account, applying a fee.
+    /// @dev This function allows the specified account to remove staked tokens from their Power Token balance,
+    ///      while deducting a fee from the staked token amount. The fee is determined based on the cooldown period.
+    /// @param updateGovernanceToken An object of type PowerTokenTypes.UpdateGovernanceToken containing the details of the staked token update.
+    /// @return governanceTokenAmountToTransfer The amount of staked tokens to be transferred after applying the fee.
+    function removeGovernanceTokenWithFeeInternal(
+        PowerTokenTypes.UpdateGovernanceToken memory updateGovernanceToken
+    ) external returns (uint256 governanceTokenAmountToTransfer);
 
-    /// @notice Undelegates the Power Tokens from the LiquidityMining
-    /// @dev Power Token amounts have to be higher than zero, otherwise transaction is reverted.
-    /// @param lpTokens - list of the lpToken from which Power Tokens are undelegated
-    /// @param pwTokenAmounts - list of the undelegated amounts of the Power Tokens
-    function undelegateFromLiquidityMining(
-        address[] calldata lpTokens,
-        uint256[] calldata pwTokenAmounts
-    ) external;
+    /// @notice Delegates a specified amount of Power Tokens from the caller's balance to the Liquidity Mining contract.
+    /// @dev This function allows the caller to delegate a specified amount of Power Tokens to the Liquidity Mining contract,
+    ///      enabling them to participate in liquidity mining and earn rewards.
+    /// @param account The address of the account delegating the Power Tokens.
+    /// @param pwTokenAmount The amount of Power Tokens to delegate.
+    function delegateInternal(address account, uint256 pwTokenAmount) external;
 
-    /// @notice Resets the colldown of Power Tokens to the set duration of 2 weeks.
-    /// @dev Power Tokens in cooldown cannot be unstaked without fee,
-    /// when the cooldown is elapsed then Power Tokens can be unstaked without fee.
-    /// Fee for immediate unstaking (without cooldown) is configured in param `_unstakeWithoutCooldownFee`
-    /// Power Tokens can be redeemed for Staked Tokens in relation of 1:1.
-    /// @param pwTokenAmount Power Token amount to be set in the cooldown
-    function cooldown(uint256 pwTokenAmount) external;
+    /// @notice Undelegated a specified amount of Power Tokens from the Liquidity Mining contract back to the caller's balance.
+    /// @dev This function allows the caller to undelegate a specified amount of Power Tokens from the Liquidity Mining contract,
+    ///      effectively removing them from participation in liquidity mining and stopping the earning of rewards.
+    /// @param account The address of the account to undelegate the Power Tokens from.
+    /// @param pwTokenAmount The amount of Power Tokens to undelegate.
+    function undelegateInternal(address account, uint256 pwTokenAmount) external;
 
-    /// @notice Cancel the cooldown.
-    /// @dev When this method is executed, all Power Tokens are released.
-    function cancelCooldown() external;
-
-    /// @notice The method allowing redemption of Power Tokens for the Staked Token after cooldown has passed.
-    /// @dev Power Tokens are redeemable for Staked tokens at 1:1 ratio.
-    /// @dev When the sender executes `redeem` method then the structure {PowerTokenTypes.PwTokenCoolDown} is cleared for a given sender in `_coolDowns` storage.
-    function redeem() external;
-
-    /// @notice Emitted when the account stakes [Staked] Tokens
+    /// @notice Emitted when the account stake/add [Staked] Tokens
     /// @param account account address that executed the staking
-    /// @param stakedTokenAmount of Staked Token amount being staked into PowerToken contract
+    /// @param governanceTokenAmount of Staked Token amount being staked into PowerToken contract
     /// @param internalExchangeRate internal exchange rate used to calculate the base amount
-    /// @param baseAmount value calculated based on the stakedTokenAmount and the internalExchangeRate
-    event Staked(
+    /// @param baseAmount value calculated based on the governanceTokenAmount and the internalExchangeRate
+    event GovernanceTokenAdded(
         address indexed account,
-        uint256 stakedTokenAmount,
+        uint256 governanceTokenAmount,
         uint256 internalExchangeRate,
         uint256 baseAmount
     );
@@ -125,7 +123,7 @@ interface IPowerToken {
     /// @param pwTokenAmount amount of Power Tokens that were unstaked
     /// @param internalExchangeRate which was used to calculate the base amount
     /// @param fee amount subtracted from the pwTokenAmount
-    event Unstaked(
+    event GovernanceTokenRemovedWithFee(
         address indexed account,
         uint256 pwTokenAmount,
         uint256 internalExchangeRate,
@@ -134,29 +132,18 @@ interface IPowerToken {
 
     /// @notice Emitted when the sender delegates the Power Tokens to the LiquidityMining contract
     /// @param account address delegating the Power Tokens
-    /// @param lpTokens list of the tokens representing staking pools
     /// @param pwTokenAmounts amounts of Power Tokens delegated to respective lpTokens
-    event ToLiquidityMiningDelegated(
-        address indexed account,
-        address[] lpTokens,
-        uint256[] pwTokenAmounts
-    );
+    event Delegated(address indexed account, uint256 pwTokenAmounts);
 
     /// @notice Emitted when the sender undelegates Power Tokens from the LiquidityMining
     /// @param account address undelegating Power Tokens
-    /// @param lpTokens list of the tokens representing staking pools
     /// @param pwTokenAmounts amounts of Power Tokens undelegated form respective lpTokens
-    event FromLiquidityMiningUndelegated(
-        address indexed account,
-        address[] lpTokens,
-        uint256[] pwTokenAmounts
-    );
+    event Undelegated(address indexed account, uint256 pwTokenAmounts);
 
     /// @notice Emitted when the sender sets the cooldown on Power Tokens
-    /// @param changedBy account address that has changed the cooldown rules
     /// @param pwTokenAmount amount of pwToken in cooldown
     /// @param endTimestamp end time of the cooldown
-    event CooldownChanged(address indexed changedBy, uint256 pwTokenAmount, uint256 endTimestamp);
+    event CooldownChanged(uint256 pwTokenAmount, uint256 endTimestamp);
 
     /// @notice Emitted when the sender redeems the pwTokens after the cooldown
     /// @param account address that executed the redeem function

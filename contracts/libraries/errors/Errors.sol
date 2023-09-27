@@ -1,16 +1,12 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 
 library Errors {
     /// @notice Error thrown when the lpToken address is not supported
-    /// @dev List of supported LpTokens are defined in {LiquidityMining._lpTokens}
+    /// @dev List of supported LpTokens is defined in {LiquidityMining._lpTokens}
     string public constant LP_TOKEN_NOT_SUPPORTED = "PT_701";
-    /// @notice Error thrown when the caller / msgSender is not a PowerToken smart contract
-    string public constant CALLER_NOT_POWER_TOKEN = "PT_702";
-    /// @notice Error thrown when the caller / msgSender is not a LiquidityMining smart contract
-    string public constant CALLER_NOT_LIQUIDITY_MINING = "PT_703";
     /// @notice Error thrown when the caller / msgSender is not a Pause Manager address.
-    /// @dev Pause Manager can be defined by smart contract's Onwer
+    /// @dev Pause Manager can be defined by the smart contract's Onwer
     string public constant CALLER_NOT_PAUSE_MANAGER = "PT_704";
     /// @notice Error thrown when the account's base balance is too low
     string public constant ACCOUNT_BASE_BALANCE_IS_TOO_LOW = "PT_705";
@@ -42,4 +38,12 @@ library Errors {
     string public constant INPUT_ARRAYS_LENGTH_MISMATCH = "PT_718";
     /// @notice msg.sender is not an appointed owner, it cannot confirm their ownership
     string public constant SENDER_NOT_APPOINTED_OWNER = "PT_719";
+    /// @notice msg.sender is not an appointed owner, it cannot confirm their ownership
+    string public constant ROUTER_INVALID_SIGNATURE = "PT_720";
+    string public constant INPUT_ARRAYS_EMPTY = "PT_721";
+    string public constant CALLER_NOT_ROUTER = "PT_722";
+    string public constant CALLER_NOT_GUARDIAN = "PT_723";
+    string public constant CONTRACT_PAUSED = "PT_724";
+    string public constant REENTRANCY = "PT_725";
+    string public constant CALLER_NOT_OWNER = "PT_726";
 }

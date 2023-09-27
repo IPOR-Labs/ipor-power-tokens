@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 
 /// @title Structures used in the LiquidityMining.
 library LiquidityMiningTypes {
@@ -15,7 +15,7 @@ library LiquidityMiningTypes {
     /// @title Global indicators used in rewards calculation.
     struct GlobalRewardsIndicators {
         /// @notice powerUp indicator aggregated
-        /// @dev It can be changed many times during transaction, represended with 18 decimals
+        /// @dev It can be changed many times during transaction, represented with 18 decimals
         uint256 aggregatedPowerUp;
         /// @notice composite multiplier in a block described in field blockNumber
         /// @dev It can be changed many times during transaction, represented with 27 decimals
@@ -29,7 +29,7 @@ library LiquidityMiningTypes {
         /// @dev It can be changed at most once per block, represented with 8 decimals
         uint32 rewardsPerBlock;
         /// @notice amount of accrued rewards since inception
-        /// @dev It can be changed at most once per block, represented with 8 decimals
+        /// @dev It can be changed at most once per block, represented with 18 decimals
         uint88 accruedRewards;
     }
 
@@ -47,5 +47,38 @@ library LiquidityMiningTypes {
         /// @notice balance of Power Tokens delegated to LiquidityMining
         /// @dev delegatedPwTokenBalance < 10^26 < 2^87
         uint96 delegatedPwTokenBalance;
+    }
+
+    struct UpdateLpToken {
+        address beneficiary;
+        address lpToken;
+        uint256 lpTokenAmount;
+    }
+
+    struct UpdatePwToken {
+        address beneficiary;
+        address lpToken;
+        uint256 pwTokenAmount;
+    }
+
+    struct AccruedRewardsResult {
+        address lpToken;
+        uint256 rewardsAmount;
+    }
+
+    struct AccountRewardResult {
+        address lpToken;
+        uint256 rewardsAmount;
+        uint256 allocatedPwTokens;
+    }
+
+    struct AccountIndicatorsResult {
+        address lpToken;
+        LiquidityMiningTypes.AccountRewardsIndicators indicators;
+    }
+
+    struct GlobalIndicatorsResult {
+        address lpToken;
+        LiquidityMiningTypes.GlobalRewardsIndicators indicators;
     }
 }

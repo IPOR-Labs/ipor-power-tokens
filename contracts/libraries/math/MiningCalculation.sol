@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.17;
+pragma solidity 0.8.20;
 
 import "abdk-libraries-solidity/ABDKMathQuad.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 
 import "../errors/Errors.sol";
-import "../Constants.sol";
-import "./Math.sol";
+import "./MathOperation.sol";
 
 /// @title Library containing the core logic used in the Liquidity Mining module.
 library MiningCalculation {
@@ -47,12 +46,12 @@ library MiningCalculation {
         bytes16 verticalShift,
         bytes16 horizontalShift
     ) internal pure returns (uint256) {
-        if (accountLpTokenAmount < Constants.D18) {
+        if (accountLpTokenAmount < 1e18) {
             return 0;
         }
 
-        bytes16 accountPwTokenAmountQP = _toQuadruplePrecision(accountPwTokenAmount, Constants.D18);
-        bytes16 lpTokenAmountQP = _toQuadruplePrecision(accountLpTokenAmount, Constants.D18);
+        bytes16 accountPwTokenAmountQP = _toQuadruplePrecision(accountPwTokenAmount, 1e18);
+        bytes16 lpTokenAmountQP = _toQuadruplePrecision(accountLpTokenAmount, 1e18);
         bytes16 ratio = ABDKMathQuad.div(accountPwTokenAmountQP, lpTokenAmountQP);
 
         bytes16 result;
@@ -71,7 +70,7 @@ library MiningCalculation {
 
             result = ABDKMathQuad.add(verticalShift, ABDKMathQuad.log_2(underLog));
         }
-        bytes16 resultD18 = ABDKMathQuad.mul(result, ABDKMathQuad.fromUInt(Constants.D18));
+        bytes16 resultD18 = ABDKMathQuad.mul(result, ABDKMathQuad.fromUInt(1e18));
 
         return ABDKMathQuad.toUInt(resultD18);
     }
@@ -98,7 +97,7 @@ library MiningCalculation {
         uint256 newApu;
 
         if (apu < 0) {
-            uint256 absApu = Math.division((-apu).toUint256(), Constants.D18);
+            uint256 absApu = MathOperation.division((-apu).toUint256(), 1e18);
 
             /// @dev the last unstaking of lpTokens can experience a rounding error
             if (previousAggregatedPowerUp < absApu && previousAggregatedPowerUp + 10000 >= absApu) {
@@ -112,7 +111,7 @@ library MiningCalculation {
 
             newApu = previousAggregatedPowerUp - absApu;
         } else {
-            newApu = previousAggregatedPowerUp + Math.division(apu.toUint256(), Constants.D18);
+            newApu = previousAggregatedPowerUp + MathOperation.division(apu.toUint256(), 1e18);
         }
 
         if (newApu < 10000) {
@@ -137,9 +136,7 @@ library MiningCalculation {
             blockNumber >= lastRebalanceBlockNumber,
             Errors.BLOCK_NUMBER_LOWER_THAN_PREVIOUS_BLOCK_NUMBER
         );
-        uint256 newRewards = (blockNumber - lastRebalanceBlockNumber) *
-            rewardsPerBlock *
-            Constants.D10;
+        uint256 newRewards = (blockNumber - lastRebalanceBlockNumber) * rewardsPerBlock * 1e10;
         return previousAccruedRewards + newRewards;
     }
 
@@ -147,16 +144,15 @@ library MiningCalculation {
     /// @param rewardsPerBlock config param, number of Power Token rewardes across all participants in one block, represented with 8 decimals
     /// @param aggregatedPowerUp Aggregated Power-up indicator, represented with 18 decimals
     /// @return composite multiplier, value represented with 27 decimals
-    function calculateCompositeMultiplier(uint256 rewardsPerBlock, uint256 aggregatedPowerUp)
-        internal
-        pure
-        returns (uint256)
-    {
+    function calculateCompositeMultiplier(
+        uint256 rewardsPerBlock,
+        uint256 aggregatedPowerUp
+    ) internal pure returns (uint256) {
         if (aggregatedPowerUp == 0) {
             return 0;
         }
         /// @dev decimals: 8 + 18 + 19 - 18 = 27
-        return Math.division(rewardsPerBlock * Constants.D18 * Constants.D19, aggregatedPowerUp);
+        return MathOperation.division(rewardsPerBlock * 1e18 * 1e19, aggregatedPowerUp);
     }
 
     /// @notice calculates the account's rewards issued in pwTokens
@@ -176,12 +172,12 @@ library MiningCalculation {
             Errors.ACCOUNT_COMPOSITE_MULTIPLIER_GT_COMPOSITE_MULTIPLIER
         );
 
-        uint256 accountStakedTokenRewards = accountLpTokenAmount *
+        uint256 accountGovernanceTokenRewards = accountLpTokenAmount *
             accountPowerUp *
             (accruedCompMultiplierCumulativePrevBlock - accountCompMultiplierCumulativePrevBlock);
 
         /// @dev decimals: 18 + 18 + 27 - 45 =  18
-        return Math.division(accountStakedTokenRewards, Constants.D45);
+        return MathOperation.division(accountGovernanceTokenRewards, 1e45);
     }
 
     /// @notice Calculates the accrued Composite Multiplier Cumulative for the previous block
@@ -216,11 +212,10 @@ library MiningCalculation {
     }
 
     /// @dev Quadruple precision, 128 bits
-    function _toQuadruplePrecision(uint256 number, uint256 decimals)
-        private
-        pure
-        returns (bytes16)
-    {
+    function _toQuadruplePrecision(
+        uint256 number,
+        uint256 decimals
+    ) private pure returns (bytes16) {
         if (number % decimals > 0) {
             /// @dev during calculation this value is lost in the conversion
             number += 1;
