@@ -65,6 +65,32 @@ contract StakeLpTokensTest is TestCommons {
         assertEq(userBalanceBefore, userBalanceAfter);
     }
 
+    function testShouldNotBeAbleToStakeWhenSenderDontHasLpTokens()
+        external
+        parameterizedLpTokens(_lpTokens)
+    {
+        // GIVEN
+        address router = _powerTokensSystem.router();
+        address[] memory governanceTokens = new address[](1);
+        governanceTokens[0] = _activeLpToken;
+        uint256[] memory stakedAmounts = new uint256[](1);
+        stakedAmounts[0] = 1_000e18;
+
+        uint256 miningBalanceBefore = ERC20(_activeLpToken).balanceOf(
+            _powerTokensSystem.liquidityMining()
+        );
+        uint256 userBalanceBefore = ERC20(_activeLpToken).balanceOf(_userOne);
+
+        // WHEN
+        vm.expectRevert(bytes(Errors.VALUE_NOT_GREATER_THAN_ZERO));
+        vm.prank(_userOne);
+        IPowerTokenStakeService(router).stakeLpTokensToLiquidityMining(
+            _userOne,
+            governanceTokens,
+            stakedAmounts
+        );
+    }
+
     function testShouldBeAbleToStakeLpToken() external parameterizedLpTokens(_lpTokens) {
         // GIVEN
         uint256 mintAmount = 10_000e18;
