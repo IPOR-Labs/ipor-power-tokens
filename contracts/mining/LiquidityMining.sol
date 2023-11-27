@@ -68,6 +68,9 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
                     lpTokens[i],
                     globalIndicators.accruedRewards
                 );
+                unchecked {
+                    ++i;
+                }
                 continue;
             }
 
@@ -135,6 +138,9 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
             globalIndicators = _globalIndicators[lpToken];
 
             if (accountIndicators.lpTokenBalance == 0) {
+                unchecked {
+                    ++i;
+                }
                 continue;
             }
 
