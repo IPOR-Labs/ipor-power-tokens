@@ -59,23 +59,9 @@ interface IPowerTokenInternal {
     /// @return A boolean indicating whether the address is a pause guardian (true) or not (false).
     function isPauseGuardian(address guardian) external view returns (bool);
 
-    /// @notice Emitted when the user receives rewards from the LiquidityMining
-    /// @dev Receiving rewards does not change Internal Exchange Rate of Power Tokens in PowerToken smart contract.
-    /// @param account address
-    /// @param rewardsAmount amount of Power Tokens received from LiquidityMining
-    event RewardsReceived(address account, uint256 rewardsAmount);
-
     /// @notice Emitted when the fee for immediate unstaking is modified.
     /// @param newFee new value of the fee, represented with 18 decimals
     event UnstakeWithoutCooldownFeeChanged(uint256 newFee);
-
-    /// @notice Emmited when PauseManager's address had been changed by its owner.
-    /// @param newLiquidityMining PauseManager's new address
-    event LiquidityMiningChanged(address indexed newLiquidityMining);
-
-    /// @notice Emmited when the PauseManager's address is changed by its owner.
-    /// @param newPauseManager PauseManager's new address
-    event PauseManagerChanged(address indexed newPauseManager);
 
     /// @notice Emitted when owner grants allowance for router
     /// @param erc20Token address of ERC20 token

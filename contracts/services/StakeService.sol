@@ -56,11 +56,11 @@ contract StakeService is IPowerTokenStakeService {
         uint256 transferAmount;
         for (uint256 i; i != lpTokensLength; ) {
             require(lpTokens[i] != address(0), Errors.WRONG_ADDRESS);
-            require(lpTokenMaxAmounts[i] > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
             senderBalance = IERC20(lpTokens[i]).balanceOf(msg.sender);
             transferAmount = senderBalance < lpTokenMaxAmounts[i]
                 ? senderBalance
                 : lpTokenMaxAmounts[i];
+            require(transferAmount > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
 
             IERC20(lpTokens[i]).safeTransferFrom(msg.sender, liquidityMining, transferAmount);
             updateLpTokens[i] = LiquidityMiningTypes.UpdateLpToken(

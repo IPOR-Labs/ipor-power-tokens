@@ -101,22 +101,11 @@ interface ILiquidityMining {
         address[] calldata lpTokens
     ) external view returns (LiquidityMiningTypes.AccountIndicatorsResult[] memory);
 
-    /// @notice Emitted when the account stakes the lpTokens
-    /// @param account Account's address in the context of which the activities of staking of lpTokens are performed
-    /// @param lpToken address of lpToken being staked
-    /// @param lpTokenAmount of lpTokens to stake, represented with 18 decimals
-    event LpTokensStaked(address account, address lpToken, uint256 lpTokenAmount);
-
     /// @notice Emitted when the account claims the rewards
     /// @param account Account's address in the context of which activities of claiming are performed
     /// @param lpTokens The addresses of the lpTokens for which the rewards are claimed
     /// @param rewardsAmount Reward amount denominated in pwToken, represented with 18 decimals
     event Claimed(address account, address[] lpTokens, uint256 rewardsAmount);
-
-    /// @notice Emitted when the account claims the allocated rewards
-    /// @param account Account address in the context of which activities of claiming are performed
-    /// @param allocatedRewards Reward amount denominated in pwToken, represented in 18 decimals
-    event AllocatedTokensClaimed(address account, uint256 allocatedRewards);
 
     /// @notice Emitted when update was triggered for the account on the lpToken
     /// @param account Account address to which the update was triggered
