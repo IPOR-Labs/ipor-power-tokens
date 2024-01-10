@@ -47,6 +47,9 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         address[] memory lpTokens = new address[](1);
         lpTokens[0] = _lpDai;
 
+        uint32[] memory rewards = new uint32[](1);
+        rewards[0] = 2e8;
+
         LiquidityMiningTypes.GlobalIndicatorsResult[]
             memory globalIndicatorsBefore = ILiquidityMiningLens(_router)
                 .getGlobalIndicatorsFromLiquidityMining(lpTokens);
@@ -55,7 +58,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         vm.prank(_owner);
         vm.expectEmit(true, true, true, true);
         emit RewardsPerBlockChanged(_lpDai, 2e8);
-        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 2e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(lpTokens, rewards);
 
         // then
         LiquidityMiningTypes.GlobalIndicatorsResult[]
@@ -90,7 +93,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         emit RewardsPerBlockChanged(_lpUsdc, 2e8);
         vm.expectEmit(true, true, true, true);
         emit RewardsPerBlockChanged(_lpUsdt, 3e8);
-        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlockBatch(lpTokens, rewards);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(lpTokens, rewards);
 
         // then
         LiquidityMiningTypes.GlobalIndicatorsResult[]
@@ -123,7 +126,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         // when
         vm.prank(_owner);
         vm.expectRevert(bytes(Errors.INPUT_ARRAYS_LENGTH_MISMATCH));
-        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlockBatch(lpTokens, rewards);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(lpTokens, rewards);
 
         // then
         LiquidityMiningTypes.GlobalIndicatorsResult[]
@@ -143,13 +146,15 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         address[] memory lpTokens = new address[](1);
         lpTokens[0] = _lpDai;
 
+        uint32[] memory rewards = new uint32[](1);
+        rewards[0] = 2e8;
         LiquidityMiningTypes.GlobalIndicatorsResult[]
             memory globalIndicatorsBefore = ILiquidityMiningLens(_router)
                 .getGlobalIndicatorsFromLiquidityMining(lpTokens);
 
         // when
         vm.prank(_owner);
-        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 2e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(lpTokens, rewards);
 
         // then
         LiquidityMiningTypes.GlobalIndicatorsResult[]
@@ -160,42 +165,12 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         assertEq(globalIndicatorsAfter[0].indicators.accruedRewards, 0);
     }
 
-    function testShouldSetupBlockRewardsFor3LpTokens() external {
-        // given
-        address[] memory lpTokens = new address[](3);
-        lpTokens[0] = _lpDai;
-        lpTokens[1] = _lpUsdc;
-        lpTokens[2] = _lpUsdt;
-
-        LiquidityMiningTypes.GlobalIndicatorsResult[]
-            memory globalIndicatorsBefore = ILiquidityMiningLens(_router)
-                .getGlobalIndicatorsFromLiquidityMining(lpTokens);
-
-        // when
-        vm.startPrank(_owner);
-        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
-        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpUsdc, 2e8);
-        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpUsdt, 1e7);
-        vm.stopPrank();
-
-        // then
-
-        LiquidityMiningTypes.GlobalIndicatorsResult[]
-            memory globalIndicatorsAfter = ILiquidityMiningLens(_router)
-                .getGlobalIndicatorsFromLiquidityMining(lpTokens);
-
-        assertEq(globalIndicatorsBefore[0].indicators.rewardsPerBlock, 0);
-        assertEq(globalIndicatorsAfter[0].indicators.rewardsPerBlock, 1e8);
-        assertEq(globalIndicatorsBefore[1].indicators.rewardsPerBlock, 0);
-        assertEq(globalIndicatorsAfter[1].indicators.rewardsPerBlock, 2e8);
-        assertEq(globalIndicatorsBefore[2].indicators.rewardsPerBlock, 0);
-        assertEq(globalIndicatorsAfter[2].indicators.rewardsPerBlock, 1e7);
-    }
-
     function testShouldNotBeAbleToUpdateValueWhenNotOwner() external {
         // given
         address[] memory lpTokens = new address[](1);
         lpTokens[0] = _lpDai;
+        uint32[] memory rewards = new uint32[](1);
+        rewards[0] = 2e8;
 
         LiquidityMiningTypes.GlobalIndicatorsResult[]
             memory globalIndicatorsBefore = ILiquidityMiningLens(_router)
@@ -203,7 +178,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
 
         // when
         vm.expectRevert(bytes("Ownable: caller is not the owner"));
-        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 2e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(lpTokens, rewards);
 
         // then
 
@@ -222,9 +197,11 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
 
         uint256[] memory amounts = new uint256[](1);
         amounts[0] = 1_000e18;
+        uint32[] memory rewards = new uint32[](1);
+        rewards[0] = 1e8;
 
         vm.prank(_owner);
-        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(lpTokens, rewards);
 
         vm.prank(_userOne);
         IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
@@ -239,9 +216,10 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
             _router
         ).getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
+        rewards[0] = 0;
         // when
         vm.prank(_owner);
-        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 0);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(lpTokens, rewards);
 
         vm.roll(block.number + 100);
 
@@ -262,8 +240,11 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         uint256[] memory amounts = new uint256[](1);
         amounts[0] = 1_000e18;
 
+        uint32[] memory rewards = new uint32[](1);
+        rewards[0] = 1e8;
+
         vm.prank(_owner);
-        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(lpTokens, rewards);
 
         vm.prank(_userOne);
         IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
@@ -275,7 +256,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         vm.roll(block.number + 100);
 
         vm.prank(_owner);
-        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(lpTokens, rewards);
 
         LiquidityMiningTypes.AccountRewardResult[] memory rewardsBefore = ILiquidityMiningLens(
             _router
@@ -283,7 +264,7 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
 
         // when
         vm.prank(_owner);
-        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(lpTokens, rewards);
 
         vm.roll(block.number + 100);
 
@@ -304,8 +285,11 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         uint256[] memory amounts = new uint256[](1);
         amounts[0] = 1_000e18;
 
+        uint32[] memory rewards = new uint32[](1);
+        rewards[0] = 1e8;
+
         vm.prank(_owner);
-        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(lpTokens, rewards);
 
         vm.prank(_userOne);
         IPowerTokenStakeService(_router).stakeLpTokensToLiquidityMining(
@@ -320,9 +304,10 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
             memory globalIndicatorsBefore = ILiquidityMiningLens(_router)
                 .getGlobalIndicatorsFromLiquidityMining(lpTokens);
 
+        rewards[0] = 2e8;
         // when
         vm.prank(_owner);
-        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 2e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(lpTokens, rewards);
 
         // then
         LiquidityMiningTypes.GlobalIndicatorsResult[]
@@ -350,11 +335,16 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
 
     function testShouldNotBeAbleToSetNewBlockRewardWhenAssetNotActive() external {
         // given
-        address dai = _powerTokensSystem.dai();
+        address[] memory lpTokens = new address[](1);
+        lpTokens[0] = _powerTokensSystem.dai();
+
+        uint32[] memory rewards = new uint32[](1);
+        rewards[0] = 1e8;
+
         //when
         vm.prank(_owner);
         vm.expectRevert(bytes(Errors.LP_TOKEN_NOT_SUPPORTED));
-        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(dai, 1e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(lpTokens, rewards);
     }
 
     function testShouldProperCalculateRewardWhenBlockRewardsDecrease() external {
@@ -365,8 +355,11 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         uint256[] memory amounts = new uint256[](1);
         amounts[0] = 1_000e18;
 
+        uint32[] memory rewards = new uint32[](1);
+        rewards[0] = 2e8;
+
         vm.prank(_owner);
-        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 2e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(lpTokens, rewards);
 
         vm.startPrank(_userOne);
         IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 2_000e18);
@@ -383,9 +376,10 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
             _router
         ).getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
+        rewards[0] = 1e8;
         // when
         vm.prank(_owner);
-        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(lpTokens, rewards);
 
         vm.roll(block.number + 100);
 
@@ -406,8 +400,11 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         uint256[] memory amounts = new uint256[](1);
         amounts[0] = 1_000e18;
 
+        uint32[] memory rewards = new uint32[](1);
+        rewards[0] = 1e8;
+
         vm.prank(_owner);
-        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 1e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(lpTokens, rewards);
 
         vm.startPrank(_userOne);
         IPowerTokenStakeService(_router).stakeGovernanceTokenToPowerToken(_userOne, 2_000e18);
@@ -424,9 +421,10 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
             _router
         ).getAccountRewardsInLiquidityMining(_userOne, lpTokens);
 
+        rewards[0] = 2e8;
         // when
         vm.prank(_owner);
-        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(_lpDai, 2e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlock(lpTokens, rewards);
 
         vm.roll(block.number + 100);
 

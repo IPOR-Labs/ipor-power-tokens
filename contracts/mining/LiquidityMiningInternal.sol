@@ -100,11 +100,7 @@ abstract contract LiquidityMiningInternal is
         return _lpTokens[lpToken];
     }
 
-    function setRewardsPerBlock(address lpToken, uint32 pwTokenAmount) external override onlyOwner {
-        _setRewardsPerBlock(lpToken, pwTokenAmount);
-    }
-
-    function setRewardsPerBlockBatch(
+    function setRewardsPerBlock(
         address[] calldata lpTokens,
         uint32[] calldata pwTokenAmounts
     ) external override onlyOwner {

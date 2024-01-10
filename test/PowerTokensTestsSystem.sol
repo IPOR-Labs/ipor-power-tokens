@@ -63,11 +63,13 @@ contract PowerTokensTestsSystem is TestCommons {
     }
 
     function setRewardsPerBlock(address lpToken, uint256 rewardsPerBlock) external {
+        address[] memory lpTokens = new address[](1);
+        lpTokens[0] = lpToken;
+        uint32[] memory rewards = new uint32[](1);
+        rewards[0] = rewardsPerBlock.toUint32();
+
         vm.startPrank(owner);
-        ILiquidityMiningInternal(liquidityMining).setRewardsPerBlock(
-            lpToken,
-            rewardsPerBlock.toUint32()
-        );
+        ILiquidityMiningInternal(liquidityMining).setRewardsPerBlock(lpTokens, rewards);
         vm.stopPrank();
     }
 

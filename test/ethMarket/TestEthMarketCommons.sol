@@ -100,9 +100,13 @@ contract TestEthMarketCommons is Test {
     }
 
     function _addLpStEth() private {
+        address[] memory lpTokens = new address[](1);
+        lpTokens[0] = lpStEth;
+        uint32[] memory rewards = new uint32[](1);
+        rewards[0] = 35e6;
         vm.startPrank(owner);
         ILiquidityMiningInternal(liquidityMining).newSupportedLpToken(lpStEth);
-        ILiquidityMiningInternal(liquidityMining).setRewardsPerBlock(lpStEth, 35e6);
+        ILiquidityMiningInternal(liquidityMining).setRewardsPerBlock(lpTokens, rewards);
         vm.stopPrank();
     }
 
