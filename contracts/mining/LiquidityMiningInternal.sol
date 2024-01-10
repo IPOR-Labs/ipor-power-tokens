@@ -104,6 +104,21 @@ abstract contract LiquidityMiningInternal is
         _setRewardsPerBlock(lpToken, pwTokenAmount);
     }
 
+    function setRewardsPerBlockBatch(
+        address[] calldata lpTokens,
+        uint32[] calldata pwTokenAmounts
+    ) external override onlyOwner {
+        uint256 lpTokensLength = lpTokens.length;
+        require(lpTokensLength == pwTokenAmounts.length, Errors.INPUT_ARRAYS_LENGTH_MISMATCH);
+
+        for (uint256 i; i < lpTokensLength; ) {
+            _setRewardsPerBlock(lpTokens[i], pwTokenAmounts[i]);
+            unchecked {
+                ++i;
+            }
+        }
+    }
+
     function newSupportedLpToken(address lpToken) external onlyOwner {
         require(lpToken != address(0), Errors.WRONG_ADDRESS);
         _lpTokens[lpToken] = true;

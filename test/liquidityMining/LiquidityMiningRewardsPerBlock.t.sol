@@ -66,6 +66,78 @@ contract LiquidityMiningRewardsPerBlockTest is TestCommons {
         assertEq(globalIndicatorsAfter[0].indicators.rewardsPerBlock, 2e8);
     }
 
+    function testShouldSetUpBlockRewardsForLpTokensWhenBatchExecute() external {
+        // given
+        address[] memory lpTokens = new address[](3);
+        lpTokens[0] = _lpDai;
+        lpTokens[1] = _lpUsdc;
+        lpTokens[2] = _lpUsdt;
+
+        uint32[] memory rewards = new uint32[](3);
+        rewards[0] = 1e8;
+        rewards[1] = 2e8;
+        rewards[2] = 3e8;
+
+        LiquidityMiningTypes.GlobalIndicatorsResult[]
+            memory globalIndicatorsBefore = ILiquidityMiningLens(_router)
+                .getGlobalIndicatorsFromLiquidityMining(lpTokens);
+
+        // when
+        vm.prank(_owner);
+        vm.expectEmit(true, true, true, true);
+        emit RewardsPerBlockChanged(_lpDai, 1e8);
+        vm.expectEmit(true, true, true, true);
+        emit RewardsPerBlockChanged(_lpUsdc, 2e8);
+        vm.expectEmit(true, true, true, true);
+        emit RewardsPerBlockChanged(_lpUsdt, 3e8);
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlockBatch(lpTokens, rewards);
+
+        // then
+        LiquidityMiningTypes.GlobalIndicatorsResult[]
+            memory globalIndicatorsAfter = ILiquidityMiningLens(_router)
+                .getGlobalIndicatorsFromLiquidityMining(lpTokens);
+
+        assertEq(globalIndicatorsBefore[0].indicators.rewardsPerBlock, 0);
+        assertEq(globalIndicatorsBefore[1].indicators.rewardsPerBlock, 0);
+        assertEq(globalIndicatorsBefore[2].indicators.rewardsPerBlock, 0);
+        assertEq(globalIndicatorsAfter[0].indicators.rewardsPerBlock, 1e8);
+        assertEq(globalIndicatorsAfter[1].indicators.rewardsPerBlock, 2e8);
+        assertEq(globalIndicatorsAfter[2].indicators.rewardsPerBlock, 3e8);
+    }
+
+    function testShouldFailWhenMismatchArraysSize() external {
+        // given
+        address[] memory lpTokens = new address[](3);
+        lpTokens[0] = _lpDai;
+        lpTokens[1] = _lpUsdc;
+        lpTokens[2] = _lpUsdt;
+
+        uint32[] memory rewards = new uint32[](2);
+        rewards[0] = 1e8;
+        rewards[1] = 2e8;
+
+        LiquidityMiningTypes.GlobalIndicatorsResult[]
+            memory globalIndicatorsBefore = ILiquidityMiningLens(_router)
+                .getGlobalIndicatorsFromLiquidityMining(lpTokens);
+
+        // when
+        vm.prank(_owner);
+        vm.expectRevert(bytes(Errors.INPUT_ARRAYS_LENGTH_MISMATCH));
+        ILiquidityMiningInternal(_miningAddress).setRewardsPerBlockBatch(lpTokens, rewards);
+
+        // then
+        LiquidityMiningTypes.GlobalIndicatorsResult[]
+            memory globalIndicatorsAfter = ILiquidityMiningLens(_router)
+                .getGlobalIndicatorsFromLiquidityMining(lpTokens);
+
+        assertEq(globalIndicatorsBefore[0].indicators.rewardsPerBlock, 0);
+        assertEq(globalIndicatorsBefore[1].indicators.rewardsPerBlock, 0);
+        assertEq(globalIndicatorsBefore[2].indicators.rewardsPerBlock, 0);
+        assertEq(globalIndicatorsAfter[0].indicators.rewardsPerBlock, 0);
+        assertEq(globalIndicatorsAfter[1].indicators.rewardsPerBlock, 0);
+        assertEq(globalIndicatorsAfter[2].indicators.rewardsPerBlock, 0);
+    }
+
     function testShouldNotUpdateAccruedRewardsWhenUpdateBlockRewords() external {
         // given
         address[] memory lpTokens = new address[](1);
