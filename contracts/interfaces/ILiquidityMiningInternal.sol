@@ -14,10 +14,13 @@ interface ILiquidityMiningInternal {
     /// @return returns true if lpToken is supported by the LiquidityMining, false otherwise
     function isLpTokenSupported(address lpToken) external view returns (bool);
 
-    /// @notice Sets the global configuration indicator - rewardsPerBlock for a given lpToken
-    /// @param lpToken address for which to setup `rewards per block`
-    /// @param pwTokenAmount amount of the `rewards per block`, denominated in Power Token, represented with 8 decimals
-    function setRewardsPerBlock(address lpToken, uint32 pwTokenAmount) external;
+    /// @notice Sets the global configuration indicator - rewardsPerBlock for a given lpTokens
+    /// @param lpTokens list of address for which to setup `rewards per block`
+    /// @param pwTokenAmounts list amount of the `rewards per block`, denominated in Power Token, represented with 8 decimals
+    function setRewardsPerBlock(
+        address[] calldata lpTokens,
+        uint32[] calldata pwTokenAmounts
+    ) external;
 
     /// @notice Adds LiquidityMining's support for a new lpToken
     /// @dev Can only be executed by the Owner
