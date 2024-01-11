@@ -16,7 +16,7 @@ jobs:
     needs: notify
     uses: ./.github/workflows/foundry-tests.yml
     secrets:
-      ETHEREUM_PROVIDER_URL: ${{ secrets.PROVIDER_URL }}
+      ETHEREUM_PROVIDER_URL: ${{ secrets.ETHEREUM_PROVIDER_URL }}
       ARBITRUM_PROVIDER_URL: ${{ secrets.ARBITRUM_PROVIDER_URL }}
     with:
       fork-test-enabled: false

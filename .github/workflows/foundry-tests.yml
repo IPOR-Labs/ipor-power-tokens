@@ -4,9 +4,9 @@ on:
   workflow_call:
     secrets:
       ETHEREUM_PROVIDER_URL:
-        required: false
+        required: true
       ARBITRUM_PROVIDER_URL:
-        required: false
+        required: true
 
     inputs:
 
@@ -83,8 +83,7 @@ jobs:
       - name: Run Forge tests
         if: inputs.test-enabled
         env:
-          FORK_URL: ${{ secrets.ETHEREUM_PROVIDER_URL }}
-          PROVIDER_URL: ${{ secrets.ETHEREUM_PROVIDER_URL }}
+          ETHEREUM_PROVIDER_URL: ${{ secrets.ETHEREUM_PROVIDER_URL }}
           ARBITRUM_PROVIDER_URL: ${{ secrets.ARBITRUM_PROVIDER_URL }}
         run: |
           forge test ${{ inputs.test-options }} -vvv
@@ -93,8 +92,7 @@ jobs:
       - name: Run Forge fork tests
         if: inputs.fork-test-enabled
         env:
-          FORK_URL: ${{ secrets.ETHEREUM_PROVIDER_URL }}
-          PROVIDER_URL: ${{ secrets.ETHEREUM_PROVIDER_URL }}
+          ETHEREUM_PROVIDER_URL: ${{ secrets.ETHEREUM_PROVIDER_URL }}
           ARBITRUM_PROVIDER_URL: ${{ secrets.ARBITRUM_PROVIDER_URL }}
         run: |
           forge test ${{ inputs.fork-test-options }} -vvv
