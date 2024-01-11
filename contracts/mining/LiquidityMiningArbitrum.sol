@@ -14,17 +14,17 @@ contract LiquidityMiningArbitrum is LiquidityMining {
 
     address public immutable lpWstEth;
     address public immutable ethUsdOracle;
-    address public immutable wstEthStEthOracle;
+    address public immutable wstEthStEthExchangeRateOracle;
 
     constructor(
         address routerAddress,
         address lpWstEthInput,
         address ethUsdOracleInput,
-        address wstEthStEthOracleInput
+        address wstEthStEthExchangeRateOracleInput
     ) LiquidityMining(routerAddress) {
         lpWstEth = lpWstEthInput.checkAddress();
         ethUsdOracle = ethUsdOracleInput.checkAddress();
-        wstEthStEthOracle = wstEthStEthOracleInput.checkAddress();
+        wstEthStEthExchangeRateOracle = wstEthStEthExchangeRateOracleInput.checkAddress();
         _disableInitializers();
     }
 
@@ -39,7 +39,7 @@ contract LiquidityMiningArbitrum is LiquidityMining {
         // @dev returned value has 8 decimal, on arbitrum 0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612
         (, int256 answerEthUsd, , , ) = AggregatorV3Interface(ethUsdOracle).latestRoundData();
         // @dev returned value has 18 decimal, on arbitrum 0xe59eba0d492ca53c6f46015eea00517f2707dc77, not avable on mainnet
-        (, int256 answerWstEthStEth, , , ) = AggregatorV3Interface(wstEthStEthOracle)
+        (, int256 answerWstEthStEth, , , ) = AggregatorV3Interface(wstEthStEthExchangeRateOracle)
             .latestRoundData();
 
         return
