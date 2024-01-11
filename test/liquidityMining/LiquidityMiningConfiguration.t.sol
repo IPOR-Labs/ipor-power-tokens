@@ -160,7 +160,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         address[] memory lpTokewns = new address[](0);
 
         // when
-        LiquidityMining implementation = new LiquidityMining(
+        LiquidityMiningEthereum implementation = new LiquidityMiningEthereum(
             _powerTokensSystem.dao(),
             _getUserAddress(123),
             _getUserAddress(123)
@@ -203,7 +203,7 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         lpTokewns[0] = _powerTokensSystem.lpDai();
 
         // when
-        LiquidityMining implementation = new LiquidityMining(
+        LiquidityMiningEthereum implementation = new LiquidityMiningEthereum(
             _powerTokensSystem.dao(),
             _getUserAddress(123),
             _getUserAddress(123)

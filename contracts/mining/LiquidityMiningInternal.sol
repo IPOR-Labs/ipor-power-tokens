@@ -32,8 +32,6 @@ abstract contract LiquidityMiningInternal is
     using SafeCast for int256;
 
     address public immutable routerAddress;
-    address public immutable lpStEth;
-    address public immutable ethUsdOracle;
 
     // @deprecated field is deprecated
     address internal _powerTokenDeprecated;
@@ -49,10 +47,8 @@ abstract contract LiquidityMiningInternal is
     mapping(address => mapping(address => LiquidityMiningTypes.AccountRewardsIndicators))
         internal _accountIndicators;
 
-    constructor(address routerAddressInput, address lpStEthInput, address ethUsdOracleInput) {
+    constructor(address routerAddressInput) {
         routerAddress = routerAddressInput.checkAddress();
-        lpStEth = lpStEthInput.checkAddress();
-        ethUsdOracle = ethUsdOracleInput.checkAddress();
     }
 
     /// @dev Throws an error if called by any account other than the pause guardian.
@@ -237,23 +233,10 @@ abstract contract LiquidityMiningInternal is
         );
     }
 
-    /// @notice Calculates the weighted balance of PW tokens based on the provided LP token and delegated balance.
-    /// @dev If the provided LP token is not `lpStEth`, it simply returns the `delegatedPwTokenBalance`.
-    /// If it is `lpStEth`, it calculates the weighted balance using the current ETH to USD price.
-    /// @param lpToken Address of the LP token.
-    /// @param lpTokenBalance The balance of lp tokens.
-    /// @return uint256 The weighted balance of PW tokens.
     function _calculateWeightedLpTokenBalance(
         address lpToken,
         uint256 lpTokenBalance
-    ) internal view returns (uint256) {
-        if (lpToken != lpStEth) {
-            return lpTokenBalance;
-        }
-        // @dev returned value has 8 decimal address on mainnet 0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419
-        (, int256 answer, , , ) = AggregatorV3Interface(ethUsdOracle).latestRoundData();
-        return MathOperation.division(lpTokenBalance * answer.toUint256(), 1e8);
-    }
+    ) internal view virtual returns (uint256);
 
     function _calculateAccountRewards(
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators,

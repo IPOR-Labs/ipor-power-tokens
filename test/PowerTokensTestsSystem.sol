@@ -8,6 +8,7 @@ import "@power-tokens/contracts/mocks/tokens/MockToken.sol";
 import "@power-tokens/contracts/mocks/tokens/MockLpToken.sol";
 import "./TestCommons.sol";
 import "@power-tokens/contracts/mining/LiquidityMining.sol";
+import "@power-tokens/contracts/mining/LiquidityMiningEthereum.sol";
 import "@power-tokens/contracts/tokens/PowerToken.sol";
 import "@power-tokens/contracts/lens/LiquidityMiningLens.sol";
 import "@power-tokens/contracts/services/StakeService.sol";
@@ -130,7 +131,7 @@ contract PowerTokensTestsSystem is TestCommons {
 
     function _createLiquidityMining() private {
         // address in constructor will be replaced
-        LiquidityMining implementation = new LiquidityMining(
+        LiquidityMiningEthereum implementation = new LiquidityMiningEthereum(
             dao,
             _getUserAddress(123),
             _getUserAddress(123)
@@ -157,7 +158,7 @@ contract PowerTokensTestsSystem is TestCommons {
     }
 
     function _updateLiquidityMiningImplementation() private {
-        LiquidityMining implementation = new LiquidityMining(
+        LiquidityMiningEthereum implementation = new LiquidityMiningEthereum(
             router,
             _getUserAddress(123),
             _getUserAddress(123)

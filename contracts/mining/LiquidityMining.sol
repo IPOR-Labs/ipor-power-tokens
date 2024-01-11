@@ -6,17 +6,11 @@ import "./LiquidityMiningInternal.sol";
 
 /// @title Smart contract responsible for distribution of Power Token rewards across accounts contributing to Liquidity Mining
 /// by staking lpTokens and / or delegating Power Tokens.
-contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
+abstract contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
     using SafeCast for uint256;
     using SafeCast for int256;
 
-    constructor(
-        address routerAddress,
-        address lpStEthInput,
-        address ethUsdOracleInput
-    ) LiquidityMiningInternal(routerAddress, lpStEthInput, ethUsdOracleInput) {
-        _disableInitializers();
-    }
+    constructor(address routerAddress) LiquidityMiningInternal(routerAddress) {}
 
     function getContractId() external pure returns (bytes32) {
         return 0x9b1f3aa590476fc9aa58d44ad1419ab53d34c344bd5ed46b12e4af7d27c38e06;
