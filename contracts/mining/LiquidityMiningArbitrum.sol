@@ -47,6 +47,5 @@ contract LiquidityMiningArbitrum is LiquidityMining {
                 lpTokenBalance * answerEthUsd.toUint256() * answerWstEthStEth.toUint256(),
                 1e26 // 18 + 8 + 18 - 26 = 18
             );
-        return result;
     }
 }
