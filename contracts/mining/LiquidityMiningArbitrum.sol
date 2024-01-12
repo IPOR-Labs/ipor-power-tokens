@@ -8,8 +8,8 @@ import "./LiquidityMining.sol";
 contract LiquidityMiningArbitrum is LiquidityMining {
     using SafeCast for int256;
 
-    address public immutable ethUsdOracle;
-    address public immutable wstEthStEthExchangeRateOracle;
+    address internal immutable ethUsdOracle;
+    address internal immutable wstEthStEthExchangeRateOracle;
 
     constructor(
         address routerAddress,
@@ -41,7 +41,7 @@ contract LiquidityMiningArbitrum is LiquidityMining {
             );
     }
 
-    function getConfigurations() external view returns (address, address) {
+    function getConfiguration() external view returns (address, address) {
         return (ethUsdOracle, wstEthStEthExchangeRateOracle);
     }
 }

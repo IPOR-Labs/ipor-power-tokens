@@ -12,10 +12,6 @@ abstract contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
 
     constructor(address routerAddress) LiquidityMiningInternal(routerAddress) {}
 
-    function getContractId() external pure returns (bytes32) {
-        return 0x9b1f3aa590476fc9aa58d44ad1419ab53d34c344bd5ed46b12e4af7d27c38e06;
-    }
-
     function balanceOf(address account, address lpToken) external view override returns (uint256) {
         return _accountIndicators[account][lpToken].lpTokenBalance;
     }
