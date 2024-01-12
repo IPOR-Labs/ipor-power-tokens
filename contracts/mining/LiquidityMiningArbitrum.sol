@@ -25,7 +25,7 @@ contract LiquidityMiningArbitrum is LiquidityMining {
     /// @param lpTokenBalance The balance of lp tokens.
     /// @return uint256 The weighted balance of PW tokens.
     function _calculateWeightedLpTokenBalance(
-        address ,
+        address,
         uint256 lpTokenBalance
     ) internal view override returns (uint256) {
         // @dev returned value has 8 decimal, on arbitrum 0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612
@@ -42,6 +42,6 @@ contract LiquidityMiningArbitrum is LiquidityMining {
     }
 
     function getConfigurations() external view returns (address, address) {
-        return (ethUsdOracle, wstEthStEthOracle);
+        return (ethUsdOracle, wstEthStEthExchangeRateOracle);
     }
 }
