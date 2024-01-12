@@ -16,7 +16,6 @@ import "../interfaces/AggregatorV3Interface.sol";
 import "../security/MiningOwnableUpgradeable.sol";
 import "../security/PauseManager.sol";
 import "../interfaces/IProxyImplementation.sol";
-import "../libraries/ContractValidator.sol";
 
 abstract contract LiquidityMiningInternal is
     Initializable,
@@ -27,7 +26,6 @@ abstract contract LiquidityMiningInternal is
     ILiquidityMiningInternal,
     IProxyImplementation
 {
-    using ContractValidator for address;
     using SafeCast for uint256;
     using SafeCast for int256;
 
@@ -48,7 +46,7 @@ abstract contract LiquidityMiningInternal is
         internal _accountIndicators;
 
     constructor(address routerAddressInput) {
-        routerAddress = routerAddressInput.checkAddress();
+        routerAddress = routerAddressInput;
     }
 
     /// @dev Throws an error if called by any account other than the pause guardian.
@@ -67,9 +65,7 @@ abstract contract LiquidityMiningInternal is
         __Ownable_init_unchained();
         __UUPSUpgradeable_init_unchained();
 
-        uint256 lpTokensLength = lpTokens.length;
-
-        for (uint256 i; i != lpTokensLength; ) {
+        for (uint256 i; i != lpTokens.length; ) {
             require(lpTokens[i] != address(0), Errors.WRONG_ADDRESS);
 
             _lpTokens[lpTokens[i]] = true;
@@ -100,10 +96,9 @@ abstract contract LiquidityMiningInternal is
         address[] calldata lpTokens,
         uint32[] calldata pwTokenAmounts
     ) external override onlyOwner {
-        uint256 lpTokensLength = lpTokens.length;
-        require(lpTokensLength == pwTokenAmounts.length, Errors.INPUT_ARRAYS_LENGTH_MISMATCH);
+        require(lpTokens.length == pwTokenAmounts.length, Errors.INPUT_ARRAYS_LENGTH_MISMATCH);
 
-        for (uint256 i; i < lpTokensLength; ) {
+        for (uint256 i; i < lpTokens.length; ) {
             _setRewardsPerBlock(lpTokens[i], pwTokenAmounts[i]);
             unchecked {
                 ++i;

@@ -215,7 +215,6 @@ abstract contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
     function addLpTokensInternal(
         LiquidityMiningTypes.UpdateLpToken[] memory updateLpToken
     ) external override onlyRouter whenNotPaused {
-        uint256 length = updateLpToken.length;
         uint256 rewardsAmount;
         uint256 accruedCompMultiplierCumulativePrevBlock;
 
@@ -223,7 +222,7 @@ abstract contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators;
         LiquidityMiningTypes.UpdateLpToken memory update;
 
-        for (uint256 i; i != length; ) {
+        for (uint256 i; i != updateLpToken.length; ) {
             update = updateLpToken[i];
             require(_lpTokens[update.lpToken], Errors.LP_TOKEN_NOT_SUPPORTED);
 

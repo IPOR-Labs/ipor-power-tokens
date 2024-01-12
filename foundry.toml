@@ -13,5 +13,6 @@ remappings = [
     'forge-std/=lib/forge-std/src/',
     '@power-tokens/contracts=contracts/',
 ]
+optimizer_runs = 0
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config

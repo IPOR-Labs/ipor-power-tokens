@@ -22,7 +22,6 @@ contract LiquidityMiningArbitrumTest is Test {
         MockLpToken(lpWstEth).setJoseph(address(this));
         LiquidityMiningArbitrum liquidityMiningImpl = new LiquidityMiningArbitrum(
             address(this),
-            lpWstEth,
             ethUsdOracle,
             wstEthStEthOracle
         );
