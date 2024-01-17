@@ -35,10 +35,17 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         address lpUsdc = _powerTokensSystem.lpUsdc();
         address lpUsdt = _powerTokensSystem.lpUsdt();
 
+        address[] memory lpTokens = new address[](3);
+        lpTokens[0] = lpDai;
+        lpTokens[1] = lpUsdc;
+        lpTokens[2] = lpUsdt;
+        uint32[] memory rewards = new uint32[](3);
+        rewards[0] = 1e8;
+        rewards[1] = 1e8;
+        rewards[2] = 1e8;
+
         vm.startPrank(_powerTokensSystem.owner());
-        ILiquidityMiningInternal(miningAddress).setRewardsPerBlock(lpDai, 1e8);
-        ILiquidityMiningInternal(miningAddress).setRewardsPerBlock(lpUsdc, 1e8);
-        ILiquidityMiningInternal(miningAddress).setRewardsPerBlock(lpUsdt, 1e8);
+        ILiquidityMiningInternal(miningAddress).setRewardsPerBlock(lpTokens, rewards);
         vm.stopPrank();
 
         _powerTokensSystem.mintLpTokens(lpDai, _userOne, 100_000e18);

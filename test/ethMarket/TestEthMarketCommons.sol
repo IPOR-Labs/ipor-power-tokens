@@ -9,7 +9,7 @@ import "../../contracts/lens/PowerTokenLens.sol";
 import "../../contracts/services/StakeService.sol";
 import "../../contracts/services/FlowsService.sol";
 import "../../contracts/router/PowerTokenRouter.sol";
-import "../../contracts/mining/LiquidityMining.sol";
+import "../../contracts/mining/LiquidityMiningEthereum.sol";
 import "../../contracts/tokens/PowerToken.sol";
 
 contract TestEthMarketCommons is Test {
@@ -84,8 +84,12 @@ contract TestEthMarketCommons is Test {
 
     function _updateLiquidityMiningImplementation() private {
         vm.startPrank(owner);
-        LiquidityMining implementation = new LiquidityMining(router, lpStEth, ethUsdOracle);
-        LiquidityMining(liquidityMining).upgradeTo(address(implementation));
+        LiquidityMiningEthereum implementation = new LiquidityMiningEthereum(
+            router,
+            lpStEth,
+            ethUsdOracle
+        );
+        LiquidityMiningEthereum(liquidityMining).upgradeTo(address(implementation));
         ILiquidityMiningInternal(liquidityMining).grantAllowanceForRouter(lpStEth);
         ILiquidityMiningInternal(liquidityMining).grantAllowanceForRouter(iporToken);
         vm.stopPrank();
@@ -100,9 +104,13 @@ contract TestEthMarketCommons is Test {
     }
 
     function _addLpStEth() private {
+        address[] memory lpTokens = new address[](1);
+        lpTokens[0] = lpStEth;
+        uint32[] memory rewards = new uint32[](1);
+        rewards[0] = 35e6;
         vm.startPrank(owner);
         ILiquidityMiningInternal(liquidityMining).newSupportedLpToken(lpStEth);
-        ILiquidityMiningInternal(liquidityMining).setRewardsPerBlock(lpStEth, 35e6);
+        ILiquidityMiningInternal(liquidityMining).setRewardsPerBlock(lpTokens, rewards);
         vm.stopPrank();
     }
 

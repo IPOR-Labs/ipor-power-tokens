@@ -8,6 +8,7 @@ import "@power-tokens/contracts/mocks/tokens/MockToken.sol";
 import "@power-tokens/contracts/mocks/tokens/MockLpToken.sol";
 import "./TestCommons.sol";
 import "@power-tokens/contracts/mining/LiquidityMining.sol";
+import "@power-tokens/contracts/mining/LiquidityMiningEthereum.sol";
 import "@power-tokens/contracts/tokens/PowerToken.sol";
 import "@power-tokens/contracts/lens/LiquidityMiningLens.sol";
 import "@power-tokens/contracts/services/StakeService.sol";
@@ -63,11 +64,13 @@ contract PowerTokensTestsSystem is TestCommons {
     }
 
     function setRewardsPerBlock(address lpToken, uint256 rewardsPerBlock) external {
+        address[] memory lpTokens = new address[](1);
+        lpTokens[0] = lpToken;
+        uint32[] memory rewards = new uint32[](1);
+        rewards[0] = rewardsPerBlock.toUint32();
+
         vm.startPrank(owner);
-        ILiquidityMiningInternal(liquidityMining).setRewardsPerBlock(
-            lpToken,
-            rewardsPerBlock.toUint32()
-        );
+        ILiquidityMiningInternal(liquidityMining).setRewardsPerBlock(lpTokens, rewards);
         vm.stopPrank();
     }
 
@@ -128,7 +131,7 @@ contract PowerTokensTestsSystem is TestCommons {
 
     function _createLiquidityMining() private {
         // address in constructor will be replaced
-        LiquidityMining implementation = new LiquidityMining(
+        LiquidityMiningEthereum implementation = new LiquidityMiningEthereum(
             dao,
             _getUserAddress(123),
             _getUserAddress(123)
@@ -155,7 +158,7 @@ contract PowerTokensTestsSystem is TestCommons {
     }
 
     function _updateLiquidityMiningImplementation() private {
-        LiquidityMining implementation = new LiquidityMining(
+        LiquidityMiningEthereum implementation = new LiquidityMiningEthereum(
             router,
             _getUserAddress(123),
             _getUserAddress(123)

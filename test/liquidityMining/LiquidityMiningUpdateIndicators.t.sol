@@ -26,10 +26,16 @@ contract LiquidityMiningUpdateIndicatorsTest is TestCommons {
         address lpUsdt = _powerTokensSystem.lpUsdt();
         address iporToken = _powerTokensSystem.iporToken();
 
+        address[] memory lpTokens = new address[](3);
+        lpTokens[0] = lpDai;
+        lpTokens[1] = lpUsdc;
+        lpTokens[2] = lpUsdt;
+        uint32[] memory rewards = new uint32[](3);
+        rewards[0] = 1e8;
+        rewards[1] = 1e8;
+        rewards[2] = 1e8;
         vm.startPrank(_powerTokensSystem.owner());
-        ILiquidityMiningInternal(miningAddress).setRewardsPerBlock(lpDai, 1e8);
-        ILiquidityMiningInternal(miningAddress).setRewardsPerBlock(lpUsdc, 1e8);
-        ILiquidityMiningInternal(miningAddress).setRewardsPerBlock(lpUsdt, 1e8);
+        ILiquidityMiningInternal(miningAddress).setRewardsPerBlock(lpTokens, rewards);
         vm.stopPrank();
         vm.prank(_powerTokensSystem.dao());
         ERC20(iporToken).transfer(miningAddress, 10_000e18);

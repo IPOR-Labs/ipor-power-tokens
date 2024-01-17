@@ -27,9 +27,6 @@ abstract contract PowerTokenInternal is
 {
     using ContractValidator for address;
 
-    bytes32 internal constant _GOVERNANCE_TOKEN_ID =
-        0xdba05ed67d0251facfcab8345f27ccd3e72b5a1da8cebfabbcccf4316e6d053c;
-
     /// @dev 14 days
     uint256 public constant COOL_DOWN_IN_SECONDS = 2 * 7 * 24 * 60 * 60;
 
@@ -59,10 +56,6 @@ abstract contract PowerTokenInternal is
     constructor(address routerAddressInput, address governanceTokenInput) {
         _governanceToken = governanceTokenInput.checkAddress();
         routerAddress = routerAddressInput.checkAddress();
-        require(
-            IGovernanceToken(governanceTokenInput).getContractId() == _GOVERNANCE_TOKEN_ID,
-            Errors.WRONG_CONTRACT_ID
-        );
     }
 
     /// @dev Throws an error if called by any account other than the pause guardian.
