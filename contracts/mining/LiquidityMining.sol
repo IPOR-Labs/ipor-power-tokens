@@ -6,21 +6,11 @@ import "./LiquidityMiningInternal.sol";
 
 /// @title Smart contract responsible for distribution of Power Token rewards across accounts contributing to Liquidity Mining
 /// by staking lpTokens and / or delegating Power Tokens.
-contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
+abstract contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
     using SafeCast for uint256;
     using SafeCast for int256;
 
-    constructor(
-        address routerAddress,
-        address lpStEthInput,
-        address ethUsdOracleInput
-    ) LiquidityMiningInternal(routerAddress, lpStEthInput, ethUsdOracleInput) {
-        _disableInitializers();
-    }
-
-    function getContractId() external pure returns (bytes32) {
-        return 0x9b1f3aa590476fc9aa58d44ad1419ab53d34c344bd5ed46b12e4af7d27c38e06;
-    }
+    constructor(address routerAddress) LiquidityMiningInternal(routerAddress) {}
 
     function balanceOf(address account, address lpToken) external view override returns (uint256) {
         return _accountIndicators[account][lpToken].lpTokenBalance;
@@ -221,7 +211,6 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
     function addLpTokensInternal(
         LiquidityMiningTypes.UpdateLpToken[] memory updateLpToken
     ) external override onlyRouter whenNotPaused {
-        uint256 length = updateLpToken.length;
         uint256 rewardsAmount;
         uint256 accruedCompMultiplierCumulativePrevBlock;
 
@@ -229,7 +218,7 @@ contract LiquidityMining is ILiquidityMining, LiquidityMiningInternal {
         LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators;
         LiquidityMiningTypes.UpdateLpToken memory update;
 
-        for (uint256 i; i != length; ) {
+        for (uint256 i; i != updateLpToken.length; ) {
             update = updateLpToken[i];
             require(_lpTokens[update.lpToken], Errors.LP_TOKEN_NOT_SUPPORTED);
 
