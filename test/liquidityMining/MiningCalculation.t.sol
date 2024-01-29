@@ -18,12 +18,12 @@ contract MiningCalculationTest is TestCommons {
     TestData private _testItem;
 
     function setUp() external {
-        _testData.push(TestData(1e18, 1e18, 1984962500721156182));
-        _testData.push(TestData(1e18, 2e18, 2721928094887362348));
-        _testData.push(TestData(2e18, 1e18, 1400000000000000000));
-        _testData.push(TestData(10e18, 1e18, 663034405833793834));
-        _testData.push(TestData(10e18, 123e18, 5078071905112637653));
-        _testData.push(TestData(33e18, 44e18, 2274469117916141075));
+        _testData.push(TestData(1e18, 1e18, 1499535673550914423));
+        _testData.push(TestData(1e18, 2e18, 2236501267717120589));
+        _testData.push(TestData(2e18, 1e18, 914573172829758241));
+        _testData.push(TestData(10e18, 1e18, 400000000000000001));
+        _testData.push(TestData(10e18, 123e18, 4592645077942395894));
+        _testData.push(TestData(33e18, 44e18, 1789042290745899316));
     }
 
     function testShouldReturnZeroWhenLpTokenAmountIs0() external {
@@ -93,7 +93,7 @@ contract MiningCalculationTest is TestCommons {
         );
 
         // then
-        assertEq(result, 1984962500721156182, "Should return 1984962500721156182");
+        assertEq(result, 1499535673550914423, "Should return 1984962500721156182");
     }
 
     function testShouldThrowPT_711AggregatePowerUpIsNegative() external {

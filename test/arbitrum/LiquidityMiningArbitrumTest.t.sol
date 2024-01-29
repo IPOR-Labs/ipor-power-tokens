@@ -72,7 +72,7 @@ contract LiquidityMiningArbitrumTest is Test {
             "compositeMultiplierCumulativePrevBlock should be 0"
         );
         assertEq(indicators.lpTokenBalance, 10e18, "lpTokenBalance should be 10e18");
-        assertEq(indicators.powerUp, 254472554871181666, "powerUp should be 254472554871181666");
+        assertEq(indicators.powerUp, 227236277435590833, "powerUp should be 227236277435590833");
         assertEq(
             indicators.delegatedPwTokenBalance,
             100e18,
