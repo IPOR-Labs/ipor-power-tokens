@@ -416,12 +416,12 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
 
         assertEq(
             globalIndicatorsBefore[0].indicators.aggregatedPowerUp,
-            272192809488736234700,
+            249953567355091442100,
             "aggregatedPowerUp before"
         );
         assertEq(
             globalIndicatorsBefore[0].indicators.compositeMultiplierInTheBlock,
-            3673866337168548782569648,
+            4000743060327562267741987,
             "compositeMultiplierInTheBlock before"
         );
         assertEq(
@@ -437,7 +437,7 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
 
         assertEq(
             accountIndicatorsBefore[0].indicators.powerUp,
-            2721928094887362347,
+            2499535673550914421,
             "aggregatedPowerUp before"
         );
         assertEq(accountIndicatorsAfter[0].indicators.powerUp, 0, "aggregatedPowerUp after");
@@ -448,7 +448,7 @@ contract PwTokenUnstakeLpTokensTest is TestCommons {
         );
         assertEq(
             accountIndicatorsAfter[0].indicators.compositeMultiplierCumulativePrevBlock,
-            367386633716854878256964800,
+            400074306032756226774198700,
             "compositeMultiplierCumulativePrevBlock after"
         );
         assertEq(rewardsUserOne[0].rewardsAmount, 0, "rewardsAmount");
