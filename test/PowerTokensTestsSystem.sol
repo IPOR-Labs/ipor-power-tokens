@@ -19,6 +19,8 @@ import "@power-tokens/contracts/lens/PowerTokenLens.sol";
 contract PowerTokensTestsSystem is TestCommons {
     using SafeCast for uint256;
 
+    uint256 constant public COOL_DOWN_IN_SECONDS = 2 * 7 * 24 * 60 * 60;
+
     address public dao;
     address public owner;
     address public iporToken;
@@ -108,7 +110,7 @@ contract PowerTokensTestsSystem is TestCommons {
 
     function _createPowerToken() private {
         // address in constructor will be replaced
-        PowerToken implementation = new PowerToken(dao, address(iporToken));
+        PowerToken implementation = new PowerToken(dao, address(iporToken), COOL_DOWN_IN_SECONDS);
         vm.startPrank(owner);
         ERC1967Proxy proxy = new ERC1967Proxy(
             address(implementation),
@@ -119,7 +121,7 @@ contract PowerTokensTestsSystem is TestCommons {
     }
 
     function createPowerToken(address iporTokenAddress, address routerAddress) public {
-        PowerToken implementation = new PowerToken(routerAddress, address(iporTokenAddress));
+        PowerToken implementation = new PowerToken(routerAddress, address(iporTokenAddress), COOL_DOWN_IN_SECONDS);
         vm.startPrank(owner);
         ERC1967Proxy proxy = new ERC1967Proxy(
             address(implementation),
@@ -174,7 +176,7 @@ contract PowerTokensTestsSystem is TestCommons {
     }
 
     function _updatePowerTokenImplementation() private {
-        PowerToken implementation = new PowerToken(router, address(iporToken));
+        PowerToken implementation = new PowerToken(router, address(iporToken), COOL_DOWN_IN_SECONDS);
         vm.startPrank(owner);
         PowerToken(powerToken).upgradeTo(address(implementation));
         IPowerTokenInternal(powerToken).grantAllowanceForRouter(iporToken);

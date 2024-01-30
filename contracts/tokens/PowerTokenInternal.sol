@@ -28,8 +28,7 @@ abstract contract PowerTokenInternal is
     using ContractValidator for address;
 
     /// @dev 14 days
-    uint256 public constant COOL_DOWN_IN_SECONDS = 2 * 7 * 24 * 60 * 60;
-
+    uint256 public immutable COOL_DOWN_IN_SECONDS;
     address public immutable routerAddress;
     address internal immutable _governanceToken;
 
@@ -53,9 +52,10 @@ abstract contract PowerTokenInternal is
     /// @dev value represents percentage in 18 decimals, example 1e18 = 100%, 50% = 5 * 1e17
     uint256 internal _unstakeWithoutCooldownFee;
 
-    constructor(address routerAddressInput, address governanceTokenInput) {
+    constructor(address routerAddressInput, address governanceTokenInput, uint256 coolDownInSecondsInput) {
         _governanceToken = governanceTokenInput.checkAddress();
         routerAddress = routerAddressInput.checkAddress();
+        COOL_DOWN_IN_SECONDS = coolDownInSecondsInput;
     }
 
     /// @dev Throws an error if called by any account other than the pause guardian.
