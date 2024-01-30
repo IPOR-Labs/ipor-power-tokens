@@ -13,6 +13,8 @@ import "../../contracts/mining/LiquidityMiningEthereum.sol";
 import "../../contracts/tokens/PowerToken.sol";
 
 contract TestEthMarketCommons is Test {
+    uint256 constant public COOL_DOWN_IN_SECONDS = 2 * 7 * 24 * 60 * 60;
+
     address public constant owner = 0xD92E9F039E4189c342b4067CC61f5d063960D248;
 
     address public constant stEth = 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84;
@@ -96,7 +98,7 @@ contract TestEthMarketCommons is Test {
     }
 
     function _updatePowerTokenImplementation() private {
-        PowerToken implementation = new PowerToken(router, address(iporToken));
+        PowerToken implementation = new PowerToken(router, address(iporToken), COOL_DOWN_IN_SECONDS);
         vm.startPrank(owner);
         PowerToken(powerToken).upgradeTo(address(implementation));
         IPowerTokenInternal(powerToken).grantAllowanceForRouter(iporToken);

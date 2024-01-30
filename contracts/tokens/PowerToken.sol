@@ -11,8 +11,9 @@ import "./PowerTokenInternal.sol";
 contract PowerToken is PowerTokenInternal, IPowerToken {
     constructor(
         address routerAddress,
-        address governanceTokenAddress
-    ) PowerTokenInternal(routerAddress, governanceTokenAddress) {
+        address governanceTokenAddress,
+        uint256 coolDownInSeconds
+    ) PowerTokenInternal(routerAddress, governanceTokenAddress, coolDownInSeconds) {
         _disableInitializers();
     }
 
