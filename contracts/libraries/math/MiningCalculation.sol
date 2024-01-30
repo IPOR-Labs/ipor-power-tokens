@@ -12,13 +12,13 @@ library MiningCalculation {
     uint256 constant SLOPE_1 = 5; //   5.0
     uint256 constant BASE_1 = 2e17; //    0.2
 
-    uint256 constant SLOPE_2 = 2e18; //   2.0
+    uint256 constant SLOPE_2 = 2; //   2.0
     uint256 constant BASE_2 = 26e16; //    0.26
 
     uint256 constant SLOPE_3 = 15e17; //   1.5
     uint256 constant BASE_3 = 28e16; //    0.28
 
-    uint256 constant SLOPE_4 = 1e18; //   1.0
+    uint256 constant SLOPE_4 = 1; //   1.0
     uint256 constant BASE_4 = 31e16; //    0.31
 
     uint256 constant SLOPE_5 = 5e17; //   0.5
@@ -204,7 +204,7 @@ library MiningCalculation {
             return
                 ABDKMathQuad.add(
                     _toQuadruplePrecision(BASE_2, 1e18),
-                    ABDKMathQuad.mul(_toQuadruplePrecision(SLOPE_2, 1e18), ratio)
+                    ABDKMathQuad.mul(ABDKMathQuad.fromUInt(SLOPE_2), ratio)
                 );
         } else if (ABDKMathQuad.cmp(_toQuadruplePrecision(6, 100), ratio) > 0) {
             return
@@ -216,7 +216,7 @@ library MiningCalculation {
             return
                 ABDKMathQuad.add(
                     _toQuadruplePrecision(BASE_4, 1e18),
-                    ABDKMathQuad.mul(_toQuadruplePrecision(SLOPE_4, 1e18), ratio)
+                    ABDKMathQuad.mul(ABDKMathQuad.fromUInt(SLOPE_4), ratio)
                 );
         } else {
             return
