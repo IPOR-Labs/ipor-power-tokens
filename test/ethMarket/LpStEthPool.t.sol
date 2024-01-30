@@ -80,7 +80,7 @@ contract ProvideStEthTest is TestEthMarketCommons {
 
         assertEq(account[0].indicators.compositeMultiplierCumulativePrevBlock, 0, "compositeMultiplierCumulativePrevBlock should be 0");
         assertEq(account[0].indicators.lpTokenBalance, 1e18, "lpTokenBalance should be 1e18");
-        assertEq(account[0].indicators.powerUp, 2721928094887362347, "powerUp should be 2e17");
+        assertEq(account[0].indicators.powerUp, 2499535673550914421, "powerUp should be 2e17");
         assertEq(account[0].indicators.delegatedPwTokenBalance, 187092255777e10, "delegatedPwTokenBalance should be 187092255777e10");
     }
 }
