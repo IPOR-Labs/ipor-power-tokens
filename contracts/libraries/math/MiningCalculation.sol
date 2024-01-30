@@ -48,7 +48,7 @@ library MiningCalculation {
         bytes16 ratio = ABDKMathQuad.div(accountPwTokenAmountQP, lpTokenAmountQP);
 
         bytes16 result;
-        if (ABDKMathQuad.cmp(_toQuadruplePrecision(1, 10), ratio) >= 0) {
+        if (ABDKMathQuad.cmp(_toQuadruplePrecision(1e18, 10e18), ratio) >= 0) {
             result = accountPowerUpStepFunction(ratio);
             bytes16 resultD18 = ABDKMathQuad.mul(result, ABDKMathQuad.fromUInt(1e18));
             return ABDKMathQuad.toUInt(resultD18);
@@ -66,8 +66,8 @@ library MiningCalculation {
             result = ABDKMathQuad.add(verticalShift, ABDKMathQuad.log_2(underLog));
             bytes16 resultD18 = ABDKMathQuad.mul(result, ABDKMathQuad.fromUInt(1e18));
 
-            //The number 485426827170241759 is the value by which we want to lower the default function values. This value can never be negative.
-            return ABDKMathQuad.toUInt(resultD18) - 485426827170241759;
+            //The number 222392421336447926 is the value by which we want to lower the default function values. This value can never be negative.
+            return ABDKMathQuad.toUInt(resultD18) - 222392421336447926;
         }
     }
 

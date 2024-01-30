@@ -449,6 +449,6 @@ contract LiquidityMiningOneBlockTest is TestCommons {
             userThreeRewards[0].rewardsAmount;
 
         assertEq(accruedRewards[0].rewardsAmount, 15e18, "rewardsAmount should be 15");
-        assertEq(totalRewards, 15000000000000000001, "totalRewards should be 15000000000000000001");
+        assertEq(totalRewards, 14999999999999999999, "totalRewards should be 15000000000000000001");
     }
 }

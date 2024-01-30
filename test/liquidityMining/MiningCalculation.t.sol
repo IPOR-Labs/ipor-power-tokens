@@ -12,18 +12,20 @@ contract MiningCalculationTest is TestCommons {
         uint256 result;
     }
 
-    bytes16 private _verticalShift = 0x3ffd99999999999999e36310e0e2a848;
-    bytes16 private _horizontalShift = 0x3fff0000000000000000000000000000;
+    bytes16 private _verticalShift = 0x3fff6666666666666666666666666666;
+    bytes16 private _horizontalShift = 0x3ffe0000000000000000000000000000;
     TestData[] private _testData;
     TestData private _testItem;
 
     function setUp() external {
-        _testData.push(TestData(1e18, 1e18, 1499535673550914423));
-        _testData.push(TestData(1e18, 2e18, 2236501267717120589));
-        _testData.push(TestData(2e18, 1e18, 914573172829758241));
+        _testData.push(TestData(1e18, 1e18, 2499535673550914421));
+        _testData.push(TestData(1e18, 2e18, 3347532580105864436));
+        _testData.push(TestData(2e18, 1e18, 1762570079384708255));
         _testData.push(TestData(10e18, 1e18, 400000000000000001));
-        _testData.push(TestData(10e18, 123e18, 4592645077942395894));
-        _testData.push(TestData(33e18, 44e18, 1789042290745899316));
+        _testData.push(TestData(10e18, 123e18, 5827223037726961717));
+        _testData.push(TestData(33e18, 44e18, 2840572591385981386));
+        _testData.push(TestData(1000e18, 99e18, 399500000000000001)); // should be jump between 99 and 101
+        _testData.push(TestData(1000e18, 101e18, 667150514306025735)); // should be jump between 99 and 101
     }
 
     function testShouldReturnZeroWhenLpTokenAmountIs0() external {
@@ -93,7 +95,7 @@ contract MiningCalculationTest is TestCommons {
         );
 
         // then
-        assertEq(result, 1499535673550914423, "Should return 1984962500721156182");
+        assertEq(result, 2499535673550914421, "Should return 2499535673550914421");
     }
 
     function testShouldThrowPT_711AggregatePowerUpIsNegative() external {
@@ -190,7 +192,6 @@ contract MiningCalculationTest is TestCommons {
             _verticalShift,
             _horizontalShift
         );
-        console2.log("result", result);
         // then
         assertEq(
             result,
