@@ -163,6 +163,8 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         LiquidityMiningEthereum implementation = new LiquidityMiningEthereum(
             _powerTokensSystem.dao(),
             _getUserAddress(123),
+            _getUserAddress(123),
+            _getUserAddress(123),
             _getUserAddress(123)
         );
         ERC1967Proxy proxy = new ERC1967Proxy(
@@ -205,6 +207,8 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         // when
         LiquidityMiningEthereum implementation = new LiquidityMiningEthereum(
             _powerTokensSystem.dao(),
+            _getUserAddress(123),
+            _getUserAddress(123),
             _getUserAddress(123),
             _getUserAddress(123)
         );

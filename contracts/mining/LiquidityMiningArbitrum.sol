@@ -2,6 +2,7 @@
 pragma solidity 0.8.20;
 
 import "./LiquidityMining.sol";
+import "../interfaces/AggregatorV3Interface.sol";
 
 /// @title Smart contract responsible for distribution of Power Token rewards across accounts contributing to Liquidity Mining
 /// by staking lpTokens and / or delegating Power Tokens.

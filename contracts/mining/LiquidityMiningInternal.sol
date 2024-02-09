@@ -12,7 +12,6 @@ import "../interfaces/types/LiquidityMiningTypes.sol";
 import "../interfaces/ILiquidityMiningInternal.sol";
 import "../interfaces/IGovernanceToken.sol";
 import "../interfaces/IPowerToken.sol";
-import "../interfaces/AggregatorV3Interface.sol";
 import "../security/MiningOwnableUpgradeable.sol";
 import "../security/PauseManager.sol";
 import "../interfaces/IProxyImplementation.sol";
@@ -85,7 +84,7 @@ abstract contract LiquidityMiningInternal is
     }
 
     function getVersion() external pure override returns (uint256) {
-        return 2_001;
+        return 2_002;
     }
 
     function isLpTokenSupported(address lpToken) external view override returns (bool) {
