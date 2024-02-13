@@ -5,18 +5,18 @@ import "./TestEthMarketCommons.sol";
 import "../../contracts/interfaces/types/LiquidityMiningTypes.sol";
 import "../../contracts/interfaces/ILiquidityMiningLens.sol";
 
-contract ProvideStEthTest is TestEthMarketCommons {
+contract ProvideWeEthTest is TestEthMarketCommons {
     using SafeCast for int256;
 
     function setUp() public {
-        vm.createSelectFork(vm.envString("ETHEREUM_PROVIDER_URL"), 17810000);
+        vm.createSelectFork(vm.envString("ETHEREUM_PROVIDER_URL"), 19189021);
         _init();
     }
 
     function testShouldReturnProperRewardsPerBlock() external {
         //given
         address[] memory pools = new address[](1);
-        pools[0] = lpStEth;
+        pools[0] = lpWeEth;
 
         //when
         LiquidityMiningTypes.GlobalIndicatorsResult[] memory global = ILiquidityMiningLens(router)
@@ -31,7 +31,7 @@ contract ProvideStEthTest is TestEthMarketCommons {
         uint256[] memory amounts = new uint256[](1);
         amounts[0] = 100e18;
         address[] memory pools = new address[](1);
-        pools[0] = lpStEth;
+        pools[0] = lpWeEth;
 
         //when
         vm.prank(userOne);
@@ -54,18 +54,10 @@ contract ProvideStEthTest is TestEthMarketCommons {
         address[] memory pools = new address[](1);
         pools[0] = lpStEth;
         uint256[] memory delegateAmounts = new uint256[](1);
-        (
-            uint80 roundId,
-            int256 answer,
-            uint256 startedAt,
-            uint256 updatedAt,
-            uint80 answeredInRound
-        ) = AggregatorV3Interface(ethUsdOracle).latestRoundData();
 
-        uint priceEth = answer.toUint256();
-        delegateAmounts[0] = priceEth*1e10;
-        console2.log("answer", answer.toUint256());
+        uint256 eEthBalance = IWeETH(weEth).getEETHByWeETH(lpAmounts[0]);
 
+        delegateAmounts[0] = eEthBalance;
 
         //when
         vm.startPrank(userOne);
@@ -80,7 +72,7 @@ contract ProvideStEthTest is TestEthMarketCommons {
 
         assertEq(account[0].indicators.compositeMultiplierCumulativePrevBlock, 0, "compositeMultiplierCumulativePrevBlock should be 0");
         assertEq(account[0].indicators.lpTokenBalance, 1e18, "lpTokenBalance should be 1e18");
-        assertEq(account[0].indicators.powerUp, 2499535673550914421, "powerUp should be 2e17");
-        assertEq(account[0].indicators.delegatedPwTokenBalance, 187092255777e10, "delegatedPwTokenBalance should be 187092255777e10");
+        assertEq(account[0].indicators.powerUp, 202105079928094839, "powerUp should be 202105079928094839");
+        assertEq(account[0].indicators.delegatedPwTokenBalance, 1030848809405162547, "delegatedPwTokenBalance should be 1030848809405162547");
     }
 }
