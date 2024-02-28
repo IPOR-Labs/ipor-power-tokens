@@ -13,11 +13,12 @@ import "../../contracts/mining/LiquidityMiningEthereum.sol";
 import "../../contracts/tokens/PowerToken.sol";
 
 contract TestEthMarketCommons is Test {
-    uint256 constant public COOL_DOWN_IN_SECONDS = 2 * 7 * 24 * 60 * 60;
+    uint256 public constant COOL_DOWN_IN_SECONDS = 2 * 7 * 24 * 60 * 60;
 
     address public constant owner = 0xD92E9F039E4189c342b4067CC61f5d063960D248;
 
     address public constant stEth = 0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84;
+    address public constant weEth = 0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee;
     address public constant iporToken = 0x1e4746dC744503b53b4A082cB3607B169a289090;
     address public constant ipUSDT = 0x9Bd2177027edEE300DC9F1fb88F24DB6e5e1edC6;
     address public constant ipUSDC = 0x7c0e72f431FD69560D951e4C04A4de3657621a88;
@@ -28,6 +29,7 @@ contract TestEthMarketCommons is Test {
     address public constant ethUsdOracle = 0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419;
 
     address public lpStEth;
+    address public lpWeEth;
     address public liquidityMiningLens;
     address public powerTokenLens;
     address public stakeService;
@@ -53,6 +55,8 @@ contract TestEthMarketCommons is Test {
         vm.startPrank(owner);
         lpStEth = address(new MockLpToken("lpStEth", "lpStEth", stEth));
         MockLpToken(lpStEth).setJoseph(owner);
+        lpWeEth = address(new MockLpToken("lpWeEth", "lpWeEth", weEth));
+        MockLpToken(lpWeEth).setJoseph(owner);
         vm.stopPrank();
     }
 
@@ -89,16 +93,23 @@ contract TestEthMarketCommons is Test {
         LiquidityMiningEthereum implementation = new LiquidityMiningEthereum(
             router,
             lpStEth,
-            ethUsdOracle
+            ethUsdOracle,
+            lpWeEth,
+            weEth
         );
         LiquidityMiningEthereum(liquidityMining).upgradeTo(address(implementation));
         ILiquidityMiningInternal(liquidityMining).grantAllowanceForRouter(lpStEth);
+        ILiquidityMiningInternal(liquidityMining).grantAllowanceForRouter(lpWeEth);
         ILiquidityMiningInternal(liquidityMining).grantAllowanceForRouter(iporToken);
         vm.stopPrank();
     }
 
     function _updatePowerTokenImplementation() private {
-        PowerToken implementation = new PowerToken(router, address(iporToken), COOL_DOWN_IN_SECONDS);
+        PowerToken implementation = new PowerToken(
+            router,
+            address(iporToken),
+            COOL_DOWN_IN_SECONDS
+        );
         vm.startPrank(owner);
         PowerToken(powerToken).upgradeTo(address(implementation));
         IPowerTokenInternal(powerToken).grantAllowanceForRouter(iporToken);
@@ -106,12 +117,15 @@ contract TestEthMarketCommons is Test {
     }
 
     function _addLpStEth() private {
-        address[] memory lpTokens = new address[](1);
+        address[] memory lpTokens = new address[](2);
         lpTokens[0] = lpStEth;
-        uint32[] memory rewards = new uint32[](1);
+        lpTokens[1] = lpWeEth;
+        uint32[] memory rewards = new uint32[](2);
         rewards[0] = 35e6;
+        rewards[1] = 35e6;
         vm.startPrank(owner);
         ILiquidityMiningInternal(liquidityMining).newSupportedLpToken(lpStEth);
+        ILiquidityMiningInternal(liquidityMining).newSupportedLpToken(lpWeEth);
         ILiquidityMiningInternal(liquidityMining).setRewardsPerBlock(lpTokens, rewards);
         vm.stopPrank();
     }
@@ -123,8 +137,12 @@ contract TestEthMarketCommons is Test {
         MockLpToken(lpStEth).approve(router, type(uint256).max);
         vm.prank(user);
         IERC20(iporToken).approve(router, type(uint256).max);
+        vm.prank(user);
+        MockLpToken(lpWeEth).approve(router, type(uint256).max);
 
         vm.prank(owner);
         MockLpToken(lpStEth).mint(user, 10_000e18);
+        vm.prank(owner);
+        MockLpToken(lpWeEth).mint(user, 10_000e18);
     }
 }

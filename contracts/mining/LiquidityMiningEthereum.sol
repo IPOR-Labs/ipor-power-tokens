@@ -2,6 +2,7 @@
 pragma solidity 0.8.20;
 
 import "./LiquidityMining.sol";
+import "./CalculateWeightedLpTokenBalanceEthereum.sol";
 
 /// @title Smart contract responsible for distribution of Power Token rewards across accounts contributing to Liquidity Mining
 /// by staking lpTokens and / or delegating Power Tokens.
@@ -10,14 +11,20 @@ contract LiquidityMiningEthereum is LiquidityMining {
 
     address internal immutable lpStEth;
     address internal immutable ethUsdOracle;
+    address internal immutable lpWeEth;
+    address internal immutable weEth;
 
     constructor(
         address routerAddress,
         address lpStEthInput,
-        address ethUsdOracleInput
+        address ethUsdOracleInput,
+        address lpWeEthInput,
+        address weEthInput
     ) LiquidityMining(routerAddress) {
         lpStEth = lpStEthInput;
         ethUsdOracle = ethUsdOracleInput;
+        lpWeEth = lpWeEthInput;
+        weEth = weEthInput;
         _disableInitializers();
     }
 
@@ -31,15 +38,18 @@ contract LiquidityMiningEthereum is LiquidityMining {
         address lpToken,
         uint256 lpTokenBalance
     ) internal view override returns (uint256) {
-        if (lpToken != lpStEth) {
-            return lpTokenBalance;
-        }
-        // @dev returned value has 8 decimal address on mainnet 0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419
-        (, int256 answer, , , ) = AggregatorV3Interface(ethUsdOracle).latestRoundData();
-        return MathOperation.division(lpTokenBalance * answer.toUint256(), 1e8);
+        return
+            CalculateWeightedLpTokenBalanceEthereum._calculateWeightedLpTokenBalance({
+                lpToken: lpToken,
+                lpTokenBalance: lpTokenBalance,
+                ethUsdOracle: ethUsdOracle,
+                lpWeEth: lpWeEth,
+                lpStEth: lpStEth,
+                weEth: weEth
+            });
     }
 
-    function getConfiguration() external view returns (address, address) {
-        return (lpStEth, ethUsdOracle);
+    function getConfiguration() external view returns (address, address, address, address) {
+        return (lpStEth, ethUsdOracle, lpWeEth, weEth);
     }
 }
