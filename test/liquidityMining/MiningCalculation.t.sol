@@ -3,7 +3,8 @@ pragma solidity 0.8.20;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "../TestCommons.sol";
-import "@power-tokens/contracts/libraries/math/MiningCalculation.sol";
+import "../../contracts/libraries/math/MiningCalculationAccountPowerUp.sol";
+import "../../contracts/libraries/math/MiningCalculation.sol";
 
 contract MiningCalculationTest is TestCommons {
     struct TestData {
@@ -31,11 +32,15 @@ contract MiningCalculationTest is TestCommons {
     function testShouldReturnZeroWhenLpTokenAmountIs0() external {
         // given
         // when
-        uint256 result = MiningCalculation.calculateAccountPowerUp(
-            2,
-            0,
-            _verticalShift,
-            _horizontalShift
+        uint256 result = MiningCalculationAccountPowerUp.calculateAccountPowerUp(
+            AccountPowerUpData({
+                accountPwTokenAmount: 2,
+                accountLpTokenAmount: 0,
+                verticalShift: _verticalShift,
+                horizontalShift: _horizontalShift,
+                logBase: 2e18,
+                pwTokenModifier: 2e18
+            })
         );
 
         // then
@@ -45,11 +50,15 @@ contract MiningCalculationTest is TestCommons {
     function testShouldReturnVerticalShiftWhenPwTokenAmount0() external {
         // given
         // when
-        uint256 result = MiningCalculation.calculateAccountPowerUp(
-            0,
-            1e18,
-            _verticalShift,
-            _horizontalShift
+        uint256 result = MiningCalculationAccountPowerUp.calculateAccountPowerUp(
+            AccountPowerUpData({
+                accountPwTokenAmount: 0,
+                accountLpTokenAmount: 1e18,
+                verticalShift: _verticalShift,
+                horizontalShift: _horizontalShift,
+                logBase: 2e18,
+                pwTokenModifier: 2e18
+            })
         );
 
         // then
@@ -59,11 +68,15 @@ contract MiningCalculationTest is TestCommons {
     function testShouldReturn0_2WhenPwTokenAmountIs0HS0_5VS1_4() external {
         // given
         // when
-        uint256 result = MiningCalculation.calculateAccountPowerUp(
-            0,
-            1e18,
-            0x3fff6666666666666666666666666666,
-            0x3ffe0000000000000000000000000000
+        uint256 result = MiningCalculationAccountPowerUp.calculateAccountPowerUp(
+            AccountPowerUpData({
+                accountPwTokenAmount: 0,
+                accountLpTokenAmount: 1e18,
+                verticalShift: 0x3fff6666666666666666666666666666,
+                horizontalShift: 0x3ffe0000000000000000000000000000,
+                logBase: 2e18,
+                pwTokenModifier: 2e18
+            })
         );
 
         // then
@@ -73,11 +86,15 @@ contract MiningCalculationTest is TestCommons {
     function testShouldReturn0WhenLpTokenLessThan1() external {
         // given
         // when
-        uint256 result = MiningCalculation.calculateAccountPowerUp(
-            0,
-            999999999999999999,
-            _verticalShift,
-            _horizontalShift
+        uint256 result = MiningCalculationAccountPowerUp.calculateAccountPowerUp(
+            AccountPowerUpData({
+                accountPwTokenAmount: 0,
+                accountLpTokenAmount: 999999999999999999,
+                verticalShift: _verticalShift,
+                horizontalShift: _horizontalShift,
+                logBase: 2e18,
+                pwTokenModifier: 2e18
+            })
         );
 
         // then
@@ -87,11 +104,15 @@ contract MiningCalculationTest is TestCommons {
     function testShouldCalculateSimpleCase1() external {
         // given
         // when
-        uint256 result = MiningCalculation.calculateAccountPowerUp(
-            1e18,
-            1e18,
-            _verticalShift,
-            _horizontalShift
+        uint256 result = MiningCalculationAccountPowerUp.calculateAccountPowerUp(
+            AccountPowerUpData({
+                accountPwTokenAmount: 1e18,
+                accountLpTokenAmount: 1e18,
+                verticalShift: _verticalShift,
+                horizontalShift: _horizontalShift,
+                logBase: 2e18,
+                pwTokenModifier: 2e18
+            })
         );
 
         // then
@@ -186,11 +207,15 @@ contract MiningCalculationTest is TestCommons {
     function testShouldCalculateProperAccountPowerUp() external testAccountPowerUpData {
         // given
         // when
-        uint256 result = MiningCalculation.calculateAccountPowerUp(
-            _testItem.pwTokenAmount,
-            _testItem.lpTokenAmount,
-            _verticalShift,
-            _horizontalShift
+        uint256 result = MiningCalculationAccountPowerUp.calculateAccountPowerUp(
+            AccountPowerUpData({
+                accountPwTokenAmount: _testItem.pwTokenAmount,
+                accountLpTokenAmount: _testItem.lpTokenAmount,
+                verticalShift: _verticalShift,
+                horizontalShift: _horizontalShift,
+                logBase: 2e18,
+                pwTokenModifier: 2e18
+            })
         );
         // then
         assertEq(

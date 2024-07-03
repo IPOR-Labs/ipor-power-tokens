@@ -81,4 +81,9 @@ library LiquidityMiningTypes {
         address lpToken;
         LiquidityMiningTypes.GlobalRewardsIndicators indicators;
     }
+
+    struct AccountPowerUpModifier {
+        uint128 logBase;
+        uint128 pwTokenModifier;
+    }
 }

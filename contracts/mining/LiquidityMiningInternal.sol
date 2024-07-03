@@ -15,6 +15,7 @@ import "../interfaces/IPowerToken.sol";
 import "../security/MiningOwnableUpgradeable.sol";
 import "../security/PauseManager.sol";
 import "../interfaces/IProxyImplementation.sol";
+import "../libraries/math/MiningCalculationAccountPowerUp.sol";
 
 abstract contract LiquidityMiningInternal is
     Initializable,
@@ -43,6 +44,9 @@ abstract contract LiquidityMiningInternal is
     /// @dev account address => lpToken address => account params
     mapping(address => mapping(address => LiquidityMiningTypes.AccountRewardsIndicators))
         internal _accountIndicators;
+
+    mapping(address lpToken => LiquidityMiningTypes.AccountPowerUpModifier)
+        internal _accountPowerUpModifiers;
 
     constructor(address routerAddressInput) {
         routerAddress = routerAddressInput;
@@ -166,6 +170,30 @@ abstract contract LiquidityMiningInternal is
         return StorageSlotUpgradeable.getAddressSlot(_IMPLEMENTATION_SLOT).value;
     }
 
+    function getAccountPowerUpModifiers(
+        address lpToken
+    ) public view returns (uint256 pwTokenModifier, uint256 logBase) {
+        LiquidityMiningTypes.AccountPowerUpModifier memory data = _accountPowerUpModifiers[lpToken];
+        if (data.pwTokenModifier == 0) {
+            return (2e18, 2e18);
+        }
+    }
+
+    function setAccountPowerUpModifiers(
+        address lpToken,
+        uint256 pwTokenModifier,
+        uint256 logBase
+    ) external onlyOwner {
+        require(lpToken != address(0), Errors.WRONG_ADDRESS);
+        require(pwTokenModifier > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
+        require(logBase != 0 && logBase != 1e18, Errors.WRONG_VALUE);
+
+        _accountPowerUpModifiers[lpToken] = LiquidityMiningTypes.AccountPowerUpModifier(
+            pwTokenModifier.toUint128(),
+            logBase.toUint128()
+        );
+    }
+
     /// @dev Rebalance causes account's rewards to reset in current block.
     function _rebalanceIndicators(
         address account,
@@ -176,11 +204,16 @@ abstract contract LiquidityMiningInternal is
         uint256 lpTokenBalance,
         uint256 delegatedPwTokenBalance
     ) internal {
-        uint256 accountPowerUp = MiningCalculation.calculateAccountPowerUp(
-            delegatedPwTokenBalance,
-            _calculateWeightedLpTokenBalance(lpToken, lpTokenBalance),
-            _getVerticalShift(),
-            _getHorizontalShift()
+        (uint256 pwTokenModifier, uint256 logBase) = getAccountPowerUpModifiers(lpToken);
+        uint256 accountPowerUp = MiningCalculationAccountPowerUp.calculateAccountPowerUp(
+            AccountPowerUpData({
+                accountPwTokenAmount: delegatedPwTokenBalance,
+                accountLpTokenAmount: _calculateWeightedLpTokenBalance(lpToken, lpTokenBalance),
+                verticalShift: _getVerticalShift(),
+                horizontalShift: _getHorizontalShift(),
+                logBase: logBase,
+                pwTokenModifier: pwTokenModifier
+            })
         );
 
         _accountIndicators[account][lpToken] = LiquidityMiningTypes.AccountRewardsIndicators(
