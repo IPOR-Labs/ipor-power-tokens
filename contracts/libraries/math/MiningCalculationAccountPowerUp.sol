@@ -16,6 +16,7 @@ struct AccountPowerUpData {
     uint256 logBase;
     // @dev  value with 18 decimals,
     uint256 pwTokenModifier;
+    uint256 vectorOfCurve;
 }
 
 /// @title Library containing the core logic used in the Liquidity Mining module.
@@ -53,7 +54,7 @@ library MiningCalculationAccountPowerUp {
         if (ABDKMathQuad.cmp(_toQuadruplePrecision(1e18, 10e18), ratio) >= 0) {
             result = accountPowerUpStepFunction(ratio);
             bytes16 resultD18 = ABDKMathQuad.mul(result, ABDKMathQuad.fromUInt(1e18));
-            return ABDKMathQuad.toUInt(resultD18);
+            return ABDKMathQuad.toUInt(resultD18) + data_.vectorOfCurve;
         } else {
             bytes16 pwTokenAmountWithModifierQP = ABDKMathQuad.mul(
                 _toQuadruplePrecision(data_.pwTokenModifier, 1e18),

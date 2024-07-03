@@ -45,7 +45,7 @@ abstract contract LiquidityMiningInternal is
     mapping(address => mapping(address => LiquidityMiningTypes.AccountRewardsIndicators))
         internal _accountIndicators;
 
-    mapping(address lpToken => LiquidityMiningTypes.AccountPowerUpModifier)
+    mapping(address lpToken => LiquidityMiningTypes.PoolPowerUpModifier)
         internal _accountPowerUpModifiers;
 
     constructor(address routerAddressInput) {
@@ -170,28 +170,51 @@ abstract contract LiquidityMiningInternal is
         return StorageSlotUpgradeable.getAddressSlot(_IMPLEMENTATION_SLOT).value;
     }
 
-    function getAccountPowerUpModifiers(
+    function getPoolPowerUpModifiers(
         address lpToken
-    ) public view returns (uint256 pwTokenModifier, uint256 logBase) {
-        LiquidityMiningTypes.AccountPowerUpModifier memory data = _accountPowerUpModifiers[lpToken];
+    )
+        public
+        view
+        override
+        returns (uint256 pwTokenModifier, uint256 logBase, uint256 vectorOfCurve)
+    {
+        LiquidityMiningTypes.PoolPowerUpModifier memory data = _accountPowerUpModifiers[lpToken];
         if (data.pwTokenModifier == 0) {
-            return (2e18, 2e18);
+            return (2e18, 2e18, 0);
         }
+        /// @dev value in storage have 10 decimals, and at the output we want to have 18 decimals
+        return (
+            uint256(data.pwTokenModifier) * 1e8,
+            uint256(data.logBase) * 1e8,
+            uint256(data.vectorOfCurve) * 1e8
+        );
     }
 
-    function setAccountPowerUpModifiers(
-        address lpToken,
-        uint256 pwTokenModifier,
-        uint256 logBase
-    ) external onlyOwner {
-        require(lpToken != address(0), Errors.WRONG_ADDRESS);
-        require(pwTokenModifier > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
-        require(logBase != 0 && logBase != 1e18, Errors.WRONG_VALUE);
+    function setPoolPowerUpModifiers(
+        address[] memory lpTokens,
+        LiquidityMiningTypes.PoolPowerUpModifier[] memory modifiers
+    ) external override onlyOwner {
+        uint256 length = lpTokens.length;
 
-        _accountPowerUpModifiers[lpToken] = LiquidityMiningTypes.AccountPowerUpModifier(
-            pwTokenModifier.toUint128(),
-            logBase.toUint128()
-        );
+        require(length == modifiers.length, Errors.INPUT_ARRAYS_LENGTH_MISMATCH);
+
+        for (uint256 i; i < length; ++i) {
+            require(lpTokens[i] != address(0), Errors.WRONG_ADDRESS);
+            require(modifiers[i].pwTokenModifier > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
+            require(modifiers[i].logBase != 0 && modifiers[i].logBase != 1e10, Errors.WRONG_VALUE);
+
+            _accountPowerUpModifiers[lpTokens[i]] = LiquidityMiningTypes.PoolPowerUpModifier({
+                pwTokenModifier: modifiers[i].pwTokenModifier,
+                logBase: modifiers[i].logBase,
+                vectorOfCurve: modifiers[i].vectorOfCurve
+            });
+            emit AccountPowerUpModifiersUpdated(
+                lpTokens[i],
+                modifiers[i].logBase,
+                modifiers[i].pwTokenModifier,
+                modifiers[i].vectorOfCurve
+            );
+        }
     }
 
     /// @dev Rebalance causes account's rewards to reset in current block.
@@ -204,7 +227,9 @@ abstract contract LiquidityMiningInternal is
         uint256 lpTokenBalance,
         uint256 delegatedPwTokenBalance
     ) internal {
-        (uint256 pwTokenModifier, uint256 logBase) = getAccountPowerUpModifiers(lpToken);
+        (uint256 pwTokenModifier, uint256 logBase, uint256 vectorOfCurve) = getPoolPowerUpModifiers(
+            lpToken
+        );
         uint256 accountPowerUp = MiningCalculationAccountPowerUp.calculateAccountPowerUp(
             AccountPowerUpData({
                 accountPwTokenAmount: delegatedPwTokenBalance,
@@ -212,7 +237,8 @@ abstract contract LiquidityMiningInternal is
                 verticalShift: _getVerticalShift(),
                 horizontalShift: _getHorizontalShift(),
                 logBase: logBase,
-                pwTokenModifier: pwTokenModifier
+                pwTokenModifier: pwTokenModifier,
+                vectorOfCurve: vectorOfCurve
             })
         );
 

@@ -68,6 +68,23 @@ interface ILiquidityMiningInternal {
     /// @return A boolean indicating whether the address is a pause guardian (true) or not (false).
     function isPauseGuardian(address guardian) external view returns (bool);
 
+    /// @notice Sets the pool power-up modifiers for a given LP token.
+    /// @param lpTokens The addresses of the LP tokens for which the pool power-up modifiers are set.
+    /// @param modifiers The pool power-up modifiers to be set.
+    function setPoolPowerUpModifiers(
+        address[] memory lpTokens,
+        LiquidityMiningTypes.PoolPowerUpModifier[] memory modifiers
+    ) external;
+
+    /// @notice Gets the pool power-up modifiers for a given LP token.
+    /// @param lpToken The address of the LP token for which the pool power-up modifiers are retrieved.
+    /// @return pwTokenModifier The power-up token modifier.
+    /// @return logBase The logarithmic base.
+    /// @return vectorOfCurve The vector of the initial curve fro ratio < 0.1.
+    function getPoolPowerUpModifiers(
+        address lpToken
+    ) external view returns (uint256 pwTokenModifier, uint256 logBase, uint256 vectorOfCurve);
+
     /// @notice Emitted when the account unstakes lpTokens
     /// @param account account unstaking tokens
     /// @param lpToken address of lpToken being unstaked
@@ -114,4 +131,16 @@ interface ILiquidityMiningInternal {
     /// @param erc20Token address of ERC20 token
     /// @param router address of router
     event AllowanceRevoked(address indexed erc20Token, address indexed router);
+
+    /// @notice Emitted when the power-up modifiers for a given LP token are updated.
+    /// @param lpToken The address of the LP token for which the power-up modifiers are updated.
+    /// @param logBase The logarithmic base.
+    /// @param pwTokenModifier The power-up token modifier.
+    /// @param vectorOfCurve The vector of the initial curve for ratio < 0.1.
+    event AccountPowerUpModifiersUpdated(
+        address lpToken,
+        uint64 logBase,
+        uint64 pwTokenModifier,
+        uint64 vectorOfCurve
+    );
 }

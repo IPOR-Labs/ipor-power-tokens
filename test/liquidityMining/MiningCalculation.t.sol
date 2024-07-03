@@ -39,7 +39,8 @@ contract MiningCalculationTest is TestCommons {
                 verticalShift: _verticalShift,
                 horizontalShift: _horizontalShift,
                 logBase: 2e18,
-                pwTokenModifier: 2e18
+                pwTokenModifier: 2e18,
+                vectorOfCurve: 0
             })
         );
 
@@ -57,7 +58,8 @@ contract MiningCalculationTest is TestCommons {
                 verticalShift: _verticalShift,
                 horizontalShift: _horizontalShift,
                 logBase: 2e18,
-                pwTokenModifier: 2e18
+                pwTokenModifier: 2e18,
+                vectorOfCurve: 0
             })
         );
 
@@ -75,7 +77,8 @@ contract MiningCalculationTest is TestCommons {
                 verticalShift: 0x3fff6666666666666666666666666666,
                 horizontalShift: 0x3ffe0000000000000000000000000000,
                 logBase: 2e18,
-                pwTokenModifier: 2e18
+                pwTokenModifier: 2e18,
+                vectorOfCurve: 0
             })
         );
 
@@ -93,7 +96,8 @@ contract MiningCalculationTest is TestCommons {
                 verticalShift: _verticalShift,
                 horizontalShift: _horizontalShift,
                 logBase: 2e18,
-                pwTokenModifier: 2e18
+                pwTokenModifier: 2e18,
+                vectorOfCurve: 0
             })
         );
 
@@ -111,7 +115,8 @@ contract MiningCalculationTest is TestCommons {
                 verticalShift: _verticalShift,
                 horizontalShift: _horizontalShift,
                 logBase: 2e18,
-                pwTokenModifier: 2e18
+                pwTokenModifier: 2e18,
+                vectorOfCurve: 0
             })
         );
 
@@ -214,7 +219,8 @@ contract MiningCalculationTest is TestCommons {
                 verticalShift: _verticalShift,
                 horizontalShift: _horizontalShift,
                 logBase: 2e18,
-                pwTokenModifier: 2e18
+                pwTokenModifier: 2e18,
+                vectorOfCurve: 0
             })
         );
         // then

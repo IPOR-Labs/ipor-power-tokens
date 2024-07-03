@@ -82,8 +82,12 @@ library LiquidityMiningTypes {
         LiquidityMiningTypes.GlobalRewardsIndicators indicators;
     }
 
-    struct AccountPowerUpModifier {
-        uint128 logBase;
-        uint128 pwTokenModifier;
+    struct PoolPowerUpModifier {
+        // @dev 10 decimals
+        uint64 logBase;
+        // @dev 10 decimals
+        uint64 pwTokenModifier;
+        // @dev 10 decimals
+        uint64 vectorOfCurve;
     }
 }
