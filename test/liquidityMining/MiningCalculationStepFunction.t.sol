@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "../TestCommons.sol";
 import "@power-tokens/contracts/libraries/math/MiningCalculation.sol";
 import "abdk-libraries-solidity/ABDKMathQuad.sol";
+import "../../contracts/libraries/math/MiningCalculationAccountPowerUp.sol";
 
 contract MiningCalculationStepFunctionTest is TestCommons {
     TestData private _testData;
@@ -27,7 +28,7 @@ contract MiningCalculationStepFunctionTest is TestCommons {
         bytes16 ratio = _toQuadruplePrecision(_testData.inputRatio, 1e18);
 
         // when
-        bytes16 result = MiningCalculation.accountPowerUpStepFunction(ratio);
+        bytes16 result = MiningCalculationAccountPowerUp.accountPowerUpStepFunction(ratio);
 
         // then
 

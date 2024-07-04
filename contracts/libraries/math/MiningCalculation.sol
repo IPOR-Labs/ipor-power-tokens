@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.20;
 
-import "abdk-libraries-solidity/ABDKMathQuad.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 
 import "../errors/Errors.sol";
@@ -9,67 +8,8 @@ import "./MathOperation.sol";
 
 /// @title Library containing the core logic used in the Liquidity Mining module.
 library MiningCalculation {
-    uint256 constant SLOPE_1 = 5; //   5.0
-    uint256 constant BASE_1 = 2e17; //    0.2
-
-    uint256 constant SLOPE_2 = 2; //   2.0
-    uint256 constant BASE_2 = 26e16; //    0.26
-
-    uint256 constant SLOPE_3 = 15e17; //   1.5
-    uint256 constant BASE_3 = 28e16; //    0.28
-
-    uint256 constant SLOPE_4 = 1; //   1.0
-    uint256 constant BASE_4 = 31e16; //    0.31
-
-    uint256 constant SLOPE_5 = 5e17; //   0.5
-    uint256 constant BASE_5 = 35e16; //    0.35
-
     using SafeCast for uint256;
     using SafeCast for int256;
-
-    /// @notice Calculates the Power-up indicator for a given account.
-    /// @param accountPwTokenAmount account's Power Tokens amount
-    /// @param accountLpTokenAmount account's lpTokens amount
-    /// @param verticalShift preconfigured param, vertical shift used in equation calculating the account's power-up
-    /// @param horizontalShift preconfigured param, horizontal shift used in equation calculating account's power-up
-    /// @return power-up indicator of a given account
-    function calculateAccountPowerUp(
-        uint256 accountPwTokenAmount,
-        uint256 accountLpTokenAmount,
-        bytes16 verticalShift,
-        bytes16 horizontalShift
-    ) internal pure returns (uint256) {
-        if (accountLpTokenAmount < 1e18) {
-            return 0;
-        }
-
-        bytes16 accountPwTokenAmountQP = _toQuadruplePrecision(accountPwTokenAmount, 1e18);
-        bytes16 lpTokenAmountQP = _toQuadruplePrecision(accountLpTokenAmount, 1e18);
-        bytes16 ratio = ABDKMathQuad.div(accountPwTokenAmountQP, lpTokenAmountQP);
-
-        bytes16 result;
-        if (ABDKMathQuad.cmp(_toQuadruplePrecision(1e18, 10e18), ratio) >= 0) {
-            result = accountPowerUpStepFunction(ratio);
-            bytes16 resultD18 = ABDKMathQuad.mul(result, ABDKMathQuad.fromUInt(1e18));
-            return ABDKMathQuad.toUInt(resultD18);
-        } else {
-            bytes16 pwTokenAmountWithModifierQP = ABDKMathQuad.mul(
-                _getPwTokenModifier(),
-                accountPwTokenAmountQP
-            );
-
-            bytes16 underLog = ABDKMathQuad.add(
-                ABDKMathQuad.div(pwTokenAmountWithModifierQP, lpTokenAmountQP),
-                horizontalShift
-            );
-
-            result = ABDKMathQuad.add(verticalShift, ABDKMathQuad.log_2(underLog));
-            bytes16 resultD18 = ABDKMathQuad.mul(result, ABDKMathQuad.fromUInt(1e18));
-
-            //The number 222392421336447926 is the value by which we want to lower the default function values. This value can never be negative.
-            return ABDKMathQuad.toUInt(resultD18) - 222392421336447926;
-        }
-    }
 
     /// @notice Calculates the aggreagated power-up. Aggregate power-up is a synthetic summary of all power-ups across all users.
     /// It's used to calculate the individual rewards in relation to the rest of the pool.
@@ -191,59 +131,5 @@ library MiningCalculation {
             globalIndCompositeMultiplierCumulativePrevBlock +
             (currentBlockNumber - globalIndBlockNumber) *
             globalIndCompositeMultiplierInTheBlock;
-    }
-
-    function accountPowerUpStepFunction(bytes16 ratio) internal pure returns (bytes16) {
-        if (ABDKMathQuad.cmp(_toQuadruplePrecision(2, 100), ratio) > 0) {
-            return
-                ABDKMathQuad.add(
-                    _toQuadruplePrecision(BASE_1, 1e18),
-                    ABDKMathQuad.mul(ABDKMathQuad.fromUInt(SLOPE_1), ratio)
-                );
-        } else if (ABDKMathQuad.cmp(_toQuadruplePrecision(4, 100), ratio) > 0) {
-            return
-                ABDKMathQuad.add(
-                    _toQuadruplePrecision(BASE_2, 1e18),
-                    ABDKMathQuad.mul(ABDKMathQuad.fromUInt(SLOPE_2), ratio)
-                );
-        } else if (ABDKMathQuad.cmp(_toQuadruplePrecision(6, 100), ratio) > 0) {
-            return
-                ABDKMathQuad.add(
-                    _toQuadruplePrecision(BASE_3, 1e18),
-                    ABDKMathQuad.mul(_toQuadruplePrecision(SLOPE_3, 1e18), ratio)
-                );
-        } else if (ABDKMathQuad.cmp(_toQuadruplePrecision(8, 100), ratio) > 0) {
-            return
-                ABDKMathQuad.add(
-                    _toQuadruplePrecision(BASE_4, 1e18),
-                    ABDKMathQuad.mul(ABDKMathQuad.fromUInt(SLOPE_4), ratio)
-                );
-        } else {
-            return
-                ABDKMathQuad.add(
-                    _toQuadruplePrecision(BASE_5, 1e18),
-                    ABDKMathQuad.mul(_toQuadruplePrecision(SLOPE_5, 1e18), ratio)
-                );
-        }
-    }
-
-    /// @dev Quadruple precision, 128 bits
-    function _toQuadruplePrecision(
-        uint256 number,
-        uint256 decimals
-    ) private pure returns (bytes16) {
-        if (number % decimals > 0) {
-            /// @dev during calculation this value is lost in the conversion
-            number += 1;
-        }
-        bytes16 nominator = ABDKMathQuad.fromUInt(number);
-        bytes16 denominator = ABDKMathQuad.fromUInt(decimals);
-        bytes16 fraction = ABDKMathQuad.div(nominator, denominator);
-        return fraction;
-    }
-
-    /// @dev Quadruple precision, 128 bits
-    function _getPwTokenModifier() private pure returns (bytes16) {
-        return ABDKMathQuad.fromUInt(2);
     }
 }
