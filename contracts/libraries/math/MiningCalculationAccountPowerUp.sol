@@ -8,19 +8,27 @@ import "../errors/Errors.sol";
 import "./MathOperation.sol";
 
 struct AccountPowerUpData {
+    /// @dev  value with 18 decimals,
     uint256 accountPwTokenAmount;
+    /// @dev  value with 18 decimals,
     uint256 accountLpTokenAmount;
+    /// @dev value in format of ABDKMathQuad
     bytes16 verticalShift;
+    /// @dev value in format of ABDKMathQuad
     bytes16 horizontalShift;
-    // @dev  value with 18 decimals,
+    /// @dev  value with 18 decimals,
     uint256 logBase;
-    // @dev  value with 18 decimals,
+    /// @dev  value with 18 decimals,
     uint256 pwTokenModifier;
+    /// @dev  value with 18 decimals,
     uint256 vectorOfCurve;
 }
 
 /// @title Library containing the core logic used in the Liquidity Mining module.
 library MiningCalculationAccountPowerUp {
+    using SafeCast for uint256;
+    using SafeCast for int256;
+
     uint256 constant SLOPE_1 = 5; //   5.0
     uint256 constant BASE_1 = 2e17; //    0.2
 
@@ -35,9 +43,6 @@ library MiningCalculationAccountPowerUp {
 
     uint256 constant SLOPE_5 = 5e17; //   0.5
     uint256 constant BASE_5 = 35e16; //    0.35
-
-    using SafeCast for uint256;
-    using SafeCast for int256;
 
     function calculateAccountPowerUp(
         AccountPowerUpData memory data_
@@ -72,7 +77,7 @@ library MiningCalculationAccountPowerUp {
             );
             bytes16 resultD18 = ABDKMathQuad.mul(result, ABDKMathQuad.fromUInt(1e18));
 
-            //The number 222392421336447926 is the value by which we want to lower the default function values. This value can never be negative.
+            /// @dev The number 222392421336447926 is the value by which we want to lower the default function values. This value can never be negative.
             return ABDKMathQuad.toUInt(resultD18) - 222392421336447926;
         }
     }
