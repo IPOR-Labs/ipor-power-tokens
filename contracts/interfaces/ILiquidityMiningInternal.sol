@@ -137,7 +137,7 @@ interface ILiquidityMiningInternal {
     /// @param logBase The logarithmic base.
     /// @param pwTokenModifier The power-up token modifier.
     /// @param vectorOfCurve The vector of the initial curve for ratio < 0.1.
-    event AccountPowerUpModifiersUpdated(
+    event PoolPowerUpModifiersUpdated(
         address lpToken,
         uint64 logBase,
         uint64 pwTokenModifier,

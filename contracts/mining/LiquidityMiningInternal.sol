@@ -208,7 +208,7 @@ abstract contract LiquidityMiningInternal is
                 logBase: modifiers[i].logBase,
                 vectorOfCurve: modifiers[i].vectorOfCurve
             });
-            emit AccountPowerUpModifiersUpdated(
+            emit PoolPowerUpModifiersUpdated(
                 lpTokens[i],
                 modifiers[i].logBase,
                 modifiers[i].pwTokenModifier,
