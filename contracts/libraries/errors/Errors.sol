@@ -46,4 +46,5 @@ library Errors {
     string public constant CONTRACT_PAUSED = "PT_724";
     string public constant REENTRANCY = "PT_725";
     string public constant CALLER_NOT_OWNER = "PT_726";
+    string public constant WRONG_VALUE = "PT_727";
 }

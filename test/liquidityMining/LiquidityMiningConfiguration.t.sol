@@ -8,6 +8,8 @@ import "@power-tokens/contracts/interfaces/types/PowerTokenTypes.sol";
 import "@power-tokens/contracts/interfaces/ILiquidityMiningLens.sol";
 import "@power-tokens/contracts/interfaces/IPowerTokenLens.sol";
 import "@power-tokens/contracts/tokens/PowerTokenInternal.sol";
+import "../../contracts/interfaces/types/LiquidityMiningTypes.sol";
+import "../../contracts/mining/LiquidityMiningInternal.sol";
 
 contract LiquidityMiningConfigurationTest is TestCommons {
     event LpTokenSupportRemoved(address account, address lpToken);
@@ -486,5 +488,292 @@ contract LiquidityMiningConfigurationTest is TestCommons {
         vm.prank(userOne);
         vm.expectRevert(bytes(Errors.LP_TOKEN_NOT_SUPPORTED));
         IPowerTokenFlowsService(router).delegatePwTokensToLiquidityMining(lpTokens, pwTokenAmounts);
+    }
+
+    function testShouldBeAbleToSetAccountPowerUpModifiers() external {
+        // given
+        address liquidityMining = _powerTokensSystem.liquidityMining();
+        address owner = _powerTokensSystem.owner();
+
+        address[] memory lpTokens = new address[](1);
+        lpTokens[0] = _powerTokensSystem.lpDai();
+
+        LiquidityMiningTypes.PoolPowerUpModifier[]
+            memory modifiers = new LiquidityMiningTypes.PoolPowerUpModifier[](1);
+        modifiers[0].logBase = 3e10;
+        modifiers[0].pwTokenModifier = 5e10;
+        modifiers[0].vectorOfCurve = 2e9;
+
+        (
+            uint256 pwTokenModifierBefore,
+            uint256 logBaseBefore,
+            uint256 vectorOfCurveBefore
+        ) = LiquidityMiningInternal(liquidityMining).getPoolPowerUpModifiers(lpTokens[0]);
+
+        // when
+        vm.prank(owner);
+        LiquidityMiningInternal(liquidityMining).setPoolPowerUpModifiers(lpTokens, modifiers);
+
+        // then
+        (
+            uint256 pwTokenModifierAfter,
+            uint256 logBaseAfter,
+            uint256 vectorOfCurveAfter
+        ) = LiquidityMiningInternal(liquidityMining).getPoolPowerUpModifiers(lpTokens[0]);
+
+        assertEq(pwTokenModifierBefore, 2e18, "should be 2e18 before");
+        assertEq(logBaseBefore, 2e18, "should be 2e18 before");
+        assertEq(vectorOfCurveBefore, 0, "should be 0 before");
+
+        assertEq(pwTokenModifierAfter, 5e18, "should be 5e18 after");
+        assertEq(logBaseAfter, 3e18, "should be 3e18 after");
+        assertEq(vectorOfCurveAfter, 2e17, "should be 2e17 after");
+    }
+
+    function testShouldNotBeAbleToSetAccountPowerUpModifiersWhenNotOwner() external {
+        // given
+        address user = _getUserAddress(10);
+        address liquidityMining = _powerTokensSystem.liquidityMining();
+
+        address[] memory lpTokens = new address[](1);
+        lpTokens[0] = _powerTokensSystem.lpDai();
+
+        LiquidityMiningTypes.PoolPowerUpModifier[]
+            memory modifiers = new LiquidityMiningTypes.PoolPowerUpModifier[](1);
+        modifiers[0].logBase = 3e10;
+        modifiers[0].pwTokenModifier = 5e10;
+        modifiers[0].vectorOfCurve = 2e9;
+
+        (
+            uint256 pwTokenModifierBefore,
+            uint256 logBaseBefore,
+            uint256 vectorOfCurveBefore
+        ) = LiquidityMiningInternal(liquidityMining).getPoolPowerUpModifiers(lpTokens[0]);
+
+        // when
+        vm.prank(user);
+        vm.expectRevert(bytes("Ownable: caller is not the owner"));
+        LiquidityMiningInternal(liquidityMining).setPoolPowerUpModifiers(lpTokens, modifiers);
+
+        // then
+        (
+            uint256 pwTokenModifierAfter,
+            uint256 logBaseAfter,
+            uint256 vectorOfCurveAfter
+        ) = LiquidityMiningInternal(liquidityMining).getPoolPowerUpModifiers(lpTokens[0]);
+
+        assertEq(pwTokenModifierBefore, 2e18, "should be 2e18 before");
+        assertEq(logBaseBefore, 2e18, "should be 2e18 before");
+        assertEq(vectorOfCurveBefore, 0, "should be 0 before");
+
+        assertEq(pwTokenModifierAfter, 2e18, "should be 2e18 after");
+        assertEq(logBaseAfter, 2e18, "should be 2e18 after");
+        assertEq(vectorOfCurveAfter, 0, "should be 0 after");
+    }
+
+    function testShouldNotBeAbleToSetAccountPowerUpModifiersWhenMismatchArraysLength() external {
+        // given
+        address liquidityMining = _powerTokensSystem.liquidityMining();
+        address owner = _powerTokensSystem.owner();
+
+        address[] memory lpTokens = new address[](2);
+        lpTokens[0] = _powerTokensSystem.lpDai();
+        lpTokens[1] = _powerTokensSystem.lpDai();
+
+        LiquidityMiningTypes.PoolPowerUpModifier[]
+            memory modifiers = new LiquidityMiningTypes.PoolPowerUpModifier[](1);
+        modifiers[0].logBase = 3e10;
+        modifiers[0].pwTokenModifier = 5e10;
+        modifiers[0].vectorOfCurve = 2e9;
+
+        (
+            uint256 pwTokenModifierBefore,
+            uint256 logBaseBefore,
+            uint256 vectorOfCurveBefore
+        ) = LiquidityMiningInternal(liquidityMining).getPoolPowerUpModifiers(lpTokens[0]);
+
+        // when
+        vm.prank(owner);
+        vm.expectRevert(bytes(Errors.INPUT_ARRAYS_LENGTH_MISMATCH));
+        LiquidityMiningInternal(liquidityMining).setPoolPowerUpModifiers(lpTokens, modifiers);
+
+        // then
+        (
+            uint256 pwTokenModifierAfter,
+            uint256 logBaseAfter,
+            uint256 vectorOfCurveAfter
+        ) = LiquidityMiningInternal(liquidityMining).getPoolPowerUpModifiers(lpTokens[0]);
+
+        assertEq(pwTokenModifierBefore, 2e18, "should be 2e18 before");
+        assertEq(logBaseBefore, 2e18, "should be 2e18 before");
+        assertEq(vectorOfCurveBefore, 0, "should be 0 before");
+
+        assertEq(pwTokenModifierAfter, 2e18, "should be 2e18 after");
+        assertEq(logBaseAfter, 2e18, "should be 2e18 after");
+        assertEq(vectorOfCurveAfter, 0, "should be 0 after");
+    }
+
+    function testShouldNotBeAbleToSetAccountPowerUpModifiersWhenLogBase0() external {
+        // given
+        address liquidityMining = _powerTokensSystem.liquidityMining();
+        address owner = _powerTokensSystem.owner();
+
+        address[] memory lpTokens = new address[](1);
+        lpTokens[0] = _powerTokensSystem.lpDai();
+
+        LiquidityMiningTypes.PoolPowerUpModifier[]
+            memory modifiers = new LiquidityMiningTypes.PoolPowerUpModifier[](1);
+        modifiers[0].logBase = 0;
+        modifiers[0].pwTokenModifier = 5e10;
+        modifiers[0].vectorOfCurve = 2e9;
+
+        (
+            uint256 pwTokenModifierBefore,
+            uint256 logBaseBefore,
+            uint256 vectorOfCurveBefore
+        ) = LiquidityMiningInternal(liquidityMining).getPoolPowerUpModifiers(lpTokens[0]);
+
+        // when
+        vm.prank(owner);
+        vm.expectRevert(bytes(Errors.WRONG_VALUE));
+        LiquidityMiningInternal(liquidityMining).setPoolPowerUpModifiers(lpTokens, modifiers);
+
+        // then
+        (
+            uint256 pwTokenModifierAfter,
+            uint256 logBaseAfter,
+            uint256 vectorOfCurveAfter
+        ) = LiquidityMiningInternal(liquidityMining).getPoolPowerUpModifiers(lpTokens[0]);
+
+        assertEq(pwTokenModifierBefore, 2e18, "should be 2e18 before");
+        assertEq(logBaseBefore, 2e18, "should be 2e18 before");
+        assertEq(vectorOfCurveBefore, 0, "should be 0 before");
+
+        assertEq(pwTokenModifierAfter, 2e18, "should be 2e18 after");
+        assertEq(logBaseAfter, 2e18, "should be 2e18 after");
+        assertEq(vectorOfCurveAfter, 0, "should be 0 after");
+    }
+
+    function testShouldNotBeAbleToSetAccountPowerUpModifiersWhenLogBase1() external {
+        // given
+        address liquidityMining = _powerTokensSystem.liquidityMining();
+        address owner = _powerTokensSystem.owner();
+
+        address[] memory lpTokens = new address[](1);
+        lpTokens[0] = _powerTokensSystem.lpDai();
+
+        LiquidityMiningTypes.PoolPowerUpModifier[]
+            memory modifiers = new LiquidityMiningTypes.PoolPowerUpModifier[](1);
+        modifiers[0].logBase = 1e10;
+        modifiers[0].pwTokenModifier = 5e10;
+        modifiers[0].vectorOfCurve = 2e9;
+
+        (
+            uint256 pwTokenModifierBefore,
+            uint256 logBaseBefore,
+            uint256 vectorOfCurveBefore
+        ) = LiquidityMiningInternal(liquidityMining).getPoolPowerUpModifiers(lpTokens[0]);
+
+        // when
+        vm.prank(owner);
+        vm.expectRevert(bytes(Errors.WRONG_VALUE));
+        LiquidityMiningInternal(liquidityMining).setPoolPowerUpModifiers(lpTokens, modifiers);
+
+        // then
+        (
+            uint256 pwTokenModifierAfter,
+            uint256 logBaseAfter,
+            uint256 vectorOfCurveAfter
+        ) = LiquidityMiningInternal(liquidityMining).getPoolPowerUpModifiers(lpTokens[0]);
+
+        assertEq(pwTokenModifierBefore, 2e18, "should be 2e18 before");
+        assertEq(logBaseBefore, 2e18, "should be 2e18 before");
+        assertEq(vectorOfCurveBefore, 0, "should be 0 before");
+
+        assertEq(pwTokenModifierAfter, 2e18, "should be 2e18 after");
+        assertEq(logBaseAfter, 2e18, "should be 2e18 after");
+        assertEq(vectorOfCurveAfter, 0, "should be 0 after");
+    }
+
+    function testShouldNotBeAbleToSetAccountPowerUpModifiersWhenPwTokenModifier0() external {
+        // given
+        address liquidityMining = _powerTokensSystem.liquidityMining();
+        address owner = _powerTokensSystem.owner();
+
+        address[] memory lpTokens = new address[](1);
+        lpTokens[0] = _powerTokensSystem.lpDai();
+
+        LiquidityMiningTypes.PoolPowerUpModifier[]
+            memory modifiers = new LiquidityMiningTypes.PoolPowerUpModifier[](1);
+        modifiers[0].logBase = 3e10;
+        modifiers[0].pwTokenModifier = 0;
+        modifiers[0].vectorOfCurve = 2e9;
+
+        (
+            uint256 pwTokenModifierBefore,
+            uint256 logBaseBefore,
+            uint256 vectorOfCurveBefore
+        ) = LiquidityMiningInternal(liquidityMining).getPoolPowerUpModifiers(lpTokens[0]);
+
+        // when
+        vm.prank(owner);
+        vm.expectRevert(bytes(Errors.VALUE_NOT_GREATER_THAN_ZERO));
+        LiquidityMiningInternal(liquidityMining).setPoolPowerUpModifiers(lpTokens, modifiers);
+
+        // then
+        (
+            uint256 pwTokenModifierAfter,
+            uint256 logBaseAfter,
+            uint256 vectorOfCurveAfter
+        ) = LiquidityMiningInternal(liquidityMining).getPoolPowerUpModifiers(lpTokens[0]);
+
+        assertEq(pwTokenModifierBefore, 2e18, "should be 2e18 before");
+        assertEq(logBaseBefore, 2e18, "should be 2e18 before");
+        assertEq(vectorOfCurveBefore, 0, "should be 0 before");
+
+        assertEq(pwTokenModifierAfter, 2e18, "should be 2e18 after");
+        assertEq(logBaseAfter, 2e18, "should be 2e18 after");
+        assertEq(vectorOfCurveAfter, 0, "should be 0 after");
+    }
+
+    function testShouldNotBeAbleToSetAccountPowerUpModifiersWhenLpTokenZeroAddress0() external {
+        // given
+        address liquidityMining = _powerTokensSystem.liquidityMining();
+        address owner = _powerTokensSystem.owner();
+
+        address[] memory lpTokens = new address[](1);
+        lpTokens[0] = address(0);
+
+        LiquidityMiningTypes.PoolPowerUpModifier[]
+            memory modifiers = new LiquidityMiningTypes.PoolPowerUpModifier[](1);
+        modifiers[0].logBase = 3e10;
+        modifiers[0].pwTokenModifier = 0;
+        modifiers[0].vectorOfCurve = 2e9;
+
+        (
+            uint256 pwTokenModifierBefore,
+            uint256 logBaseBefore,
+            uint256 vectorOfCurveBefore
+        ) = LiquidityMiningInternal(liquidityMining).getPoolPowerUpModifiers(lpTokens[0]);
+
+        // when
+        vm.prank(owner);
+        vm.expectRevert(bytes(Errors.WRONG_ADDRESS));
+        LiquidityMiningInternal(liquidityMining).setPoolPowerUpModifiers(lpTokens, modifiers);
+
+        // then
+        (
+            uint256 pwTokenModifierAfter,
+            uint256 logBaseAfter,
+            uint256 vectorOfCurveAfter
+        ) = LiquidityMiningInternal(liquidityMining).getPoolPowerUpModifiers(lpTokens[0]);
+
+        assertEq(pwTokenModifierBefore, 2e18, "should be 2e18 before");
+        assertEq(logBaseBefore, 2e18, "should be 2e18 before");
+        assertEq(vectorOfCurveBefore, 0, "should be 0 before");
+
+        assertEq(pwTokenModifierAfter, 2e18, "should be 2e18 after");
+        assertEq(logBaseAfter, 2e18, "should be 2e18 after");
+        assertEq(vectorOfCurveAfter, 0, "should be 0 after");
     }
 }
