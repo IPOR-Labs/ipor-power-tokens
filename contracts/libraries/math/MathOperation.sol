@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.20;
+pragma solidity 0.8.26;
 
 library MathOperation {
     //@notice Division with the rounding up on last position, x, and y is with MD

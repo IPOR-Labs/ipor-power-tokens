@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.20;
+pragma solidity 0.8.26;
 
 import "abdk-libraries-solidity/ABDKMathQuad.sol";
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";

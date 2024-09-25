@@ -1,7 +1,8 @@
 [profile.default]
 src = 'contracts'
+evm_version = 'cancun'
 out = 'out'
-solc = "0.8.20"
+solc = "0.8.26"
 libs = ["node_modules", "lib"]
 fs_permissions = [{ access = "read-write", path = "./"}]
 remappings = [
