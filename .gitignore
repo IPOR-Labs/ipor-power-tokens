@@ -4,6 +4,10 @@
 ### Node build artifacts ###
 /node_modules
 
+### Smart Contracts build artifacts ###
+/out/
+/cache/
+
 ### IntelliJ IDEA ###
 .idea
 *.iws
@@ -13,22 +17,5 @@
 ### macOS system files ###
 .DS_Store
 
-### Ansible build artifacts ###
+### Slither artifacts ###
 slither-report.json
-.vscode/settings.json
-
-### hardhat ###
-/artifacts/
-/cache/
-
-# OpenZeppelin
-.openzeppelin/
-.openzeppelin/*.json
-/types/
-
-package-lock.json
-out/
-
-/.deps/
-/broadcast/
-ipor-power-token-addresses.json
