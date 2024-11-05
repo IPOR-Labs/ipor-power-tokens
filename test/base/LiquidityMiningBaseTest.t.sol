@@ -3,59 +3,54 @@ pragma solidity 0.8.26;
 
 import "forge-std/Test.sol";
 import "../../contracts/mocks/tokens/MockLpToken.sol";
-import "../../contracts/mining/arbitrum/LiquidityMiningArbitrum.sol";
+import "../../contracts/mining/base/LiquidityMiningBase.sol";
 import "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import "../../contracts/interfaces/types/LiquidityMiningTypes.sol";
 
-contract LiquidityMiningArbitrumTest is Test {
-    address public constant wstEth = 0x5979D7b546E38E414F7E9822514be443A4800529;
-    address public constant usdc = 0xaf88d065e77c8cC2239327C5EDb3A432268e5831;
-    address public constant ipor = 0x34229B3f16fBCDfA8d8d9d17C0852F9496f4C7BB;
-    address public constant ethUsdOracle = 0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612;
-    address public constant wstEthStEthOracle = 0xB1552C5e96B312d0Bf8b554186F846C40614a540;
+contract LiquidityMiningBaseTest is Test {
+    address public constant WST_ETH = 0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452;
+    address public constant USDC = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
+    address public constant IPOR = address(0);
+    address public constant ETH_USD_ORACLE = 0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70;
+    address public constant WST_ETH_ETH_ORACLE = 0x43a5C292A453A3bF3606fa856197f09D7B74251a;
 
     address public lpWstEth;
     address public lpUsdc;
-    LiquidityMiningArbitrum public liquidityMining;
+    LiquidityMiningBase public liquidityMining;
 
     function setUp() public {
-        vm.createSelectFork(vm.envString("ARBITRUM_PROVIDER_URL"), 18983640);
-        lpWstEth = address(new MockLpToken("lpWstEth", "lpWstEth", wstEth));
-        lpUsdc = address(new MockLpToken("lpUsdc", "lpUsdc", wstEth));
+        vm.createSelectFork(vm.envString("BASE_PROVIDER_URL"));
+        lpWstEth = address(new MockLpToken("lpWstEth", "lpWstEth", WST_ETH));
+        lpUsdc = address(new MockLpToken("lpUsdc", "lpUsdc", WST_ETH));
         MockLpToken(lpWstEth).setJoseph(address(this));
         MockLpToken(lpUsdc).setJoseph(address(this));
-        LiquidityMiningArbitrum liquidityMiningImpl = new LiquidityMiningArbitrum(
+        LiquidityMiningBase liquidityMiningImpl = new LiquidityMiningBase(
             address(this),
-            ethUsdOracle,
-            wstEthStEthOracle,
+            ETH_USD_ORACLE,
+            WST_ETH_ETH_ORACLE,
             lpWstEth
         );
 
-        address[] memory lpTokewns = new address[](2);
-        lpTokewns[0] = lpWstEth;
-        lpTokewns[1] = lpUsdc;
+        address[] memory lpTokens = new address[](2);
+        lpTokens[0] = lpWstEth;
+        lpTokens[1] = lpUsdc;
 
         ERC1967Proxy proxy = new ERC1967Proxy(
             address(liquidityMiningImpl),
-            abi.encodeWithSignature("initialize(address[])", lpTokewns)
+            abi.encodeWithSignature("initialize(address[])", lpTokens)
         );
 
-        liquidityMining = LiquidityMiningArbitrum(address(proxy));
+        liquidityMining = LiquidityMiningBase(address(proxy));
     }
 
     function testOracles() external {
-        // given
-        // answerEthUsd 264703534116
-        // answerWstEthStEth 1153222004578747471
-        // block 18983640
-        //
         MockLpToken(lpWstEth).mint(address(this), 100e18);
         LiquidityMiningTypes.UpdateLpToken[]
             memory updateLpToken = new LiquidityMiningTypes.UpdateLpToken[](1);
 
         updateLpToken[0] = LiquidityMiningTypes.UpdateLpToken(address(this), lpWstEth, 10e18);
-        address[] memory lpTokewns = new address[](1);
-        lpTokewns[0] = lpWstEth;
+        address[] memory lpTokens = new address[](1);
+        lpTokens[0] = lpWstEth;
 
         LiquidityMiningTypes.UpdatePwToken[]
             memory updatePwTokens = new LiquidityMiningTypes.UpdatePwToken[](1);
@@ -68,7 +63,7 @@ contract LiquidityMiningArbitrumTest is Test {
 
         // then
         LiquidityMiningTypes.AccountIndicatorsResult[] memory indicatorsList = liquidityMining
-            .getAccountIndicators(address(this), lpTokewns);
+            .getAccountIndicators(address(this), lpTokens);
         LiquidityMiningTypes.AccountRewardsIndicators memory indicators = indicatorsList[0]
             .indicators;
 
@@ -87,13 +82,13 @@ contract LiquidityMiningArbitrumTest is Test {
     }
 
     function testShouldCalculateDifferentValueForWstEthAndUsdc() external {
-        //        wstEth
+        // wstEth
         MockLpToken(lpWstEth).mint(address(this), 100e18);
         LiquidityMiningTypes.UpdateLpToken[]
             memory updateLpToken = new LiquidityMiningTypes.UpdateLpToken[](1);
 
         updateLpToken[0] = LiquidityMiningTypes.UpdateLpToken(address(this), lpWstEth, 10e18);
-        address[] memory lpTokewns = new address[](1);
+        address[] memory lpTokens = new address[](1);
 
         LiquidityMiningTypes.UpdatePwToken[]
             memory updatePwTokens = new LiquidityMiningTypes.UpdatePwToken[](1);
@@ -102,7 +97,7 @@ contract LiquidityMiningArbitrumTest is Test {
         liquidityMining.addPwTokensInternal(updatePwTokens);
         liquidityMining.addLpTokensInternal(updateLpToken);
 
-        //        usdc
+        // usdc
         MockLpToken(lpUsdc).mint(address(this), 100e18);
         updateLpToken[0] = LiquidityMiningTypes.UpdateLpToken(address(this), lpUsdc, 10e18);
         updatePwTokens[0] = LiquidityMiningTypes.UpdatePwToken(address(this), lpUsdc, 100e18);
@@ -110,13 +105,13 @@ contract LiquidityMiningArbitrumTest is Test {
         liquidityMining.addPwTokensInternal(updatePwTokens);
         liquidityMining.addLpTokensInternal(updateLpToken);
 
-        lpTokewns[0] = lpWstEth;
+        lpTokens[0] = lpWstEth;
         LiquidityMiningTypes.AccountIndicatorsResult[] memory indicatorsListWstEth = liquidityMining
-            .getAccountIndicators(address(this), lpTokewns);
+            .getAccountIndicators(address(this), lpTokens);
 
-        lpTokewns[0] = lpUsdc;
+        lpTokens[0] = lpUsdc;
         LiquidityMiningTypes.AccountIndicatorsResult[] memory indicatorsListUsdc = liquidityMining
-            .getAccountIndicators(address(this), lpTokewns);
+            .getAccountIndicators(address(this), lpTokens);
 
         assertEq(
             indicatorsListWstEth[0].indicators.powerUp,

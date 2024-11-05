@@ -8,7 +8,7 @@ import "@power-tokens/contracts/mocks/tokens/MockToken.sol";
 import "@power-tokens/contracts/mocks/tokens/MockLpToken.sol";
 import "./TestCommons.sol";
 import "@power-tokens/contracts/mining/LiquidityMining.sol";
-import "@power-tokens/contracts/mining/LiquidityMiningEthereum.sol";
+import "@power-tokens/contracts/mining/ethereum/LiquidityMiningEthereum.sol";
 import "@power-tokens/contracts/tokens/PowerToken.sol";
 import "@power-tokens/contracts/lens/LiquidityMiningLens.sol";
 import "@power-tokens/contracts/services/StakeService.sol";

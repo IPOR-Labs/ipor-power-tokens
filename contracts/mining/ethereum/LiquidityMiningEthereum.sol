@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.26;
 
-import "./LiquidityMining.sol";
+import "../LiquidityMining.sol";
 import "./CalculateWeightedLpTokenBalanceEthereum.sol";
 
 /// @title Smart contract responsible for distribution of Power Token rewards across accounts contributing to Liquidity Mining
