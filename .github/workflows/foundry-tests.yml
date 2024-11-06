@@ -1,99 +1,102 @@
 name: Tests in foundry
 
 on:
-  workflow_call:
-    secrets:
-      ETHEREUM_PROVIDER_URL:
-        required: true
-      ARBITRUM_PROVIDER_URL:
-        required: true
+    workflow_call:
+        secrets:
+            ETHEREUM_PROVIDER_URL:
+                required: true
+            ARBITRUM_PROVIDER_URL:
+                required: true
+            BASE_PROVIDER_URL:
+                required: true
 
-    inputs:
+        inputs:
+            node-version:
+                description: "NodeJS version"
+                type: string
+                default: 20.17.0
+                required: false
 
-      node-version:
-        description: "NodeJS version"
-        type: string
-        default: 20.17.0
-        required: false
+            test-enabled:
+                description: "Enable Forge tests"
+                type: boolean
+                default: true
+                required: false
 
-      test-enabled:
-        description: "Enable Forge tests"
-        type: boolean
-        default: true
-        required: false
+            fork-test-enabled:
+                description: "Enable Forge fork tests"
+                type: boolean
+                default: true
+                required: false
 
-      fork-test-enabled:
-        description: "Enable Forge fork tests"
-        type: boolean
-        default: true
-        required: false
+            test-options:
+                description: "Extra options in Forge test command"
+                type: string
+                default: ""
+                required: false
 
-      test-options:
-        description: "Extra options in Forge test command"
-        type: string
-        default: ""
-        required: false
-
-      fork-test-options:
-        description: "Extra options in Forge fork test command"
-        type: string
-        default: ""
-        required: false
+            fork-test-options:
+                description: "Extra options in Forge fork test command"
+                type: string
+                default: ""
+                required: false
 
 jobs:
-  foundry-tests:
-    runs-on:
-      group: foundry-build
+    foundry-tests:
+        runs-on:
+            group: foundry-build
 
-    steps:
-      - name: Checkout
-        # from tag: v4.1.7
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
-        with:
-          submodules: recursive
+        steps:
+            - name: Checkout
+              # from tag: v4.1.7
+              uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332
+              with:
+                  submodules: recursive
 
-      - name: Set up node
-        # from tag: v4.0.4
-        uses: actions/setup-node@0a44ba7841725637a19e28fa30b79a866c81b0a6
-        with:
-          node-version: ${{ inputs.node-version }}
+            - name: Set up node
+              # from tag: v4.0.4
+              uses: actions/setup-node@0a44ba7841725637a19e28fa30b79a866c81b0a6
+              with:
+                  node-version: ${{ inputs.node-version }}
 
-      - name: Set up node_modules cache
-        # from tag: v4.0.2
-        uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9
-        with:
-          path: "**/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+            - name: Set up node_modules cache
+              # from tag: v4.0.2
+              uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9
+              with:
+                  path: "**/node_modules"
+                  key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Set up Foundry
-        # from tag: v1.2.0-ipor
-        uses: IPOR-Labs/foundry-toolchain@18ecb60c02f281f6906d3349abfe450d295be7a8
-        with:
-          version: nightly-03ea54c63e33e3175a6f44d8cfe3718bd6c962ba
+            - name: Set up Foundry
+              # from tag: v1.2.0-ipor
+              uses: IPOR-Labs/foundry-toolchain@18ecb60c02f281f6906d3349abfe450d295be7a8
+              with:
+                  version: nightly-03ea54c63e33e3175a6f44d8cfe3718bd6c962ba
 
-      - name: Install
-        run: npm install
+            - name: Install
+              run: npm install
 
-      - name: Run Forge build
-        run: |
-          forge --version
-          forge build
-        id: build
+            - name: Run Forge build
+              run: |
+                  forge --version
+                  forge build
+              id: build
 
-      - name: Run Forge tests
-        if: inputs.test-enabled
-        env:
-          ETHEREUM_PROVIDER_URL: ${{ secrets.ETHEREUM_PROVIDER_URL }}
-          ARBITRUM_PROVIDER_URL: ${{ secrets.ARBITRUM_PROVIDER_URL }}
-        run: |
-          forge test ${{ inputs.test-options }} -vvv
-        id: test
+            - name: Run Forge tests
+              if: inputs.test-enabled
+              env:
+                  ETHEREUM_PROVIDER_URL: ${{ secrets.ETHEREUM_PROVIDER_URL }}
+                  ARBITRUM_PROVIDER_URL: ${{ secrets.ARBITRUM_PROVIDER_URL }}
+                  BASE_PROVIDER_URL: ${{ secrets.BASE_PROVIDER_URL }}
+              run: |
+                  forge test ${{ inputs.test-options }} -vvv
+              id: test
 
-      - name: Run Forge fork tests
-        if: inputs.fork-test-enabled
-        env:
-          ETHEREUM_PROVIDER_URL: ${{ secrets.ETHEREUM_PROVIDER_URL }}
-          ARBITRUM_PROVIDER_URL: ${{ secrets.ARBITRUM_PROVIDER_URL }}
-        run: |
-          forge test ${{ inputs.fork-test-options }} -vvv
-        id: fork-test
+            - name: Run Forge fork tests
+              if: inputs.fork-test-enabled
+              env:
+                  ETHEREUM_PROVIDER_URL: ${{ secrets.ETHEREUM_PROVIDER_URL }}
+                  ARBITRUM_PROVIDER_URL: ${{ secrets.ARBITRUM_PROVIDER_URL }}
+                  BASE_PROVIDER_URL: ${{ secrets.BASE_PROVIDER_URL }}
+              run: |
+                  forge test ${{ inputs.fork-test-options }} -vvv
+              id: fork-test
