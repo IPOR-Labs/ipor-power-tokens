@@ -9,7 +9,7 @@ import "../../contracts/lens/PowerTokenLens.sol";
 import "../../contracts/services/StakeService.sol";
 import "../../contracts/services/FlowsService.sol";
 import "../../contracts/router/PowerTokenRouter.sol";
-import "../../contracts/mining/LiquidityMiningEthereum.sol";
+import "../../contracts/mining/ethereum/LiquidityMiningEthereum.sol";
 import "../../contracts/tokens/PowerToken.sol";
 
 contract TestEthMarketCommons is Test {
