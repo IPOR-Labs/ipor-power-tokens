@@ -10,7 +10,6 @@ import "../../contracts/interfaces/types/LiquidityMiningTypes.sol";
 contract LiquidityMiningBaseTest is Test {
     address public constant WST_ETH = 0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452;
     address public constant USDC = 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913;
-    address public constant IPOR = address(0);
     address public constant ETH_USD_ORACLE = 0x71041dddad3595F9CEd3DcCFBe3D1F4b0a16Bb70;
     address public constant WST_ETH_ETH_ORACLE = 0x43a5C292A453A3bF3606fa856197f09D7B74251a;
 
@@ -19,7 +18,7 @@ contract LiquidityMiningBaseTest is Test {
     LiquidityMiningBase public liquidityMining;
 
     function setUp() public {
-        vm.createSelectFork(vm.envString("BASE_PROVIDER_URL"));
+        vm.createSelectFork(vm.envString("BASE_PROVIDER_URL"), 22044599);
         lpWstEth = address(new MockLpToken("lpWstEth", "lpWstEth", WST_ETH));
         lpUsdc = address(new MockLpToken("lpUsdc", "lpUsdc", WST_ETH));
         MockLpToken(lpWstEth).setJoseph(address(this));
@@ -73,7 +72,7 @@ contract LiquidityMiningBaseTest is Test {
             "compositeMultiplierCumulativePrevBlock should be 0"
         );
         assertEq(indicators.lpTokenBalance, 10e18, "lpTokenBalance should be 10e18");
-        assertEq(indicators.powerUp, 227236277435590833, "powerUp should be 227236277435590833");
+        assertEq(indicators.powerUp, 216028252059456695, "powerUp should be 216028252059456695");
         assertEq(
             indicators.delegatedPwTokenBalance,
             100e18,
@@ -115,8 +114,8 @@ contract LiquidityMiningBaseTest is Test {
 
         assertEq(
             indicatorsListWstEth[0].indicators.powerUp,
-            227236277435590833,
-            "powerUp should be 227236277435590833"
+            216028252059456695,
+            "powerUp should be 216028252059456695"
         );
         assertEq(
             indicatorsListUsdc[0].indicators.powerUp,
