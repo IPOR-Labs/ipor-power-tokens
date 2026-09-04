@@ -124,8 +124,8 @@ contract MiningCalculationTest is TestCommons {
         assertEq(result, 2499535673550914421, "Should return 2499535673550914421");
     }
 
-    function testShouldThrowPT_711AggregatePowerUpIsNegative() external {
-        // given
+    function testShouldClampToZeroWhenAggregatePowerUpWouldBeNegative() external {
+        // given: account contribution drops by 9_100e18 but the aggregate only holds 900e18 (under-counted aggregate)
         uint256 accountPowerUp = 900e18;
         uint256 accountLpTokenAmount = 1e18;
         uint256 previousAccountPowerUp = 1_000e18;
@@ -133,13 +133,52 @@ contract MiningCalculationTest is TestCommons {
         uint256 previousAggregatedPowerUp = 900e18;
 
         // when
-        vm.expectRevert(bytes(Errors.AGGREGATE_POWER_UP_COULD_NOT_BE_NEGATIVE));
-        MiningCalculation.calculateAggregatedPowerUp(
+        uint256 result = MiningCalculation.calculateAggregatedPowerUp(
             accountPowerUp,
             accountLpTokenAmount,
             previousAccountPowerUp,
             previousAccountLpTokenAmount,
             previousAggregatedPowerUp
+        );
+
+        // then
+        assertEq(result, 0, "under-counted aggregate must clamp to 0 instead of reverting PT_711");
+    }
+
+    function testShouldClampToZeroWhenAggregateEqualsRemovedContribution() external {
+        // given: removing exactly what the aggregate holds -> 0 (and no revert on the boundary)
+        uint256 result = MiningCalculation.calculateAggregatedPowerUp(0, 0, 1e18, 10e18, 10e18);
+        uint256 resultOneWeiShort = MiningCalculation.calculateAggregatedPowerUp(
+            0,
+            0,
+            1e18,
+            10e18,
+            10e18 - 1
+        );
+
+        // then
+        assertEq(result, 0, "exact drain should give 0");
+        assertEq(resultOneWeiShort, 0, "1 wei deficit should give 0");
+    }
+
+    function testShouldSubtractNormallyWhenAggregateIsSufficient() external {
+        // given
+        uint256 result = MiningCalculation.calculateAggregatedPowerUp(0, 0, 1e18, 10e18, 25e18);
+
+        // then
+        assertEq(result, 15e18, "25 - 10 = 15");
+    }
+
+    function testShouldFlushRoundingDustToZero() external {
+        // given: remaining aggregate below the dust threshold (10_000 wei)
+        uint256 result = MiningCalculation.calculateAggregatedPowerUp(0, 0, 1e18, 10e18, 10e18 + 9_999);
+
+        // then
+        assertEq(result, 0, "dust below threshold should be flushed to 0");
+        assertEq(
+            MiningCalculation.calculateAggregatedPowerUp(0, 0, 1e18, 10e18, 10e18 + 10_000),
+            10_000,
+            "threshold itself is kept"
         );
     }
 

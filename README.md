@@ -77,6 +77,19 @@ to deploy the smart contracts to the mainnet or testnet.
 - `scripts/` contains all the scripts to deploy smart contracts.
 - `test/` contains all the tests.
 
+### Liquidity mining accounting invariant
+For every pool `LiquidityMining` keeps `aggregatedPowerUp == sum(round(powerUp_i * lpTokenBalance_i / 1e18))`
+over all accounts (up to 1 wei of rounding per rebalance; dust below `10_000` wei is flushed to 0 when a pool
+drains). The invariant holds only if every write of an account's `powerUp` goes through `_rebalanceIndicators`.
+
+- `MiningCalculation.calculateAggregatedPowerUp` clamps the subtraction to 0 instead of reverting `PT_711`:
+  lpToken principal must always be withdrawable, an under-counted aggregate may only under-accrue rewards.
+- `reconcileAggregatedPowerUp(lpTokens, deltas)` (owner-only, `reinitializer(2)`) is a one-off correction
+  executed atomically with the v2003 upgrade (`upgradeToAndCall`) for the Ethereum legacy pools ipDAI / ipUSDC /
+  ipUSDT, whose aggregates were under-counted by a short-lived Feb-2023 implementation.
+- Tests: `test/liquidityMining/LiquidityMiningAggregatedPowerUp*.t.sol` (unit + invariant fuzzing) and
+  `test/ethMarket/LiquidityMiningReconcileLegacyPools.t.sol` (mainnet fork at block 25,881,574, needs `ETHEREUM_PROVIDER_URL`).
+
 ### Analyse the contracts with slither
 - Install [remixd](https://remix-ide.readthedocs.io/fr/latest/remixd.html)
 - Install [Slither](https://remix-ide.readthedocs.io/fr/latest/slither.html),  `remixd -i slither`  
