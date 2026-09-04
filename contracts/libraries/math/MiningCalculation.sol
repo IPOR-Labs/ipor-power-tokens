@@ -20,7 +20,7 @@ library MiningCalculation {
     ///      aggregatedPowerUp == sum over accounts of round(powerUp_i * lpTokenBalance_i / 1e18)
     ///      up to rounding (each rebalance can lose < 1 wei; the last unstake flushes dust below `AGGREGATED_POWER_UP_DUST` to 0).
     ///      The invariant holds only if every write of an account's `powerUp` goes through `_rebalanceIndicators`.
-    ///      If the stored aggregate is ever lower than the sum of the stored account contributions (see IL-8156:
+    ///      If the stored aggregate is ever lower than the sum of the stored account contributions (e.g.
     ///      a 2023 implementation wrote `powerUp` on claim without updating the aggregate), the subtraction is clamped to 0
     ///      instead of reverting: lpToken principal must always be withdrawable; rewards on such a pool may only
     ///      under-accrue until the aggregate is reconciled (see {LiquidityMiningInternal.reconcileAggregatedPowerUp}).

@@ -127,7 +127,7 @@ contract AggregatedPowerUpHandler is Test {
     }
 }
 
-/// @notice IL-8156 item 4: `aggregatedPowerUp == sum(round(powerUp_i * lpTokenBalance_i / 1e18))` per pool
+/// @notice `aggregatedPowerUp == sum(round(powerUp_i * lpTokenBalance_i / 1e18))` per pool
 /// must survive any sequence of user actions (each rebalance may lose at most 1 wei to rounding).
 contract LiquidityMiningAggregatedPowerUpInvariantTest is TestCommons {
     PowerTokensTestsSystem internal _system;

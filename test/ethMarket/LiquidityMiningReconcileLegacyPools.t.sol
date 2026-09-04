@@ -9,10 +9,10 @@ import "../../contracts/interfaces/ILiquidityMiningLens.sol";
 import "../../contracts/interfaces/IPowerTokenStakeService.sol";
 import "../../contracts/libraries/errors/Errors.sol";
 
-/// @notice IL-8156 / IL-8155 (Immunefi 2026-09-01): mainnet fork at the block where the victim's full ipDAI
+/// @notice Mainnet fork at the block where an affected account's full ipDAI
 /// unstake reverts with PT_711. Upgrades the live LiquidityMining proxy to this implementation, reconciles the
-/// three legacy pools atomically (`upgradeToAndCall`) and proves the victim can withdraw all principal.
-contract LiquidityMiningReconcileIL8156Test is Test {
+/// three legacy pools atomically (`upgradeToAndCall`) and proves the account can withdraw all principal.
+contract LiquidityMiningReconcileLegacyPoolsTest is Test {
     uint256 internal constant FORK_BLOCK = 25_881_574;
 
     address internal constant LM = 0xCC3Fc4C9Ba7f8b8aA433Bc586D390A70560FF366;
@@ -25,7 +25,7 @@ contract LiquidityMiningReconcileIL8156Test is Test {
     address internal constant IP_USDT = 0x9Bd2177027edEE300DC9F1fb88F24DB6e5e1edC6;
 
     /// @dev deficit = sum(round(powerUp_i * lpTokenBalance_i / 1e18)) - aggregatedPowerUp, measured at FORK_BLOCK
-    /// with ipor-immunefi-reports/.../tools/apu_bisect.py (constant since block 16627821, see IL-8156)
+    /// (constant since block 16627821)
     uint256 internal constant DELTA_DAI = 5_190_306_735_875_255_544_747;
     uint256 internal constant DELTA_USDC = 28_454_371_127_407_923_331_918;
     uint256 internal constant DELTA_USDT = 638_630_366_113_229_344_754;

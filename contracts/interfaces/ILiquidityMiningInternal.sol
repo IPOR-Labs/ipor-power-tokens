@@ -76,7 +76,7 @@ interface ILiquidityMiningInternal {
         LiquidityMiningTypes.PoolPowerUpModifier[] memory modifiers
     ) external;
 
-    /// @notice One-off reconciliation of the per-pool `aggregatedPowerUp` (IL-8156).
+    /// @notice One-off reconciliation of the per-pool `aggregatedPowerUp`.
     /// @dev Restores the invariant `aggregatedPowerUp == sum(round(powerUp_i * lpTokenBalance_i / 1e18))`
     /// broken in Feb 2023 by a short-lived implementation whose claim() rewrote account power-ups without updating the aggregate.
     /// Owner-only, executed once, atomically with the implementation upgrade (`upgradeToAndCall`), guarded by `reinitializer(2)`.
@@ -100,7 +100,7 @@ interface ILiquidityMiningInternal {
     /// @param lpTokenAmount of lpTokens to unstake, represented with 18 decimals
     event LpTokensUnstaked(address account, address lpToken, uint256 lpTokenAmount);
 
-    /// @notice Emitted when the aggregated power-up of a pool is reconciled (IL-8156)
+    /// @notice Emitted when the aggregated power-up of a pool is reconciled
     /// @param lpToken address of the pool
     /// @param previousAggregatedPowerUp aggregated power-up before reconciliation, 18 decimals
     /// @param newAggregatedPowerUp aggregated power-up after reconciliation, 18 decimals

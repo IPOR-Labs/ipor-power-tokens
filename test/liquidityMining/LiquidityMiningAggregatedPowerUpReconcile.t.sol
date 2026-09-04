@@ -9,7 +9,7 @@ import "@power-tokens/contracts/interfaces/IPowerTokenFlowsService.sol";
 import "@power-tokens/contracts/interfaces/ILiquidityMiningInternal.sol";
 import "@power-tokens/contracts/libraries/errors/Errors.sol";
 
-/// @notice IL-8156: an under-counted `aggregatedPowerUp` must never block withdrawal of lpToken principal,
+/// @notice An under-counted `aggregatedPowerUp` must never block withdrawal of lpToken principal,
 /// and the owner can reconcile the aggregate once, atomically with the upgrade.
 contract LiquidityMiningAggregatedPowerUpReconcileTest is TestCommons {
     event AggregatedPowerUpReconciled(

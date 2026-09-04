@@ -125,7 +125,7 @@ contract MiningCalculationTest is TestCommons {
     }
 
     function testShouldClampToZeroWhenAggregatePowerUpWouldBeNegative() external {
-        // given: account contribution drops by 9_100e18 but the aggregate only holds 900e18 (IL-8156 deficit)
+        // given: account contribution drops by 9_100e18 but the aggregate only holds 900e18 (under-counted aggregate)
         uint256 accountPowerUp = 900e18;
         uint256 accountLpTokenAmount = 1e18;
         uint256 previousAccountPowerUp = 1_000e18;
