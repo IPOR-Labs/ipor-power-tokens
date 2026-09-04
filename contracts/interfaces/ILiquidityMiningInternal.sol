@@ -76,6 +76,15 @@ interface ILiquidityMiningInternal {
         LiquidityMiningTypes.PoolPowerUpModifier[] memory modifiers
     ) external;
 
+    /// @notice One-off reconciliation of the per-pool `aggregatedPowerUp` (IL-8156).
+    /// @dev Restores the invariant `aggregatedPowerUp == sum(round(powerUp_i * lpTokenBalance_i / 1e18))`
+    /// broken in Feb 2023 by a short-lived implementation whose claim() rewrote account power-ups without updating the aggregate.
+    /// Owner-only, executed once, atomically with the implementation upgrade (`upgradeToAndCall`), guarded by `reinitializer(2)`.
+    /// Rewards accrued up to the current block are settled with the old aggregate before the new one is stored.
+    /// @param lpTokens pools to reconcile
+    /// @param deltas amount to ADD to each pool's aggregatedPowerUp, 18 decimals (deficit = sum of stored contributions - stored aggregate)
+    function reconcileAggregatedPowerUp(address[] calldata lpTokens, uint256[] calldata deltas) external;
+
     /// @notice Gets the pool power-up modifiers for a given LP token.
     /// @param lpToken The address of the LP token for which the pool power-up modifiers are retrieved.
     /// @return pwTokenModifier The power-up token modifier.
@@ -90,6 +99,16 @@ interface ILiquidityMiningInternal {
     /// @param lpToken address of lpToken being unstaked
     /// @param lpTokenAmount of lpTokens to unstake, represented with 18 decimals
     event LpTokensUnstaked(address account, address lpToken, uint256 lpTokenAmount);
+
+    /// @notice Emitted when the aggregated power-up of a pool is reconciled (IL-8156)
+    /// @param lpToken address of the pool
+    /// @param previousAggregatedPowerUp aggregated power-up before reconciliation, 18 decimals
+    /// @param newAggregatedPowerUp aggregated power-up after reconciliation, 18 decimals
+    event AggregatedPowerUpReconciled(
+        address lpToken,
+        uint256 previousAggregatedPowerUp,
+        uint256 newAggregatedPowerUp
+    );
 
     /// @notice Emitted when the LiquidityMining's Owner changes the `rewards per block`
     /// @param lpToken address of lpToken for which the `rewards per block` is changed

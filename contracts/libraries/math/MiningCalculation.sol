@@ -11,13 +11,25 @@ library MiningCalculation {
     using SafeCast for uint256;
     using SafeCast for int256;
 
+    /// @dev Aggregated power-up values below this threshold (in wei, 18 decimals) are treated as rounding dust and flushed to 0.
+    uint256 internal constant AGGREGATED_POWER_UP_DUST = 10_000;
+
     /// @notice Calculates the aggreagated power-up. Aggregate power-up is a synthetic summary of all power-ups across all users.
     /// It's used to calculate the individual rewards in relation to the rest of the pool.
+    /// @dev Invariant maintained by this function (per pool):
+    ///      aggregatedPowerUp == sum over accounts of round(powerUp_i * lpTokenBalance_i / 1e18)
+    ///      up to rounding (each rebalance can lose < 1 wei; the last unstake flushes dust below `AGGREGATED_POWER_UP_DUST` to 0).
+    ///      The invariant holds only if every write of an account's `powerUp` goes through `_rebalanceIndicators`.
+    ///      If the stored aggregate is ever lower than the sum of the stored account contributions (see IL-8156:
+    ///      a 2023 implementation wrote `powerUp` on claim without updating the aggregate), the subtraction is clamped to 0
+    ///      instead of reverting: lpToken principal must always be withdrawable; rewards on such a pool may only
+    ///      under-accrue until the aggregate is reconciled (see {LiquidityMiningInternal.reconcileAggregatedPowerUp}).
     /// @param accountPowerUp power up indicator is calculated for a given account
     /// @param accountLpTokenAmount lpToken amount for a given account
     /// @param previousAccountPowerUp previous power-up indicator for a given account
     /// @param previousAccountLpTokenAmount previous lpToken amount for a given account
     /// @param previousAggregatedPowerUp previous aggregated power-up indicator
+    /// @return aggregated power-up indicator, never reverts on an under-counted aggregate
     function calculateAggregatedPowerUp(
         uint256 accountPowerUp,
         uint256 accountLpTokenAmount,
@@ -35,22 +47,15 @@ library MiningCalculation {
         if (apu < 0) {
             uint256 absApu = MathOperation.division((-apu).toUint256(), 1e18);
 
-            /// @dev the last unstaking of lpTokens can experience a rounding error
-            if (previousAggregatedPowerUp < absApu && previousAggregatedPowerUp + 10000 >= absApu) {
-                return 0;
-            }
-
-            require(
-                previousAggregatedPowerUp >= absApu,
-                Errors.AGGREGATE_POWER_UP_COULD_NOT_BE_NEGATIVE
-            );
-
-            newApu = previousAggregatedPowerUp - absApu;
+            /// @dev clamp instead of revert: an under-counted aggregate (rounding or a historical accounting defect)
+            /// must never block withdrawal of lpToken principal
+            newApu = previousAggregatedPowerUp > absApu ? previousAggregatedPowerUp - absApu : 0;
         } else {
             newApu = previousAggregatedPowerUp + MathOperation.division(apu.toUint256(), 1e18);
         }
 
-        if (newApu < 10000) {
+        /// @dev flush rounding dust so that a fully drained pool reports exactly 0 (no stakers)
+        if (newApu < AGGREGATED_POWER_UP_DUST) {
             return 0;
         }
         return newApu;
