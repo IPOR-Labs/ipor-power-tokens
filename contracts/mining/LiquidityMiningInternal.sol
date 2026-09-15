@@ -88,7 +88,22 @@ abstract contract LiquidityMiningInternal is
     }
 
     function getVersion() external pure override returns (uint256) {
-        return 2_002;
+        return 2_003;
+    }
+
+    function reconcileAggregatedPowerUp(
+        address[] calldata lpTokens,
+        uint256[] calldata deltas
+    ) external override onlyOwner reinitializer(2) {
+        uint256 length = lpTokens.length;
+        require(length == deltas.length, Errors.INPUT_ARRAYS_LENGTH_MISMATCH);
+
+        for (uint256 i; i != length; ) {
+            _reconcileAggregatedPowerUp(lpTokens[i], deltas[i]);
+            unchecked {
+                ++i;
+            }
+        }
     }
 
     function isLpTokenSupported(address lpToken) external view override returns (bool) {
@@ -358,6 +373,60 @@ abstract contract LiquidityMiningInternal is
         );
 
         emit RewardsPerBlockChanged(lpToken, pwTokenAmount);
+    }
+
+    /// @dev Settles rewards up to the current block with the old aggregate, then stores `aggregatedPowerUp + delta`
+    /// and the composite multiplier recomputed for the new aggregate. Mirrors the accrual path of {_setRewardsPerBlock}.
+    function _reconcileAggregatedPowerUp(address lpToken, uint256 delta) internal {
+        require(_lpTokens[lpToken], Errors.LP_TOKEN_NOT_SUPPORTED);
+        require(delta > 0, Errors.VALUE_NOT_GREATER_THAN_ZERO);
+
+        LiquidityMiningTypes.GlobalRewardsIndicators memory globalIndicators = _globalIndicators[
+            lpToken
+        ];
+        uint256 blockNumber = block.number;
+
+        uint256 accruedCompositeMultiplierCumulativePrevBlock = MiningCalculation
+            .calculateAccruedCompMultiplierCumulativePrevBlock(
+                blockNumber,
+                globalIndicators.blockNumber,
+                globalIndicators.compositeMultiplierInTheBlock,
+                globalIndicators.compositeMultiplierCumulativePrevBlock
+            );
+
+        uint256 accruedRewards;
+        if (globalIndicators.aggregatedPowerUp != 0) {
+            accruedRewards = MiningCalculation.calculateAccruedRewards(
+                blockNumber.toUint32(),
+                globalIndicators.blockNumber,
+                globalIndicators.rewardsPerBlock,
+                globalIndicators.accruedRewards
+            );
+        } else {
+            accruedRewards = globalIndicators.accruedRewards;
+        }
+
+        uint256 newAggregatedPowerUp = globalIndicators.aggregatedPowerUp + delta;
+
+        uint256 compositeMultiplier = MiningCalculation.calculateCompositeMultiplier(
+            globalIndicators.rewardsPerBlock,
+            newAggregatedPowerUp
+        );
+
+        _globalIndicators[lpToken] = LiquidityMiningTypes.GlobalRewardsIndicators(
+            newAggregatedPowerUp,
+            compositeMultiplier.toUint128(),
+            accruedCompositeMultiplierCumulativePrevBlock.toUint128(),
+            blockNumber.toUint32(),
+            globalIndicators.rewardsPerBlock,
+            accruedRewards.toUint88()
+        );
+
+        emit AggregatedPowerUpReconciled(
+            lpToken,
+            globalIndicators.aggregatedPowerUp,
+            newAggregatedPowerUp
+        );
     }
 
     /// @notice Gets Horizontal shift param used in Liquidity Mining equations.
